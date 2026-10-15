@@ -1,0 +1,78 @@
+// 本機靜態伺服器，沒有任何相依套件。
+// 用法：node scripts/serve.mjs [port]    （預設 5173，傳 0 會自動挑一個空的 port）
+import { createServer } from "node:http";
+import { readFile, stat } from "node:fs/promises";
+import { extname, join, normalize, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
+
+const TYPES = {
+  ".html": "text/html; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".json": "application/json; charset=utf-8",
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".ico": "image/x-icon",
+  ".mp3": "audio/mpeg",
+  ".txt": "text/plain; charset=utf-8",
+};
+
+// 不對外提供的路徑：程式碼以外的東西不該被瀏覽器讀到。
+const HIDDEN = ["node_modules", ".git", "scripts", "tests", "package.json", "package-lock.json"];
+
+export function startServer(port = 5173) {
+  const server = createServer(async (req, res) => {
+    try {
+      const url = new URL(req.url, "http://localhost");
+      let pathname = decodeURIComponent(url.pathname);
+      const target = normalize(join(root, pathname));
+
+      // 擋掉 ../ 跳出專案資料夾的路徑
+      if (target !== root && !target.startsWith(root + sep)) {
+        res.writeHead(403).end("Forbidden");
+        return;
+      }
+      const first = target.slice(root.length + 1).split(sep)[0];
+      if (HIDDEN.includes(first)) {
+        res.writeHead(404).end("Not found");
+        return;
+      }
+
+      let filePath = target;
+      const info = await stat(filePath).catch(() => null);
+      if (info && info.isDirectory()) {
+        if (!pathname.endsWith("/")) {
+          res.writeHead(301, { Location: pathname + "/" + url.search }).end();
+          return;
+        }
+        filePath = join(filePath, "index.html");
+      }
+
+      const body = await readFile(filePath);
+      res.writeHead(200, {
+        "Content-Type": TYPES[extname(filePath)] || "application/octet-stream",
+        "Cache-Control": "no-store",
+      });
+      res.end(body);
+    } catch (error) {
+      res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" }).end("Not found");
+    }
+  });
+
+  return new Promise((resolveStart) => {
+    server.listen(port, "127.0.0.1", () => resolveStart(server));
+  });
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const port = process.argv[2] !== undefined ? Number(process.argv[2]) : 5173;
+  const server = await startServer(port);
+  const actual = server.address().port;
+  console.log("候補頁本機預覽：");
+  console.log(`  http://127.0.0.1:${actual}/listening/?src=local`);
+  console.log(`  http://127.0.0.1:${actual}/fluency/?src=local`);
+  console.log("按 Ctrl+C 結束。");
+}

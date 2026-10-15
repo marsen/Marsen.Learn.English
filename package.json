@@ -1,0 +1,18 @@
+{
+  "name": "marsen-learn-english",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "兩個靜態候補頁（聽力練習、英文流利度練習），用來驗證有沒有人願意留 email。",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "check": "node scripts/check.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "jsdom": "^26.0.0"
+  }
+}
