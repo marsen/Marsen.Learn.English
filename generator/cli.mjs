@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { draw, DrawError } from "./draw.mjs";
 import { validate } from "./validate.mjs";
 import { buildPaper } from "./paper.mjs";
+import { renderPreview } from "./preview.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const readJson = (p) => JSON.parse(readFileSync(p, "utf8"));
@@ -26,7 +27,15 @@ if (cmd === "draw") {
   try {
     const skeleton = draw({ seed, topics, recipes, profile, variantId: flag("variant"), previousRecipe: flag("previous-recipe", null) });
     const out = flag("out");
-    if (out) { mkdirSync(out, { recursive: true }); writeFileSync(join(out, "skeleton.json"), JSON.stringify(skeleton, null, 2) + "\n"); }
+    if (out) {
+      mkdirSync(out, { recursive: true });
+      const topic = topics.find((t) => t.id === skeleton.topic);
+      const paper = buildPaper({ topic, skeleton });
+      writeFileSync(join(out, "skeleton.json"), JSON.stringify(skeleton, null, 2) + "\n");
+      writeFileSync(join(out, "paper.json"), JSON.stringify(paper, null, 2) + "\n");
+      writeFileSync(join(out, "preview.html"), renderPreview({ paper, skeleton }));
+      console.error(`已寫入 ${out}/skeleton.json、paper.json、preview.html`);
+    }
     console.log(JSON.stringify(skeleton, null, 2));
   } catch (e) {
     if (e instanceof DrawError) { console.error(`${e.code}: ${e.message}`); process.exit(2); }
@@ -40,6 +49,14 @@ if (cmd === "draw") {
   const paper = buildPaper({ topic, plan });
   writeFileSync(join(dir, "paper.json"), JSON.stringify(paper, null, 2) + "\n");
   console.log(JSON.stringify(paper, null, 2));
+} else if (cmd === "preview") {
+  const dir = resolve(rest[0]);
+  const load = (n) => (existsSync(join(dir, n)) ? readJson(join(dir, n)) : undefined);
+  const { topics } = loadContent();
+  const skeleton = load("skeleton.json");
+  const paper = load("paper.json") ?? buildPaper({ topic: topics.find((t) => t.id === skeleton.topic), skeleton });
+  writeFileSync(join(dir, "preview.html"), renderPreview({ paper, skeleton, plan: load("plan.json"), script: load("script.json") }));
+  console.log(`已寫入 ${join(dir, "preview.html")}`);
 } else if (cmd === "validate") {
   const dir = resolve(rest[0] ?? ".");
   const { topics, recipes, profile } = loadContent();
@@ -51,5 +68,5 @@ if (cmd === "draw") {
   console.log(result.ok ? "通過（沒有「擋」級問題）" : "未通過");
   process.exit(result.ok ? 0 : 1);
 } else {
-  console.log("用法：\n  node generator/cli.mjs draw --seed 42 [--variant student] [--out content/sets/<id>]\n  node generator/cli.mjs paper <set 資料夾>\n  node generator/cli.mjs validate <set 資料夾>");
+  console.log("用法：\n  node generator/cli.mjs draw --seed 42 [--variant student] [--out content/sets/<id>]\n  node generator/cli.mjs paper <set 資料夾>\n  node generator/cli.mjs preview <set 資料夾>   產生 preview.html\n  node generator/cli.mjs validate <set 資料夾>");
 }

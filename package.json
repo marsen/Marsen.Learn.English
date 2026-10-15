@@ -9,7 +9,8 @@
     "check": "node scripts/check.mjs",
     "test": "node --test",
     "draw": "node generator/cli.mjs draw",
-    "validate": "node generator/cli.mjs validate tests/fixtures/good-0001"
+    "validate": "node generator/cli.mjs validate tests/fixtures/good-0001",
+    "preview": "node generator/cli.mjs preview tests/fixtures/good-0001"
   },
   "engines": {
     "node": ">=20"
