@@ -217,11 +217,97 @@
     });
   }
 
+  // ---- 標題輪播 ---------------------------------------------------------
+  // 沒有 JS 時三個標題會直接堆疊顯示；有 JS 時一次顯示一個。
+  // 自動換頁只在使用者沒有開啟「減少動態效果」時啟用，滑鼠移上去或鍵盤聚焦會暫停，
+  // 只要使用者自己按過一次就永遠不再自動換。
+
+  const AUTOPLAY_MS = 6000;
+
+  function initCarousel(root) {
+    const slides = Array.from(root.querySelectorAll("[data-slide]"));
+    if (slides.length < 2) return;
+
+    const reducedMotion = Boolean(
+      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    );
+    let index = Math.max(0, slides.findIndex((slide) => slide.classList.contains("is-active")));
+    let timer = null;
+    let stopped = false;
+
+    const controls = document.createElement("div");
+    controls.className = "carousel-controls";
+
+    function makeButton(className, label, text) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = className;
+      button.setAttribute("aria-label", label);
+      if (text) button.textContent = text;
+      return button;
+    }
+
+    const prev = makeButton("carousel-btn", "上一個標題", "‹");
+    const next = makeButton("carousel-btn", "下一個標題", "›");
+    const dots = slides.map((_, i) =>
+      makeButton("carousel-dot", "第 " + (i + 1) + " 個標題，共 " + slides.length + " 個")
+    );
+
+    function show(target) {
+      index = (target + slides.length) % slides.length;
+      slides.forEach((slide, i) => slide.classList.toggle("is-active", i === index));
+      dots.forEach((dot, i) => dot.setAttribute("aria-current", i === index ? "true" : "false"));
+      root.dataset.current = String(index + 1);
+    }
+
+    function pause() {
+      if (timer === null) return;
+      window.clearInterval(timer);
+      timer = null;
+    }
+
+    function start() {
+      if (reducedMotion || stopped || timer !== null) return;
+      timer = window.setInterval(() => show(index + 1), AUTOPLAY_MS);
+    }
+
+    function takeOver(target, via) {
+      stopped = true;
+      pause();
+      root.setAttribute("aria-live", "polite");
+      show(target);
+      track("headline_change", { to: index + 1, via });
+    }
+
+    prev.addEventListener("click", () => takeOver(index - 1, "prev"));
+    next.addEventListener("click", () => takeOver(index + 1, "next"));
+    dots.forEach((dot, i) => dot.addEventListener("click", () => takeOver(i, "dot")));
+
+    root.addEventListener("mouseenter", pause);
+    root.addEventListener("mouseleave", start);
+    root.addEventListener("focusin", pause);
+    root.addEventListener("focusout", start);
+    document.addEventListener("visibilitychange", () => (document.hidden ? pause() : start()));
+
+    const dotList = document.createElement("div");
+    dotList.className = "carousel-dots";
+    dots.forEach((dot) => dotList.appendChild(dot));
+    controls.append(prev, dotList, next);
+    root.appendChild(controls);
+
+    root.setAttribute("aria-live", "off");
+    show(index);
+    start();
+  }
+
+  document.querySelectorAll("[data-carousel]").forEach(initCarousel);
+
   // ---- 按鈕與頁面雜項 ---------------------------------------------------
 
   document.querySelectorAll('[data-track="cta"]').forEach((el) => {
     el.addEventListener("click", () => {
-      track("cta_click");
+      const carousel = document.querySelector("[data-carousel]");
+      track("cta_click", carousel ? { headline: Number(carousel.dataset.current) || 1 } : undefined);
       const emailInput = form && form.elements.namedItem("email");
       if (emailInput) setTimeout(() => emailInput.focus({ preventScroll: true }), 0);
     });

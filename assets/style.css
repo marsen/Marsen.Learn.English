@@ -1,18 +1,20 @@
 /* 候補頁共用樣式。兩個頁面用同一份，確保對照測試只差在題材。
-   視覺概念：考卷的作答欄。表單做成有編號、虛線底線的作答區，
-   游標移進去時像螢光筆畫過；其餘部分刻意保持安靜。 */
+   視覺概念：精緻、安靜。襯線標題配細線，玫瑰色只用在需要被看到的地方。 */
+
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&display=swap");
 
 :root {
   color-scheme: light;
 
-  --paper: #f8f9fb;
-  --sheet: #ffffff;
-  --ink: #1c2430;
-  --ink-soft: #4a5565;
-  --line: #c9cfd9;
-  --pen: #2848c8;
-  --pen-dark: #1d36a0;
-  --mark: #fff0a3;
+  --paper: #fbf8f8;
+  --card: #ffffff;
+  --ink: #2b1d26;
+  --ink-soft: #6e5c66;
+  --line: #e9dde2;
+  --rose: #b4476a;
+  --rose-dark: #8f3354;
+  --rose-wash: #f6e8ed;
+  --mark: #fbe9ef;
   --error: #b3261e;
 
   --todo-bg: #fff6db;
@@ -22,8 +24,9 @@
   --serif: "Noto Serif TC", "Source Han Serif TC", "Songti TC", "PMingLiU", serif;
   --sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", "Heiti TC", system-ui, sans-serif;
 
-  --measure: 40rem;
+  --measure: 58rem;
   --gutter: 1.25rem;
+  --round: 8px;
 }
 
 *,
@@ -45,6 +48,7 @@ body {
   font-family: var(--sans);
   font-size: 1.0625rem;
   line-height: 1.85;
+  overflow-x: hidden;
 }
 
 .wrap {
@@ -54,17 +58,35 @@ body {
   padding-inline: var(--gutter);
 }
 
-/* ---- 區塊節奏：區塊之間用作答欄的虛線分隔 ---- */
+/* ---- 首屏：留白與大標題。標題下方一條細線，這是整頁唯一的裝飾 ---- */
+
+#hero {
+  padding-block: 5rem 4rem;
+}
+
+#hero::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 2px;
+  margin-top: 3rem;
+  background: var(--rose);
+}
+
+#hero .lede {
+  max-width: 30rem;
+  color: var(--ink-soft);
+}
+
+/* ---- 區塊：左邊小標題，右邊內容；窄螢幕再疊起來 ---- */
 
 .section {
   padding-block: 3rem;
-  border-top: 2px dotted var(--line);
+  border-top: 1px solid var(--line);
 }
 
-.section:first-child,
 #hero {
   border-top: 0;
-  padding-top: 4rem;
 }
 
 h1,
@@ -76,13 +98,16 @@ h2 {
 }
 
 h1 {
-  font-size: clamp(1.85rem, 5.2vw, 2.6rem);
-  line-height: 1.4;
+  max-width: 19em;
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  text-wrap: balance;
 }
 
 h2 {
-  font-size: 1.4rem;
-  line-height: 1.5;
+  font-size: 1.15rem;
+  line-height: 1.6;
 }
 
 p {
@@ -90,8 +115,31 @@ p {
 }
 
 .lede {
-  color: var(--ink-soft);
-  font-size: 1.125rem;
+  font-size: 1.1rem;
+}
+
+@media (min-width: 46rem) {
+  .section:not(#hero):not(#waitlist) {
+    display: grid;
+    grid-template-columns: 11rem minmax(0, 1fr);
+    column-gap: 2.5rem;
+    align-items: start;
+  }
+
+  .section:not(#hero):not(#waitlist) > h2 {
+    grid-column: 1;
+    margin: 0;
+  }
+
+  .section:not(#hero):not(#waitlist) > :not(h2) {
+    grid-column: 2;
+    max-width: 38rem;
+  }
+
+  #waitlist .sheet {
+    max-width: 38rem;
+    margin-left: 13.5rem;
+  }
 }
 
 ul,
@@ -101,24 +149,117 @@ ol {
   list-style: none;
 }
 
+/* ---- 首屏標題輪播 ----
+   沒有 JS 時三個標題直接堆疊；有 JS（<html class="js">）時疊在同一格，
+   一次只顯示一個，容器高度由最長的那個撐住，換頁時版面不會跳動。 */
+
+.carousel-title .slide {
+  display: block;
+}
+
+html:not(.js) .carousel-title .slide + .slide {
+  margin-top: 1rem;
+}
+
+.js .carousel-title {
+  display: grid;
+}
+
+.js .carousel-title .slide {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.35s ease, visibility 0s linear 0.35s;
+}
+
+.js .carousel-title .slide.is-active {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.35s ease, visibility 0s;
+}
+
+.carousel-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 1.5rem;
+}
+
+html:not(.js) .carousel-controls {
+  display: none;
+}
+
+.carousel-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--ink-soft);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.carousel-btn:hover {
+  border-color: var(--rose);
+  color: var(--rose);
+}
+
+.carousel-dots {
+  display: flex;
+  gap: 0.1rem;
+}
+
+/* 點擊範圍 1.5rem，看得見的圓點只有 0.55rem */
+.carousel-dot {
+  position: relative;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.carousel-dot::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin: -0.275rem 0 0 -0.275rem;
+  border: 1px solid var(--ink-soft);
+  border-radius: 50%;
+}
+
+.carousel-dot[aria-current="true"]::before {
+  border-color: var(--rose);
+  background: var(--rose);
+}
+
 /* ---- 按鈕 ---- */
 
 .btn {
   display: inline-block;
-  padding: 0.7rem 1.4rem;
+  padding: 0.75rem 1.8rem;
   border: 0;
-  border-radius: 6px;
-  background: var(--pen);
+  border-radius: 999px;
+  background: var(--ink);
   color: #fff;
   font: inherit;
-  font-weight: 700;
+  letter-spacing: 0.04em;
   line-height: 1.4;
   text-decoration: none;
   cursor: pointer;
+  transition: background 0.2s ease;
 }
 
 .btn:hover {
-  background: var(--pen-dark);
+  background: var(--rose-dark);
 }
 
 .btn:disabled {
@@ -127,31 +268,38 @@ ol {
 }
 
 :focus-visible {
-  outline: 3px solid var(--ink);
+  outline: 2px solid var(--rose);
   outline-offset: 3px;
   border-radius: 4px;
 }
 
-/* ---- 好處清單與步驟 ---- */
+/* ---- 好處清單與步驟：細線隔開的條列 ---- */
 
-.benefits li + li {
-  margin-top: 0.75rem;
+.benefits li,
+.steps li {
+  padding-block: 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.benefits li:first-child,
+.steps li:first-child {
+  border-top: 1px solid var(--line);
 }
 
 .benefits li {
-  padding-left: 1.25rem;
   position: relative;
+  padding-left: 1.5rem;
 }
 
 .benefits li::before {
   content: "";
   position: absolute;
-  left: 0;
-  top: 0.95em;
-  width: 0.5rem;
-  height: 0.5rem;
+  left: 0.15rem;
+  top: 1.65em;
+  width: 0.4rem;
+  height: 0.4rem;
   border-radius: 50%;
-  background: var(--pen);
+  background: var(--rose);
 }
 
 /* 步驟是真正的先後順序，所以這裡才用編號 */
@@ -165,42 +313,37 @@ ol {
   padding-left: 2.75rem;
 }
 
-.steps li + li {
-  margin-top: 1rem;
-}
-
 .steps li::before {
   content: counter(step);
   position: absolute;
   left: 0;
-  top: 0.15em;
-  width: 1.9rem;
-  height: 1.9rem;
-  border: 1.5px solid var(--pen);
-  border-radius: 50%;
-  color: var(--pen);
+  top: 0.8rem;
+  color: var(--rose);
+  font-family: var(--serif);
+  font-size: 1.4rem;
   font-weight: 700;
-  line-height: 1.7rem;
-  text-align: center;
+  line-height: 1.7;
 }
 
-/* ---- 作答欄式表單：整頁唯一的記憶點 ---- */
+/* ---- 作答欄式表單 ---- */
 
 .sheet {
-  background: var(--sheet);
-  border: 1.5px solid var(--ink);
+  background: var(--card);
+  border: 1px solid var(--ink);
+  border-radius: var(--round);
+  overflow: hidden;
 }
 
 .sheet-head {
   margin: 0;
-  padding: 0.7rem 1rem;
-  border-bottom: 1.5px solid var(--ink);
-  font-family: var(--serif);
-  font-size: 1.2rem;
+  padding: 0.8rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+  background: var(--rose-wash);
+  font-size: 1.1rem;
 }
 
 .sheet-body {
-  padding: 0.5rem 1rem 1.25rem;
+  padding: 0.5rem 1.25rem 1.5rem;
 }
 
 .notice {
@@ -211,20 +354,20 @@ ol {
 
 .answer {
   display: grid;
-  grid-template-columns: 2.25rem 1fr;
+  grid-template-columns: 2rem 1fr;
   column-gap: 0.5rem;
   align-items: end;
-  padding-block: 0.9rem 0.4rem;
+  padding-block: 0.9rem 0.2rem;
 }
 
 .answer-num {
   grid-row: 1 / span 2;
   align-self: end;
-  padding-bottom: 0.45rem;
+  padding-bottom: 0.55rem;
   font-family: var(--serif);
+  font-size: 1.25rem;
   font-weight: 700;
-  font-size: 1.3rem;
-  color: var(--pen);
+  color: var(--rose);
 }
 
 .answer label {
@@ -237,11 +380,10 @@ ol {
 .answer select {
   grid-column: 2;
   width: 100%;
-  padding: 0.35rem 0.25rem;
-  border: 0;
-  border-bottom: 2px dotted var(--ink-soft);
-  border-radius: 0;
-  background: transparent;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--paper);
   color: var(--ink);
   font: inherit;
   line-height: 1.6;
@@ -250,13 +392,12 @@ ol {
 .answer input:focus,
 .answer select:focus {
   outline: none;
-  border-bottom-style: solid;
-  border-bottom-color: var(--pen);
+  border-color: var(--rose);
   background: var(--mark);
 }
 
 .answer input[aria-invalid="true"] {
-  border-bottom-color: var(--error);
+  border-color: var(--error);
 }
 
 .form-actions {
@@ -321,7 +462,7 @@ ol {
   position: absolute;
   right: 0.25rem;
   top: 0.7rem;
-  color: var(--pen);
+  color: var(--rose);
   font-size: 1.4rem;
   line-height: 1.4;
 }
@@ -331,6 +472,7 @@ ol {
 }
 
 .faq .answer-text {
+  margin: 0;
   padding: 0 0 1rem;
   color: var(--ink-soft);
 }
@@ -339,7 +481,7 @@ ol {
 
 .site-footer {
   padding-block: 2rem 4rem;
-  border-top: 2px dotted var(--line);
+  border-top: 1px solid var(--line);
   color: var(--ink-soft);
   font-size: 0.9rem;
 }
@@ -360,6 +502,7 @@ ol {
 
 h1[data-todo],
 h2[data-todo] {
+  max-width: none;
   font-family: var(--sans);
   font-size: 1rem;
   font-weight: 400;
@@ -381,18 +524,23 @@ h2[data-todo] {
 }
 
 @media (max-width: 30rem) {
-  .section,
-  #hero {
+  .section {
     padding-block: 2.25rem;
   }
 
   #hero {
-    padding-top: 2.75rem;
+    padding-top: 3rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .js .carousel-title .slide,
+  .js .carousel-title .slide.is-active,
+  .btn {
+    transition: none;
   }
 }

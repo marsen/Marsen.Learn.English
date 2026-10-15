@@ -45,10 +45,23 @@ function finish(dir) {
 test("目前的草稿不能上線，而且會列出原因", () => {
   const { code, out } = run(repo);
   assert.equal(code, 1);
-  assert.match(out, /待填區塊/);
   assert.match(out, /formEndpoint/);
   assert.match(out, /統計服務/);
   assert.match(out, /title.*草稿|草稿.*title/i);
+});
+
+test("頁面上留著 data-todo 就不能上線", () => {
+  const dir = fixture();
+  try {
+    finish(dir);
+    const file = join(dir, "fluency", "index.html");
+    writeFileSync(file, readFileSync(file, "utf8").replace("<h2>現在的練習方式</h2>", '<h2 data-todo>待填</h2>'));
+    const { code, out } = run(dir);
+    assert.equal(code, 1);
+    assert.match(out, /待填區塊/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test("補齊之後可以通過", () => {

@@ -14,7 +14,7 @@ before(async () => {
 
 after(() => server.close());
 
-async function open(path, { fetchImpl } = {}) {
+async function open(path, { fetchImpl, reducedMotion = false } = {}) {
   const dom = await JSDOM.fromURL(base + path, {
     runScripts: "dangerously",
     resources: "usable",
@@ -22,6 +22,18 @@ async function open(path, { fetchImpl } = {}) {
     beforeParse(window) {
       window.fetch = fetchImpl || (async () => ({ ok: true }));
       window.console.debug = () => {};
+      // jsdom 沒有 matchMedia。這裡補上，並把計時器換成可手動觸發的版本：
+      // 測試不用真的等 6 秒，也不會有計時器卡住讓測試程序無法結束。
+      window.matchMedia = (query) => ({
+        matches: reducedMotion && /reduce/.test(query),
+        addEventListener() {},
+        removeEventListener() {},
+      });
+      const timers = (window.__timers = []);
+      window.setInterval = (fn, ms) => timers.push({ fn, ms }) - 1;
+      window.clearInterval = (id) => {
+        timers[id] = null;
+      };
     },
   });
   await new Promise((resolve) => {
@@ -52,7 +64,11 @@ for (const page of ["listening", "fluency"]) {
     assert.equal(document.body.dataset.page, page);
     const bar = document.querySelector(".devbar");
     assert.ok(bar, "草稿提示列應該出現");
-    assert.match(bar.textContent, /待填區塊/);
+    // 提示列要如實反映頁面狀態：還有待填區塊才提醒，填完了就不該再說有。
+    const html = await (await fetch(base + `/${page}/`)).text();
+    const todos = (html.match(/data-todo/g) || []).length;
+    if (todos > 0) assert.match(bar.textContent, new RegExp(`還有 ${todos} 個待填區塊`));
+    else assert.doesNotMatch(bar.textContent, /待填/);
     assert.match(bar.textContent, /本機測試模式/);
   });
 
@@ -183,4 +199,132 @@ test("本機伺服器不提供程式碼以外的檔案，也擋路徑跳脫", as
   const ok = await fetch(base + "/listening/");
   assert.equal(ok.status, 200);
   assert.match(ok.headers.get("content-type"), /text\/html/);
+});
+
+// ---- 標題輪播 ---------------------------------------------------------------
+
+function slideState(dom) {
+  const slides = [...dom.window.document.querySelectorAll("[data-slide]")];
+  return slides.map((slide) => slide.classList.contains("is-active"));
+}
+
+function activeIndexes(dom) {
+  return slideState(dom).flatMap((on, i) => (on ? [i + 1] : []));
+}
+
+const liveTimers = (dom) => dom.window.__timers.filter(Boolean);
+
+test("輪播：三個標題、只有一個 h1、第一個預設顯示（沒有 JS 也看得到標題）", async () => {
+  const html = await (await fetch(base + "/listening/")).text();
+  assert.equal((html.match(/<h1\b/g) || []).length, 1);
+  assert.equal((html.match(/data-slide/g) || []).length, 3);
+  assert.equal((html.match(/class="slide is-active"/g) || []).length, 1);
+  assert.match(html, /給準備雅思的人/);
+  assert.match(html, /雅思聽力練習，題題都是新的/);
+  assert.match(html, /雅思聽力題做完了？/);
+});
+
+test("輪播：載入後建立控制列，圓點標示目前是哪一個", async () => {
+  const dom = await open("/listening/");
+  const { document } = dom.window;
+  assert.deepEqual(activeIndexes(dom), [1]);
+  assert.equal(document.querySelectorAll(".carousel-dot").length, 3);
+  assert.equal(document.querySelectorAll(".carousel-btn").length, 2);
+  const current = [...document.querySelectorAll(".carousel-dot")].map((d) => d.getAttribute("aria-current"));
+  assert.deepEqual(current, ["true", "false", "false"]);
+  assert.equal(document.querySelector("[data-carousel]").dataset.current, "1");
+  assert.match(document.querySelector(".carousel-dot").getAttribute("aria-label"), /第 1 個標題，共 3 個/);
+});
+
+test("輪播：上一個、下一個、圓點都能換頁，到頭會繞回來", async () => {
+  const dom = await open("/listening/");
+  const { document } = dom.window;
+  const click = (el) => el.dispatchEvent(new dom.window.Event("click", { bubbles: true }));
+  const [prev, next] = document.querySelectorAll(".carousel-btn");
+  const dots = document.querySelectorAll(".carousel-dot");
+
+  click(next);
+  assert.deepEqual(activeIndexes(dom), [2]);
+  click(next);
+  click(next);
+  assert.deepEqual(activeIndexes(dom), [1], "第 3 個再按下一個要回到第 1 個");
+  click(prev);
+  assert.deepEqual(activeIndexes(dom), [3], "第 1 個按上一個要到最後一個");
+  click(dots[1]);
+  assert.deepEqual(activeIndexes(dom), [2]);
+  assert.equal(dots[1].getAttribute("aria-current"), "true");
+  assert.equal(dots[2].getAttribute("aria-current"), "false");
+  assert.equal(document.querySelector("[data-carousel]").dataset.current, "2");
+  assert.equal(dom.window.__events.filter((e) => e.name === "headline_change").length, 5);
+  assert.equal(dom.window.__events.find((e) => e.name === "headline_change").props.via, "next");
+});
+
+test("輪播：自動換頁，滑鼠移上去暫停、移開恢復", async () => {
+  const dom = await open("/listening/");
+  const { document } = dom.window;
+  const root = document.querySelector("[data-carousel]");
+  assert.equal(liveTimers(dom).length, 1);
+  assert.equal(liveTimers(dom)[0].ms, 6000);
+
+  liveTimers(dom)[0].fn();
+  assert.deepEqual(activeIndexes(dom), [2], "計時器觸發後換到下一個");
+
+  root.dispatchEvent(new dom.window.Event("mouseenter"));
+  assert.equal(liveTimers(dom).length, 0, "滑鼠移上去就暫停");
+  root.dispatchEvent(new dom.window.Event("mouseleave"));
+  assert.equal(liveTimers(dom).length, 1, "移開後恢復");
+
+  root.dispatchEvent(new dom.window.Event("focusin", { bubbles: true }));
+  assert.equal(liveTimers(dom).length, 0, "鍵盤聚焦進來也暫停");
+});
+
+test("輪播：使用者自己按過一次之後，不會再自動換頁", async () => {
+  const dom = await open("/listening/");
+  const { document } = dom.window;
+  const root = document.querySelector("[data-carousel]");
+  document.querySelectorAll(".carousel-btn")[1].dispatchEvent(new dom.window.Event("click", { bubbles: true }));
+  assert.equal(liveTimers(dom).length, 0);
+  assert.equal(root.getAttribute("aria-live"), "polite");
+  root.dispatchEvent(new dom.window.Event("mouseleave"));
+  root.dispatchEvent(new dom.window.Event("focusout", { bubbles: true }));
+  assert.equal(liveTimers(dom).length, 0, "移開滑鼠或離開焦點都不能重新啟動自動換頁");
+});
+
+test("輪播：使用者開了「減少動態效果」就不自動換頁，但仍可手動切換", async () => {
+  const dom = await open("/listening/", { reducedMotion: true });
+  assert.equal(dom.window.__timers.length, 0);
+  document_click(dom, ".carousel-btn:last-of-type");
+  assert.deepEqual(activeIndexes(dom), [2]);
+});
+
+function document_click(dom, selector) {
+  dom.window.document.querySelector(selector).dispatchEvent(new dom.window.Event("click", { bubbles: true }));
+}
+
+test("輪播：按主按鈕時，記錄當下看到的是第幾個標題", async () => {
+  const dom = await open("/listening/");
+  const { document } = dom.window;
+  document.querySelectorAll(".carousel-btn")[1].dispatchEvent(new dom.window.Event("click", { bubbles: true }));
+  document.querySelector('[data-track="cta"]').dispatchEvent(new dom.window.Event("click", { bubbles: true }));
+  const cta = dom.window.__events.find((e) => e.name === "cta_click");
+  assert.equal(cta.props.headline, 2);
+});
+
+test("流利度頁也有同樣的三段輪播，按鈕事件帶標題編號", async () => {
+  const dom = await open("/fluency/");
+  const { document } = dom.window;
+  assert.equal(document.querySelectorAll("[data-slide]").length, 3);
+  assert.equal(document.querySelectorAll("h1").length, 1);
+  assert.equal(document.querySelectorAll(".carousel-controls").length, 1);
+  document.querySelector('[data-track="cta"]').dispatchEvent(new dom.window.Event("click", { bubbles: true }));
+  const cta = dom.window.__events.find((e) => e.name === "cta_click");
+  assert.equal(cta.props.headline, 1);
+});
+
+test("聽力頁目前沒有待填區塊以外的內容缺漏：標題、價格、常見問題都已填", async () => {
+  const html = await (await fetch(base + "/listening/")).text();
+  assert.equal((html.match(/data-todo/g) || []).length, 0);
+  assert.match(html, /測試期間免費，正式價格待訂/);
+  assert.match(html, /題目是 AI 寫的原創內容，再轉成語音，不是官方真題/);
+  assert.match(html, /還在準備中，還沒有確定的日期/);
 });
