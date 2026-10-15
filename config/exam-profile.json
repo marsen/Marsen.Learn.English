@@ -1,0 +1,18 @@
+{
+  "section": { "value": 1, "source": "product" },
+  "question_count": { "value": 10, "source": "third_party" },
+  "play_once": { "value": true, "source": "idp" },
+  "preview_seconds": { "value": 30, "source": "third_party" },
+  "check_seconds": { "value": 30, "source": "third_party", "note": "電腦版全卷結束後另有 2 分鐘（idp）" },
+  "target_words": { "value": [650, 800], "source": "product" },
+  "length_tolerance": { "value": 0.15, "source": "product" },
+  "min_gap_words": { "value": 25, "source": "product" },
+  "min_warmup_turns": { "value": 3, "source": "product" },
+  "topic_cooldown_days": { "value": 0, "source": "product" },
+  "max_draw_attempts": { "value": 300, "source": "product" },
+  "fiction": {
+    "phone_prefix": "07700900",
+    "email_domain": "example.com",
+    "name_blacklist": ["John Smith", "Jane Doe", "Harry Potter", "Boris Johnson", "Taylor Swift"]
+  }
+}

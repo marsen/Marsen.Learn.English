@@ -1,0 +1,106 @@
+{
+  "set_id": "good-0001",
+  "type": "form_table",
+  "title": "Library Membership Application",
+  "instruction": "Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
+  "rows": [
+    {
+      "label": "Application type",
+      "parts": [
+        {
+          "text": "New membership"
+        }
+      ]
+    },
+    {
+      "label": "Family name",
+      "field_id": "family_name",
+      "parts": [
+        {
+          "blank": "q01"
+        }
+      ]
+    },
+    {
+      "label": "Date of birth",
+      "field_id": "date_of_birth",
+      "parts": [
+        {
+          "blank": "q02"
+        }
+      ]
+    },
+    {
+      "label": "House number",
+      "field_id": "house_number",
+      "parts": [
+        {
+          "blank": "q03"
+        }
+      ]
+    },
+    {
+      "label": "Street",
+      "field_id": "street_name",
+      "parts": [
+        {
+          "blank": "q04"
+        }
+      ]
+    },
+    {
+      "label": "Student number",
+      "field_id": "student_number",
+      "parts": [
+        {
+          "blank": "q05"
+        }
+      ]
+    },
+    {
+      "label": "Field of study",
+      "field_id": "course",
+      "parts": [
+        {
+          "blank": "q06"
+        }
+      ]
+    },
+    {
+      "label": "Card collection day",
+      "field_id": "pickup_day",
+      "parts": [
+        {
+          "blank": "q07"
+        }
+      ]
+    },
+    {
+      "label": "Preferred branch",
+      "field_id": "branch",
+      "parts": [
+        {
+          "blank": "q08"
+        }
+      ]
+    },
+    {
+      "label": "Favourite subject",
+      "field_id": "interest",
+      "parts": [
+        {
+          "blank": "q09"
+        }
+      ]
+    },
+    {
+      "label": "Contact by",
+      "field_id": "notification",
+      "parts": [
+        {
+          "blank": "q10"
+        }
+      ]
+    }
+  ]
+}
