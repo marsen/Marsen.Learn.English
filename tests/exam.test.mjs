@@ -42,11 +42,18 @@ async function openExam({ audio = false } = {}) {
   w.setInterval = (fn) => timers.push(fn) - 1;
   w.clearInterval = (id) => { timers[id] = null; };
   // 沒有錄音檔時，HEAD audio/full.mp3 會是 404；audio=true 時假裝有。
-  w.fetch = (p, opt) => (audio && /full\.mp3$/.test(String(p)) ? Promise.resolve({ ok: true }) : fetch(new URL(p, w.location.href), opt));
+  // audio=false：假裝沒有錄音檔；audio=true：假裝有 mp3，但不給 timing.json（舊流程）；audio="timed"：用真的 timing.json。
+  w.fetch = (p, opt) => {
+    const u = String(p);
+    if (/audio\/full\.mp3$/.test(u)) return Promise.resolve({ ok: !!audio });
+    if (/audio\/timing\.json$/.test(u) && audio !== "timed") return Promise.resolve({ ok: false });
+    return fetch(new URL(p, w.location.href), opt);
+  };
   const played = [];
   class FakeAudio {
     constructor(src) { this.src = src; this.listeners = {}; played.push(this); }
     addEventListener(n, f) { this.listeners[n] = f; }
+    at(t) { this.currentTime = t; this.listeners.timeupdate?.(); }
     play() { this.playing = true; return Promise.resolve(); }
     pause() { this.playing = false; }
     end() { this.listeners.ended?.(); }
@@ -144,4 +151,44 @@ test("頁面：送出鈕在作答中就能提早送出", async () => {
   d.getElementById("paper-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
   assert.equal(d.getElementById("result").hidden, false);
   assert.match(d.getElementById("score").textContent, /^0 \/ /);
+});
+
+test("核心：eventAt／viewOf／questionLabel 依 timing.json 判斷畫面狀態", async () => {
+  const t = JSON.parse(await readFile(new URL(`../content/sets/${SET}/audio/timing.json`, import.meta.url)));
+  const pause1 = t.events.find((e) => e.id === "pause1");
+  const mid = (pause1.start + pause1.end) / 2;
+  assert.equal(core.eventAt(t.events, mid).id, "pause1");
+  const v = core.viewOf(core.eventAt(t.events, mid), mid);
+  assert.equal(v.kind, "read");
+  assert.deepEqual(v.questions, [1, 4]);
+  assert.ok(Math.abs(v.remaining - (pause1.end - mid)) < 1e-9);
+  const check = t.events.find((e) => e.id === "check");
+  assert.equal(core.viewOf(check, check.start + 1).kind, "check");
+  assert.equal(core.viewOf(t.events[1], 0).kind, "listen");
+  assert.equal(core.eventAt(t.events, 1e6), null);
+  assert.equal(core.questionLabel([1, 4]), "第 1–4 題");
+  assert.equal(core.questionLabel([5, 6]), "第 5、6 題");
+});
+
+test("頁面：有 timing.json 時，看題停頓、題號標示、檢查階段都跟著錄音走，播完批改", async () => {
+  const t = JSON.parse(await readFile(new URL(`../content/sets/${SET}/audio/timing.json`, import.meta.url)));
+  const { d, played } = await openExam({ audio: "timed" });
+  await begin(d);
+  assert.equal(played.length, 1, "不先跑頁面自己的看題倒數，直接播錄音");
+  const a = played[0];
+  const p2 = t.events.find((e) => e.id === "pause2");
+  a.at(p2.start + 5);
+  assert.match(d.getElementById("status").textContent, /看題時間：第 5、6 題/);
+  assert.equal(d.getElementById("clock").textContent, d.defaultView.__core.formatClock(p2.end - p2.start - 5));
+  const lit = [...d.querySelectorAll("#paper input.look")].map((i) => i.dataset.q);
+  assert.deepEqual(lit, ["q05", "q06"]);
+  const turn = t.events.find((e) => e.type === "turn");
+  a.at(turn.start + 1);
+  assert.match(d.getElementById("status").textContent, /錄音播放中/);
+  assert.equal(d.querySelectorAll("#paper input.look").length, 0);
+  const check = t.events.find((e) => e.id === "check");
+  a.at(check.start + 1);
+  assert.match(d.getElementById("status").textContent, /檢查/);
+  a.end();
+  assert.equal(d.getElementById("result").hidden, false);
 });

@@ -1,5 +1,8 @@
 node_modules/
 .DS_Store
 *.log
-
-preview.html
+content/sets/*/audio/
+tts/models/
+tts/slice_cache/
+tts/out/
+tts/.venv/

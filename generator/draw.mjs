@@ -2,6 +2,8 @@ import { createRng } from "./lib/prng.mjs";
 import { makeArtifactInfo } from "./artifact.mjs";
 import { fieldOrder } from "./lib/template.mjs";
 
+export const NAME_TYPES = new Set(["name_spelled", "place"]);
+
 export class DrawError extends Error {
   constructor(code, message) { super(message); this.code = code; }
 }
@@ -59,6 +61,8 @@ export function drawFromTopic({ seed, topic, recipes, profile, variantId, previo
         if (chosen.length === total) break;
       }
       if (chosen.length !== total) continue;
+      const maxNames = profile.max_name_questions?.value ?? total;
+      if (chosen.filter((f) => NAME_TYPES.has(f.type)).length > maxNames) continue;
       const traps = assignTraps(chosen, recipe.traps, rng);
       if (!traps) continue;
       const ordered = [...chosen].sort((a, b) => rowIndex.get(a.field_id) - rowIndex.get(b.field_id));

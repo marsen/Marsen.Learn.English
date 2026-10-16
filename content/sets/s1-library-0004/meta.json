@@ -1,9 +1,9 @@
 {
   "set_id": "s1-library-0004",
   "seed": 20261022,
-  "status": "blind_passed",
+  "status": "papered",
   "created_at": "2026-10-16T07:50:39.865Z",
-  "updated_at": "2026-10-16T09:43:13.270Z",
+  "updated_at": "2026-10-16T11:04:26.027Z",
   "schema_version": 1,
   "generator_version": "0.1.0",
   "inputs": {
@@ -74,10 +74,10 @@
         "script": "d5002c875e201d54",
         "paper": "d57c5b91714ba91d"
       },
-      "ok": true,
-      "block": 0,
+      "ok": false,
+      "block": 1,
       "warn": 0,
-      "at": "2026-10-16T09:43:13.269Z"
+      "at": "2026-10-16T11:04:26.025Z"
     },
     "blind": {
       "from": {

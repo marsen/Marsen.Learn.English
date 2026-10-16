@@ -22,3 +22,5 @@ div.group .line::before{content:"• ";color:var(--ink)}
 .score{font-size:1.5rem;font-weight:700}
 table{border-collapse:collapse;width:100%}th,td{border:1px solid var(--line);padding:.45rem .6rem;text-align:left}th{background:var(--soft)}
 tr.ok td:first-child{border-left:4px solid var(--ok)}tr.bad td:first-child{border-left:4px solid var(--bad)}
+
+.paper input[type=text].look{background:#fff7d6}

@@ -220,3 +220,12 @@ test("題目卷：句型列帶出印好的事實、同一句的兩個空格、sa
   const fake = { ...skeleton, slots: skeleton.slots.filter((s) => s.field_id !== "street_name").concat([{ question_id: "q99", field_id: "house_number" }]) };
   assert.throws(() => buildPaper({ topic: gym, skeleton: fake }), /group/);
 });
+
+test("V15：人名／地名類答案超過上限就擋", () => {
+  const b = fixture();
+  const n = b.plan.answers.filter((a) => a.type === "name_spelled" || a.type === "place").length;
+  b.profile = { ...b.profile, max_name_questions: { value: n - 1 } };
+  assert.ok(rules(validate(b), "block").includes("V15"));
+  b.profile = { ...b.profile, max_name_questions: { value: n } };
+  assert.ok(!rules(validate(b), "block").includes("V15"));
+});

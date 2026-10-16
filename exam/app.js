@@ -1,7 +1,8 @@
 // 測驗頁：說明 → 預覽（看題倒數）→ 播放錄音（只播一次）→ 檢查倒數 → 批改 → 顯示對錯與正解。
+// 錄音旁有 timing.json 時，看題停頓與最後檢查都以錄音時間軸為準（不再用頁面自己的倒數）。
 // 這一版不含任何語音合成。錄音檔（content/sets/<id>/audio/full.mp3）由 M4 產生；沒有檔案時只能先填答題卷。
 // 標準答案目前放在前端（content/sets/<id>/plan.json），只適合測試版。
-import { gradeAnswers, formatClock } from "./core.mjs";
+import { gradeAnswers, formatClock, eventAt, viewOf, questionLabel } from "./core.mjs";
 
 const $ = (id) => document.getElementById(id);
 const state = { audio: null, phase: "intro", data: null, profile: null, timer: null, remaining: 0, onSkip: null };
@@ -103,7 +104,35 @@ function playRecording(src, onDone) {
   audio.play().catch(onDone);
 }
 
+// 有 timing.json：整段流程（播報、看題停頓、對話、檢查）都在錄音裡，畫面跟著錄音走。
+function startTimed() {
+  setPhase("exam");
+  renderPaper(state.data.paper);
+  setInputsEnabled(true);
+  $("skip").textContent = "結束並批改（開發用）";
+  $("skip").hidden = false;
+  state.onSkip = finish;
+  state.phase = "playing";
+  const audio = new Audio(state.data.audio);
+  state.audio = audio;
+  const show = () => {
+    const v = viewOf(eventAt(state.data.timing.events, audio.currentTime ?? 0), audio.currentTime ?? 0);
+    if (!v) return;
+    state.phase = v.kind === "check" ? "check" : "playing";
+    $("clock").textContent = v.kind === "listen" ? "" : formatClock(v.remaining);
+    $("status").textContent = v.kind === "listen" ? "錄音播放中，邊聽邊填。" : v.kind === "check" ? "檢查你的答案。" : `看題時間：${questionLabel(v.questions)}`;
+    const [a, b] = v.questions ?? [0, -1];
+    for (const i of inputs()) { const n = Number(i.dataset.q.slice(1)); i.classList.toggle("look", n >= a && n <= b); }
+  };
+  audio.addEventListener("timeupdate", show);
+  audio.addEventListener("ended", finish);
+  audio.addEventListener("error", finish);
+  $("status").textContent = "錄音開始。";
+  audio.play().catch(finish);
+}
+
 function startPreview() {
+  if (state.data.timing) return startTimed();
   setPhase("exam");
   renderPaper(state.data.paper);
   setInputsEnabled(false);
@@ -172,7 +201,8 @@ async function loadSet(id) {
   const [paper, plan, script] = await Promise.all([getJson(`${base}/paper.json`), getJson(`${base}/plan.json`), getJson(`${base}/script.json`)]);
   const src = `${base}/audio/full.mp3`;
   const head = await fetch(src, { method: "HEAD" }).catch(() => null);
-  state.data = { paper, plan, script, audio: head?.ok ? src : null };
+  const timing = head?.ok ? await getJson(`${base}/audio/timing.json`).catch(() => null) : null;
+  state.data = { paper, plan, script, audio: head?.ok ? src : null, timing };
 }
 
 async function init() {

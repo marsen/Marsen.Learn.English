@@ -187,6 +187,13 @@ export function validate({ skeleton, plan, script, paper, topic, recipes, profil
     if (!spoken.includes(String(k).toLowerCase())) block("V14", `題目卷印出「${r.parts.map((p) => p.text ?? "____").join(" ")}」，逐字稿沒有講到「${k}」`);
   }
 
+  // ---- V15 專有名詞類答案（人名、街名、地名）不能太多，最多 profile.max_name_questions 題 ----
+  const maxNames = profile.max_name_questions?.value;
+  if (maxNames !== undefined) {
+    const names = plan.answers.filter((a) => a.type === "name_spelled" || a.type === "place");
+    if (names.length > maxNames) block("V15", `專有名詞類答案有 ${names.length} 題（${names.map((a) => a.question_id).join("、")}），最多 ${maxNames} 題`);
+  }
+
   // ---- V13 骨架與 plan、配方、主題一致 ----
   const recipe = recipes.find((r) => r.id === skeleton.recipe);
   if (!recipe) block("V13", `找不到配方 ${skeleton.recipe}`);
