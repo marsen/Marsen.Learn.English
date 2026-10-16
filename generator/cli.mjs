@@ -6,6 +6,10 @@ import { draw, DrawError } from "./draw.mjs";
 import { validate } from "./validate.mjs";
 import { buildPaper } from "./paper.mjs";
 import { renderPreview } from "./preview.mjs";
+import { buildPlanPrompt, buildScriptPrompt, buildBlindPrompt } from "./prompt.mjs";
+import { assemblePlan, assembleScript, AssembleError } from "./assemble.mjs";
+import { compareBlind } from "./blind.mjs";
+import { basename } from "node:path";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const readJson = (p) => JSON.parse(readFileSync(p, "utf8"));
@@ -57,6 +61,49 @@ if (cmd === "draw") {
   const paper = load("paper.json") ?? buildPaper({ topic: topics.find((t) => t.id === skeleton.topic), skeleton });
   writeFileSync(join(dir, "preview.html"), renderPreview({ paper, skeleton, plan: load("plan.json"), script: load("script.json") }));
   console.log(`已寫入 ${join(dir, "preview.html")}`);
+} else if (cmd === "prompt") {
+  // 人工模式：印出 prompt，交給 AI（最好是全新的對話），把回覆存成檔案，再用 assemble 組回去。
+  const [kind, d] = rest;
+  const dir = resolve(d);
+  const { topics, profile } = loadContent();
+  const load = (n) => readJson(join(dir, n));
+  const skeleton = load("skeleton.json");
+  const topic = topics.find((t) => t.id === skeleton.topic);
+  const prompts = {
+    plan: () => buildPlanPrompt({ topic, skeleton, profile }),
+    script: () => buildScriptPrompt({ topic, plan: load("plan.json"), profile }),
+    blind: () => buildBlindPrompt({ paper: load("paper.json"), script: load("script.json") }),
+  };
+  if (!prompts[kind]) { console.error("用法：prompt plan|script|blind <set 資料夾> [--out 檔案]"); process.exit(2); }
+  const text = prompts[kind]();
+  const out = flag("out");
+  if (out) { writeFileSync(out, text); console.error(`已寫入 ${out}`); } else process.stdout.write(text);
+} else if (cmd === "assemble") {
+  const [kind, d, file] = rest;
+  const dir = resolve(d);
+  const input = readJson(resolve(file));
+  const setId = basename(dir);
+  try {
+    if (kind === "plan") {
+      const plan = assemblePlan({ skeleton: readJson(join(dir, "skeleton.json")), values: input, setId });
+      writeFileSync(join(dir, "plan.json"), JSON.stringify(plan, null, 2) + "\n");
+      console.log(`已寫入 ${join(dir, "plan.json")}`);
+    } else if (kind === "script") {
+      writeFileSync(join(dir, "script.json"), JSON.stringify(assembleScript({ script: input, setId }), null, 2) + "\n");
+      console.log(`已寫入 ${join(dir, "script.json")}`);
+    } else if (kind === "check") {
+      writeFileSync(join(dir, "check.json"), JSON.stringify({ set_id: setId, ...input }, null, 2) + "\n");
+      console.log(`已寫入 ${join(dir, "check.json")}`);
+    } else { console.error("用法：assemble plan|script|check <set 資料夾> <AI 回覆.json>"); process.exit(2); }
+  } catch (e) {
+    if (e instanceof AssembleError) { console.error(`組裝失敗：${e.message}`); process.exit(1); }
+    throw e;
+  }
+} else if (cmd === "blind") {
+  const dir = resolve(rest[0]);
+  const result = compareBlind({ plan: readJson(join(dir, "plan.json")), check: readJson(join(dir, "check.json")) });
+  for (const i of result.issues) console.log(`警示  ${i.rule} ${i.question_id}  ${i.message}`);
+  console.log(result.ok ? "盲答與標準答案完全一致，沒有警示" : `共 ${result.issues.length} 項警示，需要人工判斷`);
 } else if (cmd === "validate") {
   const dir = resolve(rest[0] ?? ".");
   const { topics, recipes, profile } = loadContent();
@@ -68,5 +115,5 @@ if (cmd === "draw") {
   console.log(result.ok ? "通過（沒有「擋」級問題）" : "未通過");
   process.exit(result.ok ? 0 : 1);
 } else {
-  console.log("用法：\n  node generator/cli.mjs draw --seed 42 [--variant student] [--out content/sets/<id>]\n  node generator/cli.mjs paper <set 資料夾>\n  node generator/cli.mjs preview <set 資料夾>   產生 preview.html\n  node generator/cli.mjs validate <set 資料夾>");
+  console.log("用法：\n  node generator/cli.mjs draw --seed 42 [--variant student] [--out content/sets/<id>]\n  node generator/cli.mjs paper <set 資料夾>\n  node generator/cli.mjs preview <set 資料夾>   產生 preview.html\n  node generator/cli.mjs prompt plan|script|blind <set 資料夾>   印出給 AI 的 prompt\n  node generator/cli.mjs assemble plan|script|check <set 資料夾> <AI 回覆.json>\n  node generator/cli.mjs blind <set 資料夾>   盲答與標準答案比對\n  node generator/cli.mjs validate <set 資料夾>");
 }
