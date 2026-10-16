@@ -10,8 +10,10 @@
     {
       "question_id": "q02",
       "answer": "47",
-      "alternatives": [],
-      "confidence": "high"
+      "alternatives": [
+        "Number 47"
+      ],
+      "confidence": "medium"
     },
     {
       "question_id": "q03",
@@ -28,14 +30,12 @@
     {
       "question_id": "q05",
       "answer": "07700 900 417",
-      "alternatives": [
-        "07700900417"
-      ],
+      "alternatives": [],
       "confidence": "high"
     },
     {
       "question_id": "q06",
-      "answer": "student",
+      "answer": "Student",
       "alternatives": [
         "Geography student"
       ],
@@ -62,9 +62,7 @@
     {
       "question_id": "q10",
       "answer": "university website",
-      "alternatives": [
-        "website"
-      ],
+      "alternatives": [],
       "confidence": "high"
     }
   ]

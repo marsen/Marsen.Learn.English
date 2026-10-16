@@ -1,13 +1,13 @@
 {
   "set_id": "s1-gym-0002",
   "seed": 24,
-  "status": "blind_passed",
+  "status": "validated",
   "created_at": "2026-10-16T09:33:47.316Z",
-  "updated_at": "2026-10-16T09:37:24.901Z",
+  "updated_at": "2026-10-16T09:43:13.165Z",
   "schema_version": 1,
   "generator_version": "0.1.0",
   "inputs": {
-    "topic": "1a6523a0e7b74d38",
+    "topic": "1c924a572834089c",
     "recipes": "82a0e878bf46d387",
     "profile": "1390cf2fe82e58fa"
   },
@@ -18,14 +18,21 @@
   "stages": {
     "skeleton": {
       "hash": "c46fd345c39cf258",
-      "at": "2026-10-16T09:33:47.316Z"
+      "at": "2026-10-16T09:40:43.803Z",
+      "edits": [
+        {
+          "at": "2026-10-16T09:40:43.803Z",
+          "note": "主題檔改成段落式句型（題目卷格式），欄位與骨架不變",
+          "from_hash": "c46fd345c39cf258"
+        }
+      ]
     },
     "paper": {
-      "hash": "0c0c8e6de8e28b64",
+      "hash": "e154e1cd43fac8b2",
       "from": {
         "skeleton": "c46fd345c39cf258"
       },
-      "at": "2026-10-16T09:33:47.318Z"
+      "at": "2026-10-16T09:40:43.876Z"
     },
     "plan": {
       "hash": "467d59bbf175b3db",
@@ -51,25 +58,25 @@
       "from": {
         "plan": "467d59bbf175b3db",
         "script": "c18b9fc2648456e3",
-        "paper": "0c0c8e6de8e28b64"
+        "paper": "e154e1cd43fac8b2"
       },
       "ok": true,
       "block": 0,
       "warn": 0,
-      "at": "2026-10-16T09:37:24.901Z"
+      "at": "2026-10-16T09:43:13.164Z"
     },
     "blind": {
       "from": {
         "plan": "467d59bbf175b3db",
         "script": "c18b9fc2648456e3",
-        "paper": "0c0c8e6de8e28b64",
-        "check": "1c5e6a45bcc59c33"
+        "paper": "e154e1cd43fac8b2",
+        "check": "dd1f71c25e58963a"
       },
       "prompt": "b2e164365699e6da",
       "model": "unspecified",
       "mode": "manual",
-      "warnings": 0,
-      "at": "2026-10-16T09:35:16.573Z"
+      "warnings": 1,
+      "at": "2026-10-16T09:40:33.061Z"
     }
   }
 }

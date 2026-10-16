@@ -27,10 +27,8 @@
     },
     {
       "question_id": "q05",
-      "answer": "07700 900 713",
-      "alternatives": [
-        "07700900713"
-      ],
+      "answer": "07700 900713",
+      "alternatives": [],
       "confidence": "high"
     },
     {
@@ -54,17 +52,13 @@
     {
       "question_id": "q09",
       "answer": "family",
-      "alternatives": [
-        "family one"
-      ],
+      "alternatives": [],
       "confidence": "high"
     },
     {
       "question_id": "q10",
       "answer": "council website",
-      "alternatives": [
-        "website"
-      ],
+      "alternatives": [],
       "confidence": "high"
     }
   ]

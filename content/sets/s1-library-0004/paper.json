@@ -35,25 +35,22 @@
       "section": "Personal details"
     },
     {
-      "label": "House number",
+      "label": "Address",
       "field_id": "house_number",
       "parts": [
         {
+          "text": "Address:"
+        },
+        {
           "blank": "q03",
           "field_id": "house_number"
-        }
-      ],
-      "section": "Personal details"
-    },
-    {
-      "label": "Street",
-      "field_id": "street_name",
-      "parts": [
+        },
         {
           "blank": "q04",
           "field_id": "street_name"
         }
       ],
+      "inline": true,
       "section": "Personal details"
     },
     {
@@ -72,10 +69,17 @@
       "field_id": "occupation",
       "parts": [
         {
+          "text": "Occupation:"
+        },
+        {
           "blank": "q06",
           "field_id": "occupation"
+        },
+        {
+          "text": "."
         }
       ],
+      "inline": true,
       "section": "About the applicant"
     },
     {
@@ -88,6 +92,9 @@
         {
           "blank": "q07",
           "field_id": "previous_city"
+        },
+        {
+          "text": "."
         }
       ],
       "inline": true,
@@ -103,9 +110,15 @@
         {
           "blank": "q08",
           "field_id": "pickup_day"
+        },
+        {
+          "text": ", from the main desk."
         }
       ],
       "inline": true,
+      "says": [
+        "main desk"
+      ],
       "section": "Membership"
     },
     {
@@ -113,9 +126,19 @@
       "field_id": "membership_type",
       "parts": [
         {
+          "text": "Chose the"
+        },
+        {
           "blank": "q09",
           "field_id": "membership_type"
+        },
+        {
+          "text": "membership, which can be renewed online."
         }
+      ],
+      "inline": true,
+      "says": [
+        "renew"
       ],
       "section": "Membership"
     },
@@ -129,10 +152,19 @@
         {
           "blank": "q10",
           "field_id": "heard_from"
+        },
+        {
+          "text": "."
         }
       ],
       "inline": true,
       "section": "Interests and contact"
     }
-  ]
+  ],
+  "section_styles": {
+    "Personal details": "list",
+    "About the applicant": "paragraph",
+    "Membership": "paragraph",
+    "Interests and contact": "paragraph"
+  }
 }

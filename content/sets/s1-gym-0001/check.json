@@ -10,9 +10,7 @@
     {
       "question_id": "q02",
       "answer": "Kestrel Lane",
-      "alternatives": [
-        "Kestrel"
-      ],
+      "alternatives": [],
       "confidence": "high"
     },
     {
@@ -43,16 +41,14 @@
       "question_id": "q07",
       "answer": "lunchtime",
       "alternatives": [
-        "lunch"
+        "lunch break"
       ],
       "confidence": "high"
     },
     {
       "question_id": "q08",
       "answer": "better stamina",
-      "alternatives": [
-        "stamina"
-      ],
+      "alternatives": [],
       "confidence": "high"
     },
     {

@@ -46,8 +46,10 @@
     {
       "question_id": "q08",
       "answer": "evening",
-      "alternatives": [],
-      "confidence": "high"
+      "alternatives": [
+        "after lectures"
+      ],
+      "confidence": "medium"
     },
     {
       "question_id": "q09",
@@ -57,8 +59,10 @@
     },
     {
       "question_id": "q10",
-      "answer": "three",
-      "alternatives": [],
+      "answer": "three times",
+      "alternatives": [
+        "3 times"
+      ],
       "confidence": "high"
     }
   ]

@@ -36,14 +36,13 @@
         "section": "Personal details"
       },
       {
-        "label": "House number",
+        "label": "Address",
         "field_id": "house_number",
-        "section": "Personal details"
-      },
-      {
-        "label": "Street",
-        "field_id": "street_name",
-        "section": "Personal details"
+        "section": "Personal details",
+        "also": [
+          "street_name"
+        ],
+        "template": "Address: {} {street_name}"
       },
       {
         "label": "Town",
@@ -58,75 +57,103 @@
       {
         "label": "Occupation",
         "field_id": "occupation",
-        "section": "About the applicant"
+        "section": "About the applicant",
+        "template": "Occupation: {}."
       },
       {
         "label": "Student number",
         "field_id": "student_number",
-        "section": "About the applicant"
+        "section": "About the applicant",
+        "template": "Student number {}."
       },
       {
         "label": "Field of study",
         "field_id": "course",
         "section": "About the applicant",
-        "template": "Studying {}"
+        "template": "Studying {}, in the first year.",
+        "says": [
+          "first year"
+        ]
       },
       {
         "label": "Years in the area",
         "field_id": "years_resident",
         "section": "About the applicant",
-        "template": "Has lived in the area for {} years"
+        "template": "Has lived in the area for {} years, since moving here for work.",
+        "says": [
+          "moved"
+        ]
       },
       {
         "label": "Previous city",
         "field_id": "previous_city",
         "section": "About the applicant",
-        "template": "Moved here from {}"
+        "template": "Moved here from {}."
       },
       {
         "label": "Card collection day",
         "field_id": "pickup_day",
         "section": "Membership",
-        "template": "Will collect the card on {}"
+        "template": "Will collect the card on {}, from the main desk.",
+        "says": [
+          "main desk"
+        ]
       },
       {
         "label": "Preferred branch",
         "field_id": "branch",
-        "section": "Membership"
+        "section": "Membership",
+        "template": "Prefers the {} branch, which has a quiet study area.",
+        "says": [
+          "quiet"
+        ]
       },
       {
         "label": "Reason for joining",
         "field_id": "reason",
-        "section": "Membership"
+        "section": "Membership",
+        "template": "Main reason for joining: {}."
       },
       {
         "label": "Membership type",
         "field_id": "membership_type",
-        "section": "Membership"
+        "section": "Membership",
+        "template": "Chose the {} membership, which can be renewed online.",
+        "says": [
+          "renew"
+        ]
       },
       {
         "label": "Favourite subject",
         "field_id": "interest",
-        "section": "Interests and contact"
+        "section": "Interests and contact",
+        "template": "Favourite subject: {}."
       },
       {
         "label": "Visits per month",
         "field_id": "visit_frequency",
-        "section": "Interests and contact"
+        "section": "Interests and contact",
+        "template": "Visits about {} a month."
       },
       {
         "label": "Heard about us from",
         "field_id": "heard_from",
         "section": "Interests and contact",
-        "template": "Heard about the library through {}"
+        "template": "Heard about the library through {}."
       },
       {
         "label": "Contact by",
         "field_id": "notification",
         "section": "Interests and contact",
-        "template": "Contact by {}"
+        "template": "Reminders are sent by {}."
       }
-    ]
+    ],
+    "section_styles": {
+      "Personal details": "list",
+      "About the applicant": "paragraph",
+      "Membership": "paragraph",
+      "Interests and contact": "paragraph"
+    }
   },
   "variants": [
     {

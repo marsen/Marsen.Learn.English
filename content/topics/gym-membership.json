@@ -118,13 +118,13 @@
         "label": "Preferred time",
         "field_id": "preferred_time",
         "section": "Gym information",
-        "template": "Prefers to train in the {}."
+        "template": "Preferred time to train: {}."
       },
       {
         "label": "Main goal",
         "field_id": "goal",
         "section": "Gym information",
-        "template": "Main aim is to {}."
+        "template": "Main goal: {}."
       },
       {
         "label": "Class interested in",

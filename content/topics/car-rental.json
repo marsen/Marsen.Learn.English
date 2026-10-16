@@ -36,14 +36,13 @@
         "section": "Personal details"
       },
       {
-        "label": "House number",
+        "label": "Address",
         "field_id": "house_number",
-        "section": "Personal details"
-      },
-      {
-        "label": "Street",
-        "field_id": "street_name",
-        "section": "Personal details"
+        "section": "Personal details",
+        "also": [
+          "street_name"
+        ],
+        "template": "Address: {} {street_name}"
       },
       {
         "label": "Town",
@@ -63,82 +62,112 @@
       {
         "label": "Main destination",
         "field_id": "destination",
-        "section": "Purpose of trip"
+        "section": "Purpose of trip",
+        "template": "Main destination is {}, about two hours' drive from here.",
+        "says": [
+          "two hours"
+        ]
       },
       {
         "label": "Staying at",
         "field_id": "hotel_name",
         "section": "Purpose of trip",
-        "template": "Staying at {}"
+        "template": "Staying at {}, close to the railway station.",
+        "says": [
+          "station"
+        ]
       },
       {
         "label": "Company",
         "field_id": "company_name",
-        "section": "Purpose of trip"
+        "section": "Purpose of trip",
+        "template": "Visiting the offices of {}."
       },
       {
         "label": "Meeting day",
         "field_id": "meeting_day",
         "section": "Purpose of trip",
-        "template": "Meeting on {}"
+        "template": "The meeting is on {}, in the morning.",
+        "says": [
+          "morning"
+        ]
       },
       {
         "label": "Type of car",
         "field_id": "car_type",
-        "section": "Car and dates"
+        "section": "Car and dates",
+        "template": "Would like a {}, with air conditioning.",
+        "says": [
+          "air conditioning"
+        ]
       },
       {
         "label": "Pick-up day",
         "field_id": "pickup_day",
         "section": "Car and dates",
-        "template": "Pick-up on {}"
+        "template": "Will collect the car on {}."
       },
       {
         "label": "Pick-up place",
         "field_id": "pickup_place",
         "section": "Car and dates",
-        "template": "Pick up from {}"
+        "template": "Pick-up is from the {}; the desk opens at 8 a.m.",
+        "says": [
+          "8 a.m."
+        ]
       },
       {
         "label": "Number of days",
         "field_id": "rental_days",
         "section": "Car and dates",
-        "template": "Hire for {} days"
+        "template": "Hire for {} days."
       },
       {
         "label": "Insurance",
         "field_id": "insurance",
-        "section": "Extras and costs"
+        "section": "Extras and costs",
+        "template": "Insurance: {}."
       },
       {
         "label": "Extra equipment",
         "field_id": "extra_item",
-        "section": "Extras and costs"
+        "section": "Extras and costs",
+        "template": "Extra equipment: {}."
       },
       {
         "label": "Fuel option",
         "field_id": "fuel_policy",
-        "section": "Extras and costs"
+        "section": "Extras and costs",
+        "template": "Fuel: {}."
       },
       {
         "label": "Deposit (£)",
         "field_id": "deposit",
         "section": "Extras and costs",
-        "template": "Deposit: £{}"
+        "template": "A deposit of £{} is taken, and it is refunded when the car comes back.",
+        "says": [
+          "refund"
+        ]
       },
       {
         "label": "Payment method",
         "field_id": "payment_method",
         "section": "Extras and costs",
-        "template": "Pays by {}"
+        "template": "Pays by {}."
       },
       {
         "label": "Heard about us from",
         "field_id": "heard_from",
         "section": "Extras and costs",
-        "template": "Heard about us through {}"
+        "template": "Heard about the company through {}."
       }
-    ]
+    ],
+    "section_styles": {
+      "Personal details": "list",
+      "Purpose of trip": "paragraph",
+      "Car and dates": "paragraph",
+      "Extras and costs": "paragraph"
+    }
   },
   "variants": [
     {

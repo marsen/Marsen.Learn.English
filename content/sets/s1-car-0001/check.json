@@ -4,30 +4,26 @@
     {
       "question_id": "q01",
       "answer": "23 September",
-      "alternatives": [
-        "September 23"
-      ],
+      "alternatives": [],
       "confidence": "high"
     },
     {
       "question_id": "q02",
       "answer": "58",
       "alternatives": [],
-      "confidence": "high"
+      "confidence": "medium"
     },
     {
       "question_id": "q03",
       "answer": "Cressbrook Road",
-      "alternatives": [
-        "Cressbrook"
-      ],
+      "alternatives": [],
       "confidence": "high"
     },
     {
       "question_id": "q04",
       "answer": "Whitcombe",
       "alternatives": [],
-      "confidence": "high"
+      "confidence": "medium"
     },
     {
       "question_id": "q05",
@@ -63,7 +59,7 @@
       "question_id": "q10",
       "answer": "full cover",
       "alternatives": [
-        "full"
+        "everything included"
       ],
       "confidence": "high"
     }

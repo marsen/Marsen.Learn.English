@@ -188,16 +188,19 @@ test("句型拆解：{} 是主欄位、{別的} 是 also 欄位，其餘文字�
   assert.ok(order.get("house_number") < order.get("street_name") && order.get("street_name") < order.get("town"));
 });
 
-test("段落模板：gym 主題的每個句型列都有一個 {} 、所有 {x} 都在 also 裡，同一段連續", () => {
-  const seen = [];
-  for (const r of gym.form.rows.filter((x) => x.template)) {
-    assert.ok(r.template.includes("{}"), r.label);
-    for (const m of r.template.matchAll(/\{([a-z_]+)\}/g)) assert.ok((r.also ?? []).includes(m[1]), `${r.label}: {${m[1]}}`);
-    for (const f of fieldsOf(r)) assert.ok(gym.fields_pool.some((p) => p.field_id === f), f);
+test("段落模板：每個主題的句型列都有一個 {}、所有 {x} 都在 also 裡、同一段連續、每段都有樣式", () => {
+  for (const t of content.topics) {
+    const seen = [];
+    for (const r of t.form.rows.filter((x) => x.template)) {
+      assert.ok(r.template.includes("{}"), `${t.id} ${r.label}`);
+      for (const m of r.template.matchAll(/\{([a-z_]+)\}/g)) assert.ok((r.also ?? []).includes(m[1]), `${t.id} ${r.label}: {${m[1]}}`);
+      for (const f of fieldsOf(r)) assert.ok(t.fields_pool.some((p) => p.field_id === f), `${t.id} ${f}`);
+    }
+    for (const f of t.fields_pool) assert.ok(t.form.rows.some((r) => fieldsOf(r).includes(f.field_id)), `${t.id} 欄位 ${f.field_id} 沒有對應的列`);
+    for (const r of t.form.rows) if (r.section && seen.at(-1) !== r.section) seen.push(r.section);
+    assert.equal(seen.length, new Set(seen).size, `${t.id} 同一段必須連續`);
+    assert.deepEqual(Object.keys(t.form.section_styles).sort(), [...seen].sort(), t.id);
   }
-  for (const r of gym.form.rows) if (r.section && seen.at(-1) !== r.section) seen.push(r.section);
-  assert.equal(seen.length, new Set(seen).size);
-  assert.deepEqual(Object.keys(gym.form.section_styles).sort(), [...new Set(gym.form.rows.map((r) => r.section).filter(Boolean))].sort());
 });
 
 test("V14：題目卷印出的事實，逐字稿沒講到就擋；講到就過", () => {

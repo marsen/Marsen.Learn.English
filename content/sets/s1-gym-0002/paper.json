@@ -1,5 +1,5 @@
 {
-  "set_id": null,
+  "set_id": "s1-gym-0002",
   "type": "form_table",
   "title": "Fitness Club Registration",
   "instruction": "Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
@@ -124,7 +124,7 @@
       "field_id": "preferred_time",
       "parts": [
         {
-          "text": "Prefers to train in the"
+          "text": "Preferred time to train:"
         },
         {
           "blank": "q08",

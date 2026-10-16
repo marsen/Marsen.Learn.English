@@ -35,25 +35,22 @@
       "section": "Personal details"
     },
     {
-      "label": "House number",
+      "label": "Address",
       "field_id": "house_number",
       "parts": [
         {
+          "text": "Address:"
+        },
+        {
           "blank": "q03",
           "field_id": "house_number"
-        }
-      ],
-      "section": "Personal details"
-    },
-    {
-      "label": "Street",
-      "field_id": "street_name",
-      "parts": [
+        },
         {
           "blank": "q04",
           "field_id": "street_name"
         }
       ],
+      "inline": true,
       "section": "Personal details"
     },
     {
@@ -61,10 +58,17 @@
       "field_id": "student_number",
       "parts": [
         {
+          "text": "Student number"
+        },
+        {
           "blank": "q05",
           "field_id": "student_number"
+        },
+        {
+          "text": "."
         }
       ],
+      "inline": true,
       "section": "About the applicant"
     },
     {
@@ -77,9 +81,15 @@
         {
           "blank": "q06",
           "field_id": "course"
+        },
+        {
+          "text": ", in the first year."
         }
       ],
       "inline": true,
+      "says": [
+        "first year"
+      ],
       "section": "About the applicant"
     },
     {
@@ -92,9 +102,15 @@
         {
           "blank": "q07",
           "field_id": "pickup_day"
+        },
+        {
+          "text": ", from the main desk."
         }
       ],
       "inline": true,
+      "says": [
+        "main desk"
+      ],
       "section": "Membership"
     },
     {
@@ -102,9 +118,19 @@
       "field_id": "branch",
       "parts": [
         {
+          "text": "Prefers the"
+        },
+        {
           "blank": "q08",
           "field_id": "branch"
+        },
+        {
+          "text": "branch, which has a quiet study area."
         }
+      ],
+      "inline": true,
+      "says": [
+        "quiet"
       ],
       "section": "Membership"
     },
@@ -113,10 +139,17 @@
       "field_id": "interest",
       "parts": [
         {
+          "text": "Favourite subject:"
+        },
+        {
           "blank": "q09",
           "field_id": "interest"
+        },
+        {
+          "text": "."
         }
       ],
+      "inline": true,
       "section": "Interests and contact"
     },
     {
@@ -124,15 +157,24 @@
       "field_id": "notification",
       "parts": [
         {
-          "text": "Contact by"
+          "text": "Reminders are sent by"
         },
         {
           "blank": "q10",
           "field_id": "notification"
+        },
+        {
+          "text": "."
         }
       ],
       "inline": true,
       "section": "Interests and contact"
     }
-  ]
+  ],
+  "section_styles": {
+    "Personal details": "list",
+    "About the applicant": "paragraph",
+    "Membership": "paragraph",
+    "Interests and contact": "paragraph"
+  }
 }

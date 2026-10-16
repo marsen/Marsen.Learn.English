@@ -1,4 +1,5 @@
 import test from "node:test";
+import { fieldsOf, fieldOrder } from "../generator/lib/template.mjs";
 import assert from "node:assert/strict";
 import { draw, drawFromTopic, DrawError } from "../generator/draw.mjs";
 import { staleInputs } from "../generator/artifact.mjs";
@@ -15,7 +16,7 @@ test("主題檔結構：每個情境至少 18 個欄位、2 個變體", () => {
     const n = topic.fields_pool.filter((f) => !f.only_variants || f.only_variants.includes(v.id)).length;
     assert.ok(n >= 18, `${v.id} 只有 ${n} 個欄位`);
   }
-  const rowFields = topic.form.rows.filter((r) => r.field_id).map((r) => r.field_id);
+  const rowFields = topic.form.rows.flatMap((r) => fieldsOf(r));
   assert.deepEqual([...rowFields].sort(), topic.fields_pool.map((f) => f.field_id).sort());
 });
 
@@ -35,7 +36,7 @@ test("不同種子，骨架有差異", () => {
 });
 
 test("骨架性質：10 題、題號連續、順序與表格一致、陷阱符合配方且為欄位允許、成組欄位不拆", () => {
-  const rowIndex = new Map(topic.form.rows.map((r, i) => [r.field_id, i]));
+  const rowIndex = fieldOrder(topic);
   for (let seed = 1; seed <= 300; seed++) {
     const sk = run(seed);
     const recipe = recipes.find((r) => r.id === sk.recipe);
