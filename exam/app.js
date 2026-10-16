@@ -32,7 +32,8 @@ function renderInstruction(el, text) {
   el.append(document.createTextNode(text.slice(last)));
 }
 
-// 題目卷照雅思答題卷的樣子：分段標題，段內是像隨手筆記的行，空格是行內底線欄位，前面有編號圓圈。
+// 題目卷照雅思答題卷的樣子：分段標題，段內是像隨手筆記的行（list），或連成一小段文字（paragraph）；
+// 空格是行內底線欄位，前面有編號圓圈。paper.section_styles 指定每段用哪一種，沒寫就是 list。
 // 一般列：「標籤: 前文 ① 後文」；inline 列（有句型）：「前文 ① 後文」，不另外印標籤。
 function renderPaper(paper) {
   $("paper-title").textContent = paper.title;
@@ -48,14 +49,15 @@ function renderPaper(paper) {
       const h = document.createElement("h2");
       h.className = "section";
       h.textContent = section;
-      group = document.createElement("div");
-      group.className = "group";
+      const paragraph = paper.section_styles?.[section] === "paragraph";
+      group = document.createElement(paragraph ? "p" : "div");
+      group.className = paragraph ? "group para" : "group";
       box.append(h, group);
     } else if (!row.section && section === null) group = box;
-    const line = document.createElement("div");
+    const line = document.createElement(group.classList.contains("para") ? "span" : "div");
     line.className = "line";
     if (!row.inline) line.append(document.createTextNode(`${row.label}: `));
-    for (const part of row.parts) {
+    for (const [pi, part] of row.parts.entries()) {
       if (part.text !== undefined) { line.append(document.createTextNode(part.text + " ")); continue; }
       n++;
       const num = document.createElement("span");
@@ -68,9 +70,11 @@ function renderPaper(paper) {
       input.setAttribute("aria-label", `Question ${n}`);
       input.autocapitalize = "off";
       input.spellcheck = false;
-      line.append(num, input, document.createTextNode(" "));
+      const next = row.parts[pi + 1]?.text;
+      line.append(num, input, document.createTextNode(next && /^[.,;:!?]/.test(next) ? "" : " "));
     }
     group.append(line);
+    if (group.classList.contains("para")) group.append(document.createTextNode(" "));
   }
 }
 

@@ -4,7 +4,7 @@ import { validate } from "../generator/validate.mjs";
 import { buildPaper } from "../generator/paper.mjs";
 import { grade } from "../generator/grade.mjs";
 import { matchesAnswer, findInText } from "../generator/answer.mjs";
-import { fixture, rules, topic } from "./helpers.mjs";
+import { fixture, rules, topic, content } from "./helpers.mjs";
 
 const turn = (b, id) => b.script.turns.find((t) => t.id === id);
 const ans = (b, q) => b.plan.answers.find((a) => a.question_id === q);
@@ -173,4 +173,47 @@ test("題目卷帶分段標題；有句型的列拆成前文、空格、後文�
   const seq = paper.rows.map((r) => r.section).filter(Boolean);
   const heads = seq.filter((s, i) => i === 0 || seq[i - 1] !== s);
   assert.equal(heads.length, new Set(heads).size, "同一個分段是連續的，不會被拆開");
+});
+
+// ---- 段落模板（gym 主題）----
+import { splitTemplate, fieldsOf, fieldOrder, showTemplate } from "../generator/lib/template.mjs";
+const gym = content.topics.find((t) => t.id === "gym-membership");
+
+test("句型拆解：{} 是主欄位、{別的} 是 also 欄位，其餘文字原樣保留", () => {
+  const row = gym.form.rows.find((r) => r.also);
+  assert.deepEqual(fieldsOf(row), ["house_number", "street_name"]);
+  assert.deepEqual(splitTemplate(row), [{ text: "Address:" }, { field: "house_number" }, { field: "street_name" }]);
+  assert.equal(showTemplate({ ...row }, (f) => `<${f}>`), "Address: <house_number> <street_name>");
+  const order = fieldOrder(gym);
+  assert.ok(order.get("house_number") < order.get("street_name") && order.get("street_name") < order.get("town"));
+});
+
+test("段落模板：gym 主題的每個句型列都有一個 {} 、所有 {x} 都在 also 裡，同一段連續", () => {
+  const seen = [];
+  for (const r of gym.form.rows.filter((x) => x.template)) {
+    assert.ok(r.template.includes("{}"), r.label);
+    for (const m of r.template.matchAll(/\{([a-z_]+)\}/g)) assert.ok((r.also ?? []).includes(m[1]), `${r.label}: {${m[1]}}`);
+    for (const f of fieldsOf(r)) assert.ok(gym.fields_pool.some((p) => p.field_id === f), f);
+  }
+  for (const r of gym.form.rows) if (r.section && seen.at(-1) !== r.section) seen.push(r.section);
+  assert.equal(seen.length, new Set(seen).size);
+  assert.deepEqual(Object.keys(gym.form.section_styles).sort(), [...new Set(gym.form.rows.map((r) => r.section).filter(Boolean))].sort());
+});
+
+test("V14：題目卷印出的事實，逐字稿沒講到就擋；講到就過", () => {
+  const b = fixture();
+  b.paper.rows.push({ label: "Fact", parts: [{ text: "Open until midnight" }], says: ["midnight"] });
+  assert.ok(rules(validate(b), "block").includes("V14"));
+  b.script.turns[0].text += " We stay open until midnight.";
+  assert.ok(!rules(validate(b), "block").includes("V14"));
+});
+
+test("題目卷：句型列帶出印好的事實、同一句的兩個空格、says", async () => {
+  const sk = (await import("node:fs")).readFileSync(new URL("../content/sets/s1-gym-0002/skeleton.json", import.meta.url), "utf8");
+  const skeleton = JSON.parse(sk);
+  const paper = buildPaper({ topic: gym, skeleton });
+  assert.ok(paper.rows.some((r) => r.inline && r.says?.length), "有帶 says 的句型列");
+  assert.equal(paper.section_styles["Gym information"], "paragraph");
+  const fake = { ...skeleton, slots: skeleton.slots.filter((s) => s.field_id !== "street_name").concat([{ question_id: "q99", field_id: "house_number" }]) };
+  assert.throws(() => buildPaper({ topic: gym, skeleton: fake }), /group/);
 });

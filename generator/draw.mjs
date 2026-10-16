@@ -1,5 +1,6 @@
 import { createRng } from "./lib/prng.mjs";
 import { makeArtifactInfo } from "./artifact.mjs";
+import { fieldOrder } from "./lib/template.mjs";
 
 export class DrawError extends Error {
   constructor(code, message) { super(message); this.code = code; }
@@ -44,7 +45,7 @@ export function drawFromTopic({ seed, topic, recipes, profile, variantId, previo
 
   const pool = topic.fields_pool.filter((f) => !f.only_variants || f.only_variants.includes(variant.id));
   const units = unitsOf(pool);
-  const rowIndex = new Map(topic.form.rows.map((r, i) => [r.field_id, i]));
+  const rowIndex = fieldOrder(topic);
   const candidates = rng.shuffle(recipes.filter((r) => r.id !== previousRecipe));
   const reasons = [];
 

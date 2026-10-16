@@ -18,7 +18,10 @@
     "rows": [
       {
         "label": "Joining fee",
-        "printed": "Waived this month"
+        "printed": "Waived this month",
+        "says": [
+          "joining fee"
+        ]
       },
       {
         "label": "Family name",
@@ -36,14 +39,13 @@
         "section": "Personal details"
       },
       {
-        "label": "House number",
+        "label": "Address",
         "field_id": "house_number",
-        "section": "Personal details"
-      },
-      {
-        "label": "Street",
-        "field_id": "street_name",
-        "section": "Personal details"
+        "section": "Personal details",
+        "also": [
+          "street_name"
+        ],
+        "template": "Address: {} {street_name}"
       },
       {
         "label": "Town",
@@ -63,83 +65,120 @@
       {
         "label": "Student card number",
         "field_id": "student_card_number",
-        "section": "Study or work"
+        "section": "Study or work",
+        "template": "Student card number {}."
       },
       {
         "label": "Campus",
         "field_id": "campus",
         "section": "Study or work",
-        "template": "Studies at the {} campus"
+        "template": "Studies at the {} campus, a short walk from the club.",
+        "says": [
+          "walk"
+        ]
       },
       {
         "label": "Employer",
         "field_id": "employer",
         "section": "Study or work",
-        "template": "Works for {}"
+        "template": "Works for {} in the city centre.",
+        "says": [
+          "city centre"
+        ]
       },
       {
         "label": "Office floor",
         "field_id": "work_floor",
         "section": "Study or work",
-        "template": "Office is on floor {}"
+        "template": "The office is on floor {}, and there is a lift in the building.",
+        "says": [
+          "lift"
+        ]
       },
       {
         "label": "Membership plan",
         "field_id": "membership_plan",
-        "section": "Membership"
+        "section": "Gym information",
+        "template": "Chose the {} plan, which includes use of the pool and sauna.",
+        "says": [
+          "pool",
+          "sauna"
+        ]
       },
       {
         "label": "Start day",
         "field_id": "start_day",
-        "section": "Membership",
-        "template": "Starts on {}"
+        "section": "Gym information",
+        "template": "Will start on {}, with a free induction session.",
+        "says": [
+          "induction"
+        ]
       },
       {
         "label": "Preferred time",
         "field_id": "preferred_time",
-        "section": "Membership"
+        "section": "Gym information",
+        "template": "Prefers to train in the {}."
       },
       {
         "label": "Main goal",
         "field_id": "goal",
-        "section": "Fitness"
+        "section": "Gym information",
+        "template": "Main aim is to {}."
       },
       {
         "label": "Class interested in",
         "field_id": "class_interest",
-        "section": "Fitness",
-        "template": "Interested in the {} class"
+        "section": "Gym information",
+        "template": "Also interested in the {} class, which runs twice a week.",
+        "says": [
+          "twice"
+        ]
       },
       {
         "label": "Sport played before",
         "field_id": "sport_background",
-        "section": "Fitness",
-        "template": "Has played {} before"
+        "section": "Gym information",
+        "template": "Has played {} before."
       },
       {
         "label": "Locker number",
         "field_id": "locker_number",
-        "section": "Payment and other",
-        "template": "Locker number {}"
+        "section": "Fees and payment",
+        "template": "Locker number {}; there is a £10 deposit for the key.",
+        "says": [
+          "10",
+          "deposit"
+        ]
       },
       {
         "label": "Payment method",
         "field_id": "payment_method",
-        "section": "Payment and other",
-        "template": "Pays by {}"
+        "section": "Fees and payment",
+        "template": "Membership fees are paid monthly. Pays by {}.",
+        "says": [
+          "monthly"
+        ]
       },
       {
         "label": "Visits per week",
         "field_id": "visit_frequency",
-        "section": "Payment and other"
+        "section": "Fees and payment",
+        "template": "Plans to come {} a week."
       },
       {
         "label": "Heard about us from",
         "field_id": "heard_from",
-        "section": "Payment and other",
-        "template": "Heard about the club through {}"
+        "section": "Fees and payment",
+        "template": "Heard about the club through {}."
       }
-    ]
+    ],
+    "section_styles": {
+      "Personal details": "list",
+      "Study or work": "paragraph",
+      "Gym information": "paragraph",
+      "Fees and payment": "paragraph"
+    }
   },
   "variants": [
     {

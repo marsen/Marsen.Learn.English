@@ -1,4 +1,5 @@
 import { readFileSync } from "node:fs";
+import { fieldsOf, showTemplate } from "./lib/template.mjs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -28,9 +29,13 @@ const SCRIPT_TRAP = {
   none: "state it directly once",
 };
 
-// 學生在答題卷上看到的那一行字（有行內句型就用句型，空格以 ____ 表示）。
-const shown = (r) => (r.template ? r.template.replace("{}", "____") : r.label);
-const labelOf = (topic, fieldId) => { const r = topic.form.rows.find((x) => x.field_id === fieldId); return r ? shown(r) : fieldId; };
+// 學生在答題卷上看到的那一行字：句型列顯示整句（這題的空格是 ____，同句的別題空格是 (another blank)），一般列顯示標籤。
+const rowOfField = (topic, fieldId) => topic.form.rows.find((r) => fieldsOf(r).includes(fieldId));
+const labelOf = (topic, fieldId) => {
+  const r = rowOfField(topic, fieldId);
+  if (!r) return fieldId;
+  return r.template ? showTemplate(r, (f) => (f === fieldId ? "____" : "(another blank)")) : r.label;
+};
 const speakersText = (topic) => topic.speakers.map((s) => `  - ${s.id}: ${s.role}`).join("\n");
 const printedText = (topic) => topic.form.rows.filter((r) => r.printed !== undefined).map((r) => `  - ${r.label}: ${r.printed}`).join("\n") || "  (none)";
 
@@ -63,9 +68,16 @@ export function buildScriptPrompt({ topic, plan, profile }) {
     "|---|---|---|---|---|---|---|",
     ...plan.answers.map((a) => `| ${a.question_id} | ${labelOf(topic, a.field_id)} | ${a.answer} | ${(a.accepted ?? []).join(" / ") || "-"} | ${a.wrong_value ?? "-"} | ${a.trap} | ${SCRIPT_TRAP[a.trap]} |`),
   ].join("\n");
+  const qidOf = (f) => plan.answers.find((a) => a.field_id === f)?.question_id;
   const rows = topic.form.rows
     .filter((r) => r.printed !== undefined || plan.answers.some((a) => a.field_id === r.field_id))
-    .map((r) => `  - ${r.printed !== undefined ? `${r.label}: ${r.printed}` : `${shown(r)} (question ${plan.answers.find((a) => a.field_id === r.field_id).question_id})`}`).join("\n");
+    .map((r) => {
+      if (r.printed !== undefined) return `  - ${r.label}: ${r.printed}`;
+      const section = r.section ? `[${r.section}] ` : "";
+      if (!r.template) return `  - ${section}${r.label}: (question ${qidOf(r.field_id)})`;
+      const must = r.says?.length ? `   <- the conversation MUST say: ${r.says.join(", ")}` : "";
+      return `  - ${section}${showTemplate(r, (f) => `(question ${qidOf(f)})`)}${must}`;
+    }).join("\n");
   return fill(template("script"), {
     TOPIC_TITLE: `${topic.title} (${topic.id})`,
     VARIANT_SETTING: variant.setting,

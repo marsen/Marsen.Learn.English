@@ -46,6 +46,8 @@ Reply with ONE JSON object and nothing else (no code fences, no commentary):
 10. A distractor (wrong_value) must be spoken literally, as that exact word, within two turns of the answer's turn, and rejected there. Do not place it earlier or later.
 11. A mishearing must be plausible. The clerk may only mishear a number that the other speaker actually said, and the wrong number must be a real, sensible value for that kind of answer (a day of the month is 1 to 31; a phone number or ID is a similar-sounding digit string). Never have someone "mishear" a number that was never said or that cannot exist.
 
+12. Facts printed on the form must be true in the conversation. Some rows are sentences or short notes with blanks, and words around the blanks are facts the candidate reads (for example "Includes use of the pool and sauna"). The conversation must state each of those facts in natural wording, and the lines marked "MUST say" must contain the listed keywords literally (spoken numbers as digits). Do not make any printed fact false. The candidate fills a blank only with what they hear, so a printed fact must not be the answer to a question.
+
 ## Trap requirements (per question, listed with the answers above)
 - spelling: the speaker says the word and then spells it out letter by letter in capitals with hyphens, for example "H-A-R-L-O-W". The quote you choose must include the spelled letters.
 - similar_numbers: within two turns before or after the answer, a confusable number must be mentioned, for example the clerk mishears ("Was that 3470?") and the speaker corrects it ("No, it's 3417."). Teens against tens: 13/30, 14/40 ... 19/90.

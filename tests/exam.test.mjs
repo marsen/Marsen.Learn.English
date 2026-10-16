@@ -6,7 +6,7 @@ import { JSDOM } from "jsdom";
 import { startServer } from "../scripts/serve.mjs";
 import * as core from "../exam/core.mjs";
 
-const SET = "s1-gym-0001";
+const SET = "s1-gym-0002";
 const load = async (f) => JSON.parse(await readFile(new URL(`../content/sets/${SET}/${f}`, import.meta.url)));
 
 test("gradeAnswers：全對、全空、混合；每題有題號、對錯、你寫的、正解", async () => {
@@ -84,6 +84,23 @@ test("頁面：答題卷有分段標題與行內前後文，空格編號連續",
   const line = d.querySelector(`#paper input[data-q="${inline.parts.find((p) => p.blank).blank}"]`).parentElement;
   assert.ok(!line.textContent.startsWith(`${inline.label}:`), "行內句型不另外印標籤");
   assert.ok(inline.parts.some((p) => p.text && line.textContent.includes(p.text)), "前後文有印出來");
+});
+
+test("頁面：paragraph 的分段連成一小段文字，list 的分段才有圓點行", async () => {
+  const paper = await load("paper.json");
+  const { d } = await openExam();
+  await begin(d);
+  const paras = paper.section_styles ? Object.entries(paper.section_styles).filter(([, v]) => v === "paragraph").map(([k]) => k) : [];
+  assert.ok(paras.length >= 2);
+  const heads = [...d.querySelectorAll("#paper h2.section")];
+  for (const h of heads) {
+    const group = h.nextElementSibling;
+    if (paras.includes(h.textContent)) {
+      assert.equal(group.tagName, "P", `${h.textContent} 是一小段文字`);
+      assert.ok(group.querySelectorAll(".line").length >= 1);
+      assert.ok([...group.querySelectorAll(".line")].every((l) => l.tagName === "SPAN"), "句子接在同一段裡，不是一行一行");
+    } else assert.equal(group.tagName, "DIV");
+  }
 });
 
 test("頁面：沒有錄音檔時，預覽後可以直接填答題卷，不播任何聲音，做完看到結果", async () => {

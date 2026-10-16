@@ -1,5 +1,6 @@
 import { findInText, findSpelled } from "./answer.mjs";
 import { normalize } from "./normalize.mjs";
+import { fieldOrder } from "./lib/template.mjs";
 
 const TRAPS = ["self_correction", "spelling", "similar_numbers", "paraphrase", "distractor", "none"];
 const NUM_WORD_PAIRS = { thirteen: "13", fourteen: "14", fifteen: "15", sixteen: "16", seventeen: "17", eighteen: "18", nineteen: "19", thirty: "30", forty: "40", fifty: "50", sixty: "60", seventy: "70", eighty: "80", ninety: "90" };
@@ -30,7 +31,7 @@ export function validate({ skeleton, plan, script, paper, topic, recipes, profil
   for (const e of script.evidence) need(e, ["question_id", "turn", "quote"], `evidence ${e.question_id ?? "?"}`);
   if (!structOk) return finish(issues);
 
-  const blanks = paper.rows.flatMap((r) => r.parts.filter((p) => p.blank).map((p) => ({ qid: p.blank, field_id: r.field_id })));
+  const blanks = paper.rows.flatMap((r) => r.parts.filter((p) => p.blank).map((p) => ({ qid: p.blank, field_id: p.field_id ?? r.field_id })));
   const planIds = plan.answers.map((a) => a.question_id);
   const sameSet = (a, b) => a.length === b.length && a.every((x) => b.includes(x));
   if (!sameSet(planIds, script.evidence.map((e) => e.question_id))) block("V1", "plan 與 evidence 的 question_id 不一致");
@@ -49,7 +50,7 @@ export function validate({ skeleton, plan, script, paper, topic, recipes, profil
   const turnIdx = new Map(script.turns.map((t, i) => [t.id, i]));
   const slotOf = new Map(skeleton.slots.map((s) => [s.question_id, s]));
   const evidenceOf = new Map(script.evidence.map((e) => [e.question_id, e]));
-  const rowOfField = new Map(paper.rows.filter((r) => r.field_id).map((r) => [r.field_id, r]));
+  const rowOfField = new Map(paper.rows.flatMap((r) => r.parts.filter((p) => p.blank).map((p) => [p.field_id ?? r.field_id, r])));
 
   // ---- V3a / V3b 證據 ----
   const evidenceSpan = new Map(); // qid -> {turn, start, end}（quote 在輪次文字中的位置）
@@ -180,6 +181,12 @@ export function validate({ skeleton, plan, script, paper, topic, recipes, profil
   }
   for (const name of fiction.name_blacklist) if (everything.toLowerCase().includes(name.toLowerCase())) block("V12", `使用了黑名單人名：${name}`);
 
+  // ---- V14 題目卷印出的事實，逐字稿一定要講到（says 的每個關鍵字都要出現）----
+  const spoken = script.turns.map((t) => t.text).join(" ").toLowerCase();
+  for (const r of paper.rows) for (const k of r.says ?? []) {
+    if (!spoken.includes(String(k).toLowerCase())) block("V14", `題目卷印出「${r.parts.map((p) => p.text ?? "____").join(" ")}」，逐字稿沒有講到「${k}」`);
+  }
+
   // ---- V13 骨架與 plan、配方、主題一致 ----
   const recipe = recipes.find((r) => r.id === skeleton.recipe);
   if (!recipe) block("V13", `找不到配方 ${skeleton.recipe}`);
@@ -187,7 +194,7 @@ export function validate({ skeleton, plan, script, paper, topic, recipes, profil
   const counts = {};
   for (const s of skeleton.slots) counts[s.trap] = (counts[s.trap] ?? 0) + 1;
   if (recipe) for (const t of TRAPS) if ((counts[t] ?? 0) !== (recipe.traps[t] ?? 0)) block("V13", `陷阱 ${t} 有 ${counts[t] ?? 0} 題，配方 ${recipe.id} 要 ${recipe.traps[t] ?? 0}`);
-  const rowIndex = new Map(topic.form.rows.map((r, i) => [r.field_id, i]));
+  const rowIndex = fieldOrder(topic);
   skeleton.slots.forEach((s, i) => {
     const f = topic.fields_pool.find((x) => x.field_id === s.field_id);
     if (!f) { block("V13", `骨架的欄位 ${s.field_id} 不在主題欄位池`, s.question_id); return; }

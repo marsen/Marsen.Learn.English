@@ -48,3 +48,4 @@ Reply with ONE JSON object and nothing else (no code fences, no commentary):
 6. Do not choose answers that are only distinguishable by an obscure spelling unless the question is a spelling question.
 7. If a question belongs to a group (same group name), the answers must be consistent with each other (for example a house number and a street in the same address).
 8. Make the set different from a typical one: avoid the most common first-choice names and numbers.
+9. If a question's "form label" is a sentence with ____ (for example "Works for ____"), the answer must complete that sentence naturally and grammatically, and must not repeat words already printed in the sentence. Other words printed in such a sentence are facts the later conversation will have to state, so never choose an answer that contradicts them.

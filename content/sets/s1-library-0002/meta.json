@@ -3,7 +3,7 @@
   "seed": 20261017,
   "status": "papered",
   "created_at": "2026-10-16T07:29:09.819Z",
-  "updated_at": "2026-10-16T09:20:45.059Z",
+  "updated_at": "2026-10-16T09:35:52.092Z",
   "schema_version": 1,
   "generator_version": "0.1.0",
   "inputs": {
@@ -21,11 +21,11 @@
       "at": "2026-10-16T07:29:09.819Z"
     },
     "paper": {
-      "hash": "4b2f353d54f71b5d",
+      "hash": "41edff5640d92dc5",
       "from": {
         "skeleton": "916dd2bd009e79a2"
       },
-      "at": "2026-10-16T09:20:44.916Z"
+      "at": "2026-10-16T09:35:45.973Z"
     },
     "plan": {
       "hash": "1441b56f2a8297d7",
@@ -51,12 +51,12 @@
       "from": {
         "plan": "1441b56f2a8297d7",
         "script": "2d7f330456fb44b5",
-        "paper": "4b2f353d54f71b5d"
+        "paper": "41edff5640d92dc5"
       },
       "ok": false,
       "block": 1,
       "warn": 0,
-      "at": "2026-10-16T09:20:45.057Z"
+      "at": "2026-10-16T09:35:52.090Z"
     },
     "blind": {
       "from": {
