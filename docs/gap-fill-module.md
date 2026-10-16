@@ -59,6 +59,8 @@ M3 與 M4 彼此不依賴，各自只依賴 M2，順序可以對調。
 | O | 語音品質 | 已移除瀏覽器內建語音；聲音完全留到 M4（TTS 服務商見 M） |
 | P | 播報詞的措辭 | 照雅思的結構寫，措辭依記憶，未逐字核對官方音檔：`<<TBD>>` |
 | Q | 逐字稿目標字數是否調高以配合總長 7 到 8 分鐘 | 目前 650 到 800 字，估計總長約 7 分鐘上下；是否調整 `<<TBD>>` |
+| S | 虛擬配音員與預錄字母庫 | 計劃已寫在 `docs/voice-cast-plan.md`；等 M4、M5 完成後補：`<<TBD>>` |
+| T | s1-library-0004 名字類答案 4 題，新規則（V15，上限 3 題）驗證不過 | 重抽或停用：`<<TBD>>`（與 K 一併決定） |
 | R | 澳洲、加拿大口音怎麼做 | Kokoro 沒有；方向是參考錄音複製，參考錄音的授權未解決：`<<TBD>>` |
 
 ## 1.5 文件對照
@@ -175,7 +177,7 @@ AI 的步驟目前用「人工模式」：程式印出 prompt，由人（或 Cla
 
 ## 3.4 驗證與重寫
 
-- 驗證規則 V1 到 V14，全部由程式執行，見附錄 K。分「擋」與「警示」兩級。
+- 驗證規則 V1 到 V15，全部由程式執行，見附錄 K。分「擋」與「警示」兩級。
 - 驗證不通過：把失敗原因帶回去重寫，最多 2 次，超過就停下來（要用 `--force` 才能繼續）。
 - 每次重寫後，整份逐字稿重新驗證。
 - 盲答只是警示，不能取代人工審稿。
@@ -274,7 +276,8 @@ AI 的步驟目前用「人工模式」：程式印出 prompt，由人（或 Cla
 - 頁面與測試已完成。
 - 驗收：你在瀏覽器完整做完一份，批改正確。**未完成。**
 - 與 M4 的接口：有 `audio/full.mp3` 就播檔案；沒有就不播，只能先填答題卷。**播檔案的程式已寫好，但尚未用真實錄音驗證。**
-- **M3 要跟著改（M4 開工時做）：** 有錄音的題組，音檔裡已經含播報與留白，頁面不能再自己倒數 30 秒看題。頁面改成依 `timing.json` 的事件走：留白時（`pause`）顯示題目並標出該區題號（1 到 5 或 6 到 10）、對話時開放作答、結尾檢查時間結束後自動送出。沒有錄音的題組維持現在的開發流程。細節 `<<TBD>>`。
+- **M3 已跟著改：** 錄音旁有 `audio/timing.json` 時，音檔裡已含播報與留白，頁面不再自己倒數看題；改依時間軸走。看題停頓（`pause`）時顯示該停頓的題號範圍（輸入格標黃底）與剩餘秒數；對話時顯示「錄音播放中」；最後檢查時間顯示檢查倒數；音檔播完自動批改。沒有 `timing.json` 的題組維持舊流程（頁面自己的看題倒數）；沒有錄音的題組維持開發流程。已有自動測試；**尚未用真人完整跑過：未完成。**
+- 錄音檔放 `content/sets/<id>/audio/`，該資料夾列在 `.gitignore`（錄音是產出物，不進 git）。
 
 ---
 
@@ -291,35 +294,45 @@ AI 的步驟目前用「人工模式」：程式印出 prompt，由人（或 Cla
 | 輸入 | 驗證通過且人工審過的 `script.json`；這一組的聲音設定（每個說話者一組聲音與口音）；固定播報錄音片段 |
 | 輸出 | `audio/full.mp3`、`audio/timing.json`（附錄 O） |
 
-## 5.3 錄音結構（已定案：留白 15 秒；播報照雅思）
+## 5.3 錄音結構（題組與停頓點由題目自動推算；留白秒數待確認）
+
+**停頓點不寫死在「1 到 5、6 到 10」，由答題卷與逐字稿推算（程式 `make_audio.py` 的 `plan_groups`）：**
+
+1. 題組：答題卷的每個分段（section）是一組，題號依空格順序編號。
+2. 少於 2 題的組併入下一組；最後一組太小則併入前一組。（門檻 2 是預設值，憑直覺定，待聽過後調整。）
+3. 停頓放在該組「最後一題的證據句」之後；每組的證據句必須全部早於下一組最早的證據句，否則報錯、不產生錄音。
+4. 播報詞由題組產生：單題 "question 5"；兩題 "questions 5 and 6"；三題以上 "questions 1 to 4"。
 
 | 順序 | 內容 | 說明 |
 |---|---|---|
-| 1 | 開場播報 | 固定句型加本題情境句，例如 "You will hear a woman enquiring about joining a gym." |
-| 2 | 播報：先看第 1 到 5 題 | "First you have some time to look at questions 1 to 5." |
-| 3 | 留白 15 秒 | 看題 |
-| 4 | 播報：開始聽 | "Now listen and answer questions 1 to 5." |
-| 5 | 對話前半 | 到第 5 題的證據句之後、第 6 題之前結束 |
-| 6 | 播報：先看第 6 到 10 題 | "Before you hear the rest of the conversation, you have some time to look at questions 6 to 10." |
-| 7 | 留白 15 秒 | 看題 |
-| 8 | 播報：繼續聽 | "Now listen to the rest of the conversation." |
-| 9 | 對話後半 | 第 6 到 10 題 |
-| 10 | 結尾播報與檢查時間 | "That is the end of Section 1. You now have 30 seconds to check your answers."，接著留白 30 秒（秒數取自 `check_seconds`） |
+| 1 | 開場播報 | "Section 1. Listen and answer questions 1 to 10." 加本題情境句，例如 "You will hear a university student joining a fitness club." |
+| 2 | 播報：先看第一組題 | "First you have some time to look at questions 1 to 4." |
+| 3 | 留白（`pause_seconds`） | 看題 |
+| 4 | 播報：開始聽 | "Now listen and answer questions 1 to 4." |
+| 5 | 該組的對話 | 到該組最後一題的證據句為止 |
+| 6 | 播報：先看下一組題 | "Before you hear the rest of the conversation, you have some time to look at questions 5 and 6." |
+| 7 | 留白 | 看題 |
+| 8 | 播報：繼續聽 | "Now listen to the rest of the conversation and answer questions 5 and 6." |
+| 9 | 下一組對話 | 步驟 6 到 9 對每個後續題組重複 |
+| 10 | 結尾播報與檢查時間 | "That is the end of Section 1. You now have 30 seconds to check your answers."，接著留白 30 秒（取自 `check_seconds`） |
 
+- gym-0002 試作的分組：第 1–4、5–6、7–8、9–10 題（對應 Personal details、Study or work、Gym information、Fees and payment），停頓點在第 12、18、22 句之後。
 - 措辭依我對雅思的記憶寫成，未逐字核對官方音檔：`<<TBD>>`（1.4 的 P）。
-- 注意：留白 15 秒是你的決定，與 `exam-profile.json` 的 `preview_seconds`（30 秒，來源第三方描述）不同；M4 開工時要新增設定項 `pause_seconds`（15，來源：你的決定）。
+- **留白秒數：** 原決定 15 秒；你後來提到可以拉長到 20 秒。試作用 20 秒（命令列 `--pause`），**正式值待你確認**：`<<TBD>>`。M4 正式化時新增設定項 `pause_seconds`（來源：你的決定）。它與 `exam-profile.json` 的 `preview_seconds`（30 秒，來源第三方描述）不同。
 
 ## 5.4 錄音片段與合併
 
 **固定播報片段：** 步驟 2、4、6、8、10 的播報是固定句子，一次合成後存成檔案，所有題組共用，不重複合成。播報員用固定的一個聲音。步驟 1 的情境句每個題組不同，要另外合成。情境句的英文怎麼來（主題檔每個變體加一個英文欄位，或由 AI 寫）：`<<TBD>>`。
 
-**對話片段：** 每一輪單獨合成一段。每個說話者用自己的聲音與口音（你的決定：兩人用不同口音錄）。輪與輪之間插入 0.4 到 0.8 秒靜音。
+**對話片段：** 每一輪單獨合成一段。每個說話者用自己的聲音與口音（你的決定：兩人用不同口音錄）。輪與輪之間插入靜音（目前：A 之後 0.5 秒、B 之後 0.7 秒）。
+
+**拼字與數字：** 逐字母拼字（例如 R-H-I-A-N-N-O-N）：名字念完先停 0.6 秒，再念字母，拼完停 0.4 秒再接後面的話。字母改用字母名稱字（ay、bee、see…），整串合成後在最長的靜音處切開，字母間改成固定 0.25 秒，拼字用 0.8 倍速。4 位以上的純數字逐位念（4130 念成 four one three zero）。Kokoro 的拼字品質仍不穩（A 常被吞掉），見 5.6。
 
 **合併：** 所有片段在記憶體中串接並插入靜音，一次輸出 `full.mp3`。每一段的起訖秒數由實際取樣數計算，不用文字長度估算。對話片段以「文字加聲音」的雜湊值快取，改一輪只重合成那一輪，其餘沿用。
 
-**前後半切點：** `script.json` 需要新增欄位，指出前半段最後一輪的 id（`break_after_turn`）。驗證要求：切點之前剛好 5 題的證據、之後剛好 5 題。新驗證規則與欄位細節：`<<TBD>>`。
+**切點：** 不新增 `script.json` 欄位；切點由 `evidence` 與答題卷分段推算（見 5.3）。證據順序衝突時 `make_audio` 直接報錯。
 
-**總長目標：** 整段錄音（含播報與留白）約 7 到 8 分鐘（你的決定，與雅思聽力每個 Section 平均長度相近）。以目前逐字稿 650 到 800 字估算，對話約 5 分鐘，加上播報與留白約 2 分鐘，總長約 7 分鐘；是否要調高字數：`<<TBD>>`（1.4 的 Q）。
+**總長目標：** 整段錄音（含播報與留白）約 7 到 8 分鐘（你的決定，與雅思聽力每個 Section 平均長度相近）。gym-0002 實測（留白 20 秒、四組、檢查 30 秒）：總長 7.1 分鐘，其中對話與播報約 5 分鐘、停頓 110 秒，落在目標範圍；是否調高字數：`<<TBD>>`（1.4 的 Q）。
 
 ## 5.5 規則
 
@@ -329,13 +342,14 @@ AI 的步驟目前用「人工模式」：程式印出 prompt，由人（或 Cla
 
 ## 5.6 未決定
 
-- TTS 服務商：本機模型調查已完成，建議先用 Kokoro 做美、英；最後選哪個 `<<TBD>>`
+- TTS 服務商：本機模型調查已完成；試作用 Kokoro（旁白 bm_george、A am_michael、B bf_emma）。最後選哪個 `<<TBD>>`
+- **逐字母拼字：** Kokoro 與 Piper 都無法穩定念字母（A 常被吞掉；Piper 四個聲音單獨念字母，ASR 辨識正確 4 到 19 個 / 26 個）。網路上沒有開源本地模型的現成解法，商用引擎靠 SSML 的 say-as characters。方向：固定「虛擬配音員」，字母、數字預錄一次並驗證，見 `docs/voice-cast-plan.md`。`<<TBD>>`，等 M4、M5 完成後再回頭做。
 - 澳洲、加拿大口音：`<<TBD>>`（1.4 的 R）
 - 費用：本機模型不收費；是否改用雲端服務 `<<TBD>>`
-- 每個說話者的聲音設定存在哪裡（`plan.scenario` 目前只有一個口音值）：`<<TBD>>`
+- 每個說話者的聲音設定存在哪裡（`plan.scenario` 目前只有一個口音值）：`<<TBD>>`；配音員資料表見 voice-cast-plan
 - 結果頁的內容：`<<TBD>>`（見 1.4 的 N）
-- 逐字母拼字念法不合格時的處理：規格預想「逗號分隔或 SSML 拼讀標記」，但需實際測試，`<<TBD>>`
-- 是否在電腦上安裝本機模型：待你同意
+- 加重音與音量：Kokoro 沒有重音或音量控制語法，只能事後放大音量：`<<TBD>>`
+- 在電腦上安裝本機模型：待你同意（目前試作都在雲端容器）
 
 ## 5.7 驗收
 
@@ -412,6 +426,7 @@ generator 內的檔案：`cli.mjs`（指令）、`draw.mjs`（抽籤）、`paper
 | check_seconds | 30 | 檢查時間（電腦版全卷結束後另有 2 分鐘） |
 | target_words | [650, 800] | 逐字稿目標字數 |
 | length_tolerance | 0.15 | 字數容許誤差，超過只出警示 |
+| max_name_questions | 3 | 人名、街名、地名類答案（name_spelled、place）最多幾題（3 成）；抽題時超過重抽，驗證 V15 擋 |
 | min_gap_words | 25 | 相鄰兩題證據之間至少隔幾個字 |
 | min_warmup_turns | 3 | 第 1 題前至少幾輪暖身 |
 | topic_cooldown_days | 0 | 同主題 N 天內不重複；0＝關閉 |
@@ -532,7 +547,7 @@ evidence 只是定位索引。驗證器用 turns 的原文核對：`quote` 必�
 
 不得洩漏答案：答案不得出現在標題、說明、以及該題所在那一列的標籤與印好的字。別列印好的值剛好等於某題答案，不算洩漏。
 
-## 附錄 K　驗證規則 V1 到 V14
+## 附錄 K　驗證規則 V1 到 V15
 
 驗證回傳 `{ ok, issues[] }`；issues 每項 `{ rule, level, message, question_id? }`；沒有任何「擋」級問題才是 ok。
 
@@ -554,6 +569,7 @@ evidence 只是定位索引。驗證器用 turns 的原文核對：`quote` 必�
 | V12 | 電話、email、人名都是虛構的 | 擋 |
 | V13 | 答案清單與骨架一致；骨架符合配方、欄位限制、成組規則 | 擋 |
 | V14 | 題目卷某列的 `says` 關鍵字，逐字稿都要出現 | 擋 |
+| V15 | 人名、街名、地名類答案（name_spelled、place）不超過 `max_name_questions` 題 | 擋 |
 
 ## 附錄 L　盲答結果 check.json
 
@@ -595,7 +611,13 @@ evidence 只是定位索引。驗證器用 turns 的原文核對：`quote` 必�
 
 ## 附錄 O　時間軸 audio/timing.json（M4，格式暫定）
 
-`set_id`、`total_seconds`、`events[]`（依播放順序，單位秒）。每項 `{ type, start, end }`，`type` 有三種：`announce`（播報，另帶 `id` 與 `questions`，例如 "1-5"）、`pause`（留白，另帶 `questions`；結尾檢查時間用 `check`）、`turn`（對話一輪，另帶 `id` 對應 `script.json`）。格式暫定。
+`set_id`、`total_seconds`、`events[]`（依播放順序，單位秒，四捨五入到 0.01）。每項 `{ type, start, end }`，`type` 有三種：
+
+- `announce`：播報，另帶 `id`（intro、look1、now1、look2、now2…、end）與 `text`。
+- `pause`：留白，另帶 `id`（pause1、pause2…；結尾檢查時間為 `check`）、`seconds`、`questions`（[起, 迄] 題號，例如 [1, 4]；`check` 為 [1, 題數]）。
+- `turn`：對話一輪，另帶 `id`（對應 `script.json`）、`speaker`、`text`、`group`（第幾個題組）。
+
+輪與輪之間的短靜音不記錄成事件。考試頁以 `eventAt`／`viewOf` 判斷目前狀態。格式暫定。
 
 ## 附錄 P　測試資料
 
@@ -616,7 +638,7 @@ evidence 只是定位索引。驗證器用 turns 的原文核對：`quote` 必�
 | 配方要 5 個拼字、欄位池只有 4 個允許拼字 | 回報 NO_ELIGIBLE_CANDIDATE |
 | plan 的陷阱與骨架不一致 | V13 失敗 |
 
-目前共 100 個自動測試。
+目前共 103 個自動測試（含 V15、時間軸核心函式、考試頁依時間軸播放）。
 
 ## 附錄 Q　已知風險
 
