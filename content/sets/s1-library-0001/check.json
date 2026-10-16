@@ -18,7 +18,9 @@
     {
       "question_id": "q03",
       "answer": "Wittersham Road",
-      "alternatives": [],
+      "alternatives": [
+        "Wittersham"
+      ],
       "confidence": "high"
     },
     {
@@ -51,16 +53,14 @@
       "question_id": "q08",
       "answer": "course books",
       "alternatives": [
-        "borrowing books"
+        "books"
       ],
       "confidence": "high"
     },
     {
       "question_id": "q09",
-      "answer": "Marine biology",
-      "alternatives": [
-        "coral reefs"
-      ],
+      "answer": "marine biology",
+      "alternatives": [],
       "confidence": "high"
     },
     {

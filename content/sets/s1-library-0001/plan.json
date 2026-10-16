@@ -40,7 +40,8 @@
       "field_id": "street_name",
       "answer": "Wittersham",
       "accepted": [
-        "wittersham"
+        "wittersham",
+        "Wittersham Road"
       ],
       "type": "name_spelled",
       "trap": "spelling",

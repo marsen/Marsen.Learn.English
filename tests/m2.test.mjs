@@ -44,3 +44,9 @@ test("三份 prompt 都能完整填出，且盲答 prompt 不含答案", () => {
   assert.ok(!/\{\{/.test(blind));
   assert.ok(!blind.includes('"evidence"'));
 });
+test("盲答備選若只是寫法不同（比對規則判對）就不警示", () => {
+  const { plan } = fx();
+  const check = { answers: plan.answers.map((a) => ({ question_id: a.question_id, answer: a.answer, alternatives: [a.answer.toUpperCase()], confidence: "high" })) };
+  const issues = compareBlind({ plan, check }).issues;
+  assert.ok(!issues.some((i) => i.rule === "B2" && i.question_id === plan.answers[0].question_id));
+});

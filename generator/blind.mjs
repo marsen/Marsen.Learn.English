@@ -10,8 +10,10 @@ export function compareBlind({ plan, check }) {
     if (!matchesAnswer(a.answer_policy, b.answer ?? "", a)) {
       issues.push({ rule: "B1", level: "warn", question_id: a.question_id, message: `盲答寫「${b.answer}」，標準答案是「${a.answer}」（${a.trap}）` });
     }
-    if ((b.alternatives ?? []).length) {
-      issues.push({ rule: "B2", level: "warn", question_id: a.question_id, message: `盲答認為還有可能的答案：${b.alternatives.join("、")}` });
+    // 只是寫法不同、比對規則本來就判對的備選，不算歧義
+    const real = (b.alternatives ?? []).filter((x) => !matchesAnswer(a.answer_policy, x, a));
+    if (real.length) {
+      issues.push({ rule: "B2", level: "warn", question_id: a.question_id, message: `盲答認為還有可能的答案：${real.join("、")}` });
     }
     if (b.confidence === "low") issues.push({ rule: "B3", level: "warn", question_id: a.question_id, message: "盲答信心低" });
   }
