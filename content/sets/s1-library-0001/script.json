@@ -139,7 +139,7 @@
     {
       "id": "t28",
       "speaker": "B",
-      "text": "Mostly course books. The reading lists are enormous, and honestly I can't afford to buy them all."
+      "text": "Mostly course books. Not novels or anything, the reading lists are enormous, and honestly I can't afford to buy them all."
     },
     {
       "id": "t29",
@@ -211,7 +211,7 @@
     {
       "question_id": "q08",
       "turn": "t28",
-      "quote": "Mostly course books."
+      "quote": "Mostly course books. Not novels or anything"
     },
     {
       "question_id": "q09",

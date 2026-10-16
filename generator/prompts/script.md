@@ -41,6 +41,7 @@ Reply with ONE JSON object and nothing else (no code fences, no commentary):
 5. Each answer appears in the talk in the form given. Write numbers and dates as digits ("15", "3417", "the 14th of March", "07700 900 123"). A date answer must appear as a full date with day and month.
 6. Do NOT read the form out loud and do not use the form labels as the speakers' wording. People talk naturally: a clerk asks questions, the customer answers in ordinary sentences with some "um", "well", "actually", repetition, small digressions. Real speech is a little untidy; it must still be easy to follow.
 7. Everything is fictional. Phone numbers only 07700 900 xxx; emails only example.com.
+8. The answer must be the only reasonable answer. If the answer is a modifier plus a noun (for example "course books"), the talk must contrast it so the bare noun alone would be wrong or too vague (for example "Not novels or anything, mostly course books"). Do not mention a second candidate answer for the same question that a listener could reasonably write instead (for example a hobby and its sub-topic).
 
 ## Trap requirements (per question, listed with the answers above)
 - spelling: the speaker says the word and then spells it out letter by letter in capitals with hyphens, for example "H-A-R-L-O-W". The quote you choose must include the spelled letters.

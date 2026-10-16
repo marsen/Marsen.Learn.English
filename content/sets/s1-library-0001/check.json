@@ -4,9 +4,7 @@
     {
       "question_id": "q01",
       "answer": "17 November",
-      "alternatives": [
-        "November 17"
-      ],
+      "alternatives": [],
       "confidence": "high"
     },
     {
@@ -18,9 +16,7 @@
     {
       "question_id": "q03",
       "answer": "Wittersham Road",
-      "alternatives": [
-        "Wittersham"
-      ],
+      "alternatives": [],
       "confidence": "high"
     },
     {
@@ -52,9 +48,7 @@
     {
       "question_id": "q08",
       "answer": "course books",
-      "alternatives": [
-        "books"
-      ],
+      "alternatives": [],
       "confidence": "high"
     },
     {
