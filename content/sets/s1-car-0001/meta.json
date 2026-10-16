@@ -3,11 +3,11 @@
   "seed": 20261019,
   "status": "validated",
   "created_at": "2026-10-16T07:29:10.049Z",
-  "updated_at": "2026-10-16T07:30:37.551Z",
+  "updated_at": "2026-10-16T07:53:44.408Z",
   "schema_version": 1,
   "generator_version": "0.1.0",
   "inputs": {
-    "topic": "b3abeebb91aa914a",
+    "topic": "1f3ef7979c38747b",
     "recipes": "82a0e878bf46d387",
     "profile": "1390cf2fe82e58fa"
   },
@@ -18,7 +18,14 @@
   "stages": {
     "skeleton": {
       "hash": "a433ba836434fa4c",
-      "at": "2026-10-16T07:29:10.049Z"
+      "at": "2026-10-16T07:50:39.609Z",
+      "edits": [
+        {
+          "at": "2026-10-16T07:50:39.609Z",
+          "note": "date_of_birth 不再允許相近數字陷阱；此題組的日期題本來就沒有該陷阱，不受影響",
+          "from_hash": "a433ba836434fa4c"
+        }
+      ]
     },
     "paper": {
       "hash": "15ac628464b9f9d5",

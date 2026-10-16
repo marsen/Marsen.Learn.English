@@ -146,7 +146,6 @@
       "type": "date",
       "allowed_traps": [
         "self_correction",
-        "similar_numbers",
         "none"
       ],
       "answer_policy": "date_equivalence",

@@ -1,0 +1,227 @@
+{
+  "set_id": "s1-library-0001",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "A",
+      "text": "Good morning! Welcome to the main library. It's been absolutely manic this week, so I'm afraid you've caught us on one of our busiest days. Have you been waiting long?"
+    },
+    {
+      "id": "t2",
+      "speaker": "B",
+      "text": "Morning. Not too bad, actually, about ten minutes. There was a queue right out of the door, but everyone seemed quite friendly. I only arrived in the city on Saturday, so I'm still finding my way around."
+    },
+    {
+      "id": "t3",
+      "speaker": "A",
+      "text": "Oh, welcome! Whereabouts have you come from?"
+    },
+    {
+      "id": "t4",
+      "speaker": "B",
+      "text": "Leeds, originally, so it's not far, but it's my first time living away from home. The weather here is just as grey as back home, which is oddly comforting."
+    },
+    {
+      "id": "t5",
+      "speaker": "A",
+      "text": "Ha, well, that's something. Right, so you'd like to sign up as a new member, is that right?"
+    },
+    {
+      "id": "t6",
+      "speaker": "B",
+      "text": "Yes, please. Um, the university sent me an email saying I should get it done in the first week, and the induction talk yesterday said the same thing, so here I am."
+    },
+    {
+      "id": "t7",
+      "speaker": "A",
+      "text": "Perfect, and it only takes a few minutes. Let me bring the form up on the screen. First of all, when were you born?"
+    },
+    {
+      "id": "t8",
+      "speaker": "B",
+      "text": "Oh, it's in the middle of November, so ages away yet."
+    },
+    {
+      "id": "t9",
+      "speaker": "A",
+      "text": "Sorry, did you say the 70th?"
+    },
+    {
+      "id": "t10",
+      "speaker": "B",
+      "text": "No, no, it's 17 November. I'll be nineteen, which feels terribly old."
+    },
+    {
+      "id": "t11",
+      "speaker": "A",
+      "text": "Not at all, you're still a baby to some of the staff here. Lovely. And where are you living at the moment? Is it one of the halls?"
+    },
+    {
+      "id": "t12",
+      "speaker": "B",
+      "text": "Well, no, I'm in a shared house just off the ring road, with three other first years. It's number 62, no sorry, 52. I always mix it up with my old address, which is ridiculous because I've only just moved in."
+    },
+    {
+      "id": "t13",
+      "speaker": "A",
+      "text": "Easily done. And the name of the road?"
+    },
+    {
+      "id": "t14",
+      "speaker": "B",
+      "text": "Wittersham Road. That's W-I-T-T-E-R-S-H-A-M. People always get it wrong because it sounds like there ought to be an extra T in the middle."
+    },
+    {
+      "id": "t15",
+      "speaker": "A",
+      "text": "Got it, thanks. Now, do you have a mobile number we can reach you on?"
+    },
+    {
+      "id": "t16",
+      "speaker": "B",
+      "text": "Yes, it's 07700 900 614. I only got the new SIM last week, so I still have to look it up every time somebody asks."
+    },
+    {
+      "id": "t17",
+      "speaker": "A",
+      "text": "Sorry, was that 640 at the end?"
+    },
+    {
+      "id": "t18",
+      "speaker": "B",
+      "text": "No, 614. One, four, not four, oh."
+    },
+    {
+      "id": "t19",
+      "speaker": "A",
+      "text": "Thanks, that's saved. And what's your university ID? It should be on the card they gave you at registration."
+    },
+    {
+      "id": "t20",
+      "speaker": "B",
+      "text": "Let me have a look. It's here somewhere, um, in my wallet. Right, it's 24163085. Quite a mouthful, isn't it?"
+    },
+    {
+      "id": "t21",
+      "speaker": "A",
+      "text": "Just checking I've typed it properly. Was it 2460 3085?"
+    },
+    {
+      "id": "t22",
+      "speaker": "B",
+      "text": "No, 2416. Sixteen, not sixty. Then 3085 after that."
+    },
+    {
+      "id": "t23",
+      "speaker": "A",
+      "text": "Brilliant, that's matched up with your record. We'll print the card within a couple of days. When would you like to pick it up?"
+    },
+    {
+      "id": "t24",
+      "speaker": "B",
+      "text": "Well, I'd say Tuesday, but actually, I've got a lab that day and it overruns every week, apparently. Thursday is better for me, I'm free after lunch."
+    },
+    {
+      "id": "t25",
+      "speaker": "A",
+      "text": "That's fine, I've noted it down. We've got a few libraries dotted around the city, as you probably know, and they all share the same catalogue. Which one is handiest for you?"
+    },
+    {
+      "id": "t26",
+      "speaker": "B",
+      "text": "Northgate is the closest to my house. It's about five minutes on foot, and I've heard it stays open later than this one, which suits me because I'm hopeless in the mornings."
+    },
+    {
+      "id": "t27",
+      "speaker": "A",
+      "text": "It does, and it's quieter too, with some really comfortable chairs by the windows. Now, thinking about the next few months, what will you mainly be borrowing from us?"
+    },
+    {
+      "id": "t28",
+      "speaker": "B",
+      "text": "Mostly course books. Not novels or anything, the reading lists are enormous, and honestly I can't afford to buy them all."
+    },
+    {
+      "id": "t29",
+      "speaker": "A",
+      "text": "Very sensible, that's what we're here for. And what are you studying? Anything you're really into?"
+    },
+    {
+      "id": "t30",
+      "speaker": "B",
+      "text": "Marine biology, hands down, I'm completely obsessed with it. I'd love to be out on a research boat one day, even if I'm a bit prone to seasickness."
+    },
+    {
+      "id": "t31",
+      "speaker": "A",
+      "text": "Ha, that could be a problem, but best of luck. Last thing. When your books are ready or overdue, we can send you a text, or an email, whichever you prefer."
+    },
+    {
+      "id": "t32",
+      "speaker": "B",
+      "text": "Text is no good for me, I never see them, so email, please. I check my inbox all day."
+    },
+    {
+      "id": "t33",
+      "speaker": "A",
+      "text": "Email it is. That's everything done. You'll get a message when the card is ready, so enjoy your first week!"
+    },
+    {
+      "id": "t34",
+      "speaker": "B",
+      "text": "Thanks so much, you've been really helpful. Cheers!"
+    }
+  ],
+  "evidence": [
+    {
+      "question_id": "q01",
+      "turn": "t10",
+      "quote": "No, no, it's 17 November."
+    },
+    {
+      "question_id": "q02",
+      "turn": "t12",
+      "quote": "It's number 62, no sorry, 52."
+    },
+    {
+      "question_id": "q03",
+      "turn": "t14",
+      "quote": "Wittersham Road. That's W-I-T-T-E-R-S-H-A-M."
+    },
+    {
+      "question_id": "q04",
+      "turn": "t16",
+      "quote": "Yes, it's 07700 900 614."
+    },
+    {
+      "question_id": "q05",
+      "turn": "t20",
+      "quote": "Right, it's 24163085."
+    },
+    {
+      "question_id": "q06",
+      "turn": "t24",
+      "quote": "Thursday is better for me, I'm free after lunch."
+    },
+    {
+      "question_id": "q07",
+      "turn": "t26",
+      "quote": "Northgate is the closest to my house. It's about five minutes on foot, and I've heard it stays open later than this one, which suits me because I'm hopeless in the mornings."
+    },
+    {
+      "question_id": "q08",
+      "turn": "t28",
+      "quote": "Mostly course books. Not novels or anything"
+    },
+    {
+      "question_id": "q09",
+      "turn": "t30",
+      "quote": "Marine biology, hands down, I'm completely obsessed with it."
+    },
+    {
+      "question_id": "q10",
+      "turn": "t32",
+      "quote": "Text is no good for me, I never see them, so email, please."
+    }
+  ]
+}

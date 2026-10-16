@@ -1,0 +1,75 @@
+{
+  "set_id": "s1-library-0004",
+  "seed": 20261022,
+  "status": "validated",
+  "created_at": "2026-10-16T07:50:39.865Z",
+  "updated_at": "2026-10-16T07:53:44.356Z",
+  "schema_version": 1,
+  "generator_version": "0.1.0",
+  "inputs": {
+    "topic": "9bb89be8e76d2f32",
+    "recipes": "82a0e878bf46d387",
+    "profile": "1390cf2fe82e58fa"
+  },
+  "retries": {
+    "plan": 0,
+    "script": 0
+  },
+  "stages": {
+    "skeleton": {
+      "hash": "3142f4b65771ee7a",
+      "at": "2026-10-16T07:50:39.866Z"
+    },
+    "paper": {
+      "hash": "8dcdfe55addd52d9",
+      "from": {
+        "skeleton": "3142f4b65771ee7a"
+      },
+      "at": "2026-10-16T07:50:39.867Z"
+    },
+    "plan": {
+      "hash": "238af4996377139f",
+      "from": {
+        "skeleton": "3142f4b65771ee7a"
+      },
+      "prompt": "07bdf2b8e5612b6e",
+      "model": "claude-sonnet-5-5 (subagent)",
+      "mode": "manual",
+      "at": "2026-10-16T07:51:10.870Z"
+    },
+    "script": {
+      "hash": "b4b72b09c4aa4181",
+      "from": {
+        "plan": "238af4996377139f"
+      },
+      "prompt": "d1bf85b265c394c1",
+      "model": "claude-sonnet-5-5 (subagent)",
+      "mode": "manual",
+      "at": "2026-10-16T07:52:27.763Z"
+    },
+    "validate": {
+      "from": {
+        "plan": "238af4996377139f",
+        "script": "b4b72b09c4aa4181",
+        "paper": "8dcdfe55addd52d9"
+      },
+      "ok": true,
+      "block": 0,
+      "warn": 0,
+      "at": "2026-10-16T07:52:27.887Z"
+    },
+    "blind": {
+      "from": {
+        "plan": "238af4996377139f",
+        "script": "b4b72b09c4aa4181",
+        "paper": "8dcdfe55addd52d9",
+        "check": "b38af09dc3b9b60d"
+      },
+      "prompt": "b2e164365699e6da",
+      "model": "claude-sonnet-5-5 (subagent)",
+      "mode": "manual",
+      "warnings": 2,
+      "at": "2026-10-16T07:52:52.714Z"
+    }
+  }
+}

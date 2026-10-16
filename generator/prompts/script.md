@@ -44,6 +44,7 @@ Reply with ONE JSON object and nothing else (no code fences, no commentary):
 8. The answer must be the only reasonable answer. If the answer is a modifier plus a noun (for example "course books"), the talk must contrast it so the bare noun alone would be wrong or too vague (for example "Not novels or anything, mostly course books"). Do not mention a second candidate answer for the same question that a listener could reasonably write instead (for example a hobby and its sub-topic).
 9. Confusable numbers must appear as digits or as the word, within two turns of the answer's turn. This also holds for dates: if the day is 17, someone must say "70th" or "seventy" nearby (for example the clerk asks "The 70th?" and the speaker corrects). Do not rely on an ordinal like "7th" alone.
 10. A distractor (wrong_value) must be spoken literally, as that exact word, within two turns of the answer's turn, and rejected there. Do not place it earlier or later.
+11. A mishearing must be plausible. The clerk may only mishear a number that the other speaker actually said, and the wrong number must be a real, sensible value for that kind of answer (a day of the month is 1 to 31; a phone number or ID is a similar-sounding digit string). Never have someone "mishear" a number that was never said or that cannot exist.
 
 ## Trap requirements (per question, listed with the answers above)
 - spelling: the speaker says the word and then spells it out letter by letter in capitals with hyphens, for example "H-A-R-L-O-W". The quote you choose must include the spelled letters.

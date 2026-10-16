@@ -159,9 +159,9 @@ if (cmd === "draw") {
 } else if (cmd === "accept") {
   const [d, stage] = rest;
   const dir = resolve(d); const note = flag("note", "");
-  if (!note) { console.error("用法：accept <set 資料夾> plan|script --note \"改了什麼\""); process.exit(2); }
+  if (!note) { console.error("用法：accept <set 資料夾> skeleton|plan|script --note \"改了什麼\""); process.exit(2); }
   const meta = loadMeta(dir); const set = readSet(dir);
-  accept(meta, set, stage, note); saveMeta(dir, meta, set);
+  accept(meta, set, stage, note, new Date(), loadContent()); saveMeta(dir, meta, set);
   console.log(`已重新認可 ${stage}，下游階段會標為過期，需要重跑`);
 } else if (cmd === "review") {
   const dir = resolve(rest[0]); const by = flag("by", "");
@@ -193,5 +193,5 @@ if (cmd === "draw") {
   saveMeta(dir, meta, set);
   console.log(`已補登記 ${dir}/meta.json`);
 } else {
-  console.log("用法：\n  node generator/cli.mjs draw --seed 42 [--topic library-card] [--variant student] [--out content/sets/<id>]\n  node generator/cli.mjs paper <set 資料夾>\n  node generator/cli.mjs preview <set 資料夾>   產生 preview.html\n  node generator/cli.mjs prompt plan|script|blind <set 資料夾>   印出給 AI 的 prompt\n  node generator/cli.mjs assemble plan|script|check <set 資料夾> <AI 回覆.json>\n  node generator/cli.mjs blind <set 資料夾>   盲答與標準答案比對\n  node generator/cli.mjs validate <set 資料夾>\n  node generator/cli.mjs status <set 資料夾>   看整條指紋鏈哪裡過期\n  node generator/cli.mjs accept <set 資料夾> plan|script --note \"改了什麼\"   手動改檔後重新認可\n  node generator/cli.mjs review <set 資料夾> --by 姓名   人工審核\n  node generator/cli.mjs stamp <set 資料夾> [--model 名稱]   給舊題組補 meta.json");
+  console.log("用法：\n  node generator/cli.mjs draw --seed 42 [--topic library-card] [--variant student] [--out content/sets/<id>]\n  node generator/cli.mjs paper <set 資料夾>\n  node generator/cli.mjs preview <set 資料夾>   產生 preview.html\n  node generator/cli.mjs prompt plan|script|blind <set 資料夾>   印出給 AI 的 prompt\n  node generator/cli.mjs assemble plan|script|check <set 資料夾> <AI 回覆.json>\n  node generator/cli.mjs blind <set 資料夾>   盲答與標準答案比對\n  node generator/cli.mjs validate <set 資料夾>\n  node generator/cli.mjs status <set 資料夾>   看整條指紋鏈哪裡過期\n  node generator/cli.mjs accept <set 資料夾> skeleton|plan|script --note \"改了什麼\"   手動改檔後重新認可\n  node generator/cli.mjs review <set 資料夾> --by 姓名   人工審核\n  node generator/cli.mjs stamp <set 資料夾> [--model 名稱]   給舊題組補 meta.json");
 }

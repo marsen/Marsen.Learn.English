@@ -3,7 +3,7 @@
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join, basename } from "node:path";
 import { fileURLToPath } from "node:url";
-import { hashOf, staleInputs, SCHEMA_VERSION, GENERATOR_VERSION } from "./artifact.mjs";
+import { hashOf, makeArtifactInfo, staleInputs, SCHEMA_VERSION, GENERATOR_VERSION } from "./artifact.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const MAX_RETRIES = 2;
@@ -71,18 +71,25 @@ export function retryAllowed(meta, stage) {
 }
 
 // 人工改了檔案之後，用這個重新認可，並留下紀錄；下游因指紋不符自動過期。
-export function accept(meta, set, stage, note, now = new Date()) {
+export function accept(meta, set, stage, note, now = new Date(), content = null) {
   const s = meta.stages[stage];
   if (!s) throw new Error(`${stage} 還沒有登記過，不能 accept`);
   const c = currentHashes(set);
   s.edits = [...(s.edits ?? []), { at: now.toISOString(), note, from_hash: s.hash }];
   s.hash = c[stage];
+  if (stage === "skeleton") {
+    if (!content) throw new Error("accept skeleton 需要目前的內容（主題、配方、設定）");
+    meta.inputs = { ...meta.inputs, ...currentInputs(set, content) };
+  }
   if (stage === "plan") s.from = { skeleton: c.skeleton };
   if (stage === "script") s.from = { plan: c.plan };
   s.at = now.toISOString();
   return meta;
 }
 
+const currentInputs = (set, content) => makeArtifactInfo({
+  topic: content.topics.find((t) => t.id === set.skeleton.topic), recipes: content.recipes, profile: content.profile,
+}).inputs;
 const staleNow = (meta, set, content) => staleInputs({ inputs: meta.inputs }, {
   topic: content.topics.find((t) => t.id === set.skeleton.topic), recipes: content.recipes, profile: content.profile,
 });

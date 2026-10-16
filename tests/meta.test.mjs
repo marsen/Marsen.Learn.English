@@ -5,8 +5,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { newMeta, stamp, saveMeta, loadMeta, readSet, checkChain, deriveStatus, accept, retryAllowed } from "../generator/meta.mjs";
 import { content } from "./helpers.mjs";
+import { makeArtifactInfo } from "../generator/artifact.mjs";
 
-const SRC = join(import.meta.dirname, "..", "content", "sets", "s1-library-0001");
+const SRC = join(import.meta.dirname, "fixtures", "set-sample");
 const wj = (dir, f, fn) => { const p = join(dir, f); const o = JSON.parse(readFileSync(p, "utf8")); fn(o); writeFileSync(p, JSON.stringify(o, null, 2)); };
 
 // 建一份全新、已登記到盲答的題組（複製自真實題組）
@@ -15,6 +16,8 @@ function fresh() {
   cpSync(SRC, dir, { recursive: true });
   const set = readSet(dir);
   const meta = newMeta({ dir, skeleton: set.skeleton });
+  // 樣本是舊的抽籤結果，輸入指紋以「目前的內容」為準，測試才不會隨主題檔修改而失效
+  meta.inputs = makeArtifactInfo({ topic: content.topics.find((t) => t.id === set.skeleton.topic), recipes: content.recipes, profile: content.profile }).inputs;
   stamp(meta, set, "skeleton"); stamp(meta, set, "plan", { model: "t" }); stamp(meta, set, "script", { model: "t" }); stamp(meta, set, "paper");
   stamp(meta, set, "validate", { ok: true, block: 0, warn: 0 });
   stamp(meta, set, "blind", { model: "t", warnings: 0 });

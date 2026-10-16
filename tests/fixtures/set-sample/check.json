@@ -1,0 +1,67 @@
+{
+  "set_id": "s1-library-0001",
+  "answers": [
+    {
+      "question_id": "q01",
+      "answer": "17 November",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q02",
+      "answer": "52",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q03",
+      "answer": "Wittersham Road",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q04",
+      "answer": "07700 900 614",
+      "alternatives": [
+        "07700900614"
+      ],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q05",
+      "answer": "24163085",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q06",
+      "answer": "Thursday",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q07",
+      "answer": "Northgate",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q08",
+      "answer": "course books",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q09",
+      "answer": "marine biology",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q10",
+      "answer": "email",
+      "alternatives": [],
+      "confidence": "high"
+    }
+  ]
+}

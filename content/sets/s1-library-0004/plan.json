@@ -1,0 +1,120 @@
+{
+  "set_id": "s1-library-0004",
+  "topic": "library-card",
+  "variant": "resident",
+  "recipe": "R2",
+  "seed": 20261022,
+  "scenario": {
+    "setting": "A new resident visits a town library front desk on a weekday morning to apply for a library card.",
+    "accent": "en-GB"
+  },
+  "answers": [
+    {
+      "question_id": "q01",
+      "field_id": "family_name",
+      "answer": "Brammall",
+      "accepted": [],
+      "type": "name_spelled",
+      "trap": "spelling",
+      "answer_policy": "exact_word",
+      "note": "Spelled out letter by letter: B-R-A-M-M-A-L-L, with double M and double L."
+    },
+    {
+      "question_id": "q02",
+      "field_id": "first_name",
+      "answer": "Imogen",
+      "accepted": [],
+      "type": "name_spelled",
+      "trap": "none",
+      "answer_policy": "exact_word",
+      "note": "Said plainly as the applicant's first name."
+    },
+    {
+      "question_id": "q03",
+      "field_id": "house_number",
+      "answer": "318",
+      "accepted": [],
+      "type": "number",
+      "trap": "similar_numbers",
+      "answer_policy": "digits_only",
+      "note": "Said as 'three eighteen', with the 18 easily confused with 80."
+    },
+    {
+      "question_id": "q04",
+      "field_id": "street_name",
+      "answer": "Pennycross Lane",
+      "accepted": [
+        "Pennycross"
+      ],
+      "type": "name_spelled",
+      "trap": "spelling",
+      "answer_policy": "exact_word",
+      "note": "Street name spelled out: P-E-N-N-Y-C-R-O-S-S, then 'Lane'."
+    },
+    {
+      "question_id": "q05",
+      "field_id": "phone",
+      "answer": "07700 900 713",
+      "accepted": [
+        "07700900713"
+      ],
+      "type": "phone",
+      "trap": "similar_numbers",
+      "answer_policy": "digits_only",
+      "note": "Read in digits after the 07700 900 prefix, ending 'seven one three', with 13 confusable with 30."
+    },
+    {
+      "question_id": "q06",
+      "field_id": "occupation",
+      "answer": "dental nurse",
+      "accepted": [
+        "dental nurse"
+      ],
+      "type": "word",
+      "trap": "paraphrase",
+      "answer_policy": "exact_word",
+      "note": "Applicant says she looks after patients at a dentist's surgery, a paraphrase of the occupation."
+    },
+    {
+      "question_id": "q07",
+      "field_id": "previous_city",
+      "answer": "Cheltenham",
+      "accepted": [],
+      "type": "place",
+      "trap": "spelling",
+      "answer_policy": "exact_word",
+      "note": "Spelled out: C-H-E-L-T-E-N-H-A-M, with a silent letter pattern easy to mishear."
+    },
+    {
+      "question_id": "q08",
+      "field_id": "pickup_day",
+      "answer": "Thursday",
+      "accepted": [],
+      "type": "word",
+      "trap": "self_correction",
+      "answer_policy": "exact_word",
+      "wrong_value": "Tuesday",
+      "note": "Staff first says Tuesday, then corrects to Thursday when the card will be ready."
+    },
+    {
+      "question_id": "q09",
+      "field_id": "membership_type",
+      "answer": "family",
+      "accepted": [],
+      "type": "word",
+      "trap": "paraphrase",
+      "answer_policy": "exact_word",
+      "note": "Applicant asks for a card that covers the whole household, a paraphrase of family membership."
+    },
+    {
+      "question_id": "q10",
+      "field_id": "heard_from",
+      "answer": "council website",
+      "accepted": [],
+      "type": "word",
+      "trap": "none",
+      "answer_policy": "exact_word",
+      "note": "Applicant says she saw it on the town council's web page when she moved in."
+    }
+  ]
+}

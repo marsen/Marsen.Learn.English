@@ -1,0 +1,106 @@
+{
+  "set_id": null,
+  "type": "form_table",
+  "title": "Library Membership Application",
+  "instruction": "Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
+  "rows": [
+    {
+      "label": "Application type",
+      "parts": [
+        {
+          "text": "New membership"
+        }
+      ]
+    },
+    {
+      "label": "Family name",
+      "field_id": "family_name",
+      "parts": [
+        {
+          "blank": "q01"
+        }
+      ]
+    },
+    {
+      "label": "First name",
+      "field_id": "first_name",
+      "parts": [
+        {
+          "blank": "q02"
+        }
+      ]
+    },
+    {
+      "label": "House number",
+      "field_id": "house_number",
+      "parts": [
+        {
+          "blank": "q03"
+        }
+      ]
+    },
+    {
+      "label": "Street",
+      "field_id": "street_name",
+      "parts": [
+        {
+          "blank": "q04"
+        }
+      ]
+    },
+    {
+      "label": "Phone",
+      "field_id": "phone",
+      "parts": [
+        {
+          "blank": "q05"
+        }
+      ]
+    },
+    {
+      "label": "Occupation",
+      "field_id": "occupation",
+      "parts": [
+        {
+          "blank": "q06"
+        }
+      ]
+    },
+    {
+      "label": "Previous city",
+      "field_id": "previous_city",
+      "parts": [
+        {
+          "blank": "q07"
+        }
+      ]
+    },
+    {
+      "label": "Card collection day",
+      "field_id": "pickup_day",
+      "parts": [
+        {
+          "blank": "q08"
+        }
+      ]
+    },
+    {
+      "label": "Membership type",
+      "field_id": "membership_type",
+      "parts": [
+        {
+          "blank": "q09"
+        }
+      ]
+    },
+    {
+      "label": "Heard about us from",
+      "field_id": "heard_from",
+      "parts": [
+        {
+          "blank": "q10"
+        }
+      ]
+    }
+  ]
+}

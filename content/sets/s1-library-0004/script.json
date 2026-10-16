@@ -1,0 +1,207 @@
+{
+  "set_id": "s1-library-0004",
+  "turns": [
+    {
+      "id": "t1",
+      "speaker": "A",
+      "text": "Good morning, and welcome to Ashbourne Library. How can I help you today?"
+    },
+    {
+      "id": "t2",
+      "speaker": "B",
+      "text": "Morning! Um, I've just moved to the area, actually, about two weeks ago, and I'd like to join the library, please. I've heard good things."
+    },
+    {
+      "id": "t3",
+      "speaker": "A",
+      "text": "Lovely, welcome to the town. Dreadful weather this week, isn't it? I hope the removal van didn't get caught in the rain."
+    },
+    {
+      "id": "t4",
+      "speaker": "B",
+      "text": "Oh, it did, we were absolutely soaked, but everything arrived in one piece, which is the main thing. The boxes are still everywhere, though, and I can't find the kettle, which is a proper emergency for a Brit."
+    },
+    {
+      "id": "t5",
+      "speaker": "A",
+      "text": "I know the feeling, I moved last year and I'm still finding things. Right, let's get you started. It's all brand new for you, so I'll need a few details. Could I take your surname first?"
+    },
+    {
+      "id": "t6",
+      "speaker": "B",
+      "text": "Yes, of course. It's Brammall. That's B-R-A-M-M-A-L-L, two Ms and two Ls."
+    },
+    {
+      "id": "t7",
+      "speaker": "A",
+      "text": "Brammall, two Ms, two Ls, got it. It's a lovely name, quite unusual round here, I don't think we've got any other Brammalls on the system, and I've worked here nine years. Now, what's your first name?"
+    },
+    {
+      "id": "t8",
+      "speaker": "B",
+      "text": "Ha, my dad always said we were the only ones. It's Imogen."
+    },
+    {
+      "id": "t9",
+      "speaker": "A",
+      "text": "Imogen, lovely, I'll pop that in. Now, you said you've only been here a couple of weeks, so is the address on your paperwork the new one? Which house number are you?"
+    },
+    {
+      "id": "t10",
+      "speaker": "B",
+      "text": "Yes, it's the new one, we've only just got the keys sorted. We're at number 318."
+    },
+    {
+      "id": "t11",
+      "speaker": "A",
+      "text": "Was that 380?"
+    },
+    {
+      "id": "t12",
+      "speaker": "B",
+      "text": "No, 318, the one with the green gate, next to the postbox."
+    },
+    {
+      "id": "t13",
+      "speaker": "A",
+      "text": "Ah, 318, of course. Sorry, I've got a 380 customer who lives on the other side of town, so my ears were primed. Which street is that on?"
+    },
+    {
+      "id": "t14",
+      "speaker": "B",
+      "text": "It's Pennycross Lane. That's P-E-N-N-Y-C-R-O-S-S, then Lane. It's the little road behind the allotments, you can't miss it, there's a big oak tree on the corner."
+    },
+    {
+      "id": "t15",
+      "speaker": "A",
+      "text": "Oh, I know it, very pretty spot. Now, we like to have a contact number in case a reserved book comes in, so do you have a mobile?"
+    },
+    {
+      "id": "t16",
+      "speaker": "B",
+      "text": "I do, but I always forget it, I've only had this phone a month. It's 07700 900 713."
+    },
+    {
+      "id": "t17",
+      "speaker": "A",
+      "text": "Was that 07700 900 730?"
+    },
+    {
+      "id": "t18",
+      "speaker": "B",
+      "text": "No, 713. Seven-one-three at the end."
+    },
+    {
+      "id": "t19",
+      "speaker": "A",
+      "text": "713, perfect, that's saved. Thank you. And just so we've got a rounded picture, what do you do for a living, if you don't mind me asking?"
+    },
+    {
+      "id": "t20",
+      "speaker": "B",
+      "text": "Not at all. Um, I've just started at a practice on the high street. I'm a dental nurse, mostly helping with fillings and check-ups."
+    },
+    {
+      "id": "t21",
+      "speaker": "A",
+      "text": "That sounds busy, I bet you see some very nervous faces, and a few grumpy ones too. Anyway, the next thing is where you've come from. Which town or city were you living in before you moved here?"
+    },
+    {
+      "id": "t22",
+      "speaker": "B",
+      "text": "Cheltenham, actually. That's C-H-E-L-T-E-N-H-A-M. I was there for about six years, so it still feels a bit strange, and I keep turning left when I should turn right."
+    },
+    {
+      "id": "t23",
+      "speaker": "A",
+      "text": "Lovely part of the world, the racecourse and all that, I went once for a hen weekend and never quite recovered. Right, we make the cards here and they're usually ready within a couple of days. When would you like to pop back for it?"
+    },
+    {
+      "id": "t24",
+      "speaker": "B",
+      "text": "Let me think, Tuesday should be fine. Oh, no, I'm working all day Tuesday, sorry. I'll come in on Thursday instead."
+    },
+    {
+      "id": "t25",
+      "speaker": "A",
+      "text": "Thursday it is, I'll put a note on the system. Now, would you like a card just for yourself, or do you have other people at home who'd want to borrow books too?"
+    },
+    {
+      "id": "t26",
+      "speaker": "B",
+      "text": "Oh, yes, there's my husband and our two girls, and they'd all use it. So I'd like the family one, please."
+    },
+    {
+      "id": "t27",
+      "speaker": "A",
+      "text": "Perfect, that's all sorted, and it's free of charge for residents. Just one last question for our records. How did you find out about us?"
+    },
+    {
+      "id": "t28",
+      "speaker": "B",
+      "text": "Oh, it was on the council website, when I was reading up on the area."
+    },
+    {
+      "id": "t29",
+      "speaker": "A",
+      "text": "Brilliant. Thanks, Imogen, that's everything. Enjoy the books, and good luck with the unpacking, I hope you find that kettle soon!"
+    },
+    {
+      "id": "t30",
+      "speaker": "B",
+      "text": "Thank you so much, and have a lovely day. Bye!"
+    }
+  ],
+  "evidence": [
+    {
+      "question_id": "q01",
+      "turn": "t6",
+      "quote": "Yes, of course. It's Brammall. That's B-R-A-M-M-A-L-L, two Ms and two Ls."
+    },
+    {
+      "question_id": "q02",
+      "turn": "t8",
+      "quote": "It's Imogen."
+    },
+    {
+      "question_id": "q03",
+      "turn": "t10",
+      "quote": "We're at number 318."
+    },
+    {
+      "question_id": "q04",
+      "turn": "t14",
+      "quote": "It's Pennycross Lane. That's P-E-N-N-Y-C-R-O-S-S, then Lane."
+    },
+    {
+      "question_id": "q05",
+      "turn": "t16",
+      "quote": "It's 07700 900 713."
+    },
+    {
+      "question_id": "q06",
+      "turn": "t20",
+      "quote": "I'm a dental nurse, mostly helping with fillings and check-ups."
+    },
+    {
+      "question_id": "q07",
+      "turn": "t22",
+      "quote": "Cheltenham, actually. That's C-H-E-L-T-E-N-H-A-M."
+    },
+    {
+      "question_id": "q08",
+      "turn": "t24",
+      "quote": "I'll come in on Thursday instead."
+    },
+    {
+      "question_id": "q09",
+      "turn": "t26",
+      "quote": "So I'd like the family one, please."
+    },
+    {
+      "question_id": "q10",
+      "turn": "t28",
+      "quote": "Oh, it was on the council website, when I was reading up on the area."
+    }
+  ]
+}
