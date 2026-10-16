@@ -19,7 +19,8 @@
         {
           "blank": "q01"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Date of birth",
@@ -28,7 +29,8 @@
         {
           "blank": "q02"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "House number",
@@ -37,7 +39,8 @@
         {
           "blank": "q03"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Street",
@@ -46,7 +49,8 @@
         {
           "blank": "q04"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Town",
@@ -55,34 +59,53 @@
         {
           "blank": "q05"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Years in the area",
       "field_id": "years_resident",
       "parts": [
         {
+          "text": "Has lived in the area for"
+        },
+        {
           "blank": "q06"
+        },
+        {
+          "text": "years"
         }
-      ]
+      ],
+      "inline": true,
+      "section": "About the applicant"
     },
     {
       "label": "Previous city",
       "field_id": "previous_city",
       "parts": [
         {
+          "text": "Moved here from"
+        },
+        {
           "blank": "q07"
         }
-      ]
+      ],
+      "inline": true,
+      "section": "About the applicant"
     },
     {
       "label": "Card collection day",
       "field_id": "pickup_day",
       "parts": [
         {
+          "text": "Will collect the card on"
+        },
+        {
           "blank": "q08"
         }
-      ]
+      ],
+      "inline": true,
+      "section": "Membership"
     },
     {
       "label": "Preferred branch",
@@ -91,16 +114,22 @@
         {
           "blank": "q09"
         }
-      ]
+      ],
+      "section": "Membership"
     },
     {
       "label": "Heard about us from",
       "field_id": "heard_from",
       "parts": [
         {
+          "text": "Heard about the library through"
+        },
+        {
           "blank": "q10"
         }
-      ]
+      ],
+      "inline": true,
+      "section": "Interests and contact"
     }
   ]
 }

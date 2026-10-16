@@ -19,7 +19,8 @@
         {
           "blank": "q01"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "House number",
@@ -28,7 +29,8 @@
         {
           "blank": "q02"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Street",
@@ -37,7 +39,8 @@
         {
           "blank": "q03"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Town",
@@ -46,7 +49,8 @@
         {
           "blank": "q04"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Driving licence number",
@@ -55,7 +59,8 @@
         {
           "blank": "q05"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Main destination",
@@ -64,7 +69,8 @@
         {
           "blank": "q06"
         }
-      ]
+      ],
+      "section": "Purpose of trip"
     },
     {
       "label": "Type of car",
@@ -73,25 +79,39 @@
         {
           "blank": "q07"
         }
-      ]
+      ],
+      "section": "Car and dates"
     },
     {
       "label": "Pick-up day",
       "field_id": "pickup_day",
       "parts": [
         {
+          "text": "Pick-up on"
+        },
+        {
           "blank": "q08"
         }
-      ]
+      ],
+      "inline": true,
+      "section": "Car and dates"
     },
     {
       "label": "Number of days",
       "field_id": "rental_days",
       "parts": [
         {
+          "text": "Hire for"
+        },
+        {
           "blank": "q09"
+        },
+        {
+          "text": "days"
         }
-      ]
+      ],
+      "inline": true,
+      "section": "Car and dates"
     },
     {
       "label": "Insurance",
@@ -100,7 +120,8 @@
         {
           "blank": "q10"
         }
-      ]
+      ],
+      "section": "Extras and costs"
     }
   ]
 }

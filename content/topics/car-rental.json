@@ -22,91 +22,121 @@
       },
       {
         "label": "Family name",
-        "field_id": "family_name"
+        "field_id": "family_name",
+        "section": "Personal details"
       },
       {
         "label": "First name",
-        "field_id": "first_name"
+        "field_id": "first_name",
+        "section": "Personal details"
       },
       {
         "label": "Date of birth",
-        "field_id": "date_of_birth"
+        "field_id": "date_of_birth",
+        "section": "Personal details"
       },
       {
         "label": "House number",
-        "field_id": "house_number"
+        "field_id": "house_number",
+        "section": "Personal details"
       },
       {
         "label": "Street",
-        "field_id": "street_name"
+        "field_id": "street_name",
+        "section": "Personal details"
       },
       {
         "label": "Town",
-        "field_id": "town"
+        "field_id": "town",
+        "section": "Personal details"
       },
       {
         "label": "Phone",
-        "field_id": "phone"
+        "field_id": "phone",
+        "section": "Personal details"
       },
       {
         "label": "Driving licence number",
-        "field_id": "licence_number"
+        "field_id": "licence_number",
+        "section": "Personal details"
       },
       {
         "label": "Main destination",
-        "field_id": "destination"
+        "field_id": "destination",
+        "section": "Purpose of trip"
       },
       {
         "label": "Staying at",
-        "field_id": "hotel_name"
+        "field_id": "hotel_name",
+        "section": "Purpose of trip",
+        "template": "Staying at {}"
       },
       {
         "label": "Company",
-        "field_id": "company_name"
+        "field_id": "company_name",
+        "section": "Purpose of trip"
       },
       {
         "label": "Meeting day",
-        "field_id": "meeting_day"
+        "field_id": "meeting_day",
+        "section": "Purpose of trip",
+        "template": "Meeting on {}"
       },
       {
         "label": "Type of car",
-        "field_id": "car_type"
+        "field_id": "car_type",
+        "section": "Car and dates"
       },
       {
         "label": "Pick-up day",
-        "field_id": "pickup_day"
+        "field_id": "pickup_day",
+        "section": "Car and dates",
+        "template": "Pick-up on {}"
       },
       {
         "label": "Pick-up place",
-        "field_id": "pickup_place"
+        "field_id": "pickup_place",
+        "section": "Car and dates",
+        "template": "Pick up from {}"
       },
       {
         "label": "Number of days",
-        "field_id": "rental_days"
+        "field_id": "rental_days",
+        "section": "Car and dates",
+        "template": "Hire for {} days"
       },
       {
         "label": "Insurance",
-        "field_id": "insurance"
+        "field_id": "insurance",
+        "section": "Extras and costs"
       },
       {
         "label": "Extra equipment",
-        "field_id": "extra_item"
+        "field_id": "extra_item",
+        "section": "Extras and costs"
       },
       {
         "label": "Fuel option",
-        "field_id": "fuel_policy"
+        "field_id": "fuel_policy",
+        "section": "Extras and costs"
       },
       {
         "label": "Deposit (£)",
-        "field_id": "deposit"
+        "field_id": "deposit",
+        "section": "Extras and costs",
+        "template": "Deposit: £{}"
       },
       {
         "label": "Payment method",
-        "field_id": "payment_method"
+        "field_id": "payment_method",
+        "section": "Extras and costs",
+        "template": "Pays by {}"
       },
       {
         "label": "Heard about us from",
-        "field_id": "heard_from"
+        "field_id": "heard_from",
+        "section": "Extras and costs",
+        "template": "Heard about us through {}"
       }
     ]
   },

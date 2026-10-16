@@ -22,83 +22,109 @@
       },
       {
         "label": "Family name",
-        "field_id": "family_name"
+        "field_id": "family_name",
+        "section": "Personal details"
       },
       {
         "label": "First name",
-        "field_id": "first_name"
+        "field_id": "first_name",
+        "section": "Personal details"
       },
       {
         "label": "Date of birth",
-        "field_id": "date_of_birth"
+        "field_id": "date_of_birth",
+        "section": "Personal details"
       },
       {
         "label": "House number",
-        "field_id": "house_number"
+        "field_id": "house_number",
+        "section": "Personal details"
       },
       {
         "label": "Street",
-        "field_id": "street_name"
+        "field_id": "street_name",
+        "section": "Personal details"
       },
       {
         "label": "Town",
-        "field_id": "town"
+        "field_id": "town",
+        "section": "Personal details"
       },
       {
         "label": "Phone",
-        "field_id": "phone"
+        "field_id": "phone",
+        "section": "Personal details"
       },
       {
         "label": "Occupation",
-        "field_id": "occupation"
+        "field_id": "occupation",
+        "section": "About the applicant"
       },
       {
         "label": "Student number",
-        "field_id": "student_number"
+        "field_id": "student_number",
+        "section": "About the applicant"
       },
       {
         "label": "Field of study",
-        "field_id": "course"
+        "field_id": "course",
+        "section": "About the applicant",
+        "template": "Studying {}"
       },
       {
         "label": "Years in the area",
-        "field_id": "years_resident"
+        "field_id": "years_resident",
+        "section": "About the applicant",
+        "template": "Has lived in the area for {} years"
       },
       {
         "label": "Previous city",
-        "field_id": "previous_city"
+        "field_id": "previous_city",
+        "section": "About the applicant",
+        "template": "Moved here from {}"
       },
       {
         "label": "Card collection day",
-        "field_id": "pickup_day"
+        "field_id": "pickup_day",
+        "section": "Membership",
+        "template": "Will collect the card on {}"
       },
       {
         "label": "Preferred branch",
-        "field_id": "branch"
+        "field_id": "branch",
+        "section": "Membership"
       },
       {
         "label": "Reason for joining",
-        "field_id": "reason"
+        "field_id": "reason",
+        "section": "Membership"
       },
       {
         "label": "Membership type",
-        "field_id": "membership_type"
+        "field_id": "membership_type",
+        "section": "Membership"
       },
       {
         "label": "Favourite subject",
-        "field_id": "interest"
+        "field_id": "interest",
+        "section": "Interests and contact"
       },
       {
         "label": "Visits per month",
-        "field_id": "visit_frequency"
+        "field_id": "visit_frequency",
+        "section": "Interests and contact"
       },
       {
         "label": "Heard about us from",
-        "field_id": "heard_from"
+        "field_id": "heard_from",
+        "section": "Interests and contact",
+        "template": "Heard about the library through {}"
       },
       {
         "label": "Contact by",
-        "field_id": "notification"
+        "field_id": "notification",
+        "section": "Interests and contact",
+        "template": "Contact by {}"
       }
     ]
   },

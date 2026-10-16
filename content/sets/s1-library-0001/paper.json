@@ -19,7 +19,8 @@
         {
           "blank": "q01"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "House number",
@@ -28,7 +29,8 @@
         {
           "blank": "q02"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Street",
@@ -37,7 +39,8 @@
         {
           "blank": "q03"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Phone",
@@ -46,7 +49,8 @@
         {
           "blank": "q04"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Student number",
@@ -55,16 +59,22 @@
         {
           "blank": "q05"
         }
-      ]
+      ],
+      "section": "About the applicant"
     },
     {
       "label": "Card collection day",
       "field_id": "pickup_day",
       "parts": [
         {
+          "text": "Will collect the card on"
+        },
+        {
           "blank": "q06"
         }
-      ]
+      ],
+      "inline": true,
+      "section": "Membership"
     },
     {
       "label": "Preferred branch",
@@ -73,7 +83,8 @@
         {
           "blank": "q07"
         }
-      ]
+      ],
+      "section": "Membership"
     },
     {
       "label": "Reason for joining",
@@ -82,7 +93,8 @@
         {
           "blank": "q08"
         }
-      ]
+      ],
+      "section": "Membership"
     },
     {
       "label": "Favourite subject",
@@ -91,16 +103,22 @@
         {
           "blank": "q09"
         }
-      ]
+      ],
+      "section": "Interests and contact"
     },
     {
       "label": "Contact by",
       "field_id": "notification",
       "parts": [
         {
+          "text": "Contact by"
+        },
+        {
           "blank": "q10"
         }
-      ]
+      ],
+      "inline": true,
+      "section": "Interests and contact"
     }
   ]
 }

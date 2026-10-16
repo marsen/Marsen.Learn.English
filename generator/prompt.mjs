@@ -28,7 +28,9 @@ const SCRIPT_TRAP = {
   none: "state it directly once",
 };
 
-const labelOf = (topic, fieldId) => topic.form.rows.find((r) => r.field_id === fieldId)?.label ?? fieldId;
+// 學生在答題卷上看到的那一行字（有行內句型就用句型，空格以 ____ 表示）。
+const shown = (r) => (r.template ? r.template.replace("{}", "____") : r.label);
+const labelOf = (topic, fieldId) => { const r = topic.form.rows.find((x) => x.field_id === fieldId); return r ? shown(r) : fieldId; };
 const speakersText = (topic) => topic.speakers.map((s) => `  - ${s.id}: ${s.role}`).join("\n");
 const printedText = (topic) => topic.form.rows.filter((r) => r.printed !== undefined).map((r) => `  - ${r.label}: ${r.printed}`).join("\n") || "  (none)";
 
@@ -63,7 +65,7 @@ export function buildScriptPrompt({ topic, plan, profile }) {
   ].join("\n");
   const rows = topic.form.rows
     .filter((r) => r.printed !== undefined || plan.answers.some((a) => a.field_id === r.field_id))
-    .map((r) => `  - ${r.label}: ${r.printed ?? `(question ${plan.answers.find((a) => a.field_id === r.field_id).question_id})`}`).join("\n");
+    .map((r) => `  - ${r.printed !== undefined ? `${r.label}: ${r.printed}` : `${shown(r)} (question ${plan.answers.find((a) => a.field_id === r.field_id).question_id})`}`).join("\n");
   return fill(template("script"), {
     TOPIC_TITLE: `${topic.title} (${topic.id})`,
     VARIANT_SETTING: variant.setting,
@@ -83,7 +85,7 @@ export function buildScriptPrompt({ topic, plan, profile }) {
 export function buildBlindPrompt({ paper, script }) {
   const form = [
     `Title: ${paper.title}`, `Instruction: ${paper.instruction}`,
-    ...paper.rows.map((r) => `- ${r.label}: ${r.parts.map((p) => (p.blank ? `[${p.blank}] ______` : p.text)).join(" ")}`),
+    ...paper.rows.map((r) => { const line = r.parts.map((p) => (p.blank ? `[${p.blank}] ______` : p.text)).join(" "); return `- ${r.inline ? line : `${r.label}: ${line}`}${r.section ? `   (section: ${r.section})` : ""}`; }),
   ].join("\n");
   const transcript = script.turns.map((t) => `${t.speaker}: ${t.text}`).join("\n");
   return fill(template("blind"), { FORM: form, TRANSCRIPT: transcript });

@@ -11,10 +11,10 @@
   <main id="app">
     <section id="intro" data-phase="intro">
       <h1>聽力測驗：Section 1（開發版）</h1>
-      <p class="note">語音是瀏覽器內建的，只用來測流程，不代表正式音檔品質。錄音只播一次，沒有暫停與倒轉。</p>
+      <p class="note">錄音只播一次，沒有暫停與倒轉。錄音檔由 M4 產生；還沒有錄音的題組，只能先填答題卷看版面。</p>
       <label>題組 <select id="set-select"></select></label>
-      <p><button id="start" type="button" disabled>載入中…</button></p>
-      <p id="speech-warning" class="warn" hidden>這個瀏覽器沒有語音合成，無法播放。請改用 Chrome 或 Safari。</p>
+      <p><button id="start" type="button">開始</button></p>
+      <p id="load-warning" class="warn" hidden></p>
     </section>
 
     <section id="exam" data-phase="exam" hidden>

@@ -19,7 +19,8 @@
         {
           "blank": "q01"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Street",
@@ -28,7 +29,8 @@
         {
           "blank": "q02"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Town",
@@ -37,7 +39,8 @@
         {
           "blank": "q03"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Phone",
@@ -46,25 +49,36 @@
         {
           "blank": "q04"
         }
-      ]
+      ],
+      "section": "Personal details"
     },
     {
       "label": "Office floor",
       "field_id": "work_floor",
       "parts": [
         {
+          "text": "Office is on floor"
+        },
+        {
           "blank": "q05"
         }
-      ]
+      ],
+      "inline": true,
+      "section": "Study or work"
     },
     {
       "label": "Start day",
       "field_id": "start_day",
       "parts": [
         {
+          "text": "Starts on"
+        },
+        {
           "blank": "q06"
         }
-      ]
+      ],
+      "inline": true,
+      "section": "Membership"
     },
     {
       "label": "Preferred time",
@@ -73,7 +87,8 @@
         {
           "blank": "q07"
         }
-      ]
+      ],
+      "section": "Membership"
     },
     {
       "label": "Main goal",
@@ -82,25 +97,36 @@
         {
           "blank": "q08"
         }
-      ]
+      ],
+      "section": "Fitness"
     },
     {
       "label": "Locker number",
       "field_id": "locker_number",
       "parts": [
         {
+          "text": "Locker number"
+        },
+        {
           "blank": "q09"
         }
-      ]
+      ],
+      "inline": true,
+      "section": "Payment and other"
     },
     {
       "label": "Payment method",
       "field_id": "payment_method",
       "parts": [
         {
+          "text": "Pays by"
+        },
+        {
           "blank": "q10"
         }
-      ]
+      ],
+      "inline": true,
+      "section": "Payment and other"
     }
   ]
 }

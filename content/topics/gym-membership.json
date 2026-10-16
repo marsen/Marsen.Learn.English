@@ -22,91 +22,122 @@
       },
       {
         "label": "Family name",
-        "field_id": "family_name"
+        "field_id": "family_name",
+        "section": "Personal details"
       },
       {
         "label": "First name",
-        "field_id": "first_name"
+        "field_id": "first_name",
+        "section": "Personal details"
       },
       {
         "label": "Date of birth",
-        "field_id": "date_of_birth"
+        "field_id": "date_of_birth",
+        "section": "Personal details"
       },
       {
         "label": "House number",
-        "field_id": "house_number"
+        "field_id": "house_number",
+        "section": "Personal details"
       },
       {
         "label": "Street",
-        "field_id": "street_name"
+        "field_id": "street_name",
+        "section": "Personal details"
       },
       {
         "label": "Town",
-        "field_id": "town"
+        "field_id": "town",
+        "section": "Personal details"
       },
       {
         "label": "Phone",
-        "field_id": "phone"
+        "field_id": "phone",
+        "section": "Personal details"
       },
       {
         "label": "Emergency contact (surname)",
-        "field_id": "emergency_contact"
+        "field_id": "emergency_contact",
+        "section": "Personal details"
       },
       {
         "label": "Student card number",
-        "field_id": "student_card_number"
+        "field_id": "student_card_number",
+        "section": "Study or work"
       },
       {
         "label": "Campus",
-        "field_id": "campus"
+        "field_id": "campus",
+        "section": "Study or work",
+        "template": "Studies at the {} campus"
       },
       {
         "label": "Employer",
-        "field_id": "employer"
+        "field_id": "employer",
+        "section": "Study or work",
+        "template": "Works for {}"
       },
       {
         "label": "Office floor",
-        "field_id": "work_floor"
+        "field_id": "work_floor",
+        "section": "Study or work",
+        "template": "Office is on floor {}"
       },
       {
         "label": "Membership plan",
-        "field_id": "membership_plan"
+        "field_id": "membership_plan",
+        "section": "Membership"
       },
       {
         "label": "Start day",
-        "field_id": "start_day"
+        "field_id": "start_day",
+        "section": "Membership",
+        "template": "Starts on {}"
       },
       {
         "label": "Preferred time",
-        "field_id": "preferred_time"
+        "field_id": "preferred_time",
+        "section": "Membership"
       },
       {
         "label": "Main goal",
-        "field_id": "goal"
+        "field_id": "goal",
+        "section": "Fitness"
       },
       {
         "label": "Class interested in",
-        "field_id": "class_interest"
+        "field_id": "class_interest",
+        "section": "Fitness",
+        "template": "Interested in the {} class"
       },
       {
         "label": "Sport played before",
-        "field_id": "sport_background"
+        "field_id": "sport_background",
+        "section": "Fitness",
+        "template": "Has played {} before"
       },
       {
         "label": "Locker number",
-        "field_id": "locker_number"
+        "field_id": "locker_number",
+        "section": "Payment and other",
+        "template": "Locker number {}"
       },
       {
         "label": "Payment method",
-        "field_id": "payment_method"
+        "field_id": "payment_method",
+        "section": "Payment and other",
+        "template": "Pays by {}"
       },
       {
         "label": "Visits per week",
-        "field_id": "visit_frequency"
+        "field_id": "visit_frequency",
+        "section": "Payment and other"
       },
       {
         "label": "Heard about us from",
-        "field_id": "heard_from"
+        "field_id": "heard_from",
+        "section": "Payment and other",
+        "template": "Heard about the club through {}"
       }
     ]
   },

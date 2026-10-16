@@ -24,16 +24,6 @@ test("gradeAnswers：全對、全空、混合；每題有題號、對錯、你�
   assert.equal(half.results[0].expected, plan.answers[0].answer);
 });
 
-test("pickVoices：偏好 en-GB；只有一個聲音時靠音高區分兩人", () => {
-  const us = { lang: "en-US", name: "us" }, gb = { lang: "en-GB", name: "gb" }, gb2 = { lang: "en-GB", name: "gb2" }, fr = { lang: "fr-FR" };
-  assert.equal(core.pickVoices([fr, us, gb, gb2]).A.voice, gb);
-  assert.equal(core.pickVoices([fr, us, gb, gb2]).B.voice, gb2);
-  const one = core.pickVoices([gb]);
-  assert.equal(one.A.voice, one.B.voice);
-  assert.notEqual(one.A.pitch, one.B.pitch);
-  assert.equal(core.pickVoices([fr]).A.voice, null);
-});
-
 test("formatClock", () => {
   assert.equal(core.formatClock(30), "0:30");
   assert.equal(core.formatClock(125), "2:05");
@@ -44,80 +34,95 @@ let server, base;
 before(async () => { server = await startServer(0); base = `http://127.0.0.1:${server.address().port}`; });
 after(() => server.close());
 
-async function openExam({ speech = true } = {}) {
+async function openExam({ audio = false } = {}) {
   const html = await (await fetch(`${base}/exam/index.html?set=${SET}`)).text();
   const dom = new JSDOM(html, { url: `${base}/exam/index.html?set=${SET}`, runScripts: "outside-only", pretendToBeVisual: true });
   const w = dom.window;
   const timers = [];
   w.setInterval = (fn) => timers.push(fn) - 1;
   w.clearInterval = (id) => { timers[id] = null; };
-  w.fetch = (p) => fetch(new URL(p, w.location.href));
-  const spoken = [];
-  const utterances = [];
-  if (speech) {
-    w.__speech = {
-      synth: { getVoices: () => [], speak: (u) => { spoken.push(u.text); utterances.push(u); }, cancel() {} },
-      Utterance: class { constructor(text) { this.text = text; } },
-    };
+  // 沒有錄音檔時，HEAD audio/full.mp3 會是 404；audio=true 時假裝有。
+  w.fetch = (p, opt) => (audio && /full\.mp3$/.test(String(p)) ? Promise.resolve({ ok: true }) : fetch(new URL(p, w.location.href), opt));
+  const played = [];
+  class FakeAudio {
+    constructor(src) { this.src = src; this.listeners = {}; played.push(this); }
+    addEventListener(n, f) { this.listeners[n] = f; }
+    play() { this.playing = true; return Promise.resolve(); }
+    pause() { this.playing = false; }
+    end() { this.listeners.ended?.(); }
   }
+  w.Audio = FakeAudio;
   w.__core = core;
-  w.eval = w.eval; // jsdom 的 eval 在 window 作用域
   const src = (await readFile(new URL("../exam/app.js", import.meta.url), "utf8"))
-    .replace(/import \{([^}]*)\} from "\.\/core\.mjs";/, "const {$1} = window.__core;")
-    .replace("export function speakAll", "function speakAll");
+    .replace(/import \{([^}]*)\} from "\.\/core\.mjs";/, "const {$1} = window.__core;");
   w.eval(src);
   for (let i = 0; i < 50 && !w.__examReady; i++) await new Promise((r) => setTimeout(r, 20));
   const tick = () => { for (const t of timers) t?.(); };
-  const playAll = async () => { for (let i = 0; i < 500 && utterances.length; i++) { const u = utterances.shift(); u.onend?.(); } };
-  return { w, d: w.document, tick, spoken, utterances, playAll };
+  return { w, d: w.document, tick, played };
 }
 
-test("頁面：載入後可開始；沒有語音時擋住並提示", async () => {
-  const ok = await openExam();
-  assert.equal(ok.d.getElementById("start").disabled, false);
-  assert.equal(ok.d.getElementById("speech-warning").hidden, true);
-  const no = await openExam({ speech: false });
-  assert.equal(no.d.getElementById("start").disabled, true);
-  assert.equal(no.d.getElementById("speech-warning").hidden, false);
+const begin = async (d) => { d.getElementById("start").click(); for (let i = 0; i < 50 && d.getElementById("exam").hidden; i++) await new Promise((r) => setTimeout(r, 20)); };
+
+test("頁面：程式裡沒有瀏覽器語音合成", async () => {
+  const src = await readFile(new URL("../exam/app.js", import.meta.url), "utf8");
+  assert.ok(!/speechSynthesis|SpeechSynthesisUtterance|getVoices/.test(src));
+  const { d } = await openExam();
+  assert.equal(d.getElementById("start").disabled, false);
 });
 
-test("頁面：預覽期間不能填、播放才能填；整份只播一次；做完看到結果", async () => {
-  const plan = await load("plan.json"), script = await load("script.json");
-  const { d, tick, spoken, utterances, playAll } = await openExam();
-  d.getElementById("start").click();
-  for (let i = 0; i < 50 && d.getElementById("exam").hidden; i++) await new Promise((r) => setTimeout(r, 20));
+test("頁面：答題卷有分段標題與行內前後文，空格編號連續", async () => {
+  const plan = await load("plan.json"), paper = await load("paper.json");
+  const { d } = await openExam();
+  await begin(d);
+  const heads = [...d.querySelectorAll("#paper h2.section")].map((h) => h.textContent);
+  assert.deepEqual(heads, [...new Set(paper.rows.map((r) => r.section).filter(Boolean))]);
+  assert.ok(heads.length >= 2);
+  assert.equal(d.querySelectorAll("#paper .line .num").length, plan.answers.length);
+  assert.deepEqual([...d.querySelectorAll("#paper .num")].map((n) => n.textContent), plan.answers.map((_, i) => String(i + 1)));
+  const inline = paper.rows.find((r) => r.inline);
+  assert.ok(inline, "至少有一列是行內句型");
+  const line = d.querySelector(`#paper input[data-q="${inline.parts.find((p) => p.blank).blank}"]`).parentElement;
+  assert.ok(!line.textContent.startsWith(`${inline.label}:`), "行內句型不另外印標籤");
+  assert.ok(inline.parts.some((p) => p.text && line.textContent.includes(p.text)), "前後文有印出來");
+});
+
+test("頁面：沒有錄音檔時，預覽後可以直接填答題卷，不播任何聲音，做完看到結果", async () => {
+  const plan = await load("plan.json");
+  const { d, tick, played } = await openExam();
+  await begin(d);
   const inputs = () => [...d.querySelectorAll("#paper input[data-q]")];
-  assert.ok(!d.querySelector("#paper table"), "不是表格，是雅思式的行內填空");
-  assert.equal(d.querySelectorAll("#paper .line .num").length, plan.answers.length, "每個空格前有編號圓圈");
+  assert.ok(!d.querySelector("#paper table"));
   assert.ok(d.querySelector("#paper-instruction b"), "說明裡的全大寫片語加粗");
-  assert.equal(inputs().length, plan.answers.length);
   assert.ok(inputs().every((i) => i.disabled), "預覽時不能填");
-  assert.equal(spoken.length, 0, "預覽時還沒播音");
-  // 預覽倒數走完
   for (let i = 0; i < 60; i++) tick();
-  assert.ok(inputs().every((i) => !i.disabled), "播放時可以填");
-  assert.equal(spoken.length, 1, "第一輪開始念");
-  assert.equal(spoken[0], script.turns[0].text);
-  // 播完所有輪次，每輪只念一次
-  await playAll();
-  assert.deepEqual(spoken, script.turns.map((t) => t.text));
-  // 填答案：第一題故意填錯，其餘照標準答案
+  assert.ok(inputs().every((i) => !i.disabled), "預覽結束後可以填");
+  assert.equal(played.length, 0, "沒有錄音檔就不播");
+  assert.match(d.getElementById("status").textContent, /還沒有錄音/);
   inputs().forEach((el, i) => { el.value = i === 0 ? "wrong" : plan.answers[i].answer; });
-  for (let i = 0; i < 40; i++) tick(); // 檢查倒數走完，自動送出
+  d.getElementById("skip").click(); // 結束作答，進入檢查
+  for (let i = 0; i < 40; i++) tick();
   assert.equal(d.getElementById("result").hidden, false);
   assert.equal(d.getElementById("score").textContent, `${plan.answers.length - 1} / ${plan.answers.length}`);
   assert.equal(d.querySelectorAll("#result-table tr.bad").length, 1);
-  assert.equal(d.querySelectorAll("#result-table tr.ok").length, plan.answers.length - 1);
   const bad = d.querySelector("#result-table tr.bad");
   assert.equal(bad.cells[1].textContent, "wrong");
   assert.equal(bad.cells[2].textContent, plan.answers[0].answer, "答錯的題顯示正解");
-  assert.equal(spoken.length, script.turns.length, "結果頁沒有重播整份錄音");
 });
 
-test("頁面：送出鈕在播放中就能提早送出", async () => {
+test("頁面：有錄音檔時播一次，播完進入檢查倒數", async () => {
+  const { d, tick, played } = await openExam({ audio: true });
+  await begin(d);
+  for (let i = 0; i < 60; i++) tick();
+  assert.equal(played.length, 1);
+  assert.match(played[0].src, /audio\/full\.mp3$/);
+  assert.equal(played[0].playing, true);
+  played[0].end();
+  assert.match(d.getElementById("status").textContent, /檢查/);
+});
+
+test("頁面：送出鈕在作答中就能提早送出", async () => {
   const { d, tick, w } = await openExam();
-  d.getElementById("start").click();
-  for (let i = 0; i < 50 && d.getElementById("exam").hidden; i++) await new Promise((r) => setTimeout(r, 20));
+  await begin(d);
   for (let i = 0; i < 60; i++) tick();
   d.getElementById("paper-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
   assert.equal(d.getElementById("result").hidden, false);

@@ -1,9 +1,9 @@
 {
   "set_id": "s1-library-0002",
   "seed": 20261017,
-  "status": "validated",
+  "status": "papered",
   "created_at": "2026-10-16T07:29:09.819Z",
-  "updated_at": "2026-10-16T07:50:18.866Z",
+  "updated_at": "2026-10-16T09:20:45.059Z",
   "schema_version": 1,
   "generator_version": "0.1.0",
   "inputs": {
@@ -21,11 +21,11 @@
       "at": "2026-10-16T07:29:09.819Z"
     },
     "paper": {
-      "hash": "3a0e014281735c0f",
+      "hash": "4b2f353d54f71b5d",
       "from": {
         "skeleton": "916dd2bd009e79a2"
       },
-      "at": "2026-10-16T07:29:09.821Z"
+      "at": "2026-10-16T09:20:44.916Z"
     },
     "plan": {
       "hash": "1441b56f2a8297d7",
@@ -51,12 +51,12 @@
       "from": {
         "plan": "1441b56f2a8297d7",
         "script": "2d7f330456fb44b5",
-        "paper": "3a0e014281735c0f"
+        "paper": "4b2f353d54f71b5d"
       },
-      "ok": true,
-      "block": 0,
+      "ok": false,
+      "block": 1,
       "warn": 0,
-      "at": "2026-10-16T07:29:09.869Z"
+      "at": "2026-10-16T09:20:45.057Z"
     },
     "blind": {
       "from": {

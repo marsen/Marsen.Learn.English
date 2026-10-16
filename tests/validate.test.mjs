@@ -162,3 +162,15 @@ test("評分一致性：驗證用的找答案與評分用的比對，結果一�
 test("重跑：同一輸入、同一版本，驗證結果相同", () => {
   assert.deepEqual(validate(fixture()), validate(fixture()));
 });
+
+test("題目卷帶分段標題；有句型的列拆成前文、空格、後文並標 inline", () => {
+  const b = fixture();
+  const paper = buildPaper({ topic, plan: b.plan });
+  assert.ok(paper.rows.filter((r) => r.field_id).every((r) => r.section), "每個抽到的欄位都在某個分段下");
+  const inline = paper.rows.filter((r) => r.inline);
+  assert.ok(inline.length > 0);
+  for (const r of inline) assert.ok(r.parts.some((p) => p.blank) && r.parts.some((p) => p.text), r.label);
+  const seq = paper.rows.map((r) => r.section).filter(Boolean);
+  const heads = seq.filter((s, i) => i === 0 || seq[i - 1] !== s);
+  assert.equal(heads.length, new Set(heads).size, "同一個分段是連續的，不會被拆開");
+});

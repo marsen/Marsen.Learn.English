@@ -9,6 +9,9 @@ button[disabled]{opacity:.45;cursor:not-allowed}button.link{background:none;colo
 .paper{border:1px solid var(--line);border-radius:6px;padding:1rem 1.2rem}
 .paper-title{font-size:1rem;text-align:center;margin:1rem 0}
 .instruction{font-style:italic;margin:.2rem 0 1rem}
+.section{font-size:1rem;margin:1.3rem 0 .3rem}
+.group{margin-left:.2rem}
+.group .line::before{content:"• ";color:var(--ink)}
 .line{margin:.55rem 0}
 .num{display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:50%;background:var(--accent);color:#fff;font-size:.85rem;font-weight:700;margin:0 .35rem}
 .paper input[type=text]{font:inherit;width:10rem;max-width:55%;box-sizing:border-box;padding:.1rem .3rem;border:0;border-bottom:1px solid var(--ink);border-radius:0;background:transparent}

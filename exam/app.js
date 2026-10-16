@@ -1,9 +1,10 @@
-// 測驗頁：說明 → 預覽（看題倒數）→ 播放（只播一次）→ 檢查倒數 → 批改 → 顯示對錯與正解。
+// 測驗頁：說明 → 預覽（看題倒數）→ 播放錄音（只播一次）→ 檢查倒數 → 批改 → 顯示對錯與正解。
+// 這一版不含任何語音合成。錄音檔（content/sets/<id>/audio/full.mp3）由 M4 產生；沒有檔案時只能先填答題卷。
 // 標準答案目前放在前端（content/sets/<id>/plan.json），只適合測試版。
-import { gradeAnswers, pickVoices, formatClock } from "./core.mjs";
+import { gradeAnswers, formatClock } from "./core.mjs";
 
 const $ = (id) => document.getElementById(id);
-const state = { phase: "intro", data: null, profile: null, timer: null, remaining: 0, onSkip: null };
+const state = { audio: null, phase: "intro", data: null, profile: null, timer: null, remaining: 0, onSkip: null };
 
 async function getJson(path) {
   const res = await fetch(path);
@@ -31,17 +32,29 @@ function renderInstruction(el, text) {
   el.append(document.createTextNode(text.slice(last)));
 }
 
-// 題目卷照雅思答題卷的樣子：每一列是「標籤：文字 ①＿＿＿ 文字」，空格是行內底線欄位，前面有編號圓圈。
+// 題目卷照雅思答題卷的樣子：分段標題，段內是像隨手筆記的行，空格是行內底線欄位，前面有編號圓圈。
+// 一般列：「標籤: 前文 ① 後文」；inline 列（有句型）：「前文 ① 後文」，不另外印標籤。
 function renderPaper(paper) {
   $("paper-title").textContent = paper.title;
   renderInstruction($("paper-instruction"), paper.instruction);
   const box = $("paper");
   box.textContent = "";
   let n = 0;
+  let section = null;
+  let group = box;
   for (const row of paper.rows) {
+    if (row.section && row.section !== section) {
+      section = row.section;
+      const h = document.createElement("h2");
+      h.className = "section";
+      h.textContent = section;
+      group = document.createElement("div");
+      group.className = "group";
+      box.append(h, group);
+    } else if (!row.section && section === null) group = box;
     const line = document.createElement("div");
     line.className = "line";
-    line.append(document.createTextNode(`${row.label}: `));
+    if (!row.inline) line.append(document.createTextNode(`${row.label}: `));
     for (const part of row.parts) {
       if (part.text !== undefined) { line.append(document.createTextNode(part.text + " ")); continue; }
       n++;
@@ -57,7 +70,7 @@ function renderPaper(paper) {
       input.spellcheck = false;
       line.append(num, input, document.createTextNode(" "));
     }
-    box.append(line);
+    group.append(line);
   }
 }
 
@@ -77,30 +90,13 @@ function countdown(seconds, label, onDone) {
   state.onSkip = () => { clearInterval(state.timer); state.timer = null; onDone(); };
 }
 
-// 語音：一輪一輪念，只念一次。speech 可由測試替換。
-export function speakAll(turns, speech, onDone) {
-  const voices = pickVoices(speech.synth.getVoices());
-  let i = 0;
-  const next = () => {
-    if (i >= turns.length) return onDone();
-    const t = turns[i++];
-    const u = new speech.Utterance(t.text);
-    const v = voices[t.speaker] ?? voices.A;
-    if (v.voice) u.voice = v.voice;
-    u.lang = v.voice?.lang ?? "en-GB";
-    u.pitch = v.pitch; u.rate = v.rate;
-    u.onend = next;
-    u.onerror = next;
-    speech.synth.speak(u);
-  };
-  next();
-}
-
-function getSpeech() {
-  const w = window;
-  if (w.__speech) return w.__speech;
-  if (!w.speechSynthesis || !w.SpeechSynthesisUtterance) return null;
-  return { synth: w.speechSynthesis, Utterance: w.SpeechSynthesisUtterance };
+// 錄音：有 audio/full.mp3 就播一次（沒有暫停與倒轉）；沒有就回傳 null。
+function playRecording(src, onDone) {
+  const audio = new Audio(src);
+  state.audio = audio;
+  audio.addEventListener("ended", onDone);
+  audio.addEventListener("error", onDone);
+  audio.play().catch(onDone);
 }
 
 function startPreview() {
@@ -116,13 +112,22 @@ function startPlayback() {
   setInputsEnabled(true);
   $("skip").hidden = true;
   $("clock").textContent = "";
-  $("status").textContent = "錄音播放中，邊聽邊填。";
   inputs()[0]?.focus();
-  speakAll(state.data.script.turns, getSpeech(), startCheck);
+  if (state.data.audio) {
+    $("status").textContent = "錄音播放中，邊聽邊填。";
+    playRecording(state.data.audio, startCheck);
+  } else {
+    // 還沒有錄音（M4 才會產生）：先讓人填答題卷，看版面用。
+    $("status").textContent = "這一組還沒有錄音（M4 才會產生），可以先填答題卷看版面。";
+    $("skip").textContent = "結束作答，進入檢查";
+    $("skip").hidden = false;
+    state.onSkip = startCheck;
+  }
 }
 
 function startCheck() {
   state.phase = "check";
+  $("skip").textContent = "略過倒數（開發用）";
   $("skip").hidden = false;
   countdown(state.profile.check_seconds.value, "播放結束，檢查你的答案。", finish);
 }
@@ -137,7 +142,7 @@ function finish() {
   if (state.phase === "result") return;
   clearInterval(state.timer);
   state.timer = null;
-  try { getSpeech()?.synth.cancel(); } catch { /* 沒有在念就算了 */ }
+  try { state.audio?.pause(); } catch { /* 沒有在播就算了 */ }
   showResult(gradeAnswers(state.data.plan, collect()));
 }
 
@@ -161,7 +166,9 @@ function showResult(result) {
 async function loadSet(id) {
   const base = `../content/sets/${id}`;
   const [paper, plan, script] = await Promise.all([getJson(`${base}/paper.json`), getJson(`${base}/plan.json`), getJson(`${base}/script.json`)]);
-  state.data = { paper, plan, script };
+  const src = `${base}/audio/full.mp3`;
+  const head = await fetch(src, { method: "HEAD" }).catch(() => null);
+  state.data = { paper, plan, script, audio: head?.ok ? src : null };
 }
 
 async function init() {
@@ -171,19 +178,17 @@ async function init() {
   for (const s of sets) { const o = document.createElement("option"); o.value = s.id; o.textContent = `${s.title}（${s.id}）`; select.append(o); }
   const wanted = new URLSearchParams(location.search).get("set");
   if (wanted && sets.some((s) => s.id === wanted)) select.value = wanted;
-  const speech = getSpeech();
-  $("speech-warning").hidden = !!speech;
   const start = $("start");
   start.textContent = "開始";
-  start.disabled = !speech;
+  start.disabled = false;
   start.addEventListener("click", async () => {
     start.disabled = true;
     try { await loadSet(select.value); startPreview(); }
-    catch (e) { $("speech-warning").textContent = String(e.message); $("speech-warning").hidden = false; start.disabled = false; }
+    catch (e) { $("load-warning").textContent = String(e.message); $("load-warning").hidden = false; start.disabled = false; }
   });
   $("skip").addEventListener("click", () => state.onSkip?.());
   $("paper-form").addEventListener("submit", (e) => { e.preventDefault(); if (state.phase === "playing" || state.phase === "check") finish(); });
-  $("again").addEventListener("click", () => { setPhase("intro"); $("start").disabled = !getSpeech(); });
+  $("again").addEventListener("click", () => { setPhase("intro"); $("start").disabled = false; });
   window.__examReady = true;
 }
 
