@@ -4,6 +4,7 @@ import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, join, normalize, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { makeDevApi } from "./dev-api.mjs";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 
@@ -24,9 +25,30 @@ const TYPES = {
 // 不對外提供的路徑：程式碼以外的東西不該被瀏覽器讀到。
 const HIDDEN = ["node_modules", ".git", "scripts", "tests", "package.json", "package-lock.json"];
 
+const readBody = (req) => new Promise((ok, fail) => {
+  let data = "";
+  req.on("data", (c) => { data += c; if (data.length > 1e6) fail(new Error("太大")); });
+  req.on("end", () => ok(data));
+  req.on("error", fail);
+});
+
 export function startServer(port = 5173) {
+  const dev = makeDevApi(root);
+  const ROUTES = { sets: "GET", start: "POST", finish: "POST", feedback: "POST" };
   const server = createServer(async (req, res) => {
     try {
+      // 本機假後端：和正式環境同一份 api/_core.mjs
+      const m = /^\/api\/(\w+)$/.exec(new URL(req.url, "http://localhost").pathname);
+      if (m) {
+        const name = m[1];
+        if (!ROUTES[name]) { res.writeHead(404).end("Not found"); return; }
+        if (req.method !== ROUTES[name]) { res.writeHead(405, { "Content-Type": "application/json" }).end(JSON.stringify({ error: "不支援的請求方式" })); return; }
+        let body;
+        try { const raw = await readBody(req); body = raw ? JSON.parse(raw) : undefined; } catch { res.writeHead(400, { "Content-Type": "application/json" }).end(JSON.stringify({ error: "不是 JSON" })); return; }
+        const out = await dev.api[name]({ headers: req.headers, body });
+        res.writeHead(out.status, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }).end(JSON.stringify(out.body));
+        return;
+      }
       const url = new URL(req.url, "http://localhost");
       let pathname = decodeURIComponent(url.pathname);
       const target = normalize(join(root, pathname));
@@ -63,6 +85,7 @@ export function startServer(port = 5173) {
     }
   });
 
+  server.dev = dev;
   return new Promise((resolveStart) => {
     server.listen(port, "127.0.0.1", () => resolveStart(server));
   });

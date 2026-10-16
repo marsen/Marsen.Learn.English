@@ -1,21 +1,32 @@
 // 測驗頁：說明 → 預覽（看題倒數）→ 播放錄音（只播一次）→ 檢查倒數 → 批改 → 顯示對錯與正解。
 // 錄音旁有 timing.json 時，看題停頓與最後檢查都以錄音時間軸為準（不再用頁面自己的倒數）。
-// 這一版不含任何語音合成。錄音檔（content/sets/<id>/audio/full.mp3）由 M4 產生；沒有檔案時只能先填答題卷。
-// 標準答案目前放在前端（content/sets/<id>/plan.json），只適合測試版。
-import { gradeAnswers, formatClock, eventAt, viewOf, questionLabel } from "./core.mjs";
+// 這一版不含任何語音合成。錄音檔（由伺服器簽發網址，不在公開檔案內）由 M4 產生；沒有檔案時只能先填答題卷。
+// 標準答案與批改在伺服器端（/api/finish）；瀏覽器只拿得到題目卷、時間軸與錄音的簽名網址。
+import { formatClock, eventAt, viewOf, questionLabel } from "./core.mjs";
+import { config } from "./config.js";
+import { createAuth } from "./auth.mjs";
 
 const $ = (id) => document.getElementById(id);
-const state = { audio: null, phase: "intro", data: null, profile: null, timer: null, remaining: 0, onSkip: null };
+const state = { audio: null, phase: "intro", data: null, timer: null, remaining: 0, onSkip: null, attemptId: null, lastAttemptId: null, submitting: false, previous: "intro" };
+// 沒有時間軸的題組（只有開發時才會遇到）才用這兩個秒數；有時間軸的題組，看題與檢查時間都在錄音裡。
+const PREVIEW_SECONDS = 30;
+const CHECK_SECONDS = 30;
+const auth = createAuth({ config, storage: window.localStorage, location: window.location });
 
-async function getJson(path) {
-  const res = await fetch(path);
-  if (!res.ok) throw new Error(`讀不到 ${path}`);
-  return res.json();
+// 呼叫伺服器函式；沒有登入或登入過期就回登入頁。
+async function api(path, { method = "GET", body } = {}) {
+  const token = await auth.token();
+  if (!token) { showLogin("登入已過期，請重新登入。"); throw new Error("未登入"); }
+  const res = await fetch(`/api/${path}`, { method, headers: { Authorization: `Bearer ${token}`, ...(body ? { "Content-Type": "application/json" } : {}) }, body: body ? JSON.stringify(body) : undefined });
+  const data = await res.json().catch(() => ({}));
+  if (res.status === 401) { auth.signOut(); showLogin("登入已過期，請重新登入。"); throw new Error("未登入"); }
+  if (!res.ok) throw new Error(data.error ?? `發生錯誤（${res.status}）`);
+  return data;
 }
 
 function setPhase(p) {
   state.phase = p;
-  const show = p === "intro" ? "intro" : p === "result" ? "result" : "exam";
+  const show = ["login", "intro", "result", "feedback"].includes(p) ? p : "exam";
   for (const el of document.querySelectorAll("[data-phase]")) el.hidden = el.dataset.phase !== show;
 }
 
@@ -137,7 +148,7 @@ function startPreview() {
   renderPaper(state.data.paper);
   setInputsEnabled(false);
   $("skip").hidden = false;
-  countdown(state.profile.preview_seconds.value, "先看題目。倒數結束後錄音開始播放，只播一次。", startPlayback);
+  countdown(PREVIEW_SECONDS, "先看題目。倒數結束後錄音開始播放，只播一次。", startPlayback);
 }
 
 function startPlayback() {
@@ -162,7 +173,7 @@ function startCheck() {
   state.phase = "check";
   $("skip").textContent = "略過倒數（開發用）";
   $("skip").hidden = false;
-  countdown(state.profile.check_seconds.value, "播放結束，檢查你的答案。", finish);
+  countdown(CHECK_SECONDS, "播放結束，檢查你的答案。", finish);
 }
 
 function collect() {
@@ -171,12 +182,23 @@ function collect() {
   return a;
 }
 
-function finish() {
-  if (state.phase === "result") return;
+async function finish() {
+  if (state.phase === "result" || state.submitting) return;
+  state.submitting = true;
   clearInterval(state.timer);
   state.timer = null;
   try { state.audio?.pause(); } catch { /* 沒有在播就算了 */ }
-  showResult(gradeAnswers(state.data.plan, collect()));
+  $("status").textContent = "批改中…";
+  $("submit").disabled = true;
+  try {
+    const result = await api("finish", { method: "POST", body: { attempt_id: state.attemptId, answers: collect() } });
+    state.lastAttemptId = state.attemptId;
+    showResult(result);
+    offerNext();
+  } catch (e) {
+    // 送出失敗：留在答題卷，答案還在，讓使用者再按一次送出。
+    if (state.phase !== "login") { $("status").textContent = `送出失敗：${e.message}。答案還在，請再按一次「送出」。`; $("submit").disabled = false; state.phase = "check"; }
+  } finally { state.submitting = false; }
 }
 
 function showResult(result) {
@@ -196,33 +218,119 @@ function showResult(result) {
   }
 }
 
+// 結果頁：還有沒做過的題組就給「做下一套」，沒有就說明。
+async function offerNext() {
+  const btn = $("next-set"), note = $("next-note");
+  btn.hidden = true; note.hidden = true;
+  try {
+    const { sets } = await api("sets");
+    const next = sets.find((s) => !s.best && s.set_id !== state.currentSet);
+    if (state.phase !== "result") return;
+    if (next) { btn.textContent = `做下一套：${next.title}`; btn.dataset.set = next.set_id; btn.hidden = false; }
+    else { note.textContent = "目前的題組你都做完了。新題組會陸續加入。"; note.hidden = false; }
+  } catch (e) { /* 取不到清單就只少一個按鈕，不影響結果 */ void e; }
+}
+
 async function loadSet(id) {
-  const base = `../content/sets/${id}`;
-  const [paper, plan, script] = await Promise.all([getJson(`${base}/paper.json`), getJson(`${base}/plan.json`), getJson(`${base}/script.json`)]);
-  const src = `${base}/audio/full.mp3`;
-  const head = await fetch(src, { method: "HEAD" }).catch(() => null);
-  const timing = head?.ok ? await getJson(`${base}/audio/timing.json`).catch(() => null) : null;
-  state.data = { paper, plan, script, audio: head?.ok ? src : null, timing };
+  const d = await api("start", { method: "POST", body: { set_id: id } });
+  state.attemptId = d.attempt_id;
+  state.currentSet = id;
+  state.data = { paper: d.paper, audio: d.audio_url, timing: d.timing };
+}
+
+function showLogin(message) {
+  setPhase("login");
+  const msg = $("login-message");
+  msg.hidden = !message;
+  msg.textContent = message ?? "";
+  $("dev-login").hidden = !auth.isLocalDev;
+}
+
+async function showHome() {
+  setPhase("intro");
+  $("who").textContent = auth.email() ?? "";
+  const select = $("set-select");
+  select.textContent = "";
+  $("start").disabled = true;
+  try {
+    const { sets } = await api("sets");
+    for (const s of sets) { const o = document.createElement("option"); o.value = s.set_id; o.textContent = s.best ? `${s.title}　✓ 已完成 ${s.best.score}/${s.best.total}` : s.title; select.append(o); }
+    const wanted = state.deepLinkUsed ? null : new URLSearchParams(location.search).get("set");
+    state.deepLinkUsed = true; // ?set= 只管第一次進清單；之後預設選沒做過的
+    const firstNew = sets.find((s) => !s.best);
+    if (wanted && sets.some((s) => s.set_id === wanted)) select.value = wanted;
+    else if (firstNew) select.value = firstNew.set_id; // 預設選還沒做過的第一套
+    $("start").disabled = sets.length === 0;
+    $("load-warning").hidden = sets.length > 0;
+    $("load-warning").textContent = sets.length ? "" : "目前沒有可做的題組。";
+  } catch (e) {
+    if (state.phase === "intro") { $("load-warning").textContent = e.message; $("load-warning").hidden = false; }
+  }
+}
+
+function openFeedback(from, attemptId) {
+  state.previous = from;
+  state.feedbackAttempt = attemptId ?? null;
+  $("feedback-form").reset();
+  $("feedback-message-status").hidden = true;
+  $("feedback-send").disabled = false;
+  setPhase("feedback");
+}
+
+async function sendFeedback(e) {
+  e.preventDefault();
+  const form = $("feedback-form");
+  const rating = form.elements.rating.value;
+  const audio = form.elements.audio_ok.value;
+  const message = $("feedback-message").value.trim();
+  const status = $("feedback-message-status");
+  status.hidden = false;
+  if (!rating && !audio && !message) { status.textContent = "至少填一項再送出。"; return; }
+  $("feedback-send").disabled = true;
+  try {
+    await api("feedback", { method: "POST", body: { ...(rating ? { rating: Number(rating) } : {}), ...(audio ? { audio_ok: audio === "yes" } : {}), ...(message ? { message } : {}), ...(state.feedbackAttempt ? { attempt_id: state.feedbackAttempt } : {}) } });
+    status.textContent = "收到了，謝謝你的回饋！";
+    $("feedback-cancel").textContent = "回去";
+  } catch (err) {
+    if (state.phase === "feedback") { status.textContent = `送出失敗：${err.message}`; $("feedback-send").disabled = false; }
+  }
 }
 
 async function init() {
-  const sets = await getJson("sets.json");
-  state.profile = await getJson("../config/exam-profile.json");
-  const select = $("set-select");
-  for (const s of sets) { const o = document.createElement("option"); o.value = s.id; o.textContent = `${s.title}（${s.id}）`; select.append(o); }
-  const wanted = new URLSearchParams(location.search).get("set");
-  if (wanted && sets.some((s) => s.id === wanted)) select.value = wanted;
-  const start = $("start");
-  start.textContent = "開始";
-  start.disabled = false;
-  start.addEventListener("click", async () => {
-    start.disabled = true;
-    try { await loadSet(select.value); startPreview(); }
-    catch (e) { $("load-warning").textContent = String(e.message); $("load-warning").hidden = false; start.disabled = false; }
+  if (config.contactEmail) { $("contact").textContent = `要求刪除你的資料，請寫信到 ${config.contactEmail}。`; $("contact").hidden = false; }
+  const hash = auth.consumeHash();
+  $("login-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    $("login-send").disabled = true;
+    try { await auth.signIn($("login-email").value.trim()); showLogin("已寄出登入連結，請到信箱點連結（沒看到的話看一下垃圾郵件）。"); }
+    catch (err) { showLogin(err.message); }
+    $("login-send").disabled = false;
+  });
+  $("dev-login").addEventListener("click", () => { auth.devLogin("dev-tester"); showHome(); });
+  $("logout").addEventListener("click", () => { auth.signOut(); showLogin(); });
+  $("start").addEventListener("click", async () => {
+    $("start").disabled = true;
+    try { await loadSet($("set-select").value); startPreview(); }
+    catch (e) { if (state.phase === "intro") { $("load-warning").textContent = e.message; $("load-warning").hidden = false; $("start").disabled = false; } }
   });
   $("skip").addEventListener("click", () => state.onSkip?.());
   $("paper-form").addEventListener("submit", (e) => { e.preventDefault(); if (state.phase === "playing" || state.phase === "check") finish(); });
-  $("again").addEventListener("click", () => { setPhase("intro"); $("start").disabled = false; });
+  $("again").addEventListener("click", () => showHome());
+  $("next-set").addEventListener("click", async () => {
+    const id = $("next-set").dataset.set;
+    $("next-set").disabled = true;
+    try { await loadSet(id); startPreview(); }
+    catch (e) { $("next-note").textContent = `開不了：${e.message}`; $("next-note").hidden = false; }
+    finally { $("next-set").disabled = false; }
+  });
+  $("to-feedback").addEventListener("click", () => openFeedback("intro", null));
+  $("result-feedback").addEventListener("click", () => openFeedback("result", state.lastAttemptId));
+  $("feedback-form").addEventListener("submit", sendFeedback);
+  $("feedback-cancel").addEventListener("click", () => { $("feedback-cancel").textContent = "不用了，回去"; state.previous === "result" ? setPhase("result") : showHome(); });
+
+  if (!auth.configured && !auth.isLocalDev) { showLogin("登入服務還沒設定好。"); }
+  else if (await auth.token()) await showHome();
+  else showLogin(hash?.error ? `登入失敗：${hash.error}` : undefined);
   window.__examReady = true;
 }
 

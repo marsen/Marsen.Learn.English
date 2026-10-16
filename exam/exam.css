@@ -24,3 +24,7 @@ table{border-collapse:collapse;width:100%}th,td{border:1px solid var(--line);pad
 tr.ok td:first-child{border-left:4px solid var(--ok)}tr.bad td:first-child{border-left:4px solid var(--bad)}
 
 .paper input[type=text].look{background:#fff7d6}
+
+#login-form label{display:block;margin:.5rem 0}#login-form input{font:inherit;padding:.4rem .5rem;width:min(22rem,100%);box-sizing:border-box}
+.who{color:#59636e}.rating label,#feedback-form p>label{margin-right:.8rem}textarea{font:inherit;width:100%;box-sizing:border-box;padding:.5rem}
+footer{margin-top:2rem;font-size:.9rem}

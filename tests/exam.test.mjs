@@ -5,6 +5,9 @@ import { readFile } from "node:fs/promises";
 import { JSDOM } from "jsdom";
 import { startServer } from "../scripts/serve.mjs";
 import * as core from "../exam/core.mjs";
+import * as authMod from "../exam/auth.mjs";
+import * as configMod from "../exam/config.js";
+import { gradeAnswers } from "../generator/grade.mjs";
 
 const SET = "s1-gym-0002";
 const load = async (f) => JSON.parse(await readFile(new URL(`../content/sets/${SET}/${f}`, import.meta.url)));
@@ -12,12 +15,12 @@ const load = async (f) => JSON.parse(await readFile(new URL(`../content/sets/${S
 test("gradeAnswers：全對、全空、混合；每題有題號、對錯、你寫的、正解", async () => {
   const plan = await load("plan.json");
   const all = Object.fromEntries(plan.answers.map((a) => [a.question_id, a.answer]));
-  const r = core.gradeAnswers(plan, all);
+  const r = gradeAnswers(plan, all);
   assert.equal(r.total, plan.answers.length);
   assert.equal(r.count, plan.answers.length);
   assert.deepEqual(r.results.map((x) => x.number), plan.answers.map((_, i) => i + 1));
-  assert.equal(core.gradeAnswers(plan, {}).total, 0);
-  const half = core.gradeAnswers(plan, { ...all, [plan.answers[0].question_id]: "zzz" });
+  assert.equal(gradeAnswers(plan, {}).total, 0);
+  const half = gradeAnswers(plan, { ...all, [plan.answers[0].question_id]: "zzz" });
   assert.equal(half.total, plan.answers.length - 1);
   assert.equal(half.results[0].correct, false);
   assert.equal(half.results[0].given, "zzz");
@@ -34,21 +37,27 @@ let server, base;
 before(async () => { server = await startServer(0); base = `http://127.0.0.1:${server.address().port}`; });
 after(() => server.close());
 
-async function openExam({ audio = false } = {}) {
-  const html = await (await fetch(`${base}/exam/index.html?set=${SET}`)).text();
-  const dom = new JSDOM(html, { url: `${base}/exam/index.html?set=${SET}`, runScripts: "outside-only", pretendToBeVisual: true });
+const until = async (fn, ms = 2000) => { for (let i = 0; i < ms / 20 && !fn(); i++) await new Promise((r) => setTimeout(r, 20)); };
+
+// 在 jsdom 開考試頁。後端是 scripts/serve.mjs 裡的開發用假後端（跑同一份 api/_core.mjs）。
+// 有錄音的題組（s1-gym-0002）走時間軸流程；沒有錄音的題組（例如 s1-car-0001）走開發用流程。
+async function openExam({ set = SET, failFinish = 0, login = true } = {}) {
+  const url = `${base}/exam/index.html?set=${set}`;
+  const html = await (await fetch(url)).text();
+  const dom = new JSDOM(html, { url, runScripts: "outside-only", pretendToBeVisual: true });
   const w = dom.window;
   const timers = [];
   w.setInterval = (fn) => timers.push(fn) - 1;
   w.clearInterval = (id) => { timers[id] = null; };
-  // 沒有錄音檔時，HEAD audio/full.mp3 會是 404；audio=true 時假裝有。
-  // audio=false：假裝沒有錄音檔；audio=true：假裝有 mp3，但不給 timing.json（舊流程）；audio="timed"：用真的 timing.json。
-  w.fetch = (p, opt) => {
-    const u = String(p);
-    if (/audio\/full\.mp3$/.test(u)) return Promise.resolve({ ok: !!audio });
-    if (/audio\/timing\.json$/.test(u) && audio !== "timed") return Promise.resolve({ ok: false });
-    return fetch(new URL(p, w.location.href), opt);
+  const calls = [];
+  let fails = failFinish;
+  w.fetch = (p, opt = {}) => {
+    const u = new URL(p, w.location.href);
+    calls.push({ path: u.pathname, method: opt.method ?? "GET", headers: opt.headers ?? {}, body: opt.body });
+    if (u.pathname === "/api/finish" && fails > 0) { fails--; return Promise.resolve(new w.Response(JSON.stringify({ error: "連線失敗" }), { status: 500 })); }
+    return fetch(u, opt);
   };
+  w.Response = Response;
   const played = [];
   class FakeAudio {
     constructor(src) { this.src = src; this.listeners = {}; played.push(this); }
@@ -59,22 +68,41 @@ async function openExam({ audio = false } = {}) {
     end() { this.listeners.ended?.(); }
   }
   w.Audio = FakeAudio;
-  w.__core = core;
+  w.__mods = { core, auth: authMod, config: configMod };
   const src = (await readFile(new URL("../exam/app.js", import.meta.url), "utf8"))
-    .replace(/import \{([^}]*)\} from "\.\/core\.mjs";/, "const {$1} = window.__core;");
+    .replace(/import \{([^}]*)\} from "\.\/(\w+)\.(?:mjs|js)";/g, 'const {$1} = window.__mods["$2"];');
   w.eval(src);
-  for (let i = 0; i < 50 && !w.__examReady; i++) await new Promise((r) => setTimeout(r, 20));
+  await until(() => w.__examReady);
+  const d = w.document;
+  if (login) { d.getElementById("dev-login").click(); await until(() => !d.getElementById("start").disabled); }
   const tick = () => { for (const t of timers) t?.(); };
-  return { w, d: w.document, tick, played };
+  return { w, d, tick, played, calls };
 }
 
-const begin = async (d) => { d.getElementById("start").click(); for (let i = 0; i < 50 && d.getElementById("exam").hidden; i++) await new Promise((r) => setTimeout(r, 20)); };
+const begin = async (d) => { d.getElementById("start").click(); await until(() => !d.getElementById("exam").hidden); };
+const visible = (d) => ["login", "intro", "exam", "result", "feedback"].filter((id) => !d.getElementById(id).hidden);
 
-test("頁面：程式裡沒有瀏覽器語音合成", async () => {
+test("頁面：程式裡沒有瀏覽器語音合成，也不載入批改程式與標準答案", async () => {
   const src = await readFile(new URL("../exam/app.js", import.meta.url), "utf8");
   assert.ok(!/speechSynthesis|SpeechSynthesisUtterance|getVoices/.test(src));
-  const { d } = await openExam();
-  assert.equal(d.getElementById("start").disabled, false);
+  assert.ok(!/generator\/|plan\.json|gradeAnswers/.test(src), "前端不碰標準答案");
+  const core2 = await readFile(new URL("../exam/core.mjs", import.meta.url), "utf8");
+  assert.ok(!/generator\//.test(core2));
+});
+
+test("頁面：沒登入先看到登入頁；本機開發才有開發登入；登入後是題組清單", async () => {
+  const { d } = await openExam({ login: false });
+  assert.deepEqual(visible(d), ["login"]);
+  assert.equal(d.getElementById("dev-login").hidden, false);
+  d.getElementById("dev-login").click();
+  await until(() => !d.getElementById("start").disabled);
+  assert.deepEqual(visible(d), ["intro"]);
+  const options = [...d.querySelectorAll("#set-select option")].map((o) => o.value);
+  assert.ok(options.includes(SET));
+  assert.equal(d.getElementById("set-select").value, SET, "網址的 ?set= 會選到那一組");
+  assert.match(d.getElementById("who").textContent, /dev-tester/);
+  d.getElementById("logout").click();
+  assert.deepEqual(visible(d), ["login"]);
 });
 
 test("頁面：答題卷有分段標題與行內前後文，空格編號連續", async () => {
@@ -110,12 +138,11 @@ test("頁面：paragraph 的分段連成一小段文字，list 的分段才有�
   }
 });
 
-test("頁面：沒有錄音檔時，預覽後可以直接填答題卷，不播任何聲音，做完看到結果", async () => {
-  const plan = await load("plan.json");
-  const { d, tick, played } = await openExam();
+test("頁面：沒有錄音的題組（開發用）：預覽後可以填答題卷，不播聲音，做完由伺服器批改", async () => {
+  const plan = JSON.parse(await readFile(new URL("../content/sets/s1-car-0001/plan.json", import.meta.url)));
+  const { d, tick, played, calls } = await openExam({ set: "s1-car-0001" });
   await begin(d);
   const inputs = () => [...d.querySelectorAll("#paper input[data-q]")];
-  assert.ok(!d.querySelector("#paper table"));
   assert.ok(d.querySelector("#paper-instruction b"), "說明裡的全大寫片語加粗");
   assert.ok(inputs().every((i) => i.disabled), "預覽時不能填");
   for (let i = 0; i < 60; i++) tick();
@@ -125,31 +152,22 @@ test("頁面：沒有錄音檔時，預覽後可以直接填答題卷，不播�
   inputs().forEach((el, i) => { el.value = i === 0 ? "wrong" : plan.answers[i].answer; });
   d.getElementById("skip").click(); // 結束作答，進入檢查
   for (let i = 0; i < 40; i++) tick();
-  assert.equal(d.getElementById("result").hidden, false);
+  await until(() => !d.getElementById("result").hidden);
   assert.equal(d.getElementById("score").textContent, `${plan.answers.length - 1} / ${plan.answers.length}`);
-  assert.equal(d.querySelectorAll("#result-table tr.bad").length, 1);
   const bad = d.querySelector("#result-table tr.bad");
+  assert.equal(d.querySelectorAll("#result-table tr.bad").length, 1);
   assert.equal(bad.cells[1].textContent, "wrong");
   assert.equal(bad.cells[2].textContent, plan.answers[0].answer, "答錯的題顯示正解");
+  const finish = calls.find((c) => c.path === "/api/finish");
+  assert.match(finish.headers.Authorization, /^Bearer dev-/);
+  assert.ok(!calls.some((c) => /plan\.json|script\.json/.test(c.path)), "瀏覽器沒有去讀標準答案或逐字稿");
 });
 
-test("頁面：有錄音檔時播一次，播完進入檢查倒數", async () => {
-  const { d, tick, played } = await openExam({ audio: true });
+test("頁面：送出鈕在作答中就能提早送出（走伺服器批改）", async () => {
+  const { d, w } = await openExam();
   await begin(d);
-  for (let i = 0; i < 60; i++) tick();
-  assert.equal(played.length, 1);
-  assert.match(played[0].src, /audio\/full\.mp3$/);
-  assert.equal(played[0].playing, true);
-  played[0].end();
-  assert.match(d.getElementById("status").textContent, /檢查/);
-});
-
-test("頁面：送出鈕在作答中就能提早送出", async () => {
-  const { d, tick, w } = await openExam();
-  await begin(d);
-  for (let i = 0; i < 60; i++) tick();
   d.getElementById("paper-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
-  assert.equal(d.getElementById("result").hidden, false);
+  await until(() => !d.getElementById("result").hidden);
   assert.match(d.getElementById("score").textContent, /^0 \/ /);
 });
 
@@ -170,25 +188,118 @@ test("核心：eventAt／viewOf／questionLabel 依 timing.json 判斷畫面狀�
   assert.equal(core.questionLabel([5, 6]), "第 5、6 題");
 });
 
-test("頁面：有 timing.json 時，看題停頓、題號標示、檢查階段都跟著錄音走，播完批改", async () => {
+test("頁面：有時間軸時，看題停頓、題號標示、檢查階段都跟著錄音走，播完由伺服器批改", async () => {
   const t = JSON.parse(await readFile(new URL(`../content/sets/${SET}/audio/timing.json`, import.meta.url)));
-  const { d, played } = await openExam({ audio: "timed" });
+  const { d, played } = await openExam();
   await begin(d);
   assert.equal(played.length, 1, "不先跑頁面自己的看題倒數，直接播錄音");
+  assert.match(played[0].src, /audio\/full\.mp3$/);
   const a = played[0];
   const p2 = t.events.find((e) => e.id === "pause2");
   a.at(p2.start + 5);
   assert.match(d.getElementById("status").textContent, /看題時間：第 5、6 題/);
-  assert.equal(d.getElementById("clock").textContent, d.defaultView.__core.formatClock(p2.end - p2.start - 5));
-  const lit = [...d.querySelectorAll("#paper input.look")].map((i) => i.dataset.q);
-  assert.deepEqual(lit, ["q05", "q06"]);
-  const turn = t.events.find((e) => e.type === "turn");
-  a.at(turn.start + 1);
+  assert.equal(d.getElementById("clock").textContent, core.formatClock(p2.end - p2.start - 5));
+  assert.deepEqual([...d.querySelectorAll("#paper input.look")].map((i) => i.dataset.q), ["q05", "q06"]);
+  a.at(t.events.find((e) => e.type === "turn").start + 1);
   assert.match(d.getElementById("status").textContent, /錄音播放中/);
   assert.equal(d.querySelectorAll("#paper input.look").length, 0);
-  const check = t.events.find((e) => e.id === "check");
-  a.at(check.start + 1);
+  a.at(t.events.find((e) => e.id === "check").start + 1);
   assert.match(d.getElementById("status").textContent, /檢查/);
   a.end();
+  await until(() => !d.getElementById("result").hidden);
   assert.equal(d.getElementById("result").hidden, false);
+});
+
+test("頁面：送出失敗時留在答題卷、答案還在，再按一次就成功；同一次作答只算一次", async () => {
+  const { d, w, calls } = await openExam({ failFinish: 1 });
+  await begin(d);
+  const first = d.querySelector("#paper input[data-q]");
+  first.value = "my answer";
+  d.getElementById("paper-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
+  await until(() => /送出失敗/.test(d.getElementById("status").textContent));
+  assert.match(d.getElementById("status").textContent, /送出失敗：連線失敗/);
+  assert.equal(first.value, "my answer");
+  assert.equal(d.getElementById("result").hidden, true);
+  assert.equal(d.getElementById("submit").disabled, false);
+  d.getElementById("paper-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
+  await until(() => !d.getElementById("result").hidden);
+  assert.equal(calls.filter((c) => c.path === "/api/finish").length, 2);
+  assert.equal(server.dev.attempts.size > 0, true);
+  const done = [...server.dev.attempts.values()].filter((a) => a.finished_at);
+  assert.ok(done.some((a) => a.answers.q01 === "my answer"));
+});
+
+test("頁面：回饋表單——什麼都沒填不送；送出後伺服器有紀錄，掛在剛才那次作答", async () => {
+  const { d, w } = await openExam();
+  await begin(d);
+  d.getElementById("paper-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
+  await until(() => !d.getElementById("result").hidden);
+  d.getElementById("result-feedback").click();
+  assert.deepEqual(visible(d), ["feedback"]);
+  const before = server.dev.feedback.length;
+  d.getElementById("feedback-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
+  await new Promise((r) => setTimeout(r, 50));
+  assert.match(d.getElementById("feedback-message-status").textContent, /至少填一項/);
+  assert.equal(server.dev.feedback.length, before);
+  d.querySelector('input[name="rating"][value="4"]').checked = true;
+  d.querySelector('input[name="audio_ok"][value="no"]').checked = true;
+  d.getElementById("feedback-message").value = "拼字聽不清楚";
+  d.getElementById("feedback-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
+  await until(() => /謝謝/.test(d.getElementById("feedback-message-status").textContent));
+  const row = server.dev.feedback.at(-1);
+  assert.equal(row.rating, 4);
+  assert.equal(row.audio_ok, false);
+  assert.equal(row.message, "拼字聽不清楚");
+  assert.match(row.attempt_id, /^dev-attempt-/);
+  d.getElementById("feedback-cancel").click();
+  assert.deepEqual(visible(d), ["result"]);
+});
+
+test("頁面：從題組清單直接給回饋（不掛作答）；登入過期（401）會回登入頁", async () => {
+  const { d, w } = await openExam();
+  d.getElementById("to-feedback").click();
+  d.getElementById("feedback-message").value = "整體不錯";
+  d.getElementById("feedback-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
+  await until(() => /謝謝/.test(d.getElementById("feedback-message-status").textContent));
+  assert.equal(server.dev.feedback.at(-1).attempt_id, undefined);
+  w.localStorage.setItem("exam-auth", JSON.stringify({ access_token: "bad-token", expires_at: 9999999999 }));
+  d.getElementById("feedback-cancel").click();
+  await until(() => !d.getElementById("login").hidden);
+  assert.deepEqual(visible(d), ["login"]);
+  assert.match(d.getElementById("login-message").textContent, /登入已過期/);
+});
+
+test("故事：做完一套看到分數 → 結果頁給「做下一套」→ 回清單時已完成的有標記、預設選沒做過的", async () => {
+  server.dev.attempts.clear();
+  const { d, w, tick } = await openExam({ set: "s1-car-0001" });
+  await begin(d);
+  for (let k = 0; k < 60; k++) tick();
+  d.getElementById("paper-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
+  await until(() => !d.getElementById("result").hidden);
+  await until(() => !d.getElementById("next-set").hidden);
+  const next = d.getElementById("next-set");
+  assert.match(next.textContent, /^做下一套：/);
+  assert.notEqual(next.dataset.set, "s1-car-0001", "下一套不是剛做完的這套");
+  d.getElementById("again").click();
+  await until(() => !d.getElementById("intro").hidden && !d.getElementById("start").disabled);
+  const opts = [...d.querySelectorAll("#set-select option")];
+  const done = opts.find((o) => o.value === "s1-car-0001");
+  assert.match(done.textContent, /已完成 \d+\/\d+/);
+  assert.notEqual(d.getElementById("set-select").value, "s1-car-0001", "預設選沒做過的");
+  assert.equal(opts.filter((o) => /已完成/.test(o.textContent)).length, 1);
+});
+
+test("故事：全部做完後結果頁說明沒有更多題組，而不是留空", async () => {
+  server.dev.attempts.clear();
+  const { d, w, tick } = await openExam({ set: "s1-car-0001" });
+  const total = d.querySelectorAll("#set-select option").length;
+  for (let i = 0; i < total; i++) {
+    if (i > 0) { d.getElementById("next-set").click(); await until(() => !d.getElementById("exam").hidden); }
+    else await begin(d);
+    for (let k = 0; k < 60; k++) tick();
+  d.getElementById("paper-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
+    await until(() => !d.getElementById("result").hidden && (!d.getElementById("next-set").hidden || !d.getElementById("next-note").hidden));
+  }
+  assert.equal(d.getElementById("next-set").hidden, true);
+  assert.match(d.getElementById("next-note").textContent, /都做完了/);
 });

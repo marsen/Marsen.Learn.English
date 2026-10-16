@@ -3,17 +3,29 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>聽力測驗（開發版）</title>
+  <title>聽力測驗（試用版）</title>
   <meta name="robots" content="noindex,nofollow">
   <link rel="stylesheet" href="exam.css">
 </head>
 <body>
   <main id="app">
-    <section id="intro" data-phase="intro">
-      <h1>聽力測驗：Section 1（開發版）</h1>
-      <p class="note">錄音只播一次，沒有暫停與倒轉。錄音檔由 M4 產生；還沒有錄音的題組，只能先填答題卷看版面。</p>
+    <section id="login" data-phase="login" hidden>
+      <h1>聽力測驗：試用</h1>
+      <p class="note">試用採邀請制。輸入你被邀請的 email，我們會寄一封登入連結給你。</p>
+      <form id="login-form">
+        <label>Email <input id="login-email" type="email" required autocomplete="email"></label>
+        <button id="login-send" type="submit">寄登入連結</button>
+      </form>
+      <p><button id="dev-login" type="button" class="link" hidden>以開發者身分進入（只在本機）</button></p>
+      <p id="login-message" class="note" role="status" hidden></p>
+    </section>
+
+    <section id="intro" data-phase="intro" hidden>
+      <h1>聽力測驗：Section 1</h1>
+      <p class="who"><span id="who"></span> <button id="logout" type="button" class="link">登出</button></p>
+      <p class="note">錄音只播一次，沒有暫停與倒轉。請戴耳機，在安靜的地方作答。</p>
       <label>題組 <select id="set-select"></select></label>
-      <p><button id="start" type="button">開始</button></p>
+      <p><button id="start" type="button" disabled>開始</button> <button id="to-feedback" type="button" class="link">給回饋</button></p>
       <p id="load-warning" class="warn" hidden></p>
     </section>
 
@@ -34,8 +46,32 @@
       <h1>結果</h1>
       <p id="score" class="score"></p>
       <table id="result-table"></table>
-      <p><button id="again" type="button">再做一次</button></p>
+      <p id="next-note" class="note" hidden></p>
+      <p><button id="next-set" type="button" hidden></button> <button id="result-feedback" type="button">給回饋</button> <button id="again" type="button" class="link">回到選題組</button></p>
     </section>
+
+    <section id="feedback" data-phase="feedback" hidden>
+      <h1>給回饋</h1>
+      <form id="feedback-form">
+        <p>整體感覺（1 差到 5 很好）
+          <span class="rating">
+            <label><input type="radio" name="rating" value="1">1</label>
+            <label><input type="radio" name="rating" value="2">2</label>
+            <label><input type="radio" name="rating" value="3">3</label>
+            <label><input type="radio" name="rating" value="4">4</label>
+            <label><input type="radio" name="rating" value="5">5</label>
+          </span>
+        </p>
+        <p>錄音聽得清楚嗎？
+          <label><input type="radio" name="audio_ok" value="yes">清楚</label>
+          <label><input type="radio" name="audio_ok" value="no">不清楚（拼字、數字、口音、速度…）</label>
+        </p>
+        <p><label>想說的話<br><textarea id="feedback-message" rows="5" maxlength="2000"></textarea></label></p>
+        <p><button id="feedback-send" type="submit">送出</button> <button id="feedback-cancel" type="button" class="link">不用了，回去</button></p>
+        <p id="feedback-message-status" class="note" role="status" hidden></p>
+      </form>
+    </section>
+    <footer id="contact" class="note" hidden></footer>
   </main>
   <script type="module" src="app.js"></script>
 </body>

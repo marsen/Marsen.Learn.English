@@ -2,7 +2,4 @@ node_modules/
 .DS_Store
 *.log
 content/sets/*/audio/
-tts/models/
-tts/slice_cache/
-tts/out/
-tts/.venv/
+public/

@@ -13,3 +13,9 @@ export function grade(plan, userAnswers) {
   };
   return { total: results.filter((r) => r.correct).length, results, byType: tally("type"), byTrap: tally("trap") };
 }
+
+// 給畫面用的批改結果：每題對錯、你寫的、正解，加上題號（照表格由上到下）。
+export function gradeAnswers(plan, answers) {
+  const g = grade(plan, answers);
+  return { total: g.total, count: g.results.length, results: g.results.map((r, i) => ({ number: i + 1, question_id: r.question_id, given: r.given, expected: r.expected, correct: r.correct })) };
+}

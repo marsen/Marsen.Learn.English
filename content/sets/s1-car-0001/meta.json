@@ -3,13 +3,13 @@
   "seed": 20261019,
   "status": "validated",
   "created_at": "2026-10-16T07:29:10.049Z",
-  "updated_at": "2026-10-16T11:04:25.771Z",
+  "updated_at": "2026-10-16T16:16:44.231Z",
   "schema_version": 1,
   "generator_version": "0.1.0",
   "inputs": {
     "topic": "cfc920b812864ec4",
     "recipes": "82a0e878bf46d387",
-    "profile": "1390cf2fe82e58fa"
+    "profile": "3caede53389e3f63"
   },
   "retries": {
     "plan": 0,
@@ -18,7 +18,7 @@
   "stages": {
     "skeleton": {
       "hash": "a433ba836434fa4c",
-      "at": "2026-10-16T09:40:44.303Z",
+      "at": "2026-10-16T16:16:43.782Z",
       "edits": [
         {
           "at": "2026-10-16T07:50:39.609Z",
@@ -29,6 +29,11 @@
           "at": "2026-10-16T09:40:44.303Z",
           "note": "主題檔改成段落式句型（題目卷格式），欄位與骨架不變",
           "from_hash": "a433ba836434fa4c"
+        },
+        {
+          "at": "2026-10-16T16:16:43.782Z",
+          "note": "profile 新增 max_name_questions（V15）；骨架不變",
+          "from_hash": "a433ba836434fa4c"
         }
       ]
     },
@@ -37,17 +42,17 @@
       "from": {
         "skeleton": "a433ba836434fa4c"
       },
-      "at": "2026-10-16T09:40:44.389Z"
+      "at": "2026-10-16T16:16:43.984Z"
     },
     "plan": {
       "hash": "364991fc5fea84c3",
       "from": {
         "skeleton": "a433ba836434fa4c"
       },
-      "prompt": null,
-      "model": "claude-sonnet-5-5 (subagent，補登記)",
-      "mode": "backfilled",
-      "at": "2026-10-16T07:29:10.053Z"
+      "prompt": "69c562c91be69ec0",
+      "model": "unspecified",
+      "mode": "manual",
+      "at": "2026-10-16T16:16:43.847Z"
     },
     "script": {
       "hash": "9f4926341abcbbb1",
@@ -57,7 +62,7 @@
       "prompt": "a88a0e10f3d0736c",
       "model": "unspecified",
       "mode": "manual",
-      "at": "2026-10-16T09:40:08.373Z"
+      "at": "2026-10-16T16:16:43.911Z"
     },
     "validate": {
       "from": {
@@ -68,7 +73,7 @@
       "ok": true,
       "block": 0,
       "warn": 0,
-      "at": "2026-10-16T11:04:25.769Z"
+      "at": "2026-10-16T16:16:44.085Z"
     },
     "blind": {
       "from": {
@@ -81,7 +86,7 @@
       "model": "unspecified",
       "mode": "manual",
       "warnings": 1,
-      "at": "2026-10-16T09:40:33.303Z"
+      "at": "2026-10-16T16:16:44.143Z"
     }
   }
 }

@@ -145,6 +145,17 @@ if (cmd === "draw") {
     saveMeta(dir, meta, set);
   }
   process.exit(result.ok ? 0 : 1);
+} else if (cmd === "publish") {
+  const dir = resolve(rest[0] ?? ".");
+  const { preparePublish, publishToSupabase } = await import("./publish.mjs");
+  const prep = preparePublish({ dir, content: loadContent(), allowUnreviewed: rest.includes("--allow-unreviewed") });
+  for (const w of prep.warnings) console.error(`注意：${w}`);
+  if (!prep.ok) { for (const p of prep.problems) console.error(`不能發佈：${p}`); process.exit(1); }
+  const { set } = prep.payload;
+  console.log(`${set.set_id}「${set.title}」${set.question_count} 題，錄音 ${(prep.payload.audio.length / 1e6).toFixed(1)} MB → ${set.audio_path}`);
+  if (rest.includes("--dry-run")) { console.log("（--dry-run：沒有送出任何東西）"); process.exit(0); }
+  await publishToSupabase({ payload: prep.payload });
+  console.log("已發佈。");
 } else if (cmd === "status") {
   const dir = resolve(rest[0]);
   if (!hasMeta(dir)) { console.error("沒有 meta.json（用 stamp 補登記）"); process.exit(2); }
