@@ -1,0 +1,369 @@
+{
+  "id": "gym-membership",
+  "title": "健身房入會",
+  "section": 1,
+  "speakers": [
+    {
+      "id": "A",
+      "role": "健身房櫃台接待"
+    },
+    {
+      "id": "B",
+      "role": "來入會的新會員"
+    }
+  ],
+  "form": {
+    "title": "Fitness Club Registration",
+    "instruction": "Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
+    "rows": [
+      {
+        "label": "Joining fee",
+        "printed": "Waived this month"
+      },
+      {
+        "label": "Family name",
+        "field_id": "family_name"
+      },
+      {
+        "label": "First name",
+        "field_id": "first_name"
+      },
+      {
+        "label": "Date of birth",
+        "field_id": "date_of_birth"
+      },
+      {
+        "label": "House number",
+        "field_id": "house_number"
+      },
+      {
+        "label": "Street",
+        "field_id": "street_name"
+      },
+      {
+        "label": "Town",
+        "field_id": "town"
+      },
+      {
+        "label": "Phone",
+        "field_id": "phone"
+      },
+      {
+        "label": "Emergency contact (surname)",
+        "field_id": "emergency_contact"
+      },
+      {
+        "label": "Student card number",
+        "field_id": "student_card_number"
+      },
+      {
+        "label": "Campus",
+        "field_id": "campus"
+      },
+      {
+        "label": "Employer",
+        "field_id": "employer"
+      },
+      {
+        "label": "Office floor",
+        "field_id": "work_floor"
+      },
+      {
+        "label": "Membership plan",
+        "field_id": "membership_plan"
+      },
+      {
+        "label": "Start day",
+        "field_id": "start_day"
+      },
+      {
+        "label": "Preferred time",
+        "field_id": "preferred_time"
+      },
+      {
+        "label": "Main goal",
+        "field_id": "goal"
+      },
+      {
+        "label": "Class interested in",
+        "field_id": "class_interest"
+      },
+      {
+        "label": "Sport played before",
+        "field_id": "sport_background"
+      },
+      {
+        "label": "Locker number",
+        "field_id": "locker_number"
+      },
+      {
+        "label": "Payment method",
+        "field_id": "payment_method"
+      },
+      {
+        "label": "Visits per week",
+        "field_id": "visit_frequency"
+      },
+      {
+        "label": "Heard about us from",
+        "field_id": "heard_from"
+      }
+    ]
+  },
+  "variants": [
+    {
+      "id": "student",
+      "setting": "入會的人是附近大學的學生"
+    },
+    {
+      "id": "employee",
+      "setting": "入會的人是附近公司的上班族"
+    }
+  ],
+  "fields_pool": [
+    {
+      "field_id": "family_name",
+      "type": "name_spelled",
+      "allowed_traps": [
+        "spelling",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1
+    },
+    {
+      "field_id": "first_name",
+      "type": "name_spelled",
+      "allowed_traps": [
+        "spelling",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1
+    },
+    {
+      "field_id": "date_of_birth",
+      "type": "date",
+      "allowed_traps": [
+        "self_correction",
+        "similar_numbers",
+        "none"
+      ],
+      "answer_policy": "date_equivalence",
+      "max_words": 2
+    },
+    {
+      "field_id": "house_number",
+      "type": "number",
+      "allowed_traps": [
+        "similar_numbers",
+        "self_correction",
+        "none"
+      ],
+      "answer_policy": "digits_only",
+      "max_words": 1,
+      "group": "address"
+    },
+    {
+      "field_id": "street_name",
+      "type": "name_spelled",
+      "allowed_traps": [
+        "spelling",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2,
+      "group": "address"
+    },
+    {
+      "field_id": "town",
+      "type": "place",
+      "allowed_traps": [
+        "spelling",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1
+    },
+    {
+      "field_id": "phone",
+      "type": "phone",
+      "allowed_traps": [
+        "similar_numbers",
+        "none"
+      ],
+      "answer_policy": "digits_only",
+      "max_words": 1
+    },
+    {
+      "field_id": "emergency_contact",
+      "type": "name_spelled",
+      "allowed_traps": [
+        "spelling",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1
+    },
+    {
+      "field_id": "membership_plan",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1
+    },
+    {
+      "field_id": "start_day",
+      "type": "word",
+      "allowed_traps": [
+        "self_correction",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1
+    },
+    {
+      "field_id": "preferred_time",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1
+    },
+    {
+      "field_id": "goal",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2
+    },
+    {
+      "field_id": "class_interest",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2
+    },
+    {
+      "field_id": "sport_background",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2
+    },
+    {
+      "field_id": "locker_number",
+      "type": "number",
+      "allowed_traps": [
+        "similar_numbers",
+        "none"
+      ],
+      "answer_policy": "digits_only",
+      "max_words": 1
+    },
+    {
+      "field_id": "payment_method",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2
+    },
+    {
+      "field_id": "visit_frequency",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2
+    },
+    {
+      "field_id": "heard_from",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2
+    },
+    {
+      "field_id": "student_card_number",
+      "type": "number",
+      "allowed_traps": [
+        "similar_numbers",
+        "none"
+      ],
+      "answer_policy": "digits_only",
+      "max_words": 1,
+      "only_variants": [
+        "student"
+      ]
+    },
+    {
+      "field_id": "campus",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1,
+      "only_variants": [
+        "student"
+      ]
+    },
+    {
+      "field_id": "employer",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2,
+      "only_variants": [
+        "employee"
+      ]
+    },
+    {
+      "field_id": "work_floor",
+      "type": "number",
+      "allowed_traps": [
+        "similar_numbers",
+        "none"
+      ],
+      "answer_policy": "number_word",
+      "max_words": 1,
+      "only_variants": [
+        "employee"
+      ]
+    }
+  ]
+}

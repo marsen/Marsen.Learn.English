@@ -27,7 +27,10 @@ const flag = (name, d) => { const i = rest.indexOf(`--${name}`); return i >= 0 ?
 
 if (cmd === "draw") {
   const seed = Number(flag("seed", Date.now() % 2 ** 31));
-  const { topics, recipes, profile } = loadContent();
+  const all = loadContent();
+  const { recipes, profile } = all;
+  const topics = flag("topic") ? all.topics.filter((t) => t.id === flag("topic")) : all.topics;
+  if (!topics.length) { console.error(`沒有這個主題：${flag("topic")}`); process.exit(2); }
   try {
     const skeleton = draw({ seed, topics, recipes, profile, variantId: flag("variant"), previousRecipe: flag("previous-recipe", null) });
     const out = flag("out");
@@ -115,5 +118,5 @@ if (cmd === "draw") {
   console.log(result.ok ? "通過（沒有「擋」級問題）" : "未通過");
   process.exit(result.ok ? 0 : 1);
 } else {
-  console.log("用法：\n  node generator/cli.mjs draw --seed 42 [--variant student] [--out content/sets/<id>]\n  node generator/cli.mjs paper <set 資料夾>\n  node generator/cli.mjs preview <set 資料夾>   產生 preview.html\n  node generator/cli.mjs prompt plan|script|blind <set 資料夾>   印出給 AI 的 prompt\n  node generator/cli.mjs assemble plan|script|check <set 資料夾> <AI 回覆.json>\n  node generator/cli.mjs blind <set 資料夾>   盲答與標準答案比對\n  node generator/cli.mjs validate <set 資料夾>");
+  console.log("用法：\n  node generator/cli.mjs draw --seed 42 [--topic library-card] [--variant student] [--out content/sets/<id>]\n  node generator/cli.mjs paper <set 資料夾>\n  node generator/cli.mjs preview <set 資料夾>   產生 preview.html\n  node generator/cli.mjs prompt plan|script|blind <set 資料夾>   印出給 AI 的 prompt\n  node generator/cli.mjs assemble plan|script|check <set 資料夾> <AI 回覆.json>\n  node generator/cli.mjs blind <set 資料夾>   盲答與標準答案比對\n  node generator/cli.mjs validate <set 資料夾>");
 }

@@ -1,0 +1,71 @@
+{
+  "set_id": "s1-gym-0001",
+  "answers": [
+    {
+      "question_id": "q01",
+      "answer": "52",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q02",
+      "answer": "Kestrel Lane",
+      "alternatives": [
+        "Kestrel"
+      ],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q03",
+      "answer": "Hollinwick",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q04",
+      "answer": "07700 900 614",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q05",
+      "answer": "16",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q06",
+      "answer": "Thursday",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q07",
+      "answer": "lunchtime",
+      "alternatives": [
+        "lunch"
+      ],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q08",
+      "answer": "better stamina",
+      "alternatives": [
+        "stamina"
+      ],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q09",
+      "answer": "218",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q10",
+      "answer": "direct debit",
+      "alternatives": [],
+      "confidence": "high"
+    }
+  ]
+}

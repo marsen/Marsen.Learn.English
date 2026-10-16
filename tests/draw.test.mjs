@@ -4,7 +4,9 @@ import { draw, drawFromTopic, DrawError } from "../generator/draw.mjs";
 import { staleInputs } from "../generator/artifact.mjs";
 import { content, topic } from "./helpers.mjs";
 
-const { recipes, profile, topics } = content;
+const { recipes, profile } = content;
+// 既有測試針對圖書館辦證；多主題的行為另有測試
+const topics = content.topics.filter((t) => t.id === "library-card");
 const run = (seed, extra = {}) => draw({ seed, topics, recipes, profile, ...extra });
 
 test("主題檔結構：每個情境至少 18 個欄位、2 個變體", () => {
@@ -80,4 +82,16 @@ test("版本：改了主題檔，舊骨架被標為過期", () => {
   const changed = { ...topic, title: "圖書館辦證（改）" };
   assert.deepEqual(staleInputs(sk.artifact, { topic: changed, recipes, profile }), ["topic"]);
   assert.deepEqual(staleInputs(sk.artifact, { topic, recipes: recipes.slice(1), profile }), ["recipes"]);
+});
+
+test("每個主題都能用多個種子抽出合法骨架，且每個變體至少 18 個欄位", () => {
+  for (const tp of content.topics) {
+    for (const v of tp.variants) {
+      assert.ok(tp.fields_pool.filter((f) => !f.only_variants || f.only_variants.includes(v.id)).length >= 18, `${tp.id}/${v.id} 欄位不足 18`);
+      for (let seed = 1; seed <= 30; seed++) {
+        const sk = draw({ seed, topics: [tp], recipes, profile, variantId: v.id });
+        assert.equal(sk.slots.length, 10);
+      }
+    }
+  }
 });

@@ -1,0 +1,106 @@
+{
+  "set_id": "s1-gym-0001",
+  "type": "form_table",
+  "title": "Fitness Club Registration",
+  "instruction": "Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
+  "rows": [
+    {
+      "label": "Joining fee",
+      "parts": [
+        {
+          "text": "Waived this month"
+        }
+      ]
+    },
+    {
+      "label": "House number",
+      "field_id": "house_number",
+      "parts": [
+        {
+          "blank": "q01"
+        }
+      ]
+    },
+    {
+      "label": "Street",
+      "field_id": "street_name",
+      "parts": [
+        {
+          "blank": "q02"
+        }
+      ]
+    },
+    {
+      "label": "Town",
+      "field_id": "town",
+      "parts": [
+        {
+          "blank": "q03"
+        }
+      ]
+    },
+    {
+      "label": "Phone",
+      "field_id": "phone",
+      "parts": [
+        {
+          "blank": "q04"
+        }
+      ]
+    },
+    {
+      "label": "Office floor",
+      "field_id": "work_floor",
+      "parts": [
+        {
+          "blank": "q05"
+        }
+      ]
+    },
+    {
+      "label": "Start day",
+      "field_id": "start_day",
+      "parts": [
+        {
+          "blank": "q06"
+        }
+      ]
+    },
+    {
+      "label": "Preferred time",
+      "field_id": "preferred_time",
+      "parts": [
+        {
+          "blank": "q07"
+        }
+      ]
+    },
+    {
+      "label": "Main goal",
+      "field_id": "goal",
+      "parts": [
+        {
+          "blank": "q08"
+        }
+      ]
+    },
+    {
+      "label": "Locker number",
+      "field_id": "locker_number",
+      "parts": [
+        {
+          "blank": "q09"
+        }
+      ]
+    },
+    {
+      "label": "Payment method",
+      "field_id": "payment_method",
+      "parts": [
+        {
+          "blank": "q10"
+        }
+      ]
+    }
+  ]
+}
