@@ -1,0 +1,128 @@
+{
+  "set_id": "s1-car-0001",
+  "topic": "car-rental",
+  "variant": "tourist",
+  "recipe": "R2",
+  "seed": 20261019,
+  "scenario": {
+    "setting": "A tourist visits a city-centre car rental desk on a weekday morning to arrange a trip.",
+    "accent": "en-GB"
+  },
+  "answers": [
+    {
+      "question_id": "q01",
+      "field_id": "date_of_birth",
+      "answer": "23 September",
+      "accepted": [
+        "September 23",
+        "23rd September",
+        "September 23rd"
+      ],
+      "type": "date",
+      "trap": "none",
+      "answer_policy": "date_equivalence",
+      "note": "The customer says 'the twenty-third of September' when asked for date of birth."
+    },
+    {
+      "question_id": "q02",
+      "field_id": "house_number",
+      "answer": "58",
+      "accepted": [],
+      "type": "number",
+      "trap": "none",
+      "answer_policy": "digits_only",
+      "note": "The customer says 'fifty-eight' for the house number."
+    },
+    {
+      "question_id": "q03",
+      "field_id": "street_name",
+      "answer": "Cressbrook Road",
+      "accepted": [
+        "Cressbrook Rd"
+      ],
+      "type": "name_spelled",
+      "trap": "spelling",
+      "answer_policy": "exact_word",
+      "note": "The customer spells C-R-E-S-S-B-R-O-O-K, then says 'Road'."
+    },
+    {
+      "question_id": "q04",
+      "field_id": "town",
+      "answer": "Whitcombe",
+      "accepted": [],
+      "type": "place",
+      "trap": "spelling",
+      "answer_policy": "exact_word",
+      "note": "The customer spells W-H-I-T-C-O-M-B-E."
+    },
+    {
+      "question_id": "q05",
+      "field_id": "licence_number",
+      "answer": "27160",
+      "accepted": [],
+      "type": "number",
+      "trap": "similar_numbers",
+      "answer_policy": "digits_only",
+      "note": "Read out as 'two seven one six zero'; the clerk checks 'sixteen, not sixty'."
+    },
+    {
+      "question_id": "q06",
+      "field_id": "destination",
+      "answer": "Aldeburgh",
+      "accepted": [],
+      "type": "place",
+      "trap": "spelling",
+      "answer_policy": "exact_word",
+      "note": "The customer spells A-L-D-E-B-U-R-G-H for the main destination."
+    },
+    {
+      "question_id": "q07",
+      "field_id": "car_type",
+      "answer": "people carrier",
+      "accepted": [
+        "people-carrier",
+        "MPV"
+      ],
+      "type": "word",
+      "trap": "paraphrase",
+      "answer_policy": "exact_word",
+      "note": "The customer asks for a seven-seater vehicle for the family; the clerk calls it a people carrier."
+    },
+    {
+      "question_id": "q08",
+      "field_id": "pickup_day",
+      "answer": "Thursday",
+      "accepted": [],
+      "type": "word",
+      "trap": "self_correction",
+      "answer_policy": "exact_word",
+      "wrong_value": "Tuesday",
+      "note": "The customer first says Tuesday, then corrects to Thursday."
+    },
+    {
+      "question_id": "q09",
+      "field_id": "rental_days",
+      "answer": "14",
+      "accepted": [
+        "fourteen"
+      ],
+      "type": "number",
+      "trap": "similar_numbers",
+      "answer_policy": "number_word",
+      "note": "The customer says 'fourteen days'; the clerk confirms 'fourteen, not forty'."
+    },
+    {
+      "question_id": "q10",
+      "field_id": "insurance",
+      "answer": "full cover",
+      "accepted": [
+        "fully comprehensive",
+        "full coverage"
+      ],
+      "type": "word",
+      "trap": "paraphrase",
+      "answer_policy": "exact_word",
+      "note": "The clerk offers cover with no excess; the customer calls it full cover."
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "set_id": "s1-car-0001",
+  "type": "form_table",
+  "title": "Car Rental Booking Form",
+  "instruction": "Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
+  "rows": [
+    {
+      "label": "Booking type",
+      "parts": [
+        {
+          "text": "Standard rental"
+        }
+      ]
+    },
+    {
+      "label": "Date of birth",
+      "field_id": "date_of_birth",
+      "parts": [
+        {
+          "blank": "q01"
+        }
+      ]
+    },
+    {
+      "label": "House number",
+      "field_id": "house_number",
+      "parts": [
+        {
+          "blank": "q02"
+        }
+      ]
+    },
+    {
+      "label": "Street",
+      "field_id": "street_name",
+      "parts": [
+        {
+          "blank": "q03"
+        }
+      ]
+    },
+    {
+      "label": "Town",
+      "field_id": "town",
+      "parts": [
+        {
+          "blank": "q04"
+        }
+      ]
+    },
+    {
+      "label": "Driving licence number",
+      "field_id": "licence_number",
+      "parts": [
+        {
+          "blank": "q05"
+        }
+      ]
+    },
+    {
+      "label": "Main destination",
+      "field_id": "destination",
+      "parts": [
+        {
+          "blank": "q06"
+        }
+      ]
+    },
+    {
+      "label": "Type of car",
+      "field_id": "car_type",
+      "parts": [
+        {
+          "blank": "q07"
+        }
+      ]
+    },
+    {
+      "label": "Pick-up day",
+      "field_id": "pickup_day",
+      "parts": [
+        {
+          "blank": "q08"
+        }
+      ]
+    },
+    {
+      "label": "Number of days",
+      "field_id": "rental_days",
+      "parts": [
+        {
+          "blank": "q09"
+        }
+      ]
+    },
+    {
+      "label": "Insurance",
+      "field_id": "insurance",
+      "parts": [
+        {
+          "blank": "q10"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,372 @@
+{
+  "id": "car-rental",
+  "title": "租車",
+  "section": 1,
+  "speakers": [
+    {
+      "id": "A",
+      "role": "租車公司櫃台人員"
+    },
+    {
+      "id": "B",
+      "role": "來租車的客人"
+    }
+  ],
+  "form": {
+    "title": "Car Rental Booking Form",
+    "instruction": "Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
+    "rows": [
+      {
+        "label": "Booking type",
+        "printed": "Standard rental"
+      },
+      {
+        "label": "Family name",
+        "field_id": "family_name"
+      },
+      {
+        "label": "First name",
+        "field_id": "first_name"
+      },
+      {
+        "label": "Date of birth",
+        "field_id": "date_of_birth"
+      },
+      {
+        "label": "House number",
+        "field_id": "house_number"
+      },
+      {
+        "label": "Street",
+        "field_id": "street_name"
+      },
+      {
+        "label": "Town",
+        "field_id": "town"
+      },
+      {
+        "label": "Phone",
+        "field_id": "phone"
+      },
+      {
+        "label": "Driving licence number",
+        "field_id": "licence_number"
+      },
+      {
+        "label": "Main destination",
+        "field_id": "destination"
+      },
+      {
+        "label": "Staying at",
+        "field_id": "hotel_name"
+      },
+      {
+        "label": "Company",
+        "field_id": "company_name"
+      },
+      {
+        "label": "Meeting day",
+        "field_id": "meeting_day"
+      },
+      {
+        "label": "Type of car",
+        "field_id": "car_type"
+      },
+      {
+        "label": "Pick-up day",
+        "field_id": "pickup_day"
+      },
+      {
+        "label": "Pick-up place",
+        "field_id": "pickup_place"
+      },
+      {
+        "label": "Number of days",
+        "field_id": "rental_days"
+      },
+      {
+        "label": "Insurance",
+        "field_id": "insurance"
+      },
+      {
+        "label": "Extra equipment",
+        "field_id": "extra_item"
+      },
+      {
+        "label": "Fuel option",
+        "field_id": "fuel_policy"
+      },
+      {
+        "label": "Deposit (£)",
+        "field_id": "deposit"
+      },
+      {
+        "label": "Payment method",
+        "field_id": "payment_method"
+      },
+      {
+        "label": "Heard about us from",
+        "field_id": "heard_from"
+      }
+    ]
+  },
+  "variants": [
+    {
+      "id": "tourist",
+      "setting": "客人是來這座城市旅遊的遊客"
+    },
+    {
+      "id": "business",
+      "setting": "客人是出差來開會的上班族"
+    }
+  ],
+  "fields_pool": [
+    {
+      "field_id": "family_name",
+      "type": "name_spelled",
+      "allowed_traps": [
+        "spelling",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1
+    },
+    {
+      "field_id": "first_name",
+      "type": "name_spelled",
+      "allowed_traps": [
+        "spelling",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1
+    },
+    {
+      "field_id": "date_of_birth",
+      "type": "date",
+      "allowed_traps": [
+        "self_correction",
+        "similar_numbers",
+        "none"
+      ],
+      "answer_policy": "date_equivalence",
+      "max_words": 2
+    },
+    {
+      "field_id": "house_number",
+      "type": "number",
+      "allowed_traps": [
+        "similar_numbers",
+        "self_correction",
+        "none"
+      ],
+      "answer_policy": "digits_only",
+      "max_words": 1,
+      "group": "address"
+    },
+    {
+      "field_id": "street_name",
+      "type": "name_spelled",
+      "allowed_traps": [
+        "spelling",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2,
+      "group": "address"
+    },
+    {
+      "field_id": "town",
+      "type": "place",
+      "allowed_traps": [
+        "spelling",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1
+    },
+    {
+      "field_id": "phone",
+      "type": "phone",
+      "allowed_traps": [
+        "similar_numbers",
+        "none"
+      ],
+      "answer_policy": "digits_only",
+      "max_words": 1
+    },
+    {
+      "field_id": "licence_number",
+      "type": "number",
+      "allowed_traps": [
+        "similar_numbers",
+        "none"
+      ],
+      "answer_policy": "digits_only",
+      "max_words": 1
+    },
+    {
+      "field_id": "car_type",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2
+    },
+    {
+      "field_id": "pickup_day",
+      "type": "word",
+      "allowed_traps": [
+        "self_correction",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1
+    },
+    {
+      "field_id": "pickup_place",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2
+    },
+    {
+      "field_id": "rental_days",
+      "type": "number",
+      "allowed_traps": [
+        "similar_numbers",
+        "self_correction",
+        "none"
+      ],
+      "answer_policy": "number_word",
+      "max_words": 1
+    },
+    {
+      "field_id": "insurance",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2
+    },
+    {
+      "field_id": "extra_item",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2
+    },
+    {
+      "field_id": "fuel_policy",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2
+    },
+    {
+      "field_id": "deposit",
+      "type": "number",
+      "allowed_traps": [
+        "similar_numbers",
+        "none"
+      ],
+      "answer_policy": "digits_only",
+      "max_words": 1
+    },
+    {
+      "field_id": "payment_method",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2
+    },
+    {
+      "field_id": "heard_from",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2
+    },
+    {
+      "field_id": "destination",
+      "type": "place",
+      "allowed_traps": [
+        "spelling",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1,
+      "only_variants": [
+        "tourist"
+      ]
+    },
+    {
+      "field_id": "hotel_name",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2,
+      "only_variants": [
+        "tourist"
+      ]
+    },
+    {
+      "field_id": "company_name",
+      "type": "word",
+      "allowed_traps": [
+        "paraphrase",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 2,
+      "only_variants": [
+        "business"
+      ]
+    },
+    {
+      "field_id": "meeting_day",
+      "type": "word",
+      "allowed_traps": [
+        "self_correction",
+        "distractor",
+        "none"
+      ],
+      "answer_policy": "exact_word",
+      "max_words": 1,
+      "only_variants": [
+        "business"
+      ]
+    }
+  ]
+}

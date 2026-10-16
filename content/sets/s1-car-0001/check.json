@@ -1,0 +1,71 @@
+{
+  "set_id": "s1-car-0001",
+  "answers": [
+    {
+      "question_id": "q01",
+      "answer": "23 September",
+      "alternatives": [
+        "September 23"
+      ],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q02",
+      "answer": "58",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q03",
+      "answer": "Cressbrook Road",
+      "alternatives": [
+        "Cressbrook"
+      ],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q04",
+      "answer": "Whitcombe",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q05",
+      "answer": "27160",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q06",
+      "answer": "Aldeburgh",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q07",
+      "answer": "people carrier",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q08",
+      "answer": "Thursday",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q09",
+      "answer": "14",
+      "alternatives": [],
+      "confidence": "high"
+    },
+    {
+      "question_id": "q10",
+      "answer": "full cover",
+      "alternatives": [
+        "full"
+      ],
+      "confidence": "high"
+    }
+  ]
+}
