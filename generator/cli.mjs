@@ -149,9 +149,10 @@ if (cmd === "draw") {
   const dir = resolve(rest[0]);
   if (!hasMeta(dir)) { console.error("沒有 meta.json（用 stamp 補登記）"); process.exit(2); }
   const meta = loadMeta(dir);
-  const chain = checkChain(meta, readSet(dir), loadContent());
+  const all = loadContent();
+  const chain = checkChain(meta, readSet(dir), all);
   const mark = { ok: "最新", stale: "過期", missing: "尚無", failed: "未過", warned: "有警示" };
-  console.log(`${meta.set_id}  狀態：${saveMeta(dir, meta, readSet(dir)).status}  重寫次數 plan ${meta.retries.plan} / script ${meta.retries.script}`);
+  console.log(`${meta.set_id}  狀態：${saveMeta(dir, meta, readSet(dir), new Date(), all).status}  重寫次數 plan ${meta.retries.plan} / script ${meta.retries.script}`);
   for (const o of chain) {
     const s = meta.stages[o.stage];
     console.log(`  ${o.stage.padEnd(9)} ${mark[o.state].padEnd(4)} ${o.reason}${s?.model ? `  [${s.model}]` : ""}${s?.edits?.length ? `  手動修改 ${s.edits.length} 次` : ""}`);

@@ -107,3 +107,11 @@ test("盲答有警示：狀態停在 validated，審核後變 reviewed；審核�
   assert.notEqual(deriveStatus(checkChain(meta, readSet(dir), content)), "reviewed");
   rmSync(dir, { recursive: true });
 });
+
+test("輸入（主題檔）改了：狀態要退回，不能還顯示 blind_passed", () => {
+  const { dir, meta } = fresh();
+  const changed = { ...content, topics: content.topics.map((t) => (t.id === "library-card" ? { ...t, title: t.title + "x" } : t)) };
+  const saved = saveMeta(dir, meta, readSet(dir), new Date(), changed);
+  assert.equal(saved.status, "none");
+  rmSync(dir, { recursive: true });
+});

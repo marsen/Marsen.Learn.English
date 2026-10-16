@@ -23,9 +23,9 @@ export const currentHashes = (set) => Object.fromEntries(Object.keys(FILES).map(
 export const metaPath = (dir) => join(dir, "meta.json");
 export const hasMeta = (dir) => existsSync(metaPath(dir));
 export const loadMeta = (dir) => JSON.parse(readFileSync(metaPath(dir), "utf8"));
-export function saveMeta(dir, meta, set, now = new Date()) {
+export function saveMeta(dir, meta, set, now = new Date(), content = null) {
   meta.updated_at = now.toISOString();
-  meta.status = deriveStatus(checkChain(meta, set));
+  meta.status = deriveStatus(checkChain(meta, set, content));
   writeFileSync(metaPath(dir), JSON.stringify(meta, null, 2) + "\n");
   return meta;
 }
