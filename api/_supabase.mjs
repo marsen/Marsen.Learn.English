@@ -33,13 +33,26 @@ export function supabaseFromEnv(env = process.env, fetchImpl = fetch) {
       listFinished: (userId) => rest(`attempts?select=set_id,score,total&user_id=eq.${enc(userId)}&finished_at=not.is.null`),
       getPublishedSet: (id) => one(`sets?select=*&set_id=eq.${enc(id)}&published=eq.true`),
       createAttempt: async (row) => (await rest("attempts?select=id", { method: "POST", body: row, prefer: "return=representation" }))[0],
-      getAttempt: (id) => one(`attempts?select=id,user_id,set_id,finished_at&id=eq.${enc(id)}`),
+      getAttempt: (id) => one(`attempts?select=id,user_id,set_id,finished_at,claim_hash,email,mail_count,score,total,results&id=eq.${enc(id)}`),
+      patchAttempt: (id, patch) => rest(`attempts?id=eq.${enc(id)}`, { method: "PATCH", body: patch, prefer: "return=minimal" }),
       addFeedback: (row) => rest("feedback", { method: "POST", body: row, prefer: "return=minimal" }),
       getPlan: async (setId) => (await one(`set_answers?select=plan&set_id=eq.${enc(setId)}`))?.plan ?? null,
       // 條件更新：只有還沒完成的才會更新，回傳空陣列就代表已經被別人先送出。
       finishAttempt: async (id, patch) => {
         const rows = await rest(`attempts?id=eq.${enc(id)}&finished_at=is.null&select=id`, { method: "PATCH", body: patch, prefer: "return=representation" });
         return rows.length === 1;
+      },
+    },
+    // 寄「結果連結」：Supabase 的 email 登入連結。點連結會建立帳號（第一次）並登入，同時證明信箱是真的。
+    mailer: {
+      async sendLink({ email, redirectTo }) {
+        const res = await fetchImpl(`${url}/auth/v1/otp?redirect_to=${enc(redirectTo)}`, {
+          method: "POST",
+          headers: { apikey: anon, "Content-Type": "application/json" },
+          body: JSON.stringify({ email, create_user: true }),
+        });
+        if (res.ok) return {};
+        throw Object.assign(new Error(`寄信失敗：${res.status}`), { code: res.status === 429 ? "rate_limited" : "failed" });
       },
     },
     async signUrl(path, seconds) {

@@ -66,3 +66,21 @@ test("feedback：可新增自己的；不能冒名、不能掛在別人的 attem
   await as("anon");
   assert.ok(await fails(() => db.query("insert into feedback (rating) values (1)")));
 });
+
+test("免登入作答：attempts.user_id 可以是空的；匿名與登入者都讀不到沒綁定的列、也讀不到別人的列；密鑰雜湊與信箱不外流", async () => {
+  await db.exec("reset role");
+  await db.exec("insert into attempts (id, set_id, claim_hash, email) values ('cccccccc-cccc-cccc-cccc-cccccccccccc', 's1', 'HASH', 'x@example.com')");
+  for (const [role, uid] of [["anon", null], ["authenticated", A]]) {
+    await as(role, uid);
+    if (role === "anon") assert.ok(await fails(() => db.query("select 1 from attempts")), "匿名不能讀 attempts");
+    else {
+      const ids = (await db.query("select id from attempts")).rows.map((r) => r.id);
+      assert.ok(!ids.includes("cccccccc-cccc-cccc-cccc-cccccccccccc"), "沒綁定的列只有伺服器看得到");
+      assert.ok(!ids.includes("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"));
+    }
+  }
+  await as("anon", null);
+  assert.ok(await fails(() => db.query("insert into attempts (set_id) values ('s1')")), "匿名不能直接寫入，只能透過伺服器函式");
+  await as("authenticated", A);
+  assert.ok(await fails(() => db.query("update attempts set user_id = $1 where id = 'cccccccc-cccc-cccc-cccc-cccccccccccc'", [A])), "登入者不能自己認領別人的作答");
+});

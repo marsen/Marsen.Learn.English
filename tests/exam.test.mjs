@@ -41,8 +41,8 @@ const until = async (fn, ms = 2000) => { for (let i = 0; i < ms / 20 && !fn(); i
 
 // 在 jsdom 開考試頁。後端是 scripts/serve.mjs 裡的開發用假後端（跑同一份 api/_core.mjs）。
 // 有錄音的題組（s1-gym-0002）走時間軸流程；沒有錄音的題組（例如 s1-car-0001）走開發用流程。
-async function openExam({ set = SET, failFinish = 0, login = true } = {}) {
-  const url = `${base}/exam/index.html?set=${set}`;
+async function openExam({ set = SET, failFinish = 0, as = "tester@example.com", href, pending } = {}) {
+  const url = `${base}${href ?? `/exam/index.html?set=${set}`}`;
   const html = await (await fetch(url)).text();
   const dom = new JSDOM(html, { url, runScripts: "outside-only", pretendToBeVisual: true });
   const w = dom.window;
@@ -58,6 +58,9 @@ async function openExam({ set = SET, failFinish = 0, login = true } = {}) {
     return fetch(u, opt);
   };
   w.Response = Response;
+  // as：已登入的信箱（開發登入的 token 是 dev-信箱）；null 就是免登入的訪客。pending：預先放進瀏覽器的「還沒領結果的作答」。
+  if (as) w.localStorage.setItem("exam-auth", JSON.stringify({ access_token: `dev-${as}`, expires_at: 9999999999 }));
+  if (pending) w.localStorage.setItem("exam-pending", JSON.stringify(pending));
   const played = [];
   class FakeAudio {
     constructor(src) { this.src = src; this.listeners = {}; played.push(this); }
@@ -74,13 +77,13 @@ async function openExam({ set = SET, failFinish = 0, login = true } = {}) {
   w.eval(src);
   await until(() => w.__examReady);
   const d = w.document;
-  if (login) { d.getElementById("dev-login").click(); await until(() => !d.getElementById("start").disabled); }
+  await until(() => !d.getElementById("exam").hidden || !d.getElementById("email").hidden || !d.getElementById("result").hidden || !d.getElementById("start").disabled);
   const tick = () => { for (const t of timers) t?.(); };
   return { w, d, tick, played, calls };
 }
 
 const begin = async (d) => { d.getElementById("start").click(); await until(() => !d.getElementById("exam").hidden); };
-const visible = (d) => ["login", "intro", "exam", "result", "feedback"].filter((id) => !d.getElementById(id).hidden);
+const visible = (d) => ["email", "intro", "exam", "result", "feedback"].filter((id) => !d.getElementById(id).hidden);
 
 test("頁面：程式裡沒有瀏覽器語音合成，也不載入批改程式與標準答案", async () => {
   const src = await readFile(new URL("../exam/app.js", import.meta.url), "utf8");
@@ -90,19 +93,20 @@ test("頁面：程式裡沒有瀏覽器語音合成，也不載入批改程式�
   assert.ok(!/generator\//.test(core2));
 });
 
-test("頁面：沒登入先看到登入頁；本機開發才有開發登入；登入後是題組清單", async () => {
-  const { d } = await openExam({ login: false });
-  assert.deepEqual(visible(d), ["login"]);
-  assert.equal(d.getElementById("dev-login").hidden, false);
-  d.getElementById("dev-login").click();
-  await until(() => !d.getElementById("start").disabled);
+test("頁面：免登入直接看到題組清單（不要求登入）；登入後才顯示信箱與登出、給回饋", async () => {
+  const guest = await openExam({ as: null });
+  assert.deepEqual(visible(guest.d), ["intro"]);
+  assert.equal(guest.d.getElementById("who-box").hidden, true);
+  assert.equal(guest.d.getElementById("to-feedback").hidden, true, "回饋要登入才能送");
+  assert.ok([...guest.d.querySelectorAll("#set-select option")].some((o) => o.value === SET));
+  assert.equal(guest.d.getElementById("set-select").value, SET, "網址的 ?set= 會選到那一組");
+  const { d } = await openExam();
   assert.deepEqual(visible(d), ["intro"]);
-  const options = [...d.querySelectorAll("#set-select option")].map((o) => o.value);
-  assert.ok(options.includes(SET));
-  assert.equal(d.getElementById("set-select").value, SET, "網址的 ?set= 會選到那一組");
-  assert.match(d.getElementById("who").textContent, /dev-tester/);
+  assert.match(d.getElementById("who").textContent, /tester@example\.com/);
+  assert.equal(d.getElementById("to-feedback").hidden, false);
   d.getElementById("logout").click();
-  assert.deepEqual(visible(d), ["login"]);
+  assert.equal(d.getElementById("who-box").hidden, true);
+  assert.equal(d.getElementById("to-feedback").hidden, true);
 });
 
 test("頁面：答題卷有分段標題與行內前後文，空格編號連續", async () => {
@@ -255,7 +259,7 @@ test("頁面：回饋表單——什麼都沒填不送；送出後伺服器有�
   assert.deepEqual(visible(d), ["result"]);
 });
 
-test("頁面：從題組清單直接給回饋（不掛作答）；登入過期（401）會回登入頁", async () => {
+test("頁面：從題組清單直接給回饋（不掛作答）；登入過期（401）會登出並說明", async () => {
   const { d, w } = await openExam();
   d.getElementById("to-feedback").click();
   d.getElementById("feedback-message").value = "整體不錯";
@@ -263,10 +267,13 @@ test("頁面：從題組清單直接給回饋（不掛作答）；登入過期�
   await until(() => /謝謝/.test(d.getElementById("feedback-message-status").textContent));
   assert.equal(server.dev.feedback.at(-1).attempt_id, undefined);
   w.localStorage.setItem("exam-auth", JSON.stringify({ access_token: "bad-token", expires_at: 9999999999 }));
+  d.getElementById("feedback-send").disabled = false;
+  d.getElementById("feedback-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
+  await until(() => /登入已過期/.test(d.getElementById("feedback-message-status").textContent));
+  assert.match(d.getElementById("feedback-message-status").textContent, /再點一次信箱裡的結果連結/);
   d.getElementById("feedback-cancel").click();
-  await until(() => !d.getElementById("login").hidden);
-  assert.deepEqual(visible(d), ["login"]);
-  assert.match(d.getElementById("login-message").textContent, /登入已過期/);
+  await until(() => !d.getElementById("intro").hidden);
+  assert.equal(d.getElementById("who-box").hidden, true, "過期的登入已清掉");
 });
 
 test("故事：做完一套看到分數 → 結果頁給「做下一套」→ 回清單時已完成的有標記、預設選沒做過的", async () => {
@@ -302,4 +309,80 @@ test("故事：全部做完後結果頁說明沒有更多題組，而不是留�
   }
   assert.equal(d.getElementById("next-set").hidden, true);
   assert.match(d.getElementById("next-note").textContent, /都做完了/);
+});
+
+// ---- 免登入故事：訪客作答 → 留信箱 → 收到結果連結 → 看結果 ----
+const submitNow = async (d, w, tick) => {
+  for (let k = 0; k < 60; k++) tick();
+  d.getElementById("paper-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
+};
+
+test("故事（訪客）：作答送出後不顯示分數，要留信箱；寄出連結，點連結才看到結果，之後可以做下一套", async () => {
+  server.dev.attempts.clear(); server.dev.mails.length = 0;
+  const guest = await openExam({ as: null, set: "s1-car-0001" });
+  const { d, w, tick, calls } = guest;
+  await begin(d);
+  const plan = JSON.parse(await readFile(new URL("../content/sets/s1-car-0001/plan.json", import.meta.url)));
+  [...d.querySelectorAll("#paper input[data-q]")].forEach((el, i) => { el.value = plan.answers[i].answer; });
+  await submitNow(d, w, tick);
+  await until(() => !d.getElementById("email").hidden);
+  assert.deepEqual(visible(d), ["email"], "只看到留信箱，沒有分數");
+  assert.equal(d.getElementById("score").textContent, "");
+  const fin = calls.find((c) => c.path === "/api/finish");
+  assert.equal(fin.headers.Authorization, undefined, "訪客不帶登入");
+  assert.ok(JSON.parse(fin.body).claim_token, "帶作答密鑰");
+  const [att] = [...server.dev.attempts.values()];
+  assert.ok(att.finished_at && att.score === plan.answers.length, "批改已存在伺服器");
+  assert.equal(att.user_id, null);
+  d.getElementById("email-input").value = "Student@Example.com";
+  d.getElementById("email-form").dispatchEvent(new w.Event("submit", { cancelable: true }));
+  await until(() => /已寄出結果連結/.test(d.getElementById("email-message").textContent));
+  assert.match(d.getElementById("email-message").textContent, /student@example\.com.*第 1\/3 封/);
+  assert.equal(server.dev.mails.length, 1);
+  assert.equal(server.dev.mails[0].email, "student@example.com");
+  assert.equal(d.getElementById("dev-link-box").hidden, false, "本機開發才有直接開連結");
+  // 點信箱裡的連結：新的瀏覽器分頁，帶 ?result=… 與登入 token
+  const link = new URL(d.getElementById("dev-link").href);
+  const opened = await openExam({ as: null, href: `/exam/index.html${link.search}${link.hash}` });
+  await until(() => !opened.d.getElementById("result").hidden);
+  assert.equal(opened.d.getElementById("score").textContent, `${plan.answers.length} / ${plan.answers.length}`);
+  assert.equal(opened.d.querySelectorAll("#result-table tr.ok").length, plan.answers.length);
+  assert.equal(att.user_id, "dev-student@example.com", "信箱驗證後作答綁到這個帳號");
+  assert.equal(opened.w.location.search, "", "網址已清乾淨");
+  await until(() => !opened.d.getElementById("next-set").hidden);
+  assert.match(opened.d.getElementById("next-set").textContent, /^做下一套：/);
+  opened.d.getElementById("result-feedback").click();
+  assert.deepEqual(visible(opened.d), ["feedback"], "看過結果才能給回饋");
+});
+
+test("故事（訪客）：別人的信箱不能看這次結果；寄信次數有上限；信箱格式不對不寄", async () => {
+  server.dev.attempts.clear(); server.dev.mails.length = 0;
+  const { d, w, tick } = await openExam({ as: null, set: "s1-car-0001" });
+  await begin(d);
+  await submitNow(d, w, tick);
+  await until(() => !d.getElementById("email").hidden);
+  const mail = async (v) => { d.getElementById("email-input").value = v; d.getElementById("email-form").dispatchEvent(new w.Event("submit", { cancelable: true })); await new Promise((r) => setTimeout(r, 60)); };
+  await mail("不是信箱");
+  assert.equal(server.dev.mails.length, 0);
+  await mail("a@example.com"); await mail("a@example.com"); await mail("a@example.com");
+  assert.equal(server.dev.mails.length, 3);
+  await mail("a@example.com");
+  assert.equal(server.dev.mails.length, 3, "第 4 次不寄");
+  assert.match(d.getElementById("email-message").textContent, /寄過太多次/);
+  const id = [...server.dev.attempts.keys()][0];
+  const other = await openExam({ as: null, href: `/exam/index.html?result=${id}#access_token=dev-b%40example.com&expires_in=3600` });
+  await until(() => !other.d.getElementById("load-warning").hidden);
+  assert.deepEqual(visible(other.d), ["intro"]);
+  assert.match(other.d.getElementById("load-warning").textContent, /找不到這次作答的結果/);
+});
+
+test("故事（訪客）：重新整理後，還沒領的結果會回到留信箱；沒有登入又沒有密鑰的結果連結會說明失效", async () => {
+  server.dev.attempts.clear();
+  const resumed = await openExam({ as: null, pending: { attempt_id: "x", claim_token: "y", finished: true } });
+  assert.deepEqual(visible(resumed.d), ["email"]);
+  assert.match(resumed.d.getElementById("email-message").textContent, /還沒領取/);
+  const stale = await openExam({ as: null, href: "/exam/index.html?result=abc" });
+  await until(() => !stale.d.getElementById("load-warning").hidden);
+  assert.deepEqual(visible(stale.d), ["intro"]);
+  assert.match(stale.d.getElementById("load-warning").textContent, /結果連結已失效/);
 });

@@ -3,7 +3,9 @@ import { createApi } from "./_core.mjs";
 import { supabaseFromEnv } from "./_supabase.mjs";
 
 let cached;
-const api = () => (cached ??= (() => { const s = supabaseFromEnv(); return createApi({ auth: s.auth, store: s.store, signUrl: s.signUrl }); })());
+// 結果連結要導回哪個網站：優先用環境變數 SITE_URL（例如 https://listening.example.com），沒設就用這次請求的網域。
+const siteUrlOf = (req) => (process.env.SITE_URL ?? `https://${req.headers?.["x-forwarded-host"] ?? req.headers?.host}`).replace(/\/$/, "");
+const api = () => (cached ??= (() => { const s = supabaseFromEnv(); return createApi({ auth: s.auth, store: s.store, signUrl: s.signUrl, mailer: s.mailer, siteUrl: siteUrlOf }); })());
 
 export const handle = (name, method) => async (req, res) => {
   res.setHeader("Cache-Control", "no-store");

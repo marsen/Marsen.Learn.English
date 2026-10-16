@@ -1,5 +1,5 @@
 // 登入：Supabase 的 email 登入連結（magic link），不用額外套件。
-// 流程：signIn(email) 寄連結 → 使用者點連結回到本頁，網址帶 #access_token=… → consumeHash() 存起來 → token() 取用（快過期自動換新）。
+// 寄連結由伺服器函式（/api/claim）做；這裡只管收：使用者點連結回到本頁，網址帶 #access_token=… → consumeHash() 存起來 → token() 取用（快過期自動換新）。
 const KEY = "exam-auth";
 
 export class AuthError extends Error { constructor(code, message) { super(message); this.code = code; } }
@@ -30,25 +30,6 @@ export function createAuth({ config, fetchImpl = fetch.bind(globalThis), storage
       return "ok";
     },
 
-    // 只有本機開發模式用：不寄信，直接當成登入。
-    devLogin(name = "dev-tester") {
-      if (!this.isLocalDev) throw new AuthError("dev_only", "開發登入只能在 localhost 且沒設定 Supabase 時使用");
-      save({ access_token: name.startsWith("dev-") ? name : `dev-${name}`, expires_at: Math.floor(now() / 1000) + 86400 * 365, dev: true });
-    },
-
-    async signIn(email, redirectTo = location.origin + location.pathname) {
-      if (!this.configured) throw new AuthError("not_configured", "還沒設定登入服務");
-      const res = await fetchImpl(`${url}/auth/v1/otp?redirect_to=${encodeURIComponent(redirectTo)}`, {
-        method: "POST",
-        headers: { apikey: config.supabaseAnonKey, "Content-Type": "application/json" },
-        body: JSON.stringify({ email, create_user: false }),
-      });
-      if (res.ok) return;
-      if (res.status === 422 || res.status === 400) throw new AuthError("not_invited", "這個信箱沒有受邀，或格式不對");
-      if (res.status === 429) throw new AuthError("rate_limited", "寄得太頻繁，請稍後再試");
-      throw new AuthError("failed", "寄信失敗，請稍後再試");
-    },
-
     // 取得有效的 access token；快過期就用 refresh token 換新；換不到就清掉登入。
     async token() {
       const s = load();
@@ -65,7 +46,10 @@ export function createAuth({ config, fetchImpl = fetch.bind(globalThis), storage
       return j.access_token;
     },
 
-    email() { const s = load(); return s?.dev ? `${s.access_token}（開發）` : decode(s?.access_token ?? "").email ?? null; },
+    email() {
+      const t = load()?.access_token ?? "";
+      return t.startsWith("dev-") ? (t.includes("@") ? t.slice(4) : `${t}（開發）`) : decode(t).email ?? null;
+    },
     signOut() { save(null); },
   };
 }

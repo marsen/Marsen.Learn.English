@@ -1,6 +1,7 @@
 -- M5 試用版資料庫。在 Supabase 後台 SQL Editor 執行一次。
--- 登入設定（不是 SQL）：Authentication → Sign In / Providers → 關閉 "Allow new users to sign up"，
--- 之後用 Authentication → Users → Invite user 邀請 email。
+-- 登入設定（不是 SQL）：Authentication → Sign In / Providers → Email 保持開啟、"Allow new users to sign up" 開啟
+--   （同學是第一次寄結果連結時自動建立帳號）。Authentication → URL Configuration 要把網站網址加進 Redirect URLs。
+--   內建寄信額度很低，正式給同學用前要在 Authentication → SMTP 接自己的寄信服務。
 -- 儲存桶：Storage 新增私有（private）桶 "recordings"。
 
 create table if not exists public.sets (
@@ -23,8 +24,11 @@ create table if not exists public.set_answers (
 
 create table if not exists public.attempts (
   id          uuid primary key default gen_random_uuid(),
-  user_id     uuid not null references auth.users(id) on delete cascade,
+  user_id     uuid references auth.users(id) on delete cascade,   -- 免登入作答時是空的；信箱驗證後（點結果連結）才填上
   set_id      text not null references public.sets(set_id),
+  claim_hash  text,                        -- 作答密鑰的雜湊；密鑰只在開始作答的那個瀏覽器
+  email       text,                        -- 留下的信箱（小寫）；信箱驗證通過的人才能看結果
+  mail_count  int not null default 0,      -- 已寄出結果連結的次數（上限由伺服器函式控制）
   answers     jsonb,
   score       int,
   total       int,
@@ -34,6 +38,7 @@ create table if not exists public.attempts (
   client      jsonb
 );
 create index if not exists attempts_user_idx on public.attempts (user_id, started_at desc);
+create index if not exists attempts_email_idx on public.attempts (email);
 
 create table if not exists public.feedback (
   id         uuid primary key default gen_random_uuid(),

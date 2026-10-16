@@ -8,23 +8,6 @@ const cfg = { supabaseUrl: "https://x.supabase.co/", supabaseAnonKey: "ANON" };
 const loc = (hash = "", hostname = "app.example.com") => ({ hash, hostname, origin: `https://${hostname}`, pathname: "/exam/", search: "" });
 const jwt = (payload) => `h.${Buffer.from(JSON.stringify(payload)).toString("base64url")}.s`;
 
-test("signIn：用公開金鑰寄連結；只寄給已邀請的人（create_user:false）；各種失敗有明確代碼", async () => {
-  const calls = [];
-  const status = { v: 200 };
-  const fetchImpl = async (url, opt) => { calls.push({ url, opt }); return { ok: status.v < 300, status: status.v }; };
-  const a = createAuth({ config: cfg, fetchImpl, storage: mem(), location: loc() });
-  await a.signIn("a@example.com");
-  assert.equal(calls[0].url, "https://x.supabase.co/auth/v1/otp?redirect_to=" + encodeURIComponent("https://app.example.com/exam/"));
-  assert.equal(calls[0].opt.headers.apikey, "ANON");
-  assert.deepEqual(JSON.parse(calls[0].opt.body), { email: "a@example.com", create_user: false });
-  for (const [st, code] of [[422, "not_invited"], [400, "not_invited"], [429, "rate_limited"], [500, "failed"]]) {
-    status.v = st;
-    await assert.rejects(() => a.signIn("a@example.com"), (e) => e instanceof AuthError && e.code === code);
-  }
-  const none = createAuth({ config: { supabaseUrl: "", supabaseAnonKey: "" }, fetchImpl, storage: mem(), location: loc() });
-  await assert.rejects(() => none.signIn("a@example.com"), (e) => e.code === "not_configured");
-});
-
 test("consumeHash：連結帶回 token 就存起來並取得 email；錯誤連結回傳原因；沒有 hash 回傳 null", async () => {
   const storage = mem();
   const token = jwt({ email: "a@example.com" });
@@ -59,23 +42,24 @@ test("token：快過期（60 秒內）用 refresh token 換新；換不到就登
   assert.equal(await a.token(), null);
 });
 
-test("本機開發登入：只在 localhost 且沒設定 Supabase 時可用", async () => {
-  const local = createAuth({ config: { supabaseUrl: "", supabaseAnonKey: "" }, storage: mem(), location: loc("", "127.0.0.1") });
-  assert.equal(local.isLocalDev, true);
-  local.devLogin("alice");
-  assert.equal(await local.token(), "dev-alice");
-  const remote = createAuth({ config: { supabaseUrl: "", supabaseAnonKey: "" }, storage: mem(), location: loc("", "app.example.com") });
-  assert.equal(remote.isLocalDev, false);
-  assert.throws(() => remote.devLogin(), (e) => e.code === "dev_only");
-  const configured = createAuth({ config: cfg, storage: mem(), location: loc("", "localhost") });
-  assert.equal(configured.isLocalDev, false, "設定了 Supabase 就不是開發模式，即使在 localhost");
-  assert.throws(() => configured.devLogin(), (e) => e.code === "dev_only");
+test("isLocalDev：只在 localhost 且沒設定 Supabase 時成立（決定要不要顯示開發用的直接開結果連結）", async () => {
+  assert.equal(createAuth({ config: { supabaseUrl: "", supabaseAnonKey: "" }, storage: mem(), location: loc("", "127.0.0.1") }).isLocalDev, true);
+  assert.equal(createAuth({ config: { supabaseUrl: "", supabaseAnonKey: "" }, storage: mem(), location: loc("", "app.example.com") }).isLocalDev, false);
+  assert.equal(createAuth({ config: cfg, storage: mem(), location: loc("", "localhost") }).isLocalDev, false, "設定了 Supabase 就不是開發模式，即使在 localhost");
+});
+
+test("開發 token（dev-信箱）：email() 取得信箱；token() 不會去換新", async () => {
+  const storage = mem();
+  const a = createAuth({ config: { supabaseUrl: "", supabaseAnonKey: "" }, fetchImpl: async () => { throw new Error("不該呼叫"); }, storage, location: loc("#access_token=dev-b%40example.com&expires_in=3600", "127.0.0.1"), now: () => 5_000 });
+  assert.equal(a.consumeHash(), "ok");
+  assert.equal(await a.token(), "dev-b@example.com");
+  assert.equal(a.email(), "b@example.com");
 });
 
 test("storage 不能用（無痕模式等）：這個分頁內仍維持登入，不丟例外", async () => {
   const broken = { getItem() { throw new Error("blocked"); }, setItem() { throw new Error("blocked"); }, removeItem() { throw new Error("blocked"); } };
-  const a = createAuth({ config: { supabaseUrl: "", supabaseAnonKey: "" }, storage: broken, location: loc("", "localhost") });
-  a.devLogin("bob");
+  const a = createAuth({ config: { supabaseUrl: "", supabaseAnonKey: "" }, storage: broken, location: loc("#access_token=dev-bob&expires_in=3600", "localhost") });
+  a.consumeHash(); // storage 壞掉，但登入仍存在記憶體
   assert.equal(await a.token(), "dev-bob");
   a.signOut();
   assert.equal(await a.token(), null);

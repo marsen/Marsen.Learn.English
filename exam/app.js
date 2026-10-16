@@ -7,26 +7,38 @@ import { config } from "./config.js";
 import { createAuth } from "./auth.mjs";
 
 const $ = (id) => document.getElementById(id);
-const state = { audio: null, phase: "intro", data: null, timer: null, remaining: 0, onSkip: null, attemptId: null, lastAttemptId: null, submitting: false, previous: "intro" };
+const state = { audio: null, phase: "intro", data: null, timer: null, remaining: 0, onSkip: null, attemptId: null, claim: null, lastAttemptId: null, submitting: false, previous: "intro" };
 // 沒有時間軸的題組（只有開發時才會遇到）才用這兩個秒數；有時間軸的題組，看題與檢查時間都在錄音裡。
 const PREVIEW_SECONDS = 30;
 const CHECK_SECONDS = 30;
 const auth = createAuth({ config, storage: window.localStorage, location: window.location });
 
-// 呼叫伺服器函式；沒有登入或登入過期就回登入頁。
+// 呼叫伺服器函式。大部分功能免登入；有登入就帶 token；登入過期就當作沒登入。
 async function api(path, { method = "GET", body } = {}) {
+  const send = async (token) => {
+    const res = await fetch(`/api/${path}`, { method, headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(body ? { "Content-Type": "application/json" } : {}) }, body: body ? JSON.stringify(body) : undefined });
+    return { res, data: await res.json().catch(() => ({})) };
+  };
   const token = await auth.token();
-  if (!token) { showLogin("登入已過期，請重新登入。"); throw new Error("未登入"); }
-  const res = await fetch(`/api/${path}`, { method, headers: { Authorization: `Bearer ${token}`, ...(body ? { "Content-Type": "application/json" } : {}) }, body: body ? JSON.stringify(body) : undefined });
-  const data = await res.json().catch(() => ({}));
-  if (res.status === 401) { auth.signOut(); showLogin("登入已過期，請重新登入。"); throw new Error("未登入"); }
-  if (!res.ok) throw new Error(data.error ?? `發生錯誤（${res.status}）`);
-  return data;
+  let out = await send(token);
+  if (out.res.status === 401 && token) {
+    auth.signOut();
+    renderWho();
+    if (path !== "result" && path !== "feedback") out = await send(null); // 免登入的功能：過期就改用匿名再試一次
+  }
+  if (out.res.status === 401) throw new Error("登入已過期，請再點一次信箱裡的結果連結");
+  if (!out.res.ok) throw new Error(out.data.error ?? `發生錯誤（${out.res.status}）`);
+  return out.data;
 }
+
+// 還沒領結果的作答：記在這個瀏覽器，重新整理後還能繼續留信箱。
+const PENDING = "exam-pending";
+const readPending = () => { try { return JSON.parse(window.localStorage.getItem(PENDING) ?? "null"); } catch { return null; } };
+const writePending = (v) => { try { v ? window.localStorage.setItem(PENDING, JSON.stringify(v)) : window.localStorage.removeItem(PENDING); } catch { /* 無痕模式：重新整理後就不能繼續 */ } };
 
 function setPhase(p) {
   state.phase = p;
-  const show = ["login", "intro", "result", "feedback"].includes(p) ? p : "exam";
+  const show = ["email", "intro", "result", "feedback"].includes(p) ? p : "exam";
   for (const el of document.querySelectorAll("[data-phase]")) el.hidden = el.dataset.phase !== show;
 }
 
@@ -191,13 +203,12 @@ async function finish() {
   $("status").textContent = "批改中…";
   $("submit").disabled = true;
   try {
-    const result = await api("finish", { method: "POST", body: { attempt_id: state.attemptId, answers: collect() } });
-    state.lastAttemptId = state.attemptId;
-    showResult(result);
-    offerNext();
+    const result = await api("finish", { method: "POST", body: { attempt_id: state.attemptId, claim_token: state.claim, answers: collect() } });
+    if (result.pending) { writePending({ attempt_id: state.attemptId, claim_token: state.claim, finished: true }); showEmail(); }
+    else { state.lastAttemptId = state.attemptId; writePending(null); showResult(result); offerNext(); }
   } catch (e) {
     // 送出失敗：留在答題卷，答案還在，讓使用者再按一次送出。
-    if (state.phase !== "login") { $("status").textContent = `送出失敗：${e.message}。答案還在，請再按一次「送出」。`; $("submit").disabled = false; state.phase = "check"; }
+    $("status").textContent = `送出失敗：${e.message}。答案還在，請再按一次「送出」。`; $("submit").disabled = false; state.phase = "check";
   } finally { state.submitting = false; }
 }
 
@@ -234,21 +245,47 @@ async function offerNext() {
 async function loadSet(id) {
   const d = await api("start", { method: "POST", body: { set_id: id } });
   state.attemptId = d.attempt_id;
+  state.claim = d.claim_token;
   state.currentSet = id;
   state.data = { paper: d.paper, audio: d.audio_url, timing: d.timing };
 }
 
-function showLogin(message) {
-  setPhase("login");
-  const msg = $("login-message");
-  msg.hidden = !message;
-  msg.textContent = message ?? "";
-  $("dev-login").hidden = !auth.isLocalDev;
+function renderWho() {
+  const email = auth.email();
+  $("who").textContent = email ?? "";
+  $("who-box").hidden = !email;
+  $("to-feedback").hidden = !email; // 回饋要登入（看過結果）才能送
+}
+
+// 作答已送出、結果還在伺服器：留信箱，寄結果連結。
+function showEmail(note) {
+  setPhase("email");
+  const msg = $("email-message");
+  msg.hidden = !note;
+  msg.textContent = note ?? "";
+  $("dev-link-box").hidden = true;
+  $("email-send").disabled = false;
+}
+
+async function sendEmail(e) {
+  e.preventDefault();
+  const pending = readPending();
+  const msg = $("email-message");
+  msg.hidden = false;
+  if (!pending) { msg.textContent = "找不到這次作答，請回到選題組重新開始。"; return; }
+  $("email-send").disabled = true;
+  const email = $("email-input").value.trim();
+  try {
+    const out = await api("claim", { method: "POST", body: { attempt_id: pending.attempt_id, claim_token: pending.claim_token, email } });
+    msg.textContent = `已寄出結果連結到 ${out.email}（第 ${out.sent}/${out.max} 封）。請到信箱點連結看成績；沒看到的話看一下垃圾郵件。信箱打錯了可以改了再寄一次。`;
+    if (out.dev_link && auth.isLocalDev) { $("dev-link").href = out.dev_link; $("dev-link-box").hidden = false; }
+  } catch (err) { msg.textContent = err.message; }
+  $("email-send").disabled = false;
 }
 
 async function showHome() {
   setPhase("intro");
-  $("who").textContent = auth.email() ?? "";
+  renderWho();
   const select = $("set-select");
   select.textContent = "";
   $("start").disabled = true;
@@ -299,15 +336,9 @@ async function sendFeedback(e) {
 async function init() {
   if (config.contactEmail) { $("contact").textContent = `要求刪除你的資料，請寫信到 ${config.contactEmail}。`; $("contact").hidden = false; }
   const hash = auth.consumeHash();
-  $("login-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    $("login-send").disabled = true;
-    try { await auth.signIn($("login-email").value.trim()); showLogin("已寄出登入連結，請到信箱點連結（沒看到的話看一下垃圾郵件）。"); }
-    catch (err) { showLogin(err.message); }
-    $("login-send").disabled = false;
-  });
-  $("dev-login").addEventListener("click", () => { auth.devLogin("dev-tester"); showHome(); });
-  $("logout").addEventListener("click", () => { auth.signOut(); showLogin(); });
+  $("email-form").addEventListener("submit", sendEmail);
+  $("email-back").addEventListener("click", () => showHome());
+  $("logout").addEventListener("click", () => { auth.signOut(); renderWho(); });
   $("start").addEventListener("click", async () => {
     $("start").disabled = true;
     try { await loadSet($("set-select").value); startPreview(); }
@@ -328,9 +359,21 @@ async function init() {
   $("feedback-form").addEventListener("submit", sendFeedback);
   $("feedback-cancel").addEventListener("click", () => { $("feedback-cancel").textContent = "不用了，回去"; state.previous === "result" ? setPhase("result") : showHome(); });
 
-  if (!auth.configured && !auth.isLocalDev) { showLogin("登入服務還沒設定好。"); }
-  else if (await auth.token()) await showHome();
-  else showLogin(hash?.error ? `登入失敗：${hash.error}` : undefined);
+  const params = new URLSearchParams(location.search);
+  const resultId = params.get("result");
+  if (resultId) {
+    // 信箱裡的結果連結：已經登入（連結帶來 token）就直接看結果。
+    try { history.replaceState(null, "", location.pathname); } catch { /* 略 */ }
+    try {
+      if (!(await auth.token())) throw new Error(hash?.error ? `登入失敗：${hash.error}` : "結果連結已失效，請回到選題組重做，或重新留一次信箱。");
+      const result = await api("result", { method: "POST", body: { attempt_id: resultId } });
+      state.lastAttemptId = resultId;
+      writePending(null);
+      showResult(result);
+      offerNext();
+    } catch (e) { await showHome(); $("load-warning").textContent = e.message; $("load-warning").hidden = false; }
+  } else if (readPending()?.finished) showEmail("上一次作答的結果還沒領取：留下信箱，我們會寄結果連結給你。");
+  else { await showHome(); if (hash?.error) { $("load-warning").textContent = `登入失敗：${hash.error}`; $("load-warning").hidden = false; } }
   window.__examReady = true;
 }
 

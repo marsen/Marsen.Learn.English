@@ -34,7 +34,7 @@ const readBody = (req) => new Promise((ok, fail) => {
 
 export function startServer(port = 5173) {
   const dev = makeDevApi(root);
-  const ROUTES = { sets: "GET", start: "POST", finish: "POST", feedback: "POST" };
+  const ROUTES = { sets: "GET", start: "POST", finish: "POST", claim: "POST", result: "POST", feedback: "POST" };
   const server = createServer(async (req, res) => {
     try {
       // 本機假後端：和正式環境同一份 api/_core.mjs
@@ -95,8 +95,8 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const port = process.argv[2] !== undefined ? Number(process.argv[2]) : 5173;
   const server = await startServer(port);
   const actual = server.address().port;
-  console.log("候補頁本機預覽：");
-  console.log(`  http://127.0.0.1:${actual}/listening/?src=local`);
-  console.log(`  http://127.0.0.1:${actual}/fluency/?src=local`);
+  console.log("本機預覽：");
+  console.log(`  聽力測驗（免登入作答，結果連結會直接顯示在頁面上）：http://127.0.0.1:${actual}/exam/`);
+  console.log(`  候補頁：http://127.0.0.1:${actual}/listening/?src=local  、  http://127.0.0.1:${actual}/fluency/?src=local`);
   console.log("按 Ctrl+C 結束。");
 }

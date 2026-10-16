@@ -9,23 +9,24 @@
 </head>
 <body>
   <main id="app">
-    <section id="login" data-phase="login" hidden>
-      <h1>聽力測驗：試用</h1>
-      <p class="note">試用採邀請制。輸入你被邀請的 email，我們會寄一封登入連結給你。</p>
-      <form id="login-form">
-        <label>Email <input id="login-email" type="email" required autocomplete="email"></label>
-        <button id="login-send" type="submit">寄登入連結</button>
+    <section id="email" data-phase="email" hidden>
+      <h1>作答完成</h1>
+      <p>你的答案已經批改好了。留下信箱，我們會寄一封「結果連結」給你；點開連結就能看到分數與每題對錯。</p>
+      <form id="email-form">
+        <label>Email <input id="email-input" type="email" required autocomplete="email"></label>
+        <button id="email-send" type="submit">寄結果連結</button>
       </form>
-      <p><button id="dev-login" type="button" class="link" hidden>以開發者身分進入（只在本機）</button></p>
-      <p id="login-message" class="note" role="status" hidden></p>
+      <p id="email-message" class="note" role="status" hidden></p>
+      <p id="dev-link-box" hidden>本機開發才看得到：<a id="dev-link" href="#">直接開結果連結</a></p>
+      <p><button id="email-back" type="button" class="link">回到選題組</button></p>
     </section>
 
     <section id="intro" data-phase="intro" hidden>
       <h1>聽力測驗：Section 1</h1>
-      <p class="who"><span id="who"></span> <button id="logout" type="button" class="link">登出</button></p>
-      <p class="note">錄音只播一次，沒有暫停與倒轉。請戴耳機，在安靜的地方作答。</p>
+      <p class="who" id="who-box" hidden><span id="who"></span> <button id="logout" type="button" class="link">登出</button></p>
+      <p class="note">錄音只播一次，沒有暫停與倒轉。請戴耳機，在安靜的地方作答。做完留下信箱，我們會寄結果連結給你。</p>
       <label>題組 <select id="set-select"></select></label>
-      <p><button id="start" type="button" disabled>開始</button> <button id="to-feedback" type="button" class="link">給回饋</button></p>
+      <p><button id="start" type="button" disabled>開始</button> <button id="to-feedback" type="button" class="link" hidden>給回饋</button></p>
       <p id="load-warning" class="warn" hidden></p>
     </section>
 
