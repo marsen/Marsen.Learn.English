@@ -483,7 +483,7 @@ grade(paper, plan, userAnswers) // → { total, results: [{ question_id, given, 
 | 里程碑 | 內容 | 怎麼算完成 |
 |---|---|---|
 | M1 | 格式、`normalize`、各 `answer_policy`、驗證器、固定測資，加上手寫的圖書館辦證主題、3 種配方、抽籤與排骨架 | 下面 8 項全部通過 |
-| M2 | prompt 模板、人工模式流程、盲答 | 產出 1 份真實題目，通過驗證與盲答警示處理，你親自讀過逐字稿 |
+| M2 | prompt 模板、人工模式流程、盲答、`meta.json` 指紋鏈與狀態（第 12.1 節） | 產出 1 份真實題目，通過驗證與盲答警示處理，你親自讀過逐字稿；改任何上游檔案或 prompt，`status` 能指出哪一步過期 |
 | M3 | 評分與測驗頁（用 `dev` 語音測 UI） | 你在瀏覽器完整做完一份，結果頁正確 |
 | M4 | 選一家 TTS、`timing.json`（turn 層級） | 你戴耳機聽，覺得聽得懂、拼字念清楚 |
 | M5 | 帳號與作答紀錄 | 見第 13 節，開工條件有爭議 |
@@ -512,6 +512,14 @@ grade(paper, plan, userAnswers) // → { total, results: [{ question_id, given, 
 - 輸入產物的雜湊
 - 模型與提示版本（`manual` 模式也要記是哪個對話或模型產的）
 - 建立時間與驗證結果
+
+**實作（M2）：** 所有指紋都存在每套題的 `meta.json`，不改動 plan、script 等內容檔。每個階段記錄「自己的檔案指紋」與「依據的上游檔案指紋」（plan 依據 skeleton；script 依據 plan；paper 依據 skeleton；驗證依據 plan、script、paper；盲答依據 plan、script、paper、check；審核依據 script），另外記錄產出該階段所用的 prompt 指紋、模型、時間。
+
+- 任何檔案被手動改了，或上游指紋對不上，或 prompt 模板改了，該階段與其下游就是「過期」。`status` 指令逐階段列出「最新／過期／尚無／未過／有警示」。
+- 人工改了 plan 或 script 之後，用 `accept --note "改了什麼"` 重新認可：留下修改紀錄，並讓下游自動過期。
+- 驗證失敗後換掉失敗的 plan 或 script，才算一次「重寫」，上限 2 次（`retries`），滿了 `assemble` 會拒絕，除非加 `--force`。
+- 狀態依序為 `drawn → planned → scripted → papered → validated → blind_passed → reviewed`。盲答有警示時狀態停在 `validated`；`review --by 姓名` 是人工放行，要求驗證與盲答都是最新。
+- 舊題組用 `stamp` 補登記，prompt 指紋記為「未記錄」（當時用的版本已無從考證），比對時不算過期。
 
 規則：上游產物改了，下游自動標為「過期」；`published` 的題組**不可變**，要修就發新版本號，不覆寫。這是為了日後能回答「這份錯題是哪個提示產的」「換 TTS 後哪些音檔要重做」。
 

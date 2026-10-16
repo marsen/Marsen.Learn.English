@@ -1,0 +1,75 @@
+{
+  "set_id": "s1-library-0002",
+  "seed": 20261017,
+  "status": "validated",
+  "created_at": "2026-10-16T07:29:09.819Z",
+  "updated_at": "2026-10-16T07:30:37.502Z",
+  "schema_version": 1,
+  "generator_version": "0.1.0",
+  "inputs": {
+    "topic": "f5abf66845bb960a",
+    "recipes": "82a0e878bf46d387",
+    "profile": "1390cf2fe82e58fa"
+  },
+  "retries": {
+    "plan": 0,
+    "script": 0
+  },
+  "stages": {
+    "skeleton": {
+      "hash": "916dd2bd009e79a2",
+      "at": "2026-10-16T07:29:09.819Z"
+    },
+    "paper": {
+      "hash": "3a0e014281735c0f",
+      "from": {
+        "skeleton": "916dd2bd009e79a2"
+      },
+      "at": "2026-10-16T07:29:09.821Z"
+    },
+    "plan": {
+      "hash": "1441b56f2a8297d7",
+      "from": {
+        "skeleton": "916dd2bd009e79a2"
+      },
+      "prompt": null,
+      "model": "claude-sonnet-5-5 (subagent，補登記)",
+      "mode": "backfilled",
+      "at": "2026-10-16T07:29:09.823Z"
+    },
+    "script": {
+      "hash": "2d7f330456fb44b5",
+      "from": {
+        "plan": "1441b56f2a8297d7"
+      },
+      "prompt": null,
+      "model": "claude-sonnet-5-5 (subagent，補登記)",
+      "mode": "backfilled",
+      "at": "2026-10-16T07:29:09.824Z"
+    },
+    "validate": {
+      "from": {
+        "plan": "1441b56f2a8297d7",
+        "script": "2d7f330456fb44b5",
+        "paper": "3a0e014281735c0f"
+      },
+      "ok": true,
+      "block": 0,
+      "warn": 0,
+      "at": "2026-10-16T07:29:09.869Z"
+    },
+    "blind": {
+      "from": {
+        "plan": "1441b56f2a8297d7",
+        "script": "2d7f330456fb44b5",
+        "paper": "3a0e014281735c0f",
+        "check": "3c1c15afe7f3c3a1"
+      },
+      "prompt": null,
+      "model": "claude-sonnet-5-5 (subagent，補登記)",
+      "mode": "backfilled",
+      "warnings": 2,
+      "at": "2026-10-16T07:29:09.869Z"
+    }
+  }
+}
