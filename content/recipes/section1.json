@@ -1,5 +1,0 @@
-[
-  { "id": "R1", "traps": { "self_correction": 2, "spelling": 2, "similar_numbers": 2, "paraphrase": 1, "distractor": 1, "none": 2 } },
-  { "id": "R2", "traps": { "self_correction": 1, "spelling": 3, "similar_numbers": 2, "paraphrase": 2, "distractor": 0, "none": 2 } },
-  { "id": "R3", "traps": { "self_correction": 2, "spelling": 1, "similar_numbers": 3, "paraphrase": 1, "distractor": 1, "none": 2 } }
-]

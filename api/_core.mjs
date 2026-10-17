@@ -1,7 +1,7 @@
 // M5 伺服器函式的核心邏輯。不碰網路、不碰 Vercel：登入驗證、資料庫、寄信、簽名網址都由外面傳進來，方便測試。
 // 流程：免登入開始作答 → 送出（只存、不回分數）→ 留信箱 → 寄結果連結（點連結同時完成信箱驗證與登入）→ 看結果。
 import { createHash, randomBytes } from "node:crypto";
-import { gradeAnswers } from "../generator/grade.mjs";
+import { gradeAnswers } from "../lib/grade.mjs";
 
 const QID = /^q\d{2}$/;
 const MAX_ANSWER = 200;

@@ -1,5 +1,5 @@
 // 只把「瀏覽器需要的檔案」複製到 public/，Vercel 只公開這個資料夾。
-// 這樣 content/（標準答案、逐字稿）、generator/、tests/ 等不會變成公開網址。伺服器函式（api/）另外部署，不在這裡。
+// 這樣 content/（標準答案、逐字稿）、tests/ 等不會變成公開網址。伺服器函式（api/）另外部署，不在這裡。
 import { cpSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";

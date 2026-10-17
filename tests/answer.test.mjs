@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { normalize } from "../generator/normalize.mjs";
-import { matchesAnswer, findInText } from "../generator/answer.mjs";
+import { normalize } from "../lib/normalize.mjs";
+import { matchesAnswer, findInText } from "../lib/answer.mjs";
 
 test("normalize：大小寫、空白、結尾標點、撇號", () => {
   assert.equal(normalize("  Hargreaves.  "), "hargreaves");

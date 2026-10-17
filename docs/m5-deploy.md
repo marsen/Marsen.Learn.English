@@ -30,7 +30,7 @@ npm run dev        # 開 http://127.0.0.1:5173/exam/
    - `SITE_URL`（例如 `https://xxx.vercel.app`，結果連結導回的網站；沒設就用請求的網域）
 5. 編輯 `exam/config.js`：填 `supabaseUrl`、`supabaseAnonKey`（公開金鑰，可以進 git）、`contactEmail`。
 6. 發佈題組到 Supabase（環境變數 `SUPABASE_URL`、`SUPABASE_SERVICE_ROLE_KEY` 在你的終端機設定）：
-   `node generator/cli.mjs publish s1-gym-0002`（未審核題組預設擋住；自己測試時才加 `--allow-unreviewed`，這個決定是你的）。
+   先在 Question.Generator 跑 `node src/cli.mjs bundle sets/s1-gym-0002 --out out`，再 `node scripts/publish.mjs ../Question.Generator/out/s1-gym-0002`（未審核題組預設擋住；自己測試時才加 `--allow-unreviewed`，這個決定是你的）。
 7. 部署後的檢查清單（規格 6.7）：免登入開得到題組清單 → 做完看到「留信箱」而不是分數 → 收到信、點連結看到分數 → 用另一個信箱開同一個結果連結看不到（404）→ 公開網址抓不到 `content/`、`plan.json`。
 
 ## 已知限制

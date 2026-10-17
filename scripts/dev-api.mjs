@@ -3,7 +3,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createApi } from "../api/_core.mjs";
-import { sanitizeTiming } from "../generator/publish.mjs";
+import { sanitizeTiming } from "../lib/publish.mjs";
 
 export function makeDevApi(root) {
   const readJson = (p) => JSON.parse(readFileSync(p, "utf8"));

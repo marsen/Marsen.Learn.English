@@ -7,7 +7,7 @@ import { startServer } from "../scripts/serve.mjs";
 import * as core from "../exam/core.mjs";
 import * as authMod from "../exam/auth.mjs";
 import * as configMod from "../exam/config.js";
-import { gradeAnswers } from "../generator/grade.mjs";
+import { gradeAnswers } from "../lib/grade.mjs";
 
 const SET = "s1-gym-0002";
 const load = async (f) => JSON.parse(await readFile(new URL(`../content/sets/${SET}/${f}`, import.meta.url)));
