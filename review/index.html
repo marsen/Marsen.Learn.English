@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>題組檢視（本機）</title>
+  <meta name="robots" content="noindex,nofollow">
+  <link rel="stylesheet" href="review.css">
+</head>
+<body>
+  <main id="app">
+    <header class="top">
+      <h1>題組檢視</h1>
+      <p class="note">打開 Question.Generator 打包出的 <code>set.json</code>（可以同時選 <code>audio.mp3</code>）。檔案只在你的瀏覽器裡讀，不會上傳。含標準答案，這一頁不會部署上線。</p>
+    </header>
+
+    <section id="drop" class="drop" tabindex="0">
+      <p><b>把題組資料夾拖到這裡</b>（一套的資料夾，或 <code>results/out</code> 這種裝很多套的資料夾；每套要有 set.json，audio.mp3 可有可無）</p>
+      <p><label class="btn">選資料夾 <input id="dir" type="file" webkitdirectory hidden></label> <label class="btn alt">選檔案 <input id="file" type="file" accept=".json,.mp3,audio/mpeg,application/json" multiple hidden></label></p>
+      <p id="error" class="bad" role="alert" hidden></p>
+    </section>
+
+    <section id="overview" hidden></section>
+    <div id="report" hidden>
+      <section id="summary"></section>
+      <section><h2>示警與裁決</h2><div id="warnings"></div></section>
+      <section><h2>錄音時間軸</h2><div id="timeline"></div><div id="audio-box"></div></section>
+      <section><h2>題目與答案</h2><div id="questions"></div></section>
+      <section><h2>題目卷 <label class="inline"><input id="show-answers" type="checkbox"> 顯示答案</label></h2><div id="paper" class="paper"></div></section>
+      <section><h2>製作紀錄</h2><div id="steps"></div></section>
+      <section><details><summary>原始 JSON</summary><pre id="raw"></pre></details></section>
+    </div>
+  </main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

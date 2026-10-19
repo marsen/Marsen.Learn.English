@@ -1,6 +1,6 @@
 // 本機開發用的假後端：跑的是和正式環境同一份 api/_core.mjs，只是登入、資料庫換成假的。
 // 登入：任何以 "dev-" 開頭的 token 都算登入（例如 dev-alice）。資料存在記憶體，重開就清空。
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { createApi } from "../api/_core.mjs";
 import { sanitizeTiming } from "../lib/publish.mjs";
@@ -9,6 +9,10 @@ export function makeDevApi(root) {
   const readJson = (p) => JSON.parse(readFileSync(p, "utf8"));
   const list = readJson(join(root, "scripts/dev-sets.json"));
   const dirOf = (id) => join(root, "content/sets", id);
+  // 本機匯入的打包題組（scripts/import-bundle.mjs 放進來），不進 git；每次讀取時掃描，匯入後不用重開伺服器。
+  const importRoot = join(root, "content/dev-imports");
+  const imported = () => (existsSync(importRoot) ? readdirSync(importRoot).filter((id) => existsSync(join(importRoot, id, "payload.json"))) : []);
+  const importedSet = (id) => { const p = readJson(join(importRoot, id, "payload.json")); return { ...p.set, audio_path: `content/dev-imports/${id}/audio.mp3` }; };
   const attempts = new Map();
   const feedback = [];
   const mails = []; // 本機「寄出」的結果連結（不真的寄信）
@@ -26,13 +30,13 @@ export function makeDevApi(root) {
   };
 
   const store = {
-    listPublishedSets: async () => list.map((i) => { const s = toSet(i); return { set_id: s.set_id, title: s.title, topic: s.topic, question_count: s.question_count }; }),
+    listPublishedSets: async () => [...list.map(toSet), ...imported().map(importedSet)].map((s) => ({ set_id: s.set_id, title: s.title, topic: s.topic, question_count: s.question_count })),
     listFinished: async (userId) => [...attempts.values()].filter((a) => a.user_id === userId && a.finished_at).map((a) => ({ set_id: a.set_id, score: a.score, total: a.total })),
-    getPublishedSet: async (id) => { const i = list.find((x) => x.id === id); return i ? toSet(i) : null; },
+    getPublishedSet: async (id) => { const i = list.find((x) => x.id === id); return i ? toSet(i) : imported().includes(id) ? importedSet(id) : null; },
     createAttempt: async (row) => { const a = { id: `dev-attempt-${++n}`, finished_at: null, user_id: null, email: null, mail_count: 0, ...row }; attempts.set(a.id, a); return a; },
     getAttempt: async (id) => attempts.get(id) ?? null,
     patchAttempt: async (id, patch) => { Object.assign(attempts.get(id), patch); },
-    getPlan: async (setId) => (list.some((x) => x.id === setId) ? readJson(join(dirOf(setId), "plan.json")) : null),
+    getPlan: async (setId) => (list.some((x) => x.id === setId) ? readJson(join(dirOf(setId), "plan.json")) : imported().includes(setId) ? readJson(join(importRoot, setId, "payload.json")).answers.plan : null),
     finishAttempt: async (id, patch) => { const a = attempts.get(id); if (!a || a.finished_at) return false; Object.assign(a, patch); return true; },
     addFeedback: async (row) => { feedback.push(row); },
   };

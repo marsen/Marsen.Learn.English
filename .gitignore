@@ -3,3 +3,4 @@ node_modules/
 *.log
 content/sets/*/audio/
 public/
+content/dev-imports/
