@@ -1,6 +1,22 @@
+# dependencies
 node_modules/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# env
+.env*.local
+.env
+
+# misc
 .DS_Store
 *.log
-content/sets/*/audio/
-public/
-content/dev-imports/
+.vercel
+
+# legacy（舊版靜態頁，逐步搬進 Next.js 後刪除）
+legacy/content/sets/*/audio/
+legacy/public/
+legacy/content/dev-imports/

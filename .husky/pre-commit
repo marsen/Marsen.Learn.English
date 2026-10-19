@@ -1,0 +1,8 @@
+branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
+  echo "❌ 禁止直接 commit 到 $branch 分支！"
+  echo "   請先建立 feature branch：git checkout -b <type>/短名稱"
+  exit 1
+fi
+
+pnpm test

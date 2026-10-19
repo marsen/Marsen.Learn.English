@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/*
+ * 設計 token：顏色用「用途」命名（primary、muted…），換色系只改值、不改名字。
+ * 目前是暫用的樣式，之後整體 UI 會再改；元件一律用這些 token，不寫死顏色。
+ */
+:root {
+  --background: #fafaf8;
+  --foreground: #18181b;
+  --card: #f4f4f5;
+  --muted: #e4e4e7;
+  --muted-foreground: #71717a;
+  --border: #e4e4e7;
+  --primary: #4f46e5;
+  --primary-foreground: #fafafa;
+  --destructive: #dc2626;
+  --font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --font-display: "Noto Serif TC", "Songti TC", serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-destructive: var(--destructive);
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}

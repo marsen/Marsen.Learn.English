@@ -1,0 +1,41 @@
+/**
+ * 集中管理環境變數（infrastructure/config）。
+ * - 模組載入時就用 Zod 驗證，缺必要變數立刻拋錯（fail-fast）。
+ * - 不在程式裡寫預設值；預設值放 .env.local / .env.example。
+ * - 其他模組一律 import `env`，不直接讀 process.env。
+ */
+import { z } from "zod";
+
+const schema = z.object({
+  // 站台對外網址，登入連結用它組出來
+  SITE_URL: z.string().url(),
+  // 資料庫；沒設定時用記憶體資料（開發用）
+  DATABASE_URL: z.string().min(1).optional(),
+  AUTH_SECRET: z.string().min(1),
+  AUTH_TOKEN_TTL: z.string().min(1),
+  // 寄信（Resend）；沒設定時改用開發用寄信（只限非正式環境）
+  RESEND_API_KEY: z.string().min(1).optional(),
+  MAIL_FROM: z.string().min(1).optional(),
+  NODE_ENV: z.enum(["development", "production", "test"]).optional(),
+});
+
+const parsed = schema.safeParse(process.env);
+
+if (!parsed.success) {
+  const missing = Object.keys(parsed.error.flatten().fieldErrors);
+  throw new Error(
+    `[env] Missing or invalid environment variables: ${missing.join(", ")}`,
+  );
+}
+
+const _env = parsed.data;
+
+export const env = {
+  siteUrl: _env.SITE_URL,
+  databaseUrl: _env.DATABASE_URL,
+  authSecret: _env.AUTH_SECRET,
+  authTokenTtl: _env.AUTH_TOKEN_TTL,
+  resendApiKey: _env.RESEND_API_KEY,
+  mailFrom: _env.MAIL_FROM,
+  isProduction: _env.NODE_ENV === "production",
+} as const;
