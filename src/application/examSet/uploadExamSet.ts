@@ -81,6 +81,7 @@ export class UploadExamSet {
         audioKey,
         aiVerdict,
         status: "pending_review",
+        access: "members",
         uploadedBy: input.actor.id,
         uploadedAt: this.now(),
       },

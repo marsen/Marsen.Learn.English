@@ -1,4 +1,4 @@
-import type { ExamSet, ExamSetPrivate } from "@/domain/examSet/examSet";
+import type { ExamAccess, ExamSet, ExamSetPrivate } from "@/domain/examSet/examSet";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import { statusAfter, type TeacherReview } from "@/domain/examSet/review";
 
@@ -43,6 +43,11 @@ export class InMemoryExamSetRepository implements ExamSetRepository {
     if (!set) throw new Error(`沒有題組 ${review.setId}`);
     this.reviews.set(review.setId, structuredClone(review));
     set.status = statusAfter(review.decision);
+  }
+
+  async setAccess(setId: string, access: ExamAccess): Promise<void> {
+    const set = this.sets.get(setId);
+    if (set) set.access = access;
   }
 
   /** 測試用：取私密部分 */

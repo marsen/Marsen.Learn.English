@@ -11,6 +11,7 @@ describe("permissionsOf", () => {
       "keepRecords",
       "manageRoles",
       "reviewSets",
+      "setExamAccess",
       "takeExam",
       "uploadSets",
       "viewResult",
@@ -24,6 +25,12 @@ describe("can", () => {
     expect(can(["admin"], "manageRoles")).toBe(true);
     expect(can(["teacher"], "uploadSets")).toBe(false);
     expect(can(["student"], "manageRoles")).toBe(false);
+  });
+
+  it("應該只讓管理員設定考卷開放對象", () => {
+    expect(can(["admin"], "setExamAccess")).toBe(true);
+    expect(can(["teacher"], "setExamAccess")).toBe(false);
+    expect(can([], "setExamAccess")).toBe(false);
   });
 
   it("應該只讓老師審稿", () => {

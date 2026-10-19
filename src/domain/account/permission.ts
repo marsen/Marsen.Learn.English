@@ -6,7 +6,8 @@ import type { Role } from "./role";
 export const PERMISSIONS = [
   "uploadSets", // 上傳題目
   "reviewSets", // 審稿（評估試卷是否合格）
-  "takeExam", // 寫考卷
+  "setExamAccess", // 設定考卷開放對象（公開／會員）
+  "takeExam", // 寫考卷（能寫哪幾張另看考卷的開放對象，見 examSet/access.ts）
   "viewResult", // 看批改結果
   "keepRecords", // 考試紀錄
   "manageRoles", // 管理權限
@@ -14,9 +15,9 @@ export const PERMISSIONS = [
 
 export type Permission = (typeof PERMISSIONS)[number];
 
-/** 角色 → 功能 對照表（2026-10-19 與 Marsen 確認） */
+/** 角色 → 功能 對照表（2026-10-19 與 Marsen 確認；2026-10-20 加上設定考卷開放對象） */
 export const ROLE_PERMISSIONS: Readonly<Record<Role, readonly Permission[]>> = {
-  admin: ["uploadSets", "manageRoles"],
+  admin: ["uploadSets", "setExamAccess", "manageRoles"],
   teacher: ["reviewSets", "takeExam", "viewResult", "keepRecords"],
   student: ["takeExam", "viewResult", "keepRecords"],
 };

@@ -1,10 +1,12 @@
-import type { Account } from "@/domain/account/account";
 import { can } from "@/domain/account/permission";
+import { canTake } from "@/domain/examSet/access";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
+import { rolesOf, type Actor } from "@/application/shared/actor";
 import type { AudioStorage } from "./ports";
 
 /**
- * 取題組錄音。現在只開放審稿的老師聽（第 4 步考試時再開放給考生聽合格的題組）。
+ * 取題組錄音：審稿的老師可以聽任何一套；考生只能聽自己能考的考卷。
+ * 不能聽一律回 null（呼叫端回 404，不透露題組存不存在）。
  */
 export class GetExamSetAudio {
   constructor(
@@ -12,10 +14,11 @@ export class GetExamSetAudio {
     private readonly storage: AudioStorage,
   ) {}
 
-  async execute(input: { actor: Account; setId: string }): Promise<Uint8Array | null> {
-    if (!can(input.actor.roles, "reviewSets")) return null;
+  async execute(input: { actor: Actor; setId: string }): Promise<Uint8Array | null> {
     const set = await this.sets.findById(input.setId);
     if (!set) return null;
+    const roles = rolesOf(input.actor);
+    if (!can(roles, "reviewSets") && !canTake(roles, set)) return null;
     return this.storage.get(set.audioKey);
   }
 }

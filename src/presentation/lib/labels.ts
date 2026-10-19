@@ -11,6 +11,7 @@ export const ROLE_LABELS: Record<Role, string> = {
 export const PERMISSION_LABELS: Record<Permission, string> = {
   uploadSets: "上傳題目",
   reviewSets: "審稿（評估試卷是否合格）",
+  setExamAccess: "設定考卷開放對象",
   takeExam: "寫考卷",
   viewResult: "看批改結果",
   keepRecords: "考試紀錄",

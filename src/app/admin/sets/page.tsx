@@ -4,6 +4,7 @@ import { ExamSetTable } from "@/presentation/components/admin/ExamSetTable";
 import { can } from "@/domain/account/permission";
 import { requireAccount } from "@/infrastructure/auth/currentAccount";
 import { listExamSets } from "@/infrastructure/di/examSetContainer";
+import { setExamAccessAction } from "@/app/actions/examSet";
 
 export const metadata: Metadata = { title: "題組", robots: { index: false } };
 
@@ -28,7 +29,12 @@ export default async function ExamSetsPage() {
           </a>
         )}
       </div>
-      <ExamSetTable sets={sets} />
+      <ExamSetTable
+        sets={sets}
+        setAccessAction={
+          can(account.roles, "setExamAccess") ? setExamAccessAction : undefined
+        }
+      />
     </main>
   );
 }

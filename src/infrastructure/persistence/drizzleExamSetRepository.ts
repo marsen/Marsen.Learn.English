@@ -1,6 +1,8 @@
 import { desc, eq } from "drizzle-orm";
 import {
+  isExamAccess,
   isExamSetStatus,
+  type ExamAccess,
   type ExamSet,
   type ExamSetPrivate,
 } from "@/domain/examSet/examSet";
@@ -21,6 +23,7 @@ function toDomain(row: Row): ExamSet {
     ...row,
     aiVerdict: isAiVerdict(row.aiVerdict) ? row.aiVerdict : "needs_human",
     status: isExamSetStatus(row.status) ? row.status : "pending_review",
+    access: isExamAccess(row.access) ? row.access : "members",
   };
 }
 
@@ -84,5 +87,9 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
         .set({ status: statusAfter(review.decision) })
         .where(eq(examSets.setId, setId)),
     ]);
+  }
+
+  async setAccess(setId: string, access: ExamAccess): Promise<void> {
+    await this.db.update(examSets).set({ access }).where(eq(examSets.setId, setId));
   }
 }

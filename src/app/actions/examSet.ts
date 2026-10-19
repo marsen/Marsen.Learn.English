@@ -6,7 +6,11 @@ import type {
   UploadSetFormState,
 } from "@/presentation/components/formStates";
 import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
-import { reviewExamSet, uploadExamSet } from "@/infrastructure/di/examSetContainer";
+import {
+  reviewExamSet,
+  setExamAccess,
+  uploadExamSet,
+} from "@/infrastructure/di/examSetContainer";
 
 export async function uploadExamSetAction(
   _prev: UploadSetFormState,
@@ -68,4 +72,15 @@ export async function reviewExamSetAction(
   revalidatePath("/admin/sets");
   revalidatePath(`/admin/sets/${setId}`);
   return { saved: true };
+}
+
+export async function setExamAccessAction(formData: FormData): Promise<void> {
+  const actor = await getCurrentAccount();
+  if (!actor) return;
+  await setExamAccess().execute({
+    actor,
+    setId: String(formData.get("setId") ?? ""),
+    access: formData.get("access"),
+  });
+  revalidatePath("/admin/sets");
 }

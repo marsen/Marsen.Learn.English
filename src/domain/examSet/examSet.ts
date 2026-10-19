@@ -18,6 +18,18 @@ export function isExamSetStatus(v: string): v is ExamSetStatus {
   return (EXAM_SET_STATUSES as readonly string[]).includes(v);
 }
 
+/**
+ * 考卷開放對象：public＝路人也能寫；members＝要登入的會員（學生、老師）才能寫。
+ * 新上傳的預設是 members，由管理員改成 public。
+ */
+export const EXAM_ACCESSES = ["public", "members"] as const;
+
+export type ExamAccess = (typeof EXAM_ACCESSES)[number];
+
+export function isExamAccess(v: unknown): v is ExamAccess {
+  return (EXAM_ACCESSES as readonly unknown[]).includes(v);
+}
+
 /** set.json 裡原樣保存、這一層不解讀的 JSON（題目卷、答案卡等） */
 export type JsonObject = { [key: string]: unknown };
 
@@ -47,6 +59,7 @@ export type ExamSet = {
   audioKey: string;
   aiVerdict: AiVerdict;
   status: ExamSetStatus;
+  access: ExamAccess;
   uploadedBy: string;
   uploadedAt: Date;
 };

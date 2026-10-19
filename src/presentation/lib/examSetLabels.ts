@@ -1,4 +1,4 @@
-import type { AiVerdict, ExamSetStatus } from "@/domain/examSet/examSet";
+import type { AiVerdict, ExamAccess, ExamSetStatus } from "@/domain/examSet/examSet";
 
 /** 給老師看的說法（不用技術用語）。沒列到的值就照原樣顯示。 */
 export const AI_VERDICT_LABELS: Record<AiVerdict, string> = {
@@ -10,6 +10,11 @@ export const STATUS_LABELS: Record<ExamSetStatus, string> = {
   pending_review: "待老師審稿",
   approved: "合格",
   rejected: "不合格",
+};
+
+export const ACCESS_LABELS: Record<ExamAccess, string> = {
+  public: "公開（路人也能寫）",
+  members: "會員",
 };
 
 const TRAP_LABELS: Record<string, string> = {

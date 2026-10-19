@@ -37,6 +37,14 @@ export default async function AdminPage({
           題組 →
         </a>
       )}
+      {can(account.roles, "takeExam") && (
+        <a
+          href="/exam"
+          className="mb-8 block rounded-xl border border-border bg-white p-4"
+        >
+          考卷 →
+        </a>
+      )}
       <AccountSummary account={account} />
     </main>
   );

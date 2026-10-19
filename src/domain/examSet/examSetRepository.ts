@@ -1,4 +1,4 @@
-import type { ExamSet, ExamSetPrivate } from "./examSet";
+import type { ExamAccess, ExamSet, ExamSetPrivate } from "./examSet";
 import type { TeacherReview } from "./review";
 
 /** 題組儲存的 port。 */
@@ -13,4 +13,5 @@ export interface ExamSetRepository {
   findReview(setId: string): Promise<TeacherReview | null>;
   /** 存審稿並同步更新題組狀態（同一個交易） */
   saveReview(review: TeacherReview): Promise<void>;
+  setAccess(setId: string, access: ExamAccess): Promise<void>;
 }

@@ -49,7 +49,8 @@ export const examSets = pgTable("exam_sets", {
   timing: jsonb("timing").$type<PublicTiming>().notNull(),
   audioKey: text("audio_key").notNull(),
   aiVerdict: text("ai_verdict").notNull(), // 'pass' | 'needs_human'
-  status: text("status").notNull(), // 'pending_review'
+  status: text("status").notNull(), // 'pending_review' | 'approved' | 'rejected'
+  access: text("access").notNull().default("members"), // 'public' | 'members'
   uploadedBy: uuid("uploaded_by")
     .notNull()
     .references(() => accounts.id),
@@ -78,4 +79,16 @@ export const examSetReviews = pgTable("exam_set_reviews", {
   audioNote: text("audio_note"),
   questionNotes: jsonb("question_notes").$type<QuestionNote[]>().notNull(),
   reviewedAt: timestamp("reviewed_at", { withTimezone: true }).notNull(),
+});
+
+/** 作答。路人的作答 account_id 為空。 */
+export const examAttempts = pgTable("exam_attempts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  setId: text("set_id")
+    .notNull()
+    .references(() => examSets.setId),
+  accountId: uuid("account_id").references(() => accounts.id, { onDelete: "set null" }),
+  answers: jsonb("answers").$type<Record<string, string>>(),
+  startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
+  submittedAt: timestamp("submitted_at", { withTimezone: true }),
 });
