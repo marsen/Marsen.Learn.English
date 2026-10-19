@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AccountSummary } from "@/presentation/components/AccountSummary";
+import { can } from "@/domain/account/permission";
 import { requireAccount } from "@/infrastructure/auth/currentAccount";
 import { logoutAction } from "@/app/actions/auth";
 
@@ -27,6 +28,14 @@ export default async function AdminPage({
         <p className="mb-6 rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">
           你的帳號沒有剛才那個功能的權限。
         </p>
+      )}
+      {(can(account.roles, "uploadSets") || can(account.roles, "reviewSets")) && (
+        <a
+          href="/admin/sets"
+          className="mb-8 block rounded-xl border border-border bg-white p-4"
+        >
+          題組 →
+        </a>
       )}
       <AccountSummary account={account} />
     </main>

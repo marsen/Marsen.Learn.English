@@ -1,0 +1,45 @@
+import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
+import type { AudioStorage } from "@/application/examSet/ports";
+import { ListExamSets } from "@/application/examSet/listExamSets";
+import { UploadExamSet } from "@/application/examSet/uploadExamSet";
+import { env } from "@/infrastructure/config/env";
+import { NodeSha256 } from "@/infrastructure/crypto/nodeSha256";
+import { DrizzleExamSetRepository } from "@/infrastructure/persistence/drizzleExamSetRepository";
+import { InMemoryExamSetRepository } from "@/infrastructure/persistence/inMemoryExamSetRepository";
+import { InMemoryAudioStorage } from "@/infrastructure/storage/inMemoryAudioStorage";
+import { LocalAudioStorage } from "@/infrastructure/storage/localAudioStorage";
+
+/**
+ * Composition Root（題組）。
+ * - 有 DATABASE_URL → Drizzle；沒有 → 記憶體
+ * - 有 AUDIO_LOCAL_DIR → 存本機資料夾；沒有且非正式環境 → 記憶體
+ *   （正式環境的雲端儲存等接上 Neon Object Storage 時再加）
+ */
+type Container = { sets: ExamSetRepository; storage: AudioStorage };
+
+const globalStore = globalThis as unknown as { __examSetContainer?: Container };
+
+function buildStorage(): AudioStorage {
+  if (env.audioLocalDir) return new LocalAudioStorage(env.audioLocalDir);
+  if (env.isProduction) throw new Error("[env] 正式環境還沒有設定音檔儲存空間");
+  return new InMemoryAudioStorage();
+}
+
+function container(): Container {
+  globalStore.__examSetContainer ??= {
+    sets: env.databaseUrl
+      ? new DrizzleExamSetRepository()
+      : new InMemoryExamSetRepository(),
+    storage: buildStorage(),
+  };
+  return globalStore.__examSetContainer;
+}
+
+export function uploadExamSet(): UploadExamSet {
+  const c = container();
+  return new UploadExamSet(c.sets, c.storage, new NodeSha256());
+}
+
+export function listExamSets(): ListExamSets {
+  return new ListExamSets(container().sets);
+}

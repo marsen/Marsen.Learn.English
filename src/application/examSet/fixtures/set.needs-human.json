@@ -1,0 +1,642 @@
+{
+  "schema_version": 1,
+  "set_id": "s1-gym-0001",
+  "title": "Fitness Club Registration",
+  "topic": "gym-membership",
+  "question_count": 10,
+  "paper": {
+    "set_id": "s1-gym-0001",
+    "type": "form_table",
+    "title": "Fitness Club Registration",
+    "instruction": "Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
+    "rows": [
+      {
+        "label": "Joining fee",
+        "parts": [
+          {
+            "text": "Waived this month"
+          }
+        ],
+        "says": ["joining fee"]
+      },
+      {
+        "label": "Address",
+        "field_id": "house_number",
+        "parts": [
+          {
+            "text": "Address:"
+          },
+          {
+            "blank": "q01",
+            "field_id": "house_number"
+          },
+          {
+            "blank": "q02",
+            "field_id": "street_name"
+          }
+        ],
+        "inline": true,
+        "section": "Personal details"
+      },
+      {
+        "label": "Town",
+        "field_id": "town",
+        "parts": [
+          {
+            "blank": "q03",
+            "field_id": "town"
+          }
+        ],
+        "section": "Personal details"
+      },
+      {
+        "label": "Phone",
+        "field_id": "phone",
+        "parts": [
+          {
+            "blank": "q04",
+            "field_id": "phone"
+          }
+        ],
+        "section": "Personal details"
+      },
+      {
+        "label": "Office floor",
+        "field_id": "work_floor",
+        "parts": [
+          {
+            "text": "The office is on floor"
+          },
+          {
+            "blank": "q05",
+            "field_id": "work_floor"
+          },
+          {
+            "text": ", and there is a lift in the building."
+          }
+        ],
+        "inline": true,
+        "says": ["lift"],
+        "section": "Study or work"
+      },
+      {
+        "label": "Start day",
+        "field_id": "start_day",
+        "parts": [
+          {
+            "text": "Will start on"
+          },
+          {
+            "blank": "q06",
+            "field_id": "start_day"
+          },
+          {
+            "text": ", with a free induction session."
+          }
+        ],
+        "inline": true,
+        "says": ["induction"],
+        "section": "Gym information"
+      },
+      {
+        "label": "Preferred time",
+        "field_id": "preferred_time",
+        "parts": [
+          {
+            "text": "Preferred time to train:"
+          },
+          {
+            "blank": "q07",
+            "field_id": "preferred_time"
+          },
+          {
+            "text": "."
+          }
+        ],
+        "inline": true,
+        "section": "Gym information"
+      },
+      {
+        "label": "Main goal",
+        "field_id": "goal",
+        "parts": [
+          {
+            "text": "Main goal:"
+          },
+          {
+            "blank": "q08",
+            "field_id": "goal"
+          },
+          {
+            "text": "."
+          }
+        ],
+        "inline": true,
+        "section": "Gym information"
+      },
+      {
+        "label": "Locker number",
+        "field_id": "locker_number",
+        "parts": [
+          {
+            "text": "Locker number"
+          },
+          {
+            "blank": "q09",
+            "field_id": "locker_number"
+          },
+          {
+            "text": "; there is a £10 deposit for the key."
+          }
+        ],
+        "inline": true,
+        "says": ["10", "deposit"],
+        "section": "Fees and payment"
+      },
+      {
+        "label": "Payment method",
+        "field_id": "payment_method",
+        "parts": [
+          {
+            "text": "Membership fees are paid monthly. Pays by"
+          },
+          {
+            "blank": "q10",
+            "field_id": "payment_method"
+          },
+          {
+            "text": "."
+          }
+        ],
+        "inline": true,
+        "says": ["monthly"],
+        "section": "Fees and payment"
+      }
+    ],
+    "section_styles": {
+      "Personal details": "list",
+      "Study or work": "paragraph",
+      "Gym information": "paragraph",
+      "Fees and payment": "paragraph"
+    }
+  },
+  "answers": {
+    "set_id": "s1-gym-0001",
+    "topic": "gym-membership",
+    "variant": "employee",
+    "recipe": "R3",
+    "seed": 20261018,
+    "scenario": {
+      "setting": "A new member signs up at the front desk of a city-centre fitness club on a weekday lunch break.",
+      "accent": "en-GB"
+    },
+    "answers": [
+      {
+        "question_id": "q01",
+        "field_id": "house_number",
+        "answer": "52",
+        "accepted": [],
+        "type": "number",
+        "trap": "self_correction",
+        "answer_policy": "digits_only",
+        "wrong_value": "62",
+        "note": "Member first says sixty-two, then corrects to fifty-two."
+      },
+      {
+        "question_id": "q02",
+        "field_id": "street_name",
+        "answer": "Kestrel Lane",
+        "accepted": [],
+        "type": "name_spelled",
+        "trap": "none",
+        "answer_policy": "exact_word",
+        "note": "Street name is given and then confirmed by the receptionist."
+      },
+      {
+        "question_id": "q03",
+        "field_id": "town",
+        "answer": "Hollinwick",
+        "accepted": [],
+        "type": "place",
+        "trap": "spelling",
+        "answer_policy": "exact_word",
+        "note": "Town is spelled out letter by letter: H-O-L-L-I-N-W-I-C-K."
+      },
+      {
+        "question_id": "q04",
+        "field_id": "phone",
+        "answer": "07700 900 614",
+        "accepted": ["07700900614"],
+        "type": "phone",
+        "trap": "similar_numbers",
+        "answer_policy": "digits_only",
+        "note": "Number is read out in groups; the final chunk includes fourteen versus forty."
+      },
+      {
+        "question_id": "q05",
+        "field_id": "work_floor",
+        "answer": "16",
+        "accepted": ["sixteen"],
+        "type": "number",
+        "trap": "similar_numbers",
+        "answer_policy": "number_word",
+        "note": "Member says the office is on the sixteenth floor; sixty is mentioned as a contrast."
+      },
+      {
+        "question_id": "q06",
+        "field_id": "start_day",
+        "answer": "Thursday",
+        "accepted": [],
+        "type": "word",
+        "trap": "self_correction",
+        "answer_policy": "exact_word",
+        "wrong_value": "Monday",
+        "note": "Member suggests Monday, then says Thursday suits better."
+      },
+      {
+        "question_id": "q07",
+        "field_id": "preferred_time",
+        "answer": "lunchtime",
+        "accepted": ["lunch time"],
+        "type": "word",
+        "trap": "distractor",
+        "answer_policy": "exact_word",
+        "wrong_value": "evening",
+        "note": "Evening is offered but the member prefers lunchtime sessions."
+      },
+      {
+        "question_id": "q08",
+        "field_id": "goal",
+        "answer": "better stamina",
+        "accepted": [],
+        "type": "word",
+        "trap": "none",
+        "answer_policy": "exact_word",
+        "note": "Member says they want to improve their stamina."
+      },
+      {
+        "question_id": "q09",
+        "field_id": "locker_number",
+        "answer": "218",
+        "accepted": [],
+        "type": "number",
+        "trap": "similar_numbers",
+        "answer_policy": "digits_only",
+        "note": "Receptionist assigns locker two hundred and eighteen, mentioning eighty nearby."
+      },
+      {
+        "question_id": "q10",
+        "field_id": "payment_method",
+        "answer": "direct debit",
+        "accepted": ["direct-debit"],
+        "type": "word",
+        "trap": "paraphrase",
+        "answer_policy": "exact_word",
+        "note": "Member asks to pay monthly straight from their bank account."
+      }
+    ]
+  },
+  "timing": {
+    "set_id": "s1-gym-0001",
+    "total_seconds": 396.2,
+    "events": [
+      {
+        "type": "announce",
+        "id": "intro",
+        "start": 0,
+        "end": 7.98
+      },
+      {
+        "type": "announce",
+        "id": "look1",
+        "start": 7.98,
+        "end": 11.82
+      },
+      {
+        "type": "pause",
+        "id": "pause1",
+        "start": 11.82,
+        "end": 31.82,
+        "questions": [1, 4],
+        "seconds": 20
+      },
+      {
+        "type": "announce",
+        "id": "now1",
+        "start": 31.82,
+        "end": 35.36
+      },
+      {
+        "type": "turn",
+        "id": "t1",
+        "start": 35.36,
+        "end": 42.89,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "t2",
+        "start": 43.39,
+        "end": 51.97,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "t3",
+        "start": 52.67,
+        "end": 59.81,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "t4",
+        "start": 60.31,
+        "end": 67.8,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "t5",
+        "start": 68.5,
+        "end": 78.02,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "t6",
+        "start": 78.52,
+        "end": 81.05,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "t7",
+        "start": 81.75,
+        "end": 87.66,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "t8",
+        "start": 88.16,
+        "end": 93.73,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "t9",
+        "start": 94.43,
+        "end": 106.78,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "t10",
+        "start": 107.28,
+        "end": 112.53,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "t11",
+        "start": 113.23,
+        "end": 123.47,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "t12",
+        "start": 123.97,
+        "end": 134.86,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "t13",
+        "start": 135.56,
+        "end": 149.09,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "t14",
+        "start": 149.59,
+        "end": 153.86,
+        "group": 1
+      },
+      {
+        "type": "announce",
+        "id": "look2",
+        "start": 154.56,
+        "end": 160.61
+      },
+      {
+        "type": "pause",
+        "id": "pause2",
+        "start": 160.61,
+        "end": 180.61,
+        "questions": [5, 8],
+        "seconds": 20
+      },
+      {
+        "type": "announce",
+        "id": "now2",
+        "start": 180.61,
+        "end": 185.97
+      },
+      {
+        "type": "turn",
+        "id": "t15",
+        "start": 185.97,
+        "end": 192.26,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "t16",
+        "start": 192.76,
+        "end": 198.25,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "t17",
+        "start": 198.95,
+        "end": 208.95,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "t18",
+        "start": 209.45,
+        "end": 216.73,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "t19",
+        "start": 217.43,
+        "end": 226.09,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "t20",
+        "start": 226.59,
+        "end": 234.69,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "t21",
+        "start": 235.39,
+        "end": 246.47,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "t22",
+        "start": 246.97,
+        "end": 256.42,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "t23",
+        "start": 257.12,
+        "end": 264.37,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "t24",
+        "start": 264.87,
+        "end": 271.7,
+        "group": 2
+      },
+      {
+        "type": "announce",
+        "id": "look3",
+        "start": 272.4,
+        "end": 278.6
+      },
+      {
+        "type": "pause",
+        "id": "pause3",
+        "start": 278.6,
+        "end": 298.6,
+        "questions": [9, 10],
+        "seconds": 20
+      },
+      {
+        "type": "announce",
+        "id": "now3",
+        "start": 298.6,
+        "end": 304.26
+      },
+      {
+        "type": "turn",
+        "id": "t25",
+        "start": 304.26,
+        "end": 326.23,
+        "group": 3
+      },
+      {
+        "type": "turn",
+        "id": "t26",
+        "start": 326.73,
+        "end": 329.4,
+        "group": 3
+      },
+      {
+        "type": "turn",
+        "id": "t27",
+        "start": 330.1,
+        "end": 342.71,
+        "group": 3
+      },
+      {
+        "type": "turn",
+        "id": "t28",
+        "start": 343.21,
+        "end": 350.54,
+        "group": 3
+      },
+      {
+        "type": "turn",
+        "id": "t29",
+        "start": 351.24,
+        "end": 357.54,
+        "group": 3
+      },
+      {
+        "type": "turn",
+        "id": "t30",
+        "start": 358.04,
+        "end": 360.21,
+        "group": 3
+      },
+      {
+        "type": "announce",
+        "id": "end",
+        "start": 360.91,
+        "end": 366.16
+      },
+      {
+        "type": "pause",
+        "id": "check",
+        "start": 366.16,
+        "end": 396.16,
+        "questions": [1, 10],
+        "seconds": 30
+      }
+    ]
+  },
+  "audio": {
+    "file": "audio.mp3",
+    "bytes": 3169964,
+    "sha256": "61ee49c8edaafdc7f58777c4293080f40e5f179604c3bf524824cc9686af8b0a",
+    "seconds": 396.2
+  },
+  "provenance": {
+    "generator_version": "0.1.0",
+    "plan": {
+      "model": "unspecified",
+      "mode": "manual",
+      "at": "2026-10-16T16:16:42.669Z"
+    },
+    "script": {
+      "model": "unspecified",
+      "mode": "manual",
+      "at": "2026-10-16T16:16:42.737Z"
+    },
+    "blind": {
+      "model": "unspecified",
+      "mode": "manual",
+      "warnings": 1,
+      "at": "2026-10-16T16:16:42.995Z"
+    },
+    "validate": {
+      "ok": true,
+      "block": 0,
+      "warn": 0,
+      "at": "2026-10-16T16:16:42.913Z"
+    },
+    "ai_review": {
+      "model": "manual",
+      "mode": "manual",
+      "at": "2026-10-18T14:54:16.460Z",
+      "verdict": "needs_human"
+    },
+    "warnings": [
+      {
+        "id": "w01",
+        "source": "blind",
+        "rule": "B2",
+        "question_id": "q07",
+        "message": "盲答認為還有可能的答案：lunch break",
+        "ai_ruling": "problem"
+      }
+    ]
+  }
+}

@@ -20,3 +20,6 @@ next-env.d.ts
 legacy/content/sets/*/audio/
 legacy/public/
 legacy/content/dev-imports/
+
+# 本機上傳的音檔
+.data/

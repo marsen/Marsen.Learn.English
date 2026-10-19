@@ -2,3 +2,8 @@
 export type LoginFormState = { error?: string; sent?: boolean; devLink?: string };
 
 export type VerifyFormState = { error?: string };
+
+export type UploadSetFormState = {
+  problems?: string[];
+  uploaded?: { setId: string; title: string; aiVerdict: "pass" | "needs_human" };
+};

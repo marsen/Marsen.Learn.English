@@ -1,4 +1,13 @@
-import { pgTable, uuid, text, timestamp, primaryKey } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  primaryKey,
+  integer,
+  jsonb,
+} from "drizzle-orm/pg-core";
+import type { JsonObject, PublicTiming } from "@/domain/examSet/examSet";
 
 /** 帳號。以 email 識別（存正規化後的小寫）。 */
 export const accounts = pgTable("accounts", {
@@ -27,4 +36,30 @@ export const loginTokens = pgTable("login_tokens", {
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   usedAt: timestamp("used_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+/** 題組（考生看得到的部分）。不含答案、不含逐字稿。 */
+export const examSets = pgTable("exam_sets", {
+  setId: text("set_id").primaryKey(),
+  title: text("title").notNull(),
+  topic: text("topic").notNull(),
+  questionCount: integer("question_count").notNull(),
+  paper: jsonb("paper").$type<JsonObject>().notNull(),
+  timing: jsonb("timing").$type<PublicTiming>().notNull(),
+  audioKey: text("audio_key").notNull(),
+  aiVerdict: text("ai_verdict").notNull(), // 'pass' | 'needs_human'
+  status: text("status").notNull(), // 'pending_review'
+  uploadedBy: uuid("uploaded_by")
+    .notNull()
+    .references(() => accounts.id),
+  uploadedAt: timestamp("uploaded_at", { withTimezone: true }).notNull(),
+});
+
+/** 題組私密部分：標準答案與製作紀錄。只由伺服器讀取。 */
+export const examSetPrivates = pgTable("exam_set_privates", {
+  setId: text("set_id")
+    .primaryKey()
+    .references(() => examSets.setId, { onDelete: "cascade" }),
+  answers: jsonb("answers").$type<JsonObject>().notNull(),
+  provenance: jsonb("provenance").$type<JsonObject>().notNull(),
 });

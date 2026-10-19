@@ -16,6 +16,8 @@ const schema = z.object({
   // 寄信（Resend）；沒設定時改用開發用寄信（只限非正式環境）
   RESEND_API_KEY: z.string().min(1).optional(),
   MAIL_FROM: z.string().min(1).optional(),
+  // 本機開發：上傳的音檔存在這個資料夾（相對專案根目錄）
+  AUDIO_LOCAL_DIR: z.string().min(1).optional(),
   NODE_ENV: z.enum(["development", "production", "test"]).optional(),
 });
 
@@ -37,5 +39,6 @@ export const env = {
   authTokenTtl: _env.AUTH_TOKEN_TTL,
   resendApiKey: _env.RESEND_API_KEY,
   mailFrom: _env.MAIL_FROM,
+  audioLocalDir: _env.AUDIO_LOCAL_DIR,
   isProduction: _env.NODE_ENV === "production",
 } as const;

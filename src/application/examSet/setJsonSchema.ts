@@ -1,0 +1,33 @@
+import { z } from "zod";
+
+/**
+ * set.json 的外型檢查（只驗這一層要用到的欄位；題目卷、答案卡原樣保存）。
+ * 格式說明見 Question.Generator 的 README「set.json 怎麼讀」。
+ */
+const jsonObject = z.record(z.string(), z.unknown());
+
+export const setJsonSchema = z.object({
+  schema_version: z.unknown(),
+  set_id: z.string().regex(/^[a-z0-9-]+$/, "set_id 只能有小寫英數與 -"),
+  title: z.string().min(1),
+  topic: z.string().min(1),
+  question_count: z.number().int().positive(),
+  paper: jsonObject,
+  answers: jsonObject,
+  timing: z.object({
+    total_seconds: z.number(),
+    events: z.array(jsonObject),
+  }),
+  audio: z.object({
+    bytes: z.number().int(),
+    sha256: z.string(),
+  }),
+  provenance: z
+    .object({
+      validate: z.object({ ok: z.boolean() }).partial().optional(),
+      ai_review: z.object({ verdict: z.unknown() }).partial().optional(),
+    })
+    .loose(),
+});
+
+export type SetJson = z.infer<typeof setJsonSchema>;
