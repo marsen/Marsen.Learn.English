@@ -8,6 +8,7 @@ import {
   jsonb,
 } from "drizzle-orm/pg-core";
 import type { JsonObject, PublicTiming } from "@/domain/examSet/examSet";
+import type { QuestionNote } from "@/domain/examSet/review";
 
 /** 帳號。以 email 識別（存正規化後的小寫）。 */
 export const accounts = pgTable("accounts", {
@@ -62,4 +63,19 @@ export const examSetPrivates = pgTable("exam_set_privates", {
     .references(() => examSets.setId, { onDelete: "cascade" }),
   answers: jsonb("answers").$type<JsonObject>().notNull(),
   provenance: jsonb("provenance").$type<JsonObject>().notNull(),
+});
+
+/** 老師審稿：一套題只留最新一次（以最後一次為準）。 */
+export const examSetReviews = pgTable("exam_set_reviews", {
+  setId: text("set_id")
+    .primaryKey()
+    .references(() => examSets.setId, { onDelete: "cascade" }),
+  reviewerId: uuid("reviewer_id")
+    .notNull()
+    .references(() => accounts.id),
+  decision: text("decision").notNull(), // 'approved' | 'rejected'
+  comment: text("comment"),
+  audioNote: text("audio_note"),
+  questionNotes: jsonb("question_notes").$type<QuestionNote[]>().notNull(),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }).notNull(),
 });

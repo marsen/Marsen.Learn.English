@@ -1,9 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import type { UploadSetFormState } from "@/presentation/components/formStates";
+import type {
+  ReviewFormState,
+  UploadSetFormState,
+} from "@/presentation/components/formStates";
 import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
-import { uploadExamSet } from "@/infrastructure/di/examSetContainer";
+import { reviewExamSet, uploadExamSet } from "@/infrastructure/di/examSetContainer";
 
 export async function uploadExamSetAction(
   _prev: UploadSetFormState,
@@ -34,4 +37,35 @@ export async function uploadExamSetAction(
   return {
     uploaded: { setId: result.setId, title: result.title, aiVerdict: result.aiVerdict },
   };
+}
+
+export async function reviewExamSetAction(
+  setId: string,
+  _prev: ReviewFormState,
+  formData: FormData,
+): Promise<ReviewFormState> {
+  const actor = await getCurrentAccount();
+  if (!actor) return { problems: ["請先登入"] };
+
+  const text = (key: string) => {
+    const v = formData.get(key);
+    return typeof v === "string" ? v : null;
+  };
+  const questionNotes = [...formData.keys()]
+    .filter((k) => k.startsWith("note:"))
+    .map((k) => ({ questionId: k.slice("note:".length), note: text(k) }));
+
+  const result = await reviewExamSet().execute({
+    actor,
+    setId,
+    decision: text("decision"),
+    comment: text("comment"),
+    audioNote: text("audioNote"),
+    questionNotes,
+  });
+  if (!result.ok) return { problems: result.problems };
+
+  revalidatePath("/admin/sets");
+  revalidatePath(`/admin/sets/${setId}`);
+  return { saved: true };
 }

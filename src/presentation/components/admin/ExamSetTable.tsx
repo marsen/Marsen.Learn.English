@@ -20,7 +20,11 @@ export function ExamSetTable({ sets }: { sets: ExamSet[] }) {
         <tbody>
           {sets.map((s) => (
             <tr key={s.setId} className="border-b border-border last:border-0">
-              <td className="px-4 py-3 font-mono">{s.setId}</td>
+              <td className="px-4 py-3 font-mono">
+                <a href={`/admin/sets/${s.setId}`} className="text-primary underline">
+                  {s.setId}
+                </a>
+              </td>
               <td className="px-4 py-3">{s.title}</td>
               <td className="px-4 py-3">{s.questionCount}</td>
               <td className="px-4 py-3">{AI_VERDICT_LABELS[s.aiVerdict]}</td>

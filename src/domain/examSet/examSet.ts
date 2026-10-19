@@ -9,8 +9,14 @@
 /** AI 審稿結論：pass＝通過；needs_human＝有疑慮，要老師看 */
 export type AiVerdict = "pass" | "needs_human";
 
-/** 題組狀態。第 2 步只有「待老師審稿」，第 3 步加上合格／不合格 */
-export type ExamSetStatus = "pending_review";
+/** 題組狀態：待老師審稿 → 合格／不合格（老師可以改判，以最後一次為準） */
+export const EXAM_SET_STATUSES = ["pending_review", "approved", "rejected"] as const;
+
+export type ExamSetStatus = (typeof EXAM_SET_STATUSES)[number];
+
+export function isExamSetStatus(v: string): v is ExamSetStatus {
+  return (EXAM_SET_STATUSES as readonly string[]).includes(v);
+}
 
 /** set.json 裡原樣保存、這一層不解讀的 JSON（題目卷、答案卡等） */
 export type JsonObject = { [key: string]: unknown };

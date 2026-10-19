@@ -16,7 +16,7 @@ app（路由／Server Action，薄）→ presentation → application → domain
 - `src/domain`：純資料、規則、Repository port。**不能 import 任何外部套件**（lint 會擋）
 - `src/application`：use case（一個類別一件事，constructor 注入 port，回傳 `{ ok, ... }`）
 - `src/infrastructure`：env、DB（Neon + Drizzle）、auth（jose session）、寄信（Resend）、DI
-- `src/presentation`：React 元件。不 import app 或 infrastructure；Server Action 由頁面用 props 傳進來
+- `src/presentation`：React 元件。可用 application 的結果型別；不 import app 或 infrastructure，Server Action 由頁面用 props 傳進來
 - `src/app`：路由、Server Action、組裝各層
 
 分層方向由 `eslint-plugin-boundaries` 強制（`eslint.config.mjs`），寫錯方向 `pnpm lint` 會失敗。

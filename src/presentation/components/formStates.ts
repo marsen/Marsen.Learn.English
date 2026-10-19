@@ -7,3 +7,5 @@ export type UploadSetFormState = {
   problems?: string[];
   uploaded?: { setId: string; title: string; aiVerdict: "pass" | "needs_human" };
 };
+
+export type ReviewFormState = { problems?: string[]; saved?: boolean };

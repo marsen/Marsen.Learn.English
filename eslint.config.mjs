@@ -51,10 +51,14 @@ const layers = {
               },
             },
           },
-          // presentation：畫面元件，只碰 domain 的型別與自己
+          // presentation：畫面元件，可用 application 的結果型別與 domain 的型別
           {
             from: { element: { type: "presentation" } },
-            allow: { to: { element: { types: { anyOf: ["domain", "presentation"] } } } },
+            allow: {
+              to: {
+                element: { types: { anyOf: ["domain", "application", "presentation"] } },
+              },
+            },
           },
           // app：路由與 Server Action，負責把各層組起來
           {

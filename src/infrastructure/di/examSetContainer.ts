@@ -1,6 +1,9 @@
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import type { AudioStorage } from "@/application/examSet/ports";
+import { GetExamSetAudio } from "@/application/examSet/getExamSetAudio";
+import { GetExamSetForReview } from "@/application/examSet/getExamSetForReview";
 import { ListExamSets } from "@/application/examSet/listExamSets";
+import { ReviewExamSet } from "@/application/examSet/reviewExamSet";
 import { UploadExamSet } from "@/application/examSet/uploadExamSet";
 import { env } from "@/infrastructure/config/env";
 import { NodeSha256 } from "@/infrastructure/crypto/nodeSha256";
@@ -42,4 +45,17 @@ export function uploadExamSet(): UploadExamSet {
 
 export function listExamSets(): ListExamSets {
   return new ListExamSets(container().sets);
+}
+
+export function getExamSetForReview(): GetExamSetForReview {
+  return new GetExamSetForReview(container().sets);
+}
+
+export function reviewExamSet(): ReviewExamSet {
+  return new ReviewExamSet(container().sets);
+}
+
+export function getExamSetAudio(): GetExamSetAudio {
+  const c = container();
+  return new GetExamSetAudio(c.sets, c.storage);
 }
