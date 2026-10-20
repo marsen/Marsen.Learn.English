@@ -14,6 +14,10 @@ import {
   verifyLoginLink,
 } from "@/infrastructure/di/authContainer";
 import { env } from "@/infrastructure/config/env";
+import { readGuestId } from "@/infrastructure/auth/guestKey";
+import { claimGuestAttempts } from "@/infrastructure/di/examSetContainer";
+import { getAccountRepository } from "@/infrastructure/di/authContainer";
+import { can } from "@/domain/account/permission";
 
 const SEVEN_DAYS = 60 * 60 * 24 * 7;
 
@@ -43,7 +47,21 @@ export async function verifyLoginLinkAction(
     path: "/",
     maxAge: SEVEN_DAYS,
   });
-  redirect("/admin");
+
+  // 路人註冊／登入：把這個瀏覽器先前寫的考卷移到帳號名下，直接帶去看最近一次的完整結果（含正解）
+  const claimed = await claimGuestAttempts().execute({
+    accountId: result.accountId,
+    guestId: await readGuestId(),
+  });
+  if (claimed.length > 0) redirect(`/exam/result/${claimed[0]}`);
+
+  const account = await getAccountRepository().findById(result.accountId);
+  const backOffice =
+    account &&
+    (can(account.roles, "uploadSets") ||
+      can(account.roles, "reviewSets") ||
+      can(account.roles, "manageRoles"));
+  redirect(backOffice ? "/admin" : "/exam");
 }
 
 export async function logoutAction() {

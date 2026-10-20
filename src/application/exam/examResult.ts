@@ -26,10 +26,19 @@ export type SubmitExamResult =
   | { ok: true; attemptId: string }
   | { ok: false; reason: "not_found" | "already_submitted" };
 
-/** 結果頁：分數與每題對錯、正解 */
-export type AttemptResultView = GradeResult & {
+/** 結果頁的一題。沒有「看正解」權限時 expected 為 null、accepted 為空（正解根本不會送出伺服器） */
+export type QuestionResultView = Omit<GradeResult["results"][number], "expected"> & {
+  expected: string | null;
+};
+
+/** 結果頁：分數與每題對錯；有權限才附正解 */
+export type AttemptResultView = {
   attemptId: string;
   setId: string;
   title: string;
   submittedAt: Date;
+  score: number;
+  total: number;
+  answerKeyVisible: boolean;
+  results: QuestionResultView[];
 };

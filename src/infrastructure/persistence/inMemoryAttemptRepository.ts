@@ -10,6 +10,7 @@ export class InMemoryAttemptRepository implements AttemptRepository {
   async create(input: {
     setId: string;
     accountId: string | null;
+    guestId: string | null;
     startedAt: Date;
   }): Promise<Attempt> {
     const a: Attempt = {
@@ -40,5 +41,16 @@ export class InMemoryAttemptRepository implements AttemptRepository {
     a.result = structuredClone(result);
     a.submittedAt = at;
     return true;
+  }
+
+  async claimGuestAttempts(guestId: string, accountId: string): Promise<string[]> {
+    const mine = [...this.attempts.values()]
+      .filter((a) => a.accountId === null && a.guestId === guestId)
+      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime());
+    for (const a of mine) {
+      a.accountId = accountId;
+      a.guestId = null;
+    }
+    return mine.map((a) => a.id);
   }
 }

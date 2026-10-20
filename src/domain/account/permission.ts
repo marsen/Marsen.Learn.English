@@ -8,7 +8,8 @@ export const PERMISSIONS = [
   "reviewSets", // 審稿（評估試卷是否合格）
   "setExamAccess", // 設定考卷開放對象（公開／會員）
   "takeExam", // 寫考卷（能寫哪幾張另看考卷的開放對象，見 examSet/access.ts）
-  "viewResult", // 看批改結果
+  "viewResult", // 看批改結果（分數與每題對錯）
+  "viewAnswerKey", // 看正解（路人要註冊才看得到）
   "keepRecords", // 考試紀錄
   "manageRoles", // 管理權限
 ] as const;
@@ -18,8 +19,8 @@ export type Permission = (typeof PERMISSIONS)[number];
 /** 角色 → 功能 對照表（2026-10-19 與 Marsen 確認；2026-10-20 加上設定考卷開放對象） */
 export const ROLE_PERMISSIONS: Readonly<Record<Role, readonly Permission[]>> = {
   admin: ["uploadSets", "setExamAccess", "manageRoles"],
-  teacher: ["reviewSets", "takeExam", "viewResult", "keepRecords"],
-  student: ["takeExam", "viewResult", "keepRecords"],
+  teacher: ["reviewSets", "takeExam", "viewResult", "viewAnswerKey", "keepRecords"],
+  student: ["takeExam", "viewResult", "viewAnswerKey", "keepRecords"],
 };
 
 /** 路人（沒登入）能用的功能 */

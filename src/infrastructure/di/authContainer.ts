@@ -1,6 +1,11 @@
 import type { AccountRepository } from "@/domain/account/accountRepository";
 import type { LoginTokenRepository } from "@/domain/auth/loginTokenRepository";
 import type { LoginMailer } from "@/application/auth/ports";
+import {
+  AddAccount,
+  ListAccounts,
+  SetAccountRoles,
+} from "@/application/account/manageAccounts";
 import { RequestLoginLink } from "@/application/auth/requestLoginLink";
 import { VerifyLoginLink } from "@/application/auth/verifyLoginLink";
 import { env } from "@/infrastructure/config/env";
@@ -70,7 +75,7 @@ export function getAccountRepository(): AccountRepository {
 
 export function requestLoginLink(): RequestLoginLink {
   const c = container();
-  return new RequestLoginLink(c.accounts, c.tokens, secrets, c.mailer, env.siteUrl);
+  return new RequestLoginLink(c.tokens, secrets, c.mailer, env.siteUrl);
 }
 
 export function verifyLoginLink(): VerifyLoginLink {
@@ -82,4 +87,16 @@ export function verifyLoginLink(): VerifyLoginLink {
 export function devLoginLinkFor(email: string): string | null {
   const mailer = container().mailer;
   return mailer instanceof DevMailer ? mailer.lastLinkFor(email) : null;
+}
+
+export function listAccounts(): ListAccounts {
+  return new ListAccounts(container().accounts);
+}
+
+export function addAccount(): AddAccount {
+  return new AddAccount(container().accounts);
+}
+
+export function setAccountRoles(): SetAccountRoles {
+  return new SetAccountRoles(container().accounts);
 }

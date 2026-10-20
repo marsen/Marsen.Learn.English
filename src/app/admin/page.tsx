@@ -37,6 +37,14 @@ export default async function AdminPage({
           題組 →
         </a>
       )}
+      {can(account.roles, "manageRoles") && (
+        <a
+          href="/admin/accounts"
+          className="mb-8 block rounded-xl border border-border bg-white p-4"
+        >
+          管理權限 →
+        </a>
+      )}
       {can(account.roles, "takeExam") && (
         <a
           href="/exam"

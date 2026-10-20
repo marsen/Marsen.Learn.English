@@ -5,16 +5,18 @@ import type { LoginFormState } from "./formStates";
 
 type Props = {
   action: (prev: LoginFormState, formData: FormData) => Promise<LoginFormState>;
+  submitLabel?: string;
 };
 
-export function LoginForm({ action }: Props) {
+export function LoginForm({ action, submitLabel = "寄登入連結給我" }: Props) {
   const [state, formAction, isPending] = useActionState(action, {});
 
   if (state.sent) {
     return (
       <div className="grid gap-3 text-sm">
         <p className="rounded-lg bg-card px-4 py-3">
-          如果這個 email 有帳號，登入連結已經寄出，請到信箱點連結（15 分鐘內有效）。
+          連結已經寄出，請到信箱點連結（15 分鐘內有效）。第一次使用的 email
+          會自動建立帳號。
         </p>
         {state.devLink && (
           <p className="rounded-lg border border-dashed border-primary px-4 py-3">
@@ -53,7 +55,7 @@ export function LoginForm({ action }: Props) {
         disabled={isPending}
         className="rounded-lg bg-primary px-6 py-2.5 font-medium text-primary-foreground disabled:opacity-60"
       >
-        {isPending ? "寄送中…" : "寄登入連結給我"}
+        {isPending ? "寄送中…" : submitLabel}
       </button>
     </form>
   );

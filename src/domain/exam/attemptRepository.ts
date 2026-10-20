@@ -6,6 +6,7 @@ export interface AttemptRepository {
   create(input: {
     setId: string;
     accountId: string | null;
+    guestId: string | null;
     startedAt: Date;
   }): Promise<Attempt>;
   findById(id: string): Promise<Attempt | null>;
@@ -16,4 +17,6 @@ export interface AttemptRepository {
     result: GradeResult,
     at: Date,
   ): Promise<boolean>;
+  /** 把這個瀏覽器（guestId）的路人作答移到帳號名下；回傳移過去的作答 id（新的在前） */
+  claimGuestAttempts(guestId: string, accountId: string): Promise<string[]>;
 }

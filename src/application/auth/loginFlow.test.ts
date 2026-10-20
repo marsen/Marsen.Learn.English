@@ -34,7 +34,7 @@ beforeEach(async () => {
 });
 
 const request = (email: string) =>
-  new RequestLoginLink(accounts, tokens, secrets, mailer, SITE, now).execute({ email });
+  new RequestLoginLink(tokens, secrets, mailer, SITE, now).execute({ email });
 const verify = (token: string) =>
   new VerifyLoginLink(accounts, tokens, secrets, now).execute({ token });
 
@@ -47,10 +47,11 @@ describe("RequestLoginLink", () => {
     expect(mailer.sent[0].link.startsWith(`${SITE}/auth/verify?token=`)).toBe(true);
   });
 
-  it("應該對不存在的帳號回成功但不寄信", async () => {
-    const r = await request("nobody@example.com");
+  it("應該也寄給還沒有帳號的 email（註冊），但點連結前不建立帳號", async () => {
+    const r = await request("new@example.com");
     expect(r.ok).toBe(true);
-    expect(mailer.sent).toHaveLength(0);
+    expect(mailer.sent).toHaveLength(1);
+    expect(await accounts.findByEmail("new@example.com")).toBeNull();
   });
 
   it("應該擋下格式錯誤的 email", async () => {
@@ -72,7 +73,16 @@ describe("VerifyLoginLink", () => {
     await request("admin@marsen.me");
     const r = await verify(tokenOf(mailer.sent[0].link));
     const account = await accounts.findByEmail("admin@marsen.me");
-    expect(r).toEqual({ ok: true, accountId: account?.id });
+    expect(r).toEqual({ ok: true, accountId: account?.id, isNew: false });
+    expect(account?.roles).toEqual(["admin"]);
+  });
+
+  it("應該在新 email 第一次點連結時建立學生帳號（註冊）", async () => {
+    await request("New@Example.com");
+    const r = await verify(tokenOf(mailer.sent[0].link));
+    const account = await accounts.findByEmail("new@example.com");
+    expect(r).toEqual({ ok: true, accountId: account?.id, isNew: true });
+    expect(account?.roles).toEqual(["student"]);
   });
 
   it("應該拒絕用過第二次的連結", async () => {

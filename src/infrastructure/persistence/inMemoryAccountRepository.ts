@@ -31,6 +31,17 @@ export class InMemoryAccountRepository implements AccountRepository {
     if (account && !account.roles.includes(role)) account.roles.push(role);
   }
 
+  async setRoles(accountId: string, roles: Role[]): Promise<void> {
+    const account = this.accounts.find((a) => a.id === accountId);
+    if (account) account.roles = [...roles];
+  }
+
+  async list(): Promise<Account[]> {
+    return [...this.accounts]
+      .sort((a, b) => a.email.localeCompare(b.email))
+      .map((a) => ({ ...a, roles: [...a.roles] }));
+  }
+
   private copy(account: Account | undefined): Account | null {
     return account ? { ...account, roles: [...account.roles] } : null;
   }

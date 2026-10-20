@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { asc, eq, inArray } from "drizzle-orm";
 import type { Account } from "@/domain/account/account";
 import type { AccountRepository } from "@/domain/account/accountRepository";
 import { isRole, type Role } from "@/domain/account/role";
@@ -35,6 +35,44 @@ export class DrizzleAccountRepository implements AccountRepository {
 
   async addRole(accountId: string, role: Role): Promise<void> {
     await this.db.insert(accountRoles).values({ accountId, role }).onConflictDoNothing();
+  }
+
+  async setRoles(accountId: string, roles: Role[]): Promise<void> {
+    // batch 在 Neon 上是同一個交易：刪掉舊的、寫入新的一起完成
+    const remove = this.db
+      .delete(accountRoles)
+      .where(eq(accountRoles.accountId, accountId));
+    if (roles.length === 0) {
+      await remove;
+      return;
+    }
+    await this.db.batch([
+      remove,
+      this.db.insert(accountRoles).values(roles.map((role) => ({ accountId, role }))),
+    ]);
+  }
+
+  async list(): Promise<Account[]> {
+    const rows = await this.db.select().from(accounts).orderBy(asc(accounts.email));
+    if (rows.length === 0) return [];
+    const roleRows = await this.db
+      .select()
+      .from(accountRoles)
+      .where(
+        inArray(
+          accountRoles.accountId,
+          rows.map((r) => r.id),
+        ),
+      );
+    return rows.map((row) => ({
+      id: row.id,
+      email: row.email,
+      roles: roleRows
+        .filter((r) => r.accountId === row.id)
+        .map((r) => r.role)
+        .filter(isRole),
+      createdAt: row.createdAt,
+    }));
   }
 
   private async withRoles(row: Row): Promise<Account> {

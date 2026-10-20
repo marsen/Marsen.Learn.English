@@ -89,6 +89,8 @@ export const examAttempts = pgTable("exam_attempts", {
     .notNull()
     .references(() => examSets.setId),
   accountId: uuid("account_id").references(() => accounts.id, { onDelete: "set null" }),
+  // 路人作答的瀏覽器識別（雜湊）；登入後清掉、改填 account_id
+  guestId: text("guest_id"),
   answers: jsonb("answers").$type<Record<string, string>>(),
   score: integer("score"),
   total: integer("total"),

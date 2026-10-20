@@ -14,6 +14,7 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   setExamAccess: "設定考卷開放對象",
   takeExam: "寫考卷",
   viewResult: "看批改結果",
+  viewAnswerKey: "看正解",
   keepRecords: "考試紀錄",
   manageRoles: "管理權限",
 };

@@ -16,7 +16,7 @@ export function ExamResult({ result }: { result: AttemptResultView }) {
             <tr>
               <th className="px-4 py-3 font-medium">題號</th>
               <th className="px-4 py-3 font-medium">你寫的</th>
-              <th className="px-4 py-3 font-medium">正解</th>
+              {result.answerKeyVisible && <th className="px-4 py-3 font-medium">正解</th>}
             </tr>
           </thead>
           <tbody>
@@ -31,14 +31,16 @@ export function ExamResult({ result }: { result: AttemptResultView }) {
                 <td className={`px-4 py-3 ${r.given ? "" : "text-muted-foreground"}`}>
                   {r.given || "（空白）"}
                 </td>
-                <td className="px-4 py-3">
-                  {r.expected}
-                  {r.accepted.length > 0 && (
-                    <span className="ml-2 text-muted-foreground">
-                      （也算對：{r.accepted.join("、")}）
-                    </span>
-                  )}
-                </td>
+                {result.answerKeyVisible && (
+                  <td className="px-4 py-3">
+                    {r.expected}
+                    {r.accepted.length > 0 && (
+                      <span className="ml-2 text-muted-foreground">
+                        （也算對：{r.accepted.join("、")}）
+                      </span>
+                    )}
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>

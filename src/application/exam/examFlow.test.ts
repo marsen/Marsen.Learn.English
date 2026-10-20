@@ -8,6 +8,7 @@ import { ListAvailableExams } from "./listAvailableExams";
 import { StartExam } from "./startExam";
 import { SubmitExam } from "./submitExam";
 import { GetAttemptResult } from "./getAttemptResult";
+import { ClaimGuestAttempts } from "./claimGuestAttempts";
 import type { Account } from "@/domain/account/account";
 import type { Role } from "@/domain/account/role";
 import { InMemoryExamSetRepository } from "@/infrastructure/persistence/inMemoryExamSetRepository";
@@ -54,17 +55,28 @@ async function addSet(setId: string, decision?: "approved" | "rejected") {
     await new ReviewExamSet(sets).execute({ actor: teacher, setId, decision });
 }
 
+/** 路人的瀏覽器識別：預設是同一個瀏覽器 */
+const BROWSER = "browser-1";
+const gid = (actor: Account | null, guestId = BROWSER) => (actor ? null : guestId);
+
 const list = (actor: Account | null) =>
   new ListAvailableExams(sets)
     .execute({ actor })
     .then((xs) => xs.map((x) => x.setId).sort());
-const start = (actor: Account | null, setId: string) =>
-  new StartExam(sets, attempts).execute({ actor, setId });
+const start = (actor: Account | null, setId: string, guestId?: string) =>
+  new StartExam(sets, attempts).execute({ actor, guestId: gid(actor, guestId), setId });
 const submit = (
   actor: Account | null,
   attemptId: string,
   answers: Record<string, unknown>,
-) => new SubmitExam(sets, attempts).execute({ actor, attemptId, answers });
+  guestId?: string,
+) =>
+  new SubmitExam(sets, attempts).execute({
+    actor,
+    guestId: gid(actor, guestId),
+    attemptId,
+    answers,
+  });
 
 beforeEach(async () => {
   sets = new InMemoryExamSetRepository();
@@ -197,8 +209,12 @@ describe("GetExamSetAudio（考生）", () => {
 });
 
 describe("批改與結果", () => {
-  const result = (actor: Account | null, attemptId: string) =>
-    new GetAttemptResult(sets, attempts).execute({ actor, attemptId });
+  const result = (actor: Account | null, attemptId: string, guestId?: string) =>
+    new GetAttemptResult(sets, attempts).execute({
+      actor,
+      guestId: gid(actor, guestId),
+      attemptId,
+    });
 
   it("應該在交卷時批改，結果頁看得到分數、每題對錯與正解", async () => {
     const r = await start(student, "s1-members");
@@ -234,10 +250,53 @@ describe("批改與結果", () => {
     expect(await result(guest, r.sheet.attemptId)).toBeNull();
   });
 
-  it("應該讓路人看自己試寫的結果", async () => {
+  it("應該讓路人看自己試寫的分數與對錯，但看不到正解", async () => {
     const r = await start(guest, "s1-public");
     if (!r.ok) throw new Error(r.reason);
     await submit(guest, r.sheet.attemptId, { q01: "52" });
-    expect((await result(guest, r.sheet.attemptId))?.score).toBe(1);
+    const v = await result(guest, r.sheet.attemptId);
+    expect(v?.score).toBe(1);
+    expect(v?.answerKeyVisible).toBe(false);
+    expect(v?.results.every((x) => x.expected === null && x.accepted.length === 0)).toBe(
+      true,
+    );
+    expect(v?.results[0].correct).toBe(true);
+  });
+
+  it("應該不讓別的瀏覽器看或交路人的作答（拿到網址也一樣）", async () => {
+    const r = await start(guest, "s1-public");
+    if (!r.ok) throw new Error(r.reason);
+    expect((await submit(guest, r.sheet.attemptId, {}, "browser-2")).ok).toBe(false);
+    await submit(guest, r.sheet.attemptId, {});
+    expect(await result(guest, r.sheet.attemptId, "browser-2")).toBeNull();
+  });
+
+  it("應該讓路人註冊後，把試寫的作答移到帳號名下並看到正解", async () => {
+    const r = await start(guest, "s1-public");
+    if (!r.ok) throw new Error(r.reason);
+    await submit(guest, r.sheet.attemptId, { q01: "52" });
+    const other = await start(guest, "s1-public", "browser-2");
+    if (!other.ok) throw new Error(other.reason);
+
+    const claimed = await new ClaimGuestAttempts(attempts).execute({
+      accountId: "student",
+      guestId: BROWSER,
+    });
+    expect(claimed).toEqual([r.sheet.attemptId]);
+    const v = await result(student, r.sheet.attemptId);
+    expect(v?.answerKeyVisible).toBe(true);
+    expect(v?.results[0].expected).toBe("52");
+    // 移走之後，路人身分就看不到了；別的瀏覽器的作答不受影響
+    expect(await result(guest, r.sheet.attemptId)).toBeNull();
+    expect((await attempts.findById(other.sheet.attemptId))?.accountId).toBeNull();
+  });
+
+  it("應該擋下沒有瀏覽器識別的路人", async () => {
+    const r = await new StartExam(sets, attempts).execute({
+      actor: null,
+      guestId: null,
+      setId: "s1-public",
+    });
+    expect(r.ok).toBe(false);
   });
 });

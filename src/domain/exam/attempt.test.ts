@@ -6,10 +6,11 @@ import {
   type Attempt,
 } from "./attempt";
 
-const attempt = (accountId: string | null): Attempt => ({
+const attempt = (accountId: string | null, guestId: string | null = null): Attempt => ({
   id: "a",
   setId: "s",
   accountId,
+  guestId,
   answers: null,
   result: null,
   startedAt: new Date(),
@@ -18,13 +19,24 @@ const attempt = (accountId: string | null): Attempt => ({
 
 describe("ownsAttempt", () => {
   it("應該只讓本人動有帳號的作答", () => {
-    expect(ownsAttempt(attempt("u1"), "u1")).toBe(true);
-    expect(ownsAttempt(attempt("u1"), "u2")).toBe(false);
-    expect(ownsAttempt(attempt("u1"), null)).toBe(false);
+    expect(ownsAttempt(attempt("u1"), { accountId: "u1", guestId: null })).toBe(true);
+    expect(ownsAttempt(attempt("u1"), { accountId: "u2", guestId: null })).toBe(false);
+    expect(ownsAttempt(attempt("u1"), { accountId: null, guestId: "g1" })).toBe(false);
   });
 
-  it("應該讓拿得到 id 的人動路人的作答", () => {
-    expect(ownsAttempt(attempt(null), null)).toBe(true);
+  it("應該只讓當初那個瀏覽器動路人的作答", () => {
+    expect(ownsAttempt(attempt(null, "g1"), { accountId: null, guestId: "g1" })).toBe(
+      true,
+    );
+    expect(ownsAttempt(attempt(null, "g1"), { accountId: null, guestId: "g2" })).toBe(
+      false,
+    );
+    expect(ownsAttempt(attempt(null, "g1"), { accountId: null, guestId: null })).toBe(
+      false,
+    );
+    expect(ownsAttempt(attempt(null, null), { accountId: null, guestId: null })).toBe(
+      false,
+    );
   });
 });
 

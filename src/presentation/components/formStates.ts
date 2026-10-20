@@ -9,3 +9,5 @@ export type UploadSetFormState = {
 };
 
 export type ReviewFormState = { problems?: string[]; saved?: boolean };
+
+export type ManageFormState = { problems?: string[]; saved?: boolean };

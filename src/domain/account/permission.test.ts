@@ -14,6 +14,7 @@ describe("permissionsOf", () => {
       "setExamAccess",
       "takeExam",
       "uploadSets",
+      "viewAnswerKey",
       "viewResult",
     ]);
   });
@@ -51,6 +52,12 @@ describe("can", () => {
     expect(can([], "takeExam")).toBe(true);
     expect(can([], "viewResult")).toBe(true);
     expect(can([], "keepRecords")).toBe(false);
+  });
+
+  it("應該讓學生與老師看正解，路人要註冊才看得到", () => {
+    expect(can(["student"], "viewAnswerKey")).toBe(true);
+    expect(can(["teacher"], "viewAnswerKey")).toBe(true);
+    expect(can([], "viewAnswerKey")).toBe(false);
   });
 
   it("應該讓學生與老師留考試紀錄", () => {

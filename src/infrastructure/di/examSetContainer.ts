@@ -1,6 +1,7 @@
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import type { AttemptRepository } from "@/domain/exam/attemptRepository";
 import type { AudioStorage } from "@/application/examSet/ports";
+import { ClaimGuestAttempts } from "@/application/exam/claimGuestAttempts";
 import { GetAttemptResult } from "@/application/exam/getAttemptResult";
 import { ListAvailableExams } from "@/application/exam/listAvailableExams";
 import { StartExam } from "@/application/exam/startExam";
@@ -96,4 +97,8 @@ export function submitExam(): SubmitExam {
 export function getAttemptResult(): GetAttemptResult {
   const c = container();
   return new GetAttemptResult(c.sets, c.attempts);
+}
+
+export function claimGuestAttempts(): ClaimGuestAttempts {
+  return new ClaimGuestAttempts(container().attempts);
 }

@@ -9,4 +9,8 @@ export interface AccountRepository {
   create(email: string): Promise<Account>;
   /** 重複加同一個角色不會出錯 */
   addRole(accountId: string, role: Role): Promise<void>;
+  /** 用新的角色清單整個取代 */
+  setRoles(accountId: string, roles: Role[]): Promise<void>;
+  /** 依 email 排序 */
+  list(): Promise<Account[]>;
 }

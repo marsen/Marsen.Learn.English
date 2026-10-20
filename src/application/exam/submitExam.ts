@@ -3,7 +3,7 @@ import type { AttemptRepository } from "@/domain/exam/attemptRepository";
 import { grade } from "@/domain/exam/grading";
 import { blanksOf } from "@/domain/exam/paper";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
-import type { Actor } from "@/application/shared/actor";
+import { ownerOf, type ExamTaker } from "@/application/shared/actor";
 import { parseAnswerKey } from "@/application/examSet/answerKey";
 import type { SubmitExamResult } from "./examResult";
 
@@ -18,15 +18,12 @@ export class SubmitExam {
     private readonly now: () => Date = () => new Date(),
   ) {}
 
-  async execute(input: {
-    actor: Actor;
-    attemptId: string;
-    answers: Record<string, unknown>;
-  }): Promise<SubmitExamResult> {
+  async execute(
+    input: ExamTaker & { attemptId: string; answers: Record<string, unknown> },
+  ): Promise<SubmitExamResult> {
     const attempt = await this.attempts.findById(input.attemptId);
-    if (!attempt || !ownsAttempt(attempt, input.actor?.id ?? null)) {
+    if (!attempt || !ownsAttempt(attempt, ownerOf(input)))
       return { ok: false, reason: "not_found" };
-    }
     if (attempt.submittedAt) return { ok: false, reason: "already_submitted" };
 
     const [set, secret] = await Promise.all([

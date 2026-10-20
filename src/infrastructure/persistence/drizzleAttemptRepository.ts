@@ -24,6 +24,7 @@ export class DrizzleAttemptRepository implements AttemptRepository {
   async create(input: {
     setId: string;
     accountId: string | null;
+    guestId: string | null;
     startedAt: Date;
   }): Promise<Attempt> {
     const [row] = await this.db.insert(examAttempts).values(input).returning();
@@ -58,5 +59,16 @@ export class DrizzleAttemptRepository implements AttemptRepository {
       .where(and(eq(examAttempts.id, id), isNull(examAttempts.submittedAt)))
       .returning({ id: examAttempts.id });
     return rows.length > 0;
+  }
+
+  async claimGuestAttempts(guestId: string, accountId: string): Promise<string[]> {
+    const rows = await this.db
+      .update(examAttempts)
+      .set({ accountId, guestId: null })
+      .where(and(eq(examAttempts.guestId, guestId), isNull(examAttempts.accountId)))
+      .returning({ id: examAttempts.id, startedAt: examAttempts.startedAt });
+    return rows
+      .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
+      .map((r) => r.id);
   }
 }
