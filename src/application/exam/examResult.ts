@@ -42,3 +42,13 @@ export type AttemptResultView = {
   answerKeyVisible: boolean;
   results: QuestionResultView[];
 };
+
+/** 考試紀錄的一筆 */
+export type AttemptRecord = {
+  attemptId: string;
+  setId: string;
+  title: string;
+  submittedAt: Date;
+  score: number;
+  total: number;
+};

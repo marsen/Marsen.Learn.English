@@ -53,4 +53,11 @@ export class InMemoryAttemptRepository implements AttemptRepository {
     }
     return mine.map((a) => a.id);
   }
+
+  async listSubmittedByAccount(accountId: string): Promise<Attempt[]> {
+    return [...this.attempts.values()]
+      .filter((a) => a.accountId === accountId && a.submittedAt !== null)
+      .sort((a, b) => (b.submittedAt?.getTime() ?? 0) - (a.submittedAt?.getTime() ?? 0))
+      .map((a) => structuredClone(a));
+  }
 }

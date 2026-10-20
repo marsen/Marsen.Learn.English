@@ -4,6 +4,7 @@ import type { AudioStorage } from "@/application/examSet/ports";
 import { ClaimGuestAttempts } from "@/application/exam/claimGuestAttempts";
 import { GetAttemptResult } from "@/application/exam/getAttemptResult";
 import { ListAvailableExams } from "@/application/exam/listAvailableExams";
+import { ListMyAttempts } from "@/application/exam/listMyAttempts";
 import { StartExam } from "@/application/exam/startExam";
 import { SubmitExam } from "@/application/exam/submitExam";
 import { SetExamAccess } from "@/application/examSet/setExamAccess";
@@ -101,4 +102,9 @@ export function getAttemptResult(): GetAttemptResult {
 
 export function claimGuestAttempts(): ClaimGuestAttempts {
   return new ClaimGuestAttempts(container().attempts);
+}
+
+export function listMyAttempts(): ListMyAttempts {
+  const c = container();
+  return new ListMyAttempts(c.sets, c.attempts);
 }

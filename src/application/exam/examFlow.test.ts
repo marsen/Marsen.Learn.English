@@ -9,6 +9,7 @@ import { StartExam } from "./startExam";
 import { SubmitExam } from "./submitExam";
 import { GetAttemptResult } from "./getAttemptResult";
 import { ClaimGuestAttempts } from "./claimGuestAttempts";
+import { ListMyAttempts } from "./listMyAttempts";
 import type { Account } from "@/domain/account/account";
 import type { Role } from "@/domain/account/role";
 import { InMemoryExamSetRepository } from "@/infrastructure/persistence/inMemoryExamSetRepository";
@@ -298,5 +299,50 @@ describe("批改與結果", () => {
       setId: "s1-public",
     });
     expect(r.ok).toBe(false);
+  });
+});
+
+describe("ListMyAttempts", () => {
+  const history = (actor: Account) =>
+    new ListMyAttempts(sets, attempts).execute({ actor });
+
+  it("應該列出自己交過卷的紀錄，新的在前，沒交卷的不列", async () => {
+    const first = await start(student, "s1-members");
+    const second = await start(student, "s1-public");
+    const unfinished = await start(student, "s1-public");
+    if (!first.ok || !second.ok || !unfinished.ok) throw new Error("start");
+    await submit(student, first.sheet.attemptId, { q01: "52" });
+    await new Promise((r) => setTimeout(r, 5));
+    await submit(student, second.sheet.attemptId, {});
+    const list = await history(student);
+    expect(list?.map((x) => [x.attemptId, x.score])).toEqual([
+      [second.sheet.attemptId, 0],
+      [first.sheet.attemptId, 1],
+    ]);
+    expect(list?.[0].title).toBe(fixture.title);
+  });
+
+  it("應該只列自己的，別人的看不到", async () => {
+    const r = await start(student, "s1-members");
+    if (!r.ok) throw new Error(r.reason);
+    await submit(student, r.sheet.attemptId, {});
+    expect(await history(student2)).toEqual([]);
+  });
+
+  it("應該不給沒有考試紀錄權限的帳號（只有管理員角色）", async () => {
+    expect(await history(admin)).toBeNull();
+  });
+
+  it("應該包含註冊前以路人身分試寫、後來移過來的作答", async () => {
+    const r = await start(guest, "s1-public");
+    if (!r.ok) throw new Error(r.reason);
+    await submit(guest, r.sheet.attemptId, { q01: "52" });
+    await new ClaimGuestAttempts(attempts).execute({
+      accountId: "student",
+      guestId: BROWSER,
+    });
+    expect((await history(student))?.map((x) => x.attemptId)).toEqual([
+      r.sheet.attemptId,
+    ]);
   });
 });

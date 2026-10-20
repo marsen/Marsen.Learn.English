@@ -1,4 +1,4 @@
-import { and, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull } from "drizzle-orm";
 import type { Attempt } from "@/domain/exam/attempt";
 import type { AttemptRepository } from "@/domain/exam/attemptRepository";
 import type { GradeResult } from "@/domain/exam/grading";
@@ -70,5 +70,16 @@ export class DrizzleAttemptRepository implements AttemptRepository {
     return rows
       .sort((a, b) => b.startedAt.getTime() - a.startedAt.getTime())
       .map((r) => r.id);
+  }
+
+  async listSubmittedByAccount(accountId: string): Promise<Attempt[]> {
+    const rows = await this.db
+      .select()
+      .from(examAttempts)
+      .where(
+        and(eq(examAttempts.accountId, accountId), isNotNull(examAttempts.submittedAt)),
+      )
+      .orderBy(desc(examAttempts.submittedAt));
+    return rows.map(toDomain);
   }
 }
