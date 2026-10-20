@@ -281,7 +281,7 @@ describe("批改與結果", () => {
 
     const claimed = await new ClaimGuestAttempts(attempts).execute({
       accountId: "student",
-      guestId: BROWSER,
+      guestIds: [BROWSER],
     });
     expect(claimed).toEqual([r.sheet.attemptId]);
     const v = await result(student, r.sheet.attemptId);
@@ -339,10 +339,42 @@ describe("ListMyAttempts", () => {
     await submit(guest, r.sheet.attemptId, { q01: "52" });
     await new ClaimGuestAttempts(attempts).execute({
       accountId: "student",
-      guestId: BROWSER,
+      guestIds: [BROWSER],
     });
     expect((await history(student))?.map((x) => x.attemptId)).toEqual([
       r.sheet.attemptId,
     ]);
+  });
+});
+
+describe("跨裝置認領", () => {
+  it("應該在 A 瀏覽器寫考卷、B 裝置（沒有路人識別）點連結時，作答仍移到新帳號", async () => {
+    const r = await start(guest, "s1-public", "browser-A");
+    if (!r.ok) throw new Error(r.reason);
+    await submit(guest, r.sheet.attemptId, { q01: "52" }, "browser-A");
+    // 點連結的 B 裝置沒有 cookie（null）；登入碼裡記的是 A
+    const claimed = await new ClaimGuestAttempts(attempts).execute({
+      accountId: "student",
+      guestIds: ["browser-A", null],
+    });
+    expect(claimed).toEqual([r.sheet.attemptId]);
+    const v = await new GetAttemptResult(sets, attempts).execute({
+      actor: student,
+      guestId: null,
+      attemptId: r.sheet.attemptId,
+    });
+    expect(v?.answerKeyVisible).toBe(true);
+  });
+
+  it("應該合併兩個瀏覽器的作答，新的在前", async () => {
+    const a = await start(guest, "s1-public", "browser-A");
+    await new Promise((res) => setTimeout(res, 5));
+    const b = await start(guest, "s1-public", "browser-B");
+    if (!a.ok || !b.ok) throw new Error("start");
+    const claimed = await new ClaimGuestAttempts(attempts).execute({
+      accountId: "student",
+      guestIds: ["browser-A", "browser-B", "browser-A"],
+    });
+    expect(claimed).toEqual([b.sheet.attemptId, a.sheet.attemptId]);
   });
 });

@@ -75,7 +75,7 @@ export function getAccountRepository(): AccountRepository {
 
 export function requestLoginLink(): RequestLoginLink {
   const c = container();
-  return new RequestLoginLink(c.tokens, secrets, c.mailer, env.siteUrl);
+  return new RequestLoginLink(c.accounts, c.tokens, secrets, c.mailer, env.siteUrl);
 }
 
 export function verifyLoginLink(): VerifyLoginLink {

@@ -43,6 +43,13 @@
       "when": 1792466861238,
       "tag": "0005_guest_attempts",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792471496903,
+      "tag": "0006_login_token_guest_ip",
+      "breakpoints": true
     }
   ]
 }

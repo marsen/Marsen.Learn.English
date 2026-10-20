@@ -12,6 +12,14 @@ export class DevMailer implements LoginMailer {
     console.info(`[dev-mail] 登入連結 → ${to}: ${link}`);
   }
 
+  /** 給管理員的通知（開發時只記下來、印出來） */
+  readonly notices: { to: string; subject: string; text: string }[] = [];
+
+  async sendAdminNotice(to: string, subject: string, text: string): Promise<void> {
+    this.notices.push({ to, subject, text });
+    console.info(`[dev-mail] 管理員通知 → ${to}: ${subject}`);
+  }
+
   lastLinkFor(email: string): string | null {
     return this.lastLinks.get(email) ?? null;
   }

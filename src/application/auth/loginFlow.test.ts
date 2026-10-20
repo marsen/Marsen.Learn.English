@@ -9,8 +9,12 @@ import { LOGIN_TOKEN_TTL_MINUTES } from "@/domain/auth/loginToken";
 
 class FakeMailer implements LoginMailer {
   sent: { to: string; link: string }[] = [];
+  notices: { to: string; subject: string }[] = [];
   async sendLoginLink(to: string, link: string) {
     this.sent.push({ to, link });
+  }
+  async sendAdminNotice(to: string, subject: string) {
+    this.notices.push({ to, subject });
   }
 }
 
@@ -33,8 +37,15 @@ beforeEach(async () => {
   await accounts.addRole(a.id, "admin");
 });
 
-const request = (email: string) =>
-  new RequestLoginLink(tokens, secrets, mailer, SITE, now).execute({ email });
+const request = (email: string, extra: { guestId?: string; ipHash?: string } = {}) =>
+  new RequestLoginLink(accounts, tokens, secrets, mailer, SITE, now).execute({
+    email,
+    ...extra,
+  });
+/** 時間往後推幾秒 */
+const tick = (seconds: number) => {
+  clock = new Date(clock.getTime() + seconds * 1000);
+};
 const verify = (token: string) =>
   new VerifyLoginLink(accounts, tokens, secrets, now).execute({ token });
 
@@ -73,7 +84,7 @@ describe("VerifyLoginLink", () => {
     await request("admin@marsen.me");
     const r = await verify(tokenOf(mailer.sent[0].link));
     const account = await accounts.findByEmail("admin@marsen.me");
-    expect(r).toEqual({ ok: true, accountId: account?.id, isNew: false });
+    expect(r).toEqual({ ok: true, accountId: account?.id, isNew: false, guestId: null });
     expect(account?.roles).toEqual(["admin"]);
   });
 
@@ -81,7 +92,7 @@ describe("VerifyLoginLink", () => {
     await request("New@Example.com");
     const r = await verify(tokenOf(mailer.sent[0].link));
     const account = await accounts.findByEmail("new@example.com");
-    expect(r).toEqual({ ok: true, accountId: account?.id, isNew: true });
+    expect(r).toEqual({ ok: true, accountId: account?.id, isNew: true, guestId: null });
     expect(account?.roles).toEqual(["student"]);
   });
 
@@ -101,5 +112,71 @@ describe("VerifyLoginLink", () => {
   it("應該拒絕亂填的碼", async () => {
     expect((await verify("made-up")).ok).toBe(false);
     expect((await verify("")).ok).toBe(false);
+  });
+});
+
+describe("跨裝置：申請連結的瀏覽器", () => {
+  it("應該把申請時的瀏覽器識別記在登入碼裡，點連結時交回去", async () => {
+    await request("new@example.com", { guestId: "browser-A" });
+    const r = await verify(tokenOf(mailer.sent[0].link));
+    expect(r.ok && r.guestId).toBe("browser-A");
+  });
+});
+
+describe("寄信保護", () => {
+  it("應該要同一個 email 兩封至少隔 60 秒", async () => {
+    expect((await request("a@example.com")).ok).toBe(true);
+    tick(30);
+    const r = await request("a@example.com");
+    expect(r).toEqual({ ok: false, error: "剛寄過，請等 30 秒再試" });
+    tick(30);
+    expect((await request("a@example.com")).ok).toBe(true);
+    expect(mailer.sent).toHaveLength(2);
+  });
+
+  it("應該擋下同一個 email 每小時第 6 封", async () => {
+    for (let i = 0; i < 5; i++) {
+      expect((await request("a@example.com")).ok).toBe(true);
+      tick(61);
+    }
+    expect((await request("a@example.com")).ok).toBe(false);
+    tick(3600);
+    expect((await request("a@example.com")).ok).toBe(true);
+  });
+
+  it("應該擋下同一個 IP 每小時第 21 封（換不同 email 也一樣）", async () => {
+    for (let i = 0; i < 20; i++) {
+      expect((await request(`u${i}@example.com`, { ipHash: "ip-1" })).ok).toBe(true);
+    }
+    expect((await request("u99@example.com", { ipHash: "ip-1" })).ok).toBe(false);
+    expect((await request("u99@example.com", { ipHash: "ip-2" })).ok).toBe(true);
+  });
+
+  it("應該在 24 小時內寄滿 95 封後擋下新 email，但已有帳號照常寄", async () => {
+    for (let i = 0; i < 95; i++) await request(`u${i}@example.com`);
+    const blocked = await request("late@example.com");
+    expect(blocked).toEqual({ ok: false, error: "今天註冊人數已滿，請明天再來" });
+    expect((await request("admin@marsen.me")).ok).toBe(true);
+    tick(24 * 3600);
+    expect((await request("late@example.com")).ok).toBe(true);
+  });
+
+  it("應該在剛好寄到第 50、80 封時通知管理員，其他時候不通知", async () => {
+    const teacher = await accounts.create("t@marsen.me");
+    await accounts.addRole(teacher.id, "teacher");
+    for (let i = 1; i <= 49; i++) await request(`u${i}@example.com`);
+    expect(mailer.notices).toHaveLength(0);
+    await request("u50@example.com");
+    expect(mailer.notices).toEqual([
+      { to: "admin@marsen.me", subject: "登入信今天已寄 50 封" },
+    ]);
+    for (let i = 51; i <= 79; i++) await request(`u${i}@example.com`);
+    expect(mailer.notices).toHaveLength(1);
+    await request("u80@example.com");
+    await request("u81@example.com");
+    expect(mailer.notices.map((n) => n.subject)).toEqual([
+      "登入信今天已寄 50 封",
+      "登入信今天已寄 80 封",
+    ]);
   });
 });

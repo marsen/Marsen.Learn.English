@@ -38,6 +38,10 @@ export const loginTokens = pgTable("login_tokens", {
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   usedAt: timestamp("used_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  // 申請連結的瀏覽器（路人識別的雜湊）：在別的裝置點連結也能把路人作答移過去
+  guestId: text("guest_id"),
+  // 申請者 IP 的雜湊（不存原 IP）：限制同一個 IP 的寄送次數
+  ipHash: text("ip_hash"),
 });
 
 /** 題組（考生看得到的部分）。不含答案、不含逐字稿。 */
