@@ -7,6 +7,7 @@ import { GetExamSetAudio } from "@/application/examSet/getExamSetAudio";
 import { ListAvailableExams } from "./listAvailableExams";
 import { StartExam } from "./startExam";
 import { SubmitExam } from "./submitExam";
+import { GetAttemptResult } from "./getAttemptResult";
 import type { Account } from "@/domain/account/account";
 import type { Role } from "@/domain/account/role";
 import { InMemoryExamSetRepository } from "@/infrastructure/persistence/inMemoryExamSetRepository";
@@ -150,7 +151,10 @@ describe("SubmitExam", () => {
     const r = await start(student, "s1-members");
     if (!r.ok) throw new Error(r.reason);
     const id = r.sheet.attemptId;
-    expect(await submit(student, id, { q01: " 52 ", q99: "hack" })).toEqual({ ok: true });
+    expect(await submit(student, id, { q01: " 52 ", q99: "hack" })).toEqual({
+      ok: true,
+      attemptId: id,
+    });
     const saved = await attempts.findById(id);
     expect(saved?.answers?.q01).toBe("52");
     expect(saved?.answers && "q99" in saved.answers).toBe(false);
@@ -177,7 +181,7 @@ describe("SubmitExam", () => {
   it("應該讓路人交自己的試寫卷", async () => {
     const r = await start(guest, "s1-public");
     if (!r.ok) throw new Error(r.reason);
-    expect(await submit(guest, r.sheet.attemptId, { q01: "52" })).toEqual({ ok: true });
+    expect((await submit(guest, r.sheet.attemptId, { q01: "52" })).ok).toBe(true);
   });
 });
 
@@ -189,5 +193,51 @@ describe("GetExamSetAudio（考生）", () => {
     expect(await get.execute({ actor: student, setId: "s1-members" })).not.toBeNull();
     expect(await get.execute({ actor: student, setId: "s1-pending" })).toBeNull();
     expect(await get.execute({ actor: teacher, setId: "s1-pending" })).not.toBeNull();
+  });
+});
+
+describe("批改與結果", () => {
+  const result = (actor: Account | null, attemptId: string) =>
+    new GetAttemptResult(sets, attempts).execute({ actor, attemptId });
+
+  it("應該在交卷時批改，結果頁看得到分數、每題對錯與正解", async () => {
+    const r = await start(student, "s1-members");
+    if (!r.ok) throw new Error(r.reason);
+    const id = r.sheet.attemptId;
+    // q01 標準答案 52（只寫數字）、q02 Kestrel Lane、q07 lunchtime（也接受 lunch time）
+    await submit(student, id, {
+      q01: "52",
+      q02: "kestrel lane",
+      q07: "lunch time",
+      q03: "Holinwick",
+    });
+    const v = await result(student, id);
+    expect(v?.total).toBe(10);
+    expect(v?.score).toBe(3);
+    const byQ = Object.fromEntries((v?.results ?? []).map((x) => [x.questionId, x]));
+    expect(byQ.q01).toMatchObject({ number: 1, correct: true, expected: "52" });
+    expect(byQ.q03).toMatchObject({
+      correct: false,
+      given: "Holinwick",
+      expected: "Hollinwick",
+    });
+    expect(byQ.q04.correct).toBe(false);
+  });
+
+  it("應該只讓本人看自己的結果；還沒交卷看不到", async () => {
+    const r = await start(student, "s1-members");
+    if (!r.ok) throw new Error(r.reason);
+    expect(await result(student, r.sheet.attemptId)).toBeNull();
+    await submit(student, r.sheet.attemptId, {});
+    expect(await result(student, r.sheet.attemptId)).not.toBeNull();
+    expect(await result(student2, r.sheet.attemptId)).toBeNull();
+    expect(await result(guest, r.sheet.attemptId)).toBeNull();
+  });
+
+  it("應該讓路人看自己試寫的結果", async () => {
+    const r = await start(guest, "s1-public");
+    if (!r.ok) throw new Error(r.reason);
+    await submit(guest, r.sheet.attemptId, { q01: "52" });
+    expect((await result(guest, r.sheet.attemptId))?.score).toBe(1);
   });
 });

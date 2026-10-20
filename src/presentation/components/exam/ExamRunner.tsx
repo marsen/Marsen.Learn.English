@@ -51,8 +51,13 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
     audioRef.current?.pause();
     try {
       const r = await submit(attemptId, answersRef.current);
-      if (r.ok || r.reason === "already_submitted") setStage("submitted");
-      else throw new Error("找不到這次作答");
+      if (r.ok) {
+        setStage("submitted");
+        window.location.assign(`/exam/result/${r.attemptId}`);
+      } else if (r.reason === "already_submitted") {
+        setStage("submitted");
+        window.location.assign(`/exam/result/${attemptId}`);
+      } else throw new Error("找不到這次作答");
     } catch (e) {
       setError(`交卷失敗：${(e as Error).message}。答案還在，請再按一次「交卷」。`);
       handingInRef.current = false;
@@ -112,10 +117,7 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
   if (stage === "submitted") {
     return (
       <div className="grid gap-2">
-        <p className="rounded-lg bg-card px-4 py-3">已交卷。批改結果之後會在這裡顯示。</p>
-        <a href="/exam" className="text-primary underline">
-          回考卷清單
-        </a>
+        <p className="rounded-lg bg-card px-4 py-3">已交卷，正在打開批改結果…</p>
       </div>
     );
   }

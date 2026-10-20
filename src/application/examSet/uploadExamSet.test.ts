@@ -108,6 +108,17 @@ describe("UploadExamSet", () => {
     );
     expect(r.ok).toBe(false);
   });
+
+  it("應該擋下答案規則不認得的答案卡（上傳後會批改不了）", async () => {
+    const r = await upload(
+      admin,
+      bundle((b) => {
+        b.answers.answers[0].answer_policy = "fuzzy";
+      }),
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.problems.join()).toContain("answer_policy");
+  });
 });
 
 describe("ListExamSets", () => {

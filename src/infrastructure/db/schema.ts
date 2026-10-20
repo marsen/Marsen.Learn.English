@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 import type { JsonObject, PublicTiming } from "@/domain/examSet/examSet";
 import type { QuestionNote } from "@/domain/examSet/review";
+import type { QuestionResult } from "@/domain/exam/grading";
 
 /** 帳號。以 email 識別（存正規化後的小寫）。 */
 export const accounts = pgTable("accounts", {
@@ -89,6 +90,9 @@ export const examAttempts = pgTable("exam_attempts", {
     .references(() => examSets.setId),
   accountId: uuid("account_id").references(() => accounts.id, { onDelete: "set null" }),
   answers: jsonb("answers").$type<Record<string, string>>(),
+  score: integer("score"),
+  total: integer("total"),
+  results: jsonb("results").$type<QuestionResult[]>(),
   startedAt: timestamp("started_at", { withTimezone: true }).notNull(),
   submittedAt: timestamp("submitted_at", { withTimezone: true }),
 });

@@ -11,6 +11,7 @@ const attempt = (accountId: string | null): Attempt => ({
   setId: "s",
   accountId,
   answers: null,
+  result: null,
   startedAt: new Date(),
   submittedAt: null,
 });

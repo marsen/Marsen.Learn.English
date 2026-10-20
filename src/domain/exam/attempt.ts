@@ -1,3 +1,5 @@
+import type { GradeResult } from "./grading";
+
 /**
  * 一次作答（純資料）。
  * - 路人的作答沒有帳號（accountId 為 null），靠作答 id（隨機 UUID，猜不到）找回
@@ -9,6 +11,8 @@ export type Attempt = {
   accountId: string | null;
   /** 題號（例如 q01）→ 考生寫的答案 */
   answers: Record<string, string> | null;
+  /** 交卷時就批改好的結果 */
+  result: GradeResult | null;
   startedAt: Date;
   submittedAt: Date | null;
 };

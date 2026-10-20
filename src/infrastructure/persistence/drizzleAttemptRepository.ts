@@ -1,8 +1,22 @@
 import { and, eq, isNull } from "drizzle-orm";
 import type { Attempt } from "@/domain/exam/attempt";
 import type { AttemptRepository } from "@/domain/exam/attemptRepository";
+import type { GradeResult } from "@/domain/exam/grading";
 import { createDb, type Db } from "@/infrastructure/db/client";
 import { examAttempts } from "@/infrastructure/db/schema";
+
+type Row = typeof examAttempts.$inferSelect;
+
+function toDomain(row: Row): Attempt {
+  const { score, total, results, ...rest } = row;
+  return {
+    ...rest,
+    result:
+      score !== null && total !== null && results !== null
+        ? { score, total, results }
+        : null,
+  };
+}
 
 export class DrizzleAttemptRepository implements AttemptRepository {
   constructor(private readonly db: Db = createDb()) {}
@@ -13,7 +27,7 @@ export class DrizzleAttemptRepository implements AttemptRepository {
     startedAt: Date;
   }): Promise<Attempt> {
     const [row] = await this.db.insert(examAttempts).values(input).returning();
-    return row;
+    return toDomain(row);
   }
 
   async findById(id: string): Promise<Attempt | null> {
@@ -22,14 +36,25 @@ export class DrizzleAttemptRepository implements AttemptRepository {
       .from(examAttempts)
       .where(eq(examAttempts.id, id))
       .limit(1);
-    return row ?? null;
+    return row ? toDomain(row) : null;
   }
 
-  async submit(id: string, answers: Record<string, string>, at: Date): Promise<boolean> {
+  async submit(
+    id: string,
+    answers: Record<string, string>,
+    result: GradeResult,
+    at: Date,
+  ): Promise<boolean> {
     // 只更新還沒交卷的那一筆：同時送兩次，只有一次會成功
     const rows = await this.db
       .update(examAttempts)
-      .set({ answers, submittedAt: at })
+      .set({
+        answers,
+        score: result.score,
+        total: result.total,
+        results: result.results,
+        submittedAt: at,
+      })
       .where(and(eq(examAttempts.id, id), isNull(examAttempts.submittedAt)))
       .returning({ id: examAttempts.id });
     return rows.length > 0;

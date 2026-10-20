@@ -1,4 +1,5 @@
 import type { ExamAccess, PublicTiming } from "@/domain/examSet/examSet";
+import type { GradeResult } from "@/domain/exam/grading";
 import type { PaperView } from "./paperView";
 
 /** 考卷清單上的一張 */
@@ -22,4 +23,13 @@ export type StartExamResult =
   { ok: true; sheet: ExamSheet } | { ok: false; reason: "not_available" };
 
 export type SubmitExamResult =
-  { ok: true } | { ok: false; reason: "not_found" | "already_submitted" };
+  | { ok: true; attemptId: string }
+  | { ok: false; reason: "not_found" | "already_submitted" };
+
+/** 結果頁：分數與每題對錯、正解 */
+export type AttemptResultView = GradeResult & {
+  attemptId: string;
+  setId: string;
+  title: string;
+  submittedAt: Date;
+};

@@ -10,6 +10,7 @@ import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import type { Sha256 } from "@/application/shared/ports";
 import type { AudioStorage } from "./ports";
 import { setJsonSchema } from "./setJsonSchema";
+import { parseAnswerKey } from "./answerKey";
 import type { UploadExamSetResult } from "./examSetResult";
 
 /**
@@ -62,6 +63,9 @@ export class UploadExamSet {
       validateOk: b.provenance.validate?.ok === true,
       aiVerdict,
     });
+    // 答案卡要能拿來批改（例如答案規則必須是認得的），不然上傳後考生交卷會批改不了
+    const key = parseAnswerKey(b.answers);
+    if (!key.ok) problems.push(...key.problems);
     if (problems.length > 0 || !isAiVerdict(aiVerdict)) return { ok: false, problems };
 
     if (await this.sets.exists(b.set_id)) {
