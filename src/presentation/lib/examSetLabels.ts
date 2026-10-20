@@ -46,6 +46,22 @@ const AI_RULING_LABELS: Record<string, string> = {
   ok: "AI 判定：沒問題",
 };
 
+const SEVERITY_LABELS: Record<string, string> = {
+  info: "提醒",
+  warn: "注意",
+  block: "嚴重",
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
+  ambiguity: "答案不夠明確",
+  evidence: "錄音裡找不到依據",
+  trap: "干擾陷阱",
+  naturalness: "對話不自然",
+  consistency: "前後不一致",
+  difficulty: "難度",
+  other: "其他",
+};
+
 const lookup = (table: Record<string, string>) => (v: string | null) =>
   v === null ? "—" : (table[v] ?? v);
 
@@ -53,3 +69,5 @@ export const trapLabel = lookup(TRAP_LABELS);
 export const answerPolicyLabel = lookup(ANSWER_POLICY_LABELS);
 export const answerTypeLabel = lookup(ANSWER_TYPE_LABELS);
 export const aiRulingLabel = lookup(AI_RULING_LABELS);
+export const severityLabel = lookup(SEVERITY_LABELS);
+export const categoryLabel = lookup(CATEGORY_LABELS);

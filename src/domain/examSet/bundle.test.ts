@@ -3,7 +3,7 @@ import { audioKeyFor, bundleProblems, toPublicTiming, type BundleFacts } from ".
 
 const audio = { bytes: 20_000, sha256: "abcdef1234567890" };
 const ok: BundleFacts = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   declaredAudio: audio,
   actualAudio: audio,
   validateOk: true,
@@ -17,7 +17,8 @@ describe("bundleProblems", () => {
   });
 
   it("應該擋下不支援的版本", () => {
-    expect(bundleProblems({ ...ok, schemaVersion: 2 })).toHaveLength(1);
+    expect(bundleProblems({ ...ok, schemaVersion: 1 })).toHaveLength(1);
+    expect(bundleProblems({ ...ok, schemaVersion: 3 })).toHaveLength(1);
   });
 
   it("應該擋下和 set.json 不一致的錄音", () => {

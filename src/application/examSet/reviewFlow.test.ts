@@ -63,6 +63,13 @@ describe("GetExamSetForReview", () => {
       wrongValue: "62",
     });
     expect(r.view.warnings[0]).toMatchObject({ questionId: "q07", aiRuling: "problem" });
+    expect(r.view.findings.length).toBeGreaterThan(0);
+    expect(r.view.findings[0]).toMatchObject({
+      questionId: "q07",
+      category: "ambiguity",
+      severity: "warn",
+    });
+    expect(r.view.findings[0].suggestion).toContain("lunch break");
     expect(r.view.review).toBeNull();
   });
 

@@ -24,8 +24,8 @@ export const setJsonSchema = z.object({
   }),
   provenance: z
     .object({
-      validate: z.object({ ok: z.boolean() }).partial().optional(),
-      ai_review: z.object({ verdict: z.unknown() }).partial().optional(),
+      validate: z.object({ ok: z.boolean() }).partial().loose().optional(),
+      ai_review: z.object({ verdict: z.unknown() }).partial().loose().nullish(),
     })
     .loose(),
 });

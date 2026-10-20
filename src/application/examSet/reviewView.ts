@@ -25,11 +25,21 @@ export type ReviewWarning = {
   aiRuling: string | null;
 };
 
+/** AI 審稿的其他發現（set.json schema_version 2 起才有） */
+export type ReviewFinding = {
+  questionId: string | null;
+  category: string | null;
+  severity: string;
+  message: string;
+  suggestion: string | null;
+};
+
 export type ReviewView = {
   set: ExamSet;
   instruction: string | null;
   questions: ReviewQuestion[];
   warnings: ReviewWarning[];
+  findings: ReviewFinding[];
   review: TeacherReview | null;
 };
 
@@ -52,6 +62,29 @@ const answerCardSchema = z.object({
       .loose(),
   ),
 });
+
+const findingsSchema = z
+  .object({
+    ai_review: z
+      .object({
+        findings: z
+          .array(
+            z
+              .object({
+                question_id: optStr,
+                category: optStr,
+                severity: str,
+                message: str,
+                suggestion: optStr,
+              })
+              .loose(),
+          )
+          .catch([]),
+      })
+      .loose()
+      .nullish(),
+  })
+  .loose();
 
 const warningsSchema = z
   .array(
@@ -121,6 +154,15 @@ export function buildReviewView(
         message: w.message,
         aiRuling: w.ai_ruling ?? null,
       })),
+    findings: (findingsSchema.parse(secret.provenance).ai_review?.findings ?? []).map(
+      (f) => ({
+        questionId: f.question_id ?? null,
+        category: f.category ?? null,
+        severity: f.severity,
+        message: f.message,
+        suggestion: f.suggestion || null,
+      }),
+    ),
     review,
   };
 }

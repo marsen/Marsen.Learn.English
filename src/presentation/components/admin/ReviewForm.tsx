@@ -8,6 +8,8 @@ import {
   aiRulingLabel,
   answerPolicyLabel,
   answerTypeLabel,
+  categoryLabel,
+  severityLabel,
   trapLabel,
 } from "@/presentation/lib/examSetLabels";
 
@@ -89,6 +91,30 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
                 )}
               </li>
             ))}
+          </ul>
+        </section>
+      )}
+
+      {view.findings.length > 0 && (
+        <section className="grid gap-2">
+          <h2 className="text-lg font-semibold">AI 審稿的其他發現</h2>
+          <ul className="grid gap-2 text-sm">
+            {view.findings.map((f, i) => {
+              const n = view.questions.findIndex((q) => q.questionId === f.questionId);
+              return (
+                <li key={i} className="rounded-lg bg-card px-4 py-3">
+                  <div className="mb-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                    <span>{n >= 0 ? `第 ${n + 1} 題` : "整套"}</span>
+                    <span>· {severityLabel(f.severity)}</span>
+                    {f.category && <span>· {categoryLabel(f.category)}</span>}
+                  </div>
+                  <p>{f.message}</p>
+                  {f.suggestion && (
+                    <p className="mt-1 text-muted-foreground">建議：{f.suggestion}</p>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </section>
       )}

@@ -4,7 +4,8 @@ import type { AiVerdict, PublicTiming, TimingEvent } from "./examSet";
  * 打包檔（set.json）的規則：支援的版本、錄音完整性、時間軸去敏。
  * 不檢查題目品質（那是出題工具和老師審稿的事）。
  */
-export const SUPPORTED_SCHEMA_VERSION = 1;
+/** 只支援 2（2 起 provenance.ai_review 帶 findings）。舊的打包檔在 Question.Generator 重新跑 bundle 即可 */
+export const SUPPORTED_SCHEMA_VERSION = 2;
 
 /** 小於這個大小的錄音檔視為壞檔 */
 export const MIN_AUDIO_BYTES = 10_000;
@@ -24,7 +25,7 @@ export function bundleProblems(f: BundleFacts): string[] {
   const problems: string[] = [];
   if (f.schemaVersion !== SUPPORTED_SCHEMA_VERSION) {
     problems.push(
-      `不支援的 schema_version：${String(f.schemaVersion)}（只支援 ${SUPPORTED_SCHEMA_VERSION}）`,
+      `不支援的 schema_version：${String(f.schemaVersion)}（只支援 ${SUPPORTED_SCHEMA_VERSION}，請在 Question.Generator 重新打包）`,
     );
   }
   if (f.actualAudio.bytes < MIN_AUDIO_BYTES) problems.push("錄音檔太小，可能是壞的");
