@@ -22,7 +22,7 @@ export function ExamSetTable({ sets, setAccessAction }: Props) {
             <th className="px-4 py-3 font-medium">題組</th>
             <th className="px-4 py-3 font-medium">標題</th>
             <th className="px-4 py-3 font-medium">題數</th>
-            <th className="px-4 py-3 font-medium">狀態</th>
+            <th className="px-4 py-3 font-medium">審核狀態</th>
             <th className="px-4 py-3 font-medium">開放對象</th>
             <th className="px-4 py-3 font-medium">上傳時間</th>
           </tr>
