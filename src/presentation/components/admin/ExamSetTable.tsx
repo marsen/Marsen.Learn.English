@@ -1,9 +1,7 @@
 import type { ExamAccess, ExamSet } from "@/domain/examSet/examSet";
-import {
-  AI_VERDICT_LABELS,
-  ACCESS_LABELS,
-  STATUS_LABELS,
-} from "@/presentation/lib/examSetLabels";
+import { statusTagsOf } from "@/domain/examSet/statusTags";
+import { ACCESS_HINTS, ACCESS_LABELS } from "@/presentation/lib/examSetLabels";
+import { StatusTags } from "./StatusTags";
 
 type Props = {
   sets: ExamSet[];
@@ -24,7 +22,6 @@ export function ExamSetTable({ sets, setAccessAction }: Props) {
             <th className="px-4 py-3 font-medium">題組</th>
             <th className="px-4 py-3 font-medium">標題</th>
             <th className="px-4 py-3 font-medium">題數</th>
-            <th className="px-4 py-3 font-medium">AI 審稿</th>
             <th className="px-4 py-3 font-medium">狀態</th>
             <th className="px-4 py-3 font-medium">開放對象</th>
             <th className="px-4 py-3 font-medium">上傳時間</th>
@@ -33,29 +30,42 @@ export function ExamSetTable({ sets, setAccessAction }: Props) {
         <tbody>
           {sets.map((s) => (
             <tr key={s.setId} className="border-b border-border last:border-0">
-              <td className="px-4 py-3 font-mono">
+              <td className="px-4 py-3 font-mono whitespace-nowrap">
                 <a href={`/admin/sets/${s.setId}`} className="text-primary underline">
                   {s.setId}
                 </a>
               </td>
               <td className="px-4 py-3">{s.title}</td>
-              <td className="px-4 py-3">{s.questionCount}</td>
-              <td className="px-4 py-3">{AI_VERDICT_LABELS[s.aiVerdict]}</td>
-              <td className="px-4 py-3">{STATUS_LABELS[s.status]}</td>
+              <td className="px-4 py-3 whitespace-nowrap">{s.questionCount}</td>
               <td className="px-4 py-3">
-                {ACCESS_LABELS[s.access]}
+                <StatusTags tags={statusTagsOf(s)} />
+              </td>
+              <td className="px-4 py-3">
+                <span className="whitespace-nowrap" title={ACCESS_HINTS[s.access]}>
+                  {ACCESS_LABELS[s.access]}
+                </span>
                 {setAccessAction && (
-                  <form action={setAccessAction} className="inline">
+                  <form action={setAccessAction} className="block">
                     <input type="hidden" name="setId" value={s.setId} />
                     <input type="hidden" name="access" value={other(s.access)} />
-                    <button type="submit" className="ml-2 text-xs text-primary underline">
+                    <button
+                      type="submit"
+                      className="text-xs whitespace-nowrap text-primary underline"
+                    >
                       改成{ACCESS_LABELS[other(s.access)]}
                     </button>
                   </form>
                 )}
               </td>
-              <td className="px-4 py-3 text-muted-foreground">
-                {s.uploadedAt.toLocaleString("zh-TW", { timeZone: "Asia/Taipei" })}
+              <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">
+                {s.uploadedAt.toLocaleString("zh-TW", {
+                  timeZone: "Asia/Taipei",
+                  month: "2-digit",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                })}
               </td>
             </tr>
           ))}

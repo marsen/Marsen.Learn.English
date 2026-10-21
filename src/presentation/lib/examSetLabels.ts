@@ -13,8 +13,13 @@ export const STATUS_LABELS: Record<ExamSetStatus, string> = {
 };
 
 export const ACCESS_LABELS: Record<ExamAccess, string> = {
-  public: "公開（路人也能寫）",
+  public: "公開",
   members: "會員",
+};
+
+export const ACCESS_HINTS: Record<ExamAccess, string> = {
+  public: "路人（沒登入）也能寫",
+  members: "登入的學生、老師才能寫",
 };
 
 const TRAP_LABELS: Record<string, string> = {

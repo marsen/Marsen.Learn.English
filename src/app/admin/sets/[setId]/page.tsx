@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { ReviewForm } from "@/presentation/components/admin/ReviewForm";
-import { AI_VERDICT_LABELS, STATUS_LABELS } from "@/presentation/lib/examSetLabels";
+import { StatusTags } from "@/presentation/components/admin/StatusTags";
+import { statusTagsOf } from "@/domain/examSet/statusTags";
 import { requireAccount } from "@/infrastructure/auth/currentAccount";
 import { getExamSetForReview } from "@/infrastructure/di/examSetContainer";
 import { reviewExamSetAction } from "@/app/actions/examSet";
@@ -28,10 +29,11 @@ export default async function ReviewPage({
         ← 題組
       </a>
       <h1 className="mt-4 font-display text-2xl font-semibold">{view.set.title}</h1>
-      <p className="mt-1 text-sm text-muted-foreground">
+      <div className="mt-2">
+        <StatusTags tags={statusTagsOf(view.set)} />
+      </div>
+      <p className="mt-2 text-sm text-muted-foreground">
         <span className="font-mono">{view.set.setId}</span> · {view.set.questionCount} 題
-        · {AI_VERDICT_LABELS[view.set.aiVerdict]} · 目前狀態：
-        {STATUS_LABELS[view.set.status]}
         {view.review &&
           ` · 上次審稿 ${view.review.reviewedAt.toLocaleString("zh-TW", { timeZone: "Asia/Taipei" })}`}
       </p>
