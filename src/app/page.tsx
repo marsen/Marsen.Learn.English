@@ -1,16 +1,8 @@
+import type { Metadata } from "next";
+import { LandingPage } from "@/presentation/components/landing/LandingPage";
+
+export const metadata: Metadata = { title: "無限雅思聽力模擬測試" };
+
 export default function HomePage() {
-  return (
-    <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-20">
-      <h1 className="font-display text-3xl font-semibold">Marsen Learn English</h1>
-      <p className="mt-3 text-muted-foreground">雅思聽力練習。</p>
-      <div className="mt-6 flex gap-4">
-        <a href="/exam" className="text-primary underline">
-          考卷
-        </a>
-        <a href="/login" className="text-primary underline">
-          登入
-        </a>
-      </div>
-    </main>
-  );
+  return <LandingPage examHref="/exam" loginHref="/login" />;
 }
