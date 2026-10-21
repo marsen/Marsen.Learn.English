@@ -31,6 +31,7 @@ app（路由／Server Action，薄）→ presentation → application → domain
 ## 開發規範
 
 - **分支**：禁止直接 commit `main`，走 `feat|fix|docs|refactor|chore/<短名>`；Conventional Commits
+- **main**：沒有 Marsen 同意，不得 commit、合併或推送到 `main`
 - **驗收**：`pnpm lint` + `pnpm test` + `pnpm build` 都要過
 - **環境變數**：集中 `src/infrastructure/config/env.ts`、Zod fail-fast、不在 code 寫預設值
 - **測試**：Vitest，測試檔跟原始碼放一起（`*.test.ts`），描述用中文；domain／application 必測
