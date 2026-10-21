@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { BatchUploadForm } from "@/presentation/components/admin/BatchUploadForm";
-import { UploadSetForm } from "@/presentation/components/admin/UploadSetForm";
 import { requirePermission } from "@/infrastructure/auth/currentAccount";
 import { uploadExamSetAction } from "@/app/actions/examSet";
 
@@ -17,18 +16,8 @@ export default async function UploadSetPage() {
       </p>
 
       <section className="rounded-2xl border border-border bg-surface p-6">
-        <h2 className="mb-4 text-lg font-semibold">批次上傳</h2>
         <BatchUploadForm action={uploadExamSetAction} />
       </section>
-
-      <details className="mt-6 rounded-2xl border border-border bg-surface p-6">
-        <summary className="cursor-pointer text-lg font-semibold text-heading">
-          只上傳一套
-        </summary>
-        <div className="mt-4">
-          <UploadSetForm action={uploadExamSetAction} />
-        </div>
-      </details>
     </main>
   );
 }
