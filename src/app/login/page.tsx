@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { LoginForm } from "@/presentation/components/LoginForm";
+import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
 import { requestLoginLinkAction } from "@/app/actions/auth";
 
 export const metadata: Metadata = { title: "登入／註冊", robots: { index: false } };
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  // 已經登入就不用再登入，直接進總覽
+  if (await getCurrentAccount()) redirect("/admin");
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-20">
       <div className="w-full max-w-sm rounded-2xl border border-border bg-white p-8">

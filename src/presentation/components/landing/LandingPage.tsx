@@ -10,13 +10,20 @@ const cta = "rounded-full px-7 py-3.5 font-medium transition hover:scale-105 sha
 export function LandingPage({
   examHref,
   loginHref,
+  dashboardHref,
 }: {
   examHref: string;
   loginHref: string;
+  /** 已登入時給：導覽列改成「我的總覽」「開始練習」 */
+  dashboardHref?: string;
 }) {
   return (
     <>
-      <LandingNav examHref={examHref} loginHref={loginHref} />
+      <LandingNav
+        examHref={examHref}
+        loginHref={loginHref}
+        dashboardHref={dashboardHref}
+      />
       <main id="top">
         {/* Hero */}
         <section className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-20 md:grid-cols-2 md:py-28">

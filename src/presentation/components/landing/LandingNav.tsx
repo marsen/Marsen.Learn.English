@@ -8,10 +8,17 @@ import { HeadphonesIcon } from "./icons";
 export function LandingNav({
   examHref,
   loginHref,
+  dashboardHref,
 }: {
   examHref: string;
   loginHref: string;
+  /** 已登入時給：「登入」換成「我的總覽」，「免費試寫」換成「開始練習」 */
+  dashboardHref?: string;
 }) {
+  const account = dashboardHref
+    ? { href: dashboardHref, label: LANDING.dashboard }
+    : { href: loginHref, label: LANDING.login };
+  const ctaLabel = dashboardHref ? LANDING.navCtaMember : LANDING.navCta;
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur">
@@ -28,14 +35,14 @@ export function LandingNav({
               {n.label}
             </a>
           ))}
-          <a href={loginHref} className="hover:text-primary-hover">
-            {LANDING.login}
+          <a href={account.href} className="hover:text-primary-hover">
+            {account.label}
           </a>
           <a
             href={examHref}
             className="rounded-full bg-primary px-5 py-2 font-medium text-primary-foreground transition hover:scale-105 hover:bg-primary-hover"
           >
-            {LANDING.navCta}
+            {ctaLabel}
           </a>
         </div>
         <button
@@ -65,12 +72,12 @@ export function LandingNav({
                 {n.label}
               </a>
             ))}
-            <a href={loginHref}>{LANDING.login}</a>
+            <a href={account.href}>{account.label}</a>
             <a
               href={examHref}
               className="mt-2 rounded-full bg-primary px-5 py-2.5 text-center font-medium text-primary-foreground"
             >
-              {LANDING.navCta}
+              {ctaLabel}
             </a>
           </div>
         </div>

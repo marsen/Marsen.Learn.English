@@ -12,6 +12,10 @@ export const LANDING = {
   ],
   navCta: "免費試寫",
   login: "登入",
+  /** 已登入時取代「登入」 */
+  dashboard: "我的總覽",
+  /** 已登入時取代「免費試寫」 */
+  navCtaMember: "開始練習",
 
   hero: {
     badge: "Section 1・表格填空",
