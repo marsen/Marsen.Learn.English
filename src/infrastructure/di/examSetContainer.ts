@@ -46,8 +46,8 @@ function buildStorage(): AudioStorage {
   return new InMemoryAudioStorage();
 }
 
-function container(): Container {
-  globalStore.__examContainer ??= {
+function build(): Container {
+  return {
     sets: env.databaseUrl
       ? new DrizzleExamSetRepository()
       : new InMemoryExamSetRepository(),
@@ -56,7 +56,17 @@ function container(): Container {
       : new InMemoryAttemptRepository(),
     storage: buildStorage(),
   };
-  return globalStore.__examContainer;
+}
+
+/**
+ * 有資料庫：物件放在模組裡，改程式熱更新時跟著換新（放 globalThis 會留著舊類別，新方法找不到）。
+ * 沒有資料庫：記憶體資料放 globalThis，熱更新時才不會不見（改了 repository 要重開伺服器）。
+ */
+let dbContainer: Container | undefined;
+
+function container(): Container {
+  if (env.databaseUrl) return (dbContainer ??= build());
+  return (globalStore.__examContainer ??= build());
 }
 
 export function uploadExamSet(): UploadExamSet {

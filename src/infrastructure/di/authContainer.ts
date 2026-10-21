@@ -62,9 +62,12 @@ function buildMailer(): LoginMailer {
   return new DevMailer();
 }
 
+/** 有資料庫：放模組裡，熱更新時跟著換新；沒有資料庫：放 globalThis，記憶體資料才不會不見 */
+let dbContainer: Container | undefined;
+
 function container(): Container {
-  globalStore.__authContainer ??= build();
-  return globalStore.__authContainer;
+  if (env.databaseUrl) return (dbContainer ??= build());
+  return (globalStore.__authContainer ??= build());
 }
 
 const secrets = new CryptoSecretTokens();
