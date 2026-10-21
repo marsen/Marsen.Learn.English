@@ -1,5 +1,5 @@
 /**
- * 批改規則（由舊版 legacy/lib/answer.mjs、normalize.mjs、grade.mjs 改寫）。
+ * 批改規則（由舊版 legacy/lib/answer.mjs、normalize.mjs、grade.mjs 改寫；舊版在 commit dad7a51）。
  * 每一題照出題工具給的「答案規則」（answer_policy）比對，標準答案或任一個可接受寫法對上就算對。
  */
 export const ANSWER_POLICIES = [

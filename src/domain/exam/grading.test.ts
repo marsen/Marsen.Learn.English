@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { grade, matchesAnswer, normalize, type AnswerKeyEntry } from "./grading";
 
-// 測試案例照搬舊版 legacy/tests/answer.test.mjs，確保新舊批改結果一致
+// 測試案例照搬舊版 legacy/tests/answer.test.mjs（commit dad7a51），確保新舊批改結果一致
 
 describe("normalize", () => {
   it("應該處理大小寫、空白、結尾標點、撇號", () => {

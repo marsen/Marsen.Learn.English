@@ -112,12 +112,5 @@ export default defineConfig([
   // App Router 專案沒有 pages/，關掉只適用 pages/ 的規則
   { rules: { "@next/next/no-html-link-for-pages": "off" } },
   prettier,
-  globalIgnores([
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-    "legacy/**",
-    "drizzle/**",
-  ]),
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "drizzle/**"]),
 ]);

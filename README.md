@@ -27,4 +27,4 @@ pnpm build
 
 ## 舊版
 
-改寫前的頁面在 `legacy/`，說明見 `legacy/README.md`。
+改寫前的頁面已刪除，在 git 歷史的 commit `dad7a51`（`legacy/` 資料夾）。

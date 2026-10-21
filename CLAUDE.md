@@ -52,5 +52,4 @@ app（路由／Server Action，薄）→ presentation → application → domain
 
 ## 舊版
 
-`legacy/` 是改寫前的純 JS 版本（候補頁、/exam/、review/、api/），逐步搬進來後刪除。
-`pnpm test:legacy` 跑舊版測試（要先在 `legacy/` 跑一次 `npm install`）。
+改寫前的純 JS 版本（候補頁 /listening、/fluency、舊 /exam、review/、api/、意見回饋表單）已刪除，要參考時從 git 歷史拿：最後還在的 commit 是 `dad7a51`（`git show dad7a51:legacy/<路徑>`）。

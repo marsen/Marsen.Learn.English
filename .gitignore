@@ -16,10 +16,5 @@ next-env.d.ts
 *.log
 .vercel
 
-# legacy（舊版靜態頁，逐步搬進 Next.js 後刪除）
-legacy/content/sets/*/audio/
-legacy/public/
-legacy/content/dev-imports/
-
 # 本機上傳的音檔
 .data/
