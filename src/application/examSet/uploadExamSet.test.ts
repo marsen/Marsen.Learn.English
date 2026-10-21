@@ -44,7 +44,7 @@ beforeEach(() => {
 });
 
 describe("UploadExamSet", () => {
-  it("應該讓管理員上傳 AI 有疑慮的題組，狀態是待老師審稿", async () => {
+  it("應該讓管理員上傳 AI 有疑慮的題組，狀態是待老師審稿、先下架", async () => {
     const r = await upload(admin, bundle());
     expect(r).toEqual({
       ok: true,
@@ -54,6 +54,7 @@ describe("UploadExamSet", () => {
     });
     const [saved] = await sets.list();
     expect(saved.status).toBe("pending_review");
+    expect(saved.access).toBe("unlisted");
     expect(saved.uploadedBy).toBe(admin.id);
     expect(storage.files.has(saved.audioKey)).toBe(true);
   });

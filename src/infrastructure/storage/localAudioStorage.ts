@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import type { AudioStorage } from "@/application/examSet/ports";
 
@@ -18,6 +18,10 @@ export class LocalAudioStorage implements AudioStorage {
     } catch {
       return null;
     }
+  }
+
+  async delete(key: string): Promise<void> {
+    await rm(this.pathOf(key), { force: true });
   }
 
   private pathOf(key: string): string {

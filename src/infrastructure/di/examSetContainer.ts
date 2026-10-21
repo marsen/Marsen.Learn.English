@@ -2,6 +2,9 @@ import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import type { AttemptRepository } from "@/domain/exam/attemptRepository";
 import type { AudioStorage } from "@/application/examSet/ports";
 import { GetTeacherDashboard } from "@/application/dashboard/teacherDashboard";
+import { GetAdminDashboard } from "@/application/dashboard/adminDashboard";
+import { DeleteExamSet } from "@/application/examSet/deleteExamSet";
+import { getAccountRepository } from "@/infrastructure/di/authContainer";
 import { ClaimGuestAttempts } from "@/application/exam/claimGuestAttempts";
 import { GetAttemptResult } from "@/application/exam/getAttemptResult";
 import { ListAvailableExams } from "@/application/exam/listAvailableExams";
@@ -112,4 +115,13 @@ export function listMyAttempts(): ListMyAttempts {
 
 export function getTeacherDashboard(): GetTeacherDashboard {
   return new GetTeacherDashboard(container().sets);
+}
+
+export function getAdminDashboard(): GetAdminDashboard {
+  return new GetAdminDashboard(container().sets, getAccountRepository());
+}
+
+export function deleteExamSet(): DeleteExamSet {
+  const c = container();
+  return new DeleteExamSet(c.sets, c.attempts, c.storage);
 }

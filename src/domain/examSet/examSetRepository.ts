@@ -15,5 +15,7 @@ export interface ExamSetRepository {
   saveReview(review: TeacherReview): Promise<void>;
   setAccess(setId: string, access: ExamAccess): Promise<void>;
   /** 某位老師從 since 之後審了幾套（每套只算最新一次審稿） */
+  /** 刪掉題組（連同私密部分與審稿） */
+  delete(setId: string): Promise<void>;
   countReviewsBy(reviewerId: string, since: Date): Promise<number>;
 }

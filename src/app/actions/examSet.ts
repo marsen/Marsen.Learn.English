@@ -9,6 +9,7 @@ import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
 import {
   reviewExamSet,
   setExamAccess,
+  deleteExamSet,
   uploadExamSet,
 } from "@/infrastructure/di/examSetContainer";
 
@@ -82,5 +83,14 @@ export async function setExamAccessAction(formData: FormData): Promise<void> {
     setId: String(formData.get("setId") ?? ""),
     access: formData.get("access"),
   });
+  revalidatePath("/admin/sets");
+  revalidatePath("/admin");
+}
+
+export async function deleteExamSetAction(formData: FormData): Promise<void> {
+  const actor = await getCurrentAccount();
+  if (!actor) return;
+  await deleteExamSet().execute({ actor, setId: String(formData.get("setId") ?? "") });
+  revalidatePath("/admin");
   revalidatePath("/admin/sets");
 }

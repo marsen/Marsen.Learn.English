@@ -1,4 +1,4 @@
-import { and, desc, eq, isNotNull, isNull } from "drizzle-orm";
+import { and, count, desc, eq, isNotNull, isNull } from "drizzle-orm";
 import type { Attempt } from "@/domain/exam/attempt";
 import type { AttemptRepository } from "@/domain/exam/attemptRepository";
 import type { GradeResult } from "@/domain/exam/grading";
@@ -83,5 +83,13 @@ export class DrizzleAttemptRepository implements AttemptRepository {
       )
       .orderBy(desc(examAttempts.submittedAt));
     return rows.map(toDomain);
+  }
+
+  async countBySet(setId: string): Promise<number> {
+    const [row] = await this.db
+      .select({ n: count() })
+      .from(examAttempts)
+      .where(eq(examAttempts.setId, setId));
+    return row?.n ?? 0;
   }
 }

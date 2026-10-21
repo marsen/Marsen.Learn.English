@@ -85,7 +85,7 @@ export class UploadExamSet {
         audioKey,
         aiVerdict,
         status: "pending_review",
-        access: "members",
+        access: "unlisted", // 新上傳先下架，老師通過後由管理員上架
         uploadedBy: input.actor.id,
         uploadedAt: this.now(),
       },

@@ -52,6 +52,7 @@ async function addSet(setId: string, decision?: "approved" | "rejected") {
     setJsonText: JSON.stringify(b),
     audio,
   });
+  await new SetExamAccess(sets).execute({ actor: admin, setId, access: "members" });
   if (decision)
     await new ReviewExamSet(sets).execute({ actor: teacher, setId, decision });
 }

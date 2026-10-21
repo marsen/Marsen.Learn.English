@@ -60,4 +60,10 @@ export class InMemoryExamSetRepository implements ExamSetRepository {
       (r) => r.reviewerId === reviewerId && r.reviewedAt >= since,
     ).length;
   }
+
+  async delete(setId: string): Promise<void> {
+    this.sets.delete(setId);
+    this.privates.delete(setId);
+    this.reviews.delete(setId);
+  }
 }

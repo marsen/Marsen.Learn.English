@@ -60,4 +60,8 @@ export class InMemoryAttemptRepository implements AttemptRepository {
       .sort((a, b) => (b.submittedAt?.getTime() ?? 0) - (a.submittedAt?.getTime() ?? 0))
       .map((a) => structuredClone(a));
   }
+
+  async countBySet(setId: string): Promise<number> {
+    return [...this.attempts.values()].filter((a) => a.setId === setId).length;
+  }
 }

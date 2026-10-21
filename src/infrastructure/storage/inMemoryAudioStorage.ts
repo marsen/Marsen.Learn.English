@@ -11,4 +11,8 @@ export class InMemoryAudioStorage implements AudioStorage {
   async get(key: string): Promise<Uint8Array | null> {
     return this.files.get(key)?.bytes ?? null;
   }
+
+  async delete(key: string): Promise<void> {
+    this.files.delete(key);
+  }
 }

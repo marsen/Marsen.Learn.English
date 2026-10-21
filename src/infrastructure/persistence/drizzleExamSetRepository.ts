@@ -107,4 +107,9 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
       );
     return row?.n ?? 0;
   }
+
+  async delete(setId: string): Promise<void> {
+    // exam_set_privates、exam_set_reviews 設了 on delete cascade
+    await this.db.delete(examSets).where(eq(examSets.setId, setId));
+  }
 }
