@@ -20,9 +20,6 @@ export default async function ExamPage({
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12">
-      <a href="/exam" className="text-sm text-muted-foreground underline">
-        ← 考卷
-      </a>
       {exam ? (
         <div className="mt-4">
           <ExamRunner

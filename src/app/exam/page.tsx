@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { ExamList } from "@/presentation/components/exam/ExamList";
-import { can } from "@/domain/account/permission";
 import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
 import { listAvailableExams } from "@/infrastructure/di/examSetContainer";
 
@@ -14,11 +13,6 @@ export default async function ExamListPage() {
     <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-12">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="font-display text-2xl font-semibold">雅思聽力 Section 1</h1>
-        {actor && can(actor.roles, "keepRecords") && (
-          <a href="/exam/history" className="text-sm text-primary underline">
-            我的考試紀錄
-          </a>
-        )}
       </div>
       <ExamList exams={exams} />
       {!actor && (

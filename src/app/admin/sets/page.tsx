@@ -15,9 +15,6 @@ export default async function ExamSetsPage() {
 
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-12">
-      <a href="/admin" className="text-sm text-muted-foreground underline">
-        ← 後台
-      </a>
       <div className="mt-4 mb-6 flex items-center justify-between">
         <h1 className="font-display text-2xl font-semibold">題組</h1>
         {can(account.roles, "uploadSets") && (

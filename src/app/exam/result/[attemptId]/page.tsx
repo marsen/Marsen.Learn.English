@@ -20,16 +20,6 @@ export default async function ResultPage({
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12">
-      <div className="flex gap-4 text-sm">
-        <a href="/exam" className="text-muted-foreground underline">
-          ← 考卷
-        </a>
-        {actor && (
-          <a href="/exam/history" className="text-muted-foreground underline">
-            我的考試紀錄
-          </a>
-        )}
-      </div>
       <h1 className="mt-4 mb-6 font-display text-2xl font-semibold">批改結果</h1>
       {!result && <p>找不到這次作答的結果。</p>}
       {result && !result.answerKeyVisible && (

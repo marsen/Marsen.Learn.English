@@ -13,9 +13,6 @@ export default async function HistoryPage() {
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12">
-      <a href="/exam" className="text-sm text-muted-foreground underline">
-        ← 考卷
-      </a>
       <h1 className="mt-4 mb-6 font-display text-2xl font-semibold">我的考試紀錄</h1>
       <AttemptHistory records={records} />
     </main>
