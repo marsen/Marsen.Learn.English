@@ -12,9 +12,12 @@ import { NodeSha256 } from "@/infrastructure/crypto/nodeSha256";
 
 const sha256 = new NodeSha256();
 const fixture = JSON.parse(
-  readFileSync(new URL("./fixtures/set.needs-human.json", import.meta.url), "utf8"),
+  readFileSync(
+    new URL("../../../tests/fixtures/set.sample.json", import.meta.url),
+    "utf8",
+  ),
 );
-const SET = "s1-gym-0001";
+const SET = "s1-sample-0001";
 
 const account = (id: string, roles: Role[]): Account => ({
   id,
@@ -58,9 +61,9 @@ describe("GetExamSetForReview", () => {
       questionId: "q01",
       label: "Address",
       section: "Personal details",
-      answer: "52",
+      answer: "37",
       trap: "self_correction",
-      wrongValue: "62",
+      wrongValue: "47",
     });
     expect(r.view.warnings[0]).toMatchObject({ questionId: "q07", aiRuling: "problem" });
     expect(r.view.findings.length).toBeGreaterThan(0);
@@ -69,7 +72,7 @@ describe("GetExamSetForReview", () => {
       category: "ambiguity",
       severity: "warn",
     });
-    expect(r.view.findings[0].suggestion).toContain("lunch break");
+    expect(r.view.findings[0].suggestion).toContain("early morning");
     expect(r.view.review).toBeNull();
   });
 
@@ -95,7 +98,7 @@ describe("ReviewExamSet", () => {
       comment: " 整體不錯 ",
       audioNote: "[01:23] 這句太快",
       questionNotes: [
-        { questionId: "q07", note: "lunch break 也該算對" },
+        { questionId: "q07", note: "early morning 也該算對" },
         { questionId: "q01", note: "   " },
       ],
     });
@@ -106,7 +109,7 @@ describe("ReviewExamSet", () => {
       decision: "approved",
       comment: "整體不錯",
       audioNote: "[01:23] 這句太快",
-      questionNotes: [{ questionId: "q07", note: "lunch break 也該算對" }],
+      questionNotes: [{ questionId: "q07", note: "early morning 也該算對" }],
     });
   });
 

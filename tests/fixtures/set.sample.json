@@ -1,13 +1,13 @@
 {
   "schema_version": 2,
-  "set_id": "s1-gym-0001",
-  "title": "Fitness Club Registration",
-  "topic": "gym-membership",
+  "set_id": "s1-sample-0001",
+  "title": "Sample Sports Club Registration",
+  "topic": "sample-sports-club",
   "question_count": 10,
   "paper": {
-    "set_id": "s1-gym-0001",
+    "set_id": "s1-sample-0001",
     "type": "form_table",
-    "title": "Fitness Club Registration",
+    "title": "Sample Sports Club Registration",
     "instruction": "Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
     "rows": [
       {
@@ -181,123 +181,123 @@
     }
   },
   "answers": {
-    "set_id": "s1-gym-0001",
-    "topic": "gym-membership",
+    "set_id": "s1-sample-0001",
+    "topic": "sample-sports-club",
     "variant": "employee",
     "recipe": "R3",
     "seed": 20261018,
     "scenario": {
-      "setting": "A new member signs up at the front desk of a city-centre fitness club on a weekday lunch break.",
+      "setting": "（測試用假資料）A member signs up at a sports club front desk.",
       "accent": "en-GB"
     },
     "answers": [
       {
         "question_id": "q01",
         "field_id": "house_number",
-        "answer": "52",
+        "answer": "37",
         "accepted": [],
         "type": "number",
         "trap": "self_correction",
         "answer_policy": "digits_only",
-        "wrong_value": "62",
-        "note": "Member first says sixty-two, then corrects to fifty-two."
+        "wrong_value": "47",
+        "note": "Member first says forty-seven, then corrects to thirty-seven."
       },
       {
         "question_id": "q02",
         "field_id": "street_name",
-        "answer": "Kestrel Lane",
+        "answer": "Maple Court",
         "accepted": [],
         "type": "name_spelled",
         "trap": "none",
         "answer_policy": "exact_word",
-        "note": "Street name is given and then confirmed by the receptionist."
+        "note": "Street name is given and then confirmed."
       },
       {
         "question_id": "q03",
         "field_id": "town",
-        "answer": "Hollinwick",
+        "answer": "Brantwood",
         "accepted": [],
         "type": "place",
         "trap": "spelling",
         "answer_policy": "exact_word",
-        "note": "Town is spelled out letter by letter: H-O-L-L-I-N-W-I-C-K."
+        "note": "Town is spelled out letter by letter: B-R-A-N-T-W-O-O-D."
       },
       {
         "question_id": "q04",
         "field_id": "phone",
-        "answer": "07700 900 614",
-        "accepted": ["07700900614"],
+        "answer": "07700 123 456",
+        "accepted": ["07700123456"],
         "type": "phone",
         "trap": "similar_numbers",
         "answer_policy": "digits_only",
-        "note": "Number is read out in groups; the final chunk includes fourteen versus forty."
+        "note": "Number is read out in groups."
       },
       {
         "question_id": "q05",
         "field_id": "work_floor",
-        "answer": "16",
-        "accepted": ["sixteen"],
+        "answer": "12",
+        "accepted": ["twelve"],
         "type": "number",
         "trap": "similar_numbers",
         "answer_policy": "number_word",
-        "note": "Member says the office is on the sixteenth floor; sixty is mentioned as a contrast."
+        "note": "Member says the office is on the twelfth floor; twenty is mentioned as a contrast."
       },
       {
         "question_id": "q06",
         "field_id": "start_day",
-        "answer": "Thursday",
+        "answer": "Friday",
         "accepted": [],
         "type": "word",
         "trap": "self_correction",
         "answer_policy": "exact_word",
-        "wrong_value": "Monday",
-        "note": "Member suggests Monday, then says Thursday suits better."
+        "wrong_value": "Tuesday",
+        "note": "Member suggests Tuesday, then says Friday suits better."
       },
       {
         "question_id": "q07",
         "field_id": "preferred_time",
-        "answer": "lunchtime",
-        "accepted": ["lunch time"],
+        "answer": "morning",
+        "accepted": ["mornings"],
         "type": "word",
         "trap": "distractor",
         "answer_policy": "exact_word",
         "wrong_value": "evening",
-        "note": "Evening is offered but the member prefers lunchtime sessions."
+        "note": "Evening is offered but the member prefers morning sessions."
       },
       {
         "question_id": "q08",
         "field_id": "goal",
-        "answer": "better stamina",
+        "answer": "better balance",
         "accepted": [],
         "type": "word",
         "trap": "none",
         "answer_policy": "exact_word",
-        "note": "Member says they want to improve their stamina."
+        "note": "Member says they want to improve their balance."
       },
       {
         "question_id": "q09",
         "field_id": "locker_number",
-        "answer": "218",
+        "answer": "305",
         "accepted": [],
         "type": "number",
         "trap": "similar_numbers",
         "answer_policy": "digits_only",
-        "note": "Receptionist assigns locker two hundred and eighteen, mentioning eighty nearby."
+        "note": "Receptionist assigns locker three hundred and five."
       },
       {
         "question_id": "q10",
         "field_id": "payment_method",
-        "answer": "direct debit",
-        "accepted": ["direct-debit"],
+        "answer": "credit card",
+        "accepted": ["credit-card"],
         "type": "word",
         "trap": "paraphrase",
         "answer_policy": "exact_word",
-        "note": "Member asks to pay monthly straight from their bank account."
+        "note": "Member asks to pay by card."
       }
     ]
   },
   "timing": {
-    "set_id": "s1-gym-0001",
+    "set_id": "s1-sample-0001",
     "total_seconds": 396.2,
     "events": [
       {
@@ -632,77 +632,21 @@
           "question_id": "q07",
           "category": "ambiguity",
           "severity": "warn",
-          "message": "The accepted variants are too narrow. \"Lunch break\" is a natural reading of t22 (\"lunchtime, in my break\") and is missing from the key. The distractor 'evening' is handled well: it is offered by the receptionist at t21 and clearly rejected at t22.",
-          "suggestion": "Add 'lunch break' to the accepted list, or reword t22 so only one noun phrase is available, e.g. \"I'd come at lunchtime, and be back at my desk before anyone noticed.\""
+          "message": "（測試用）The accepted variants are too narrow.",
+          "suggestion": "Add 'early morning' to the accepted list."
         },
         {
-          "question_id": "q08",
-          "category": "ambiguity",
-          "severity": "warn",
-          "message": "The only accepted answer is 'better stamina'. Candidates could reasonably write 'stamina', 'improve stamina', 'increase stamina' or 'more stamina'. The key says \"stamina\" is the essential content word, so bare 'stamina' should clearly be accepted. The stairs/out-of-breath detail is a decent distractor, but a candidate could write 'fitness' or 'breathing'.",
-          "suggestion": "Accept 'stamina' and 'improved stamina' as well. Consider whether the form should read 'Main goal: improve ______' so that 'stamina' is the single expected word."
-        },
-        {
-          "question_id": "q04",
+          "question_id": "q03",
           "category": "consistency",
           "severity": "info",
-          "message": "The trap note says the number \"includes fourteen versus forty\", but the transcript uses 614 versus 640 (t14-t16). The number is spoken as digit groups, so the actual contrast is \"six-one-four\" versus \"six-four-oh\". The candidate also hears a wrong read-back from the receptionist (t15), then the correction. That works, but the note is inaccurate. The accepted variants cover only one spacing alternative.",
-          "suggestion": "Fix the writer's note. Make sure the checker normalises spaces and hyphens in phone numbers, e.g. '0770 0900 614'."
-        },
-        {
-          "question_id": "q05",
-          "category": "trap",
-          "severity": "info",
-          "message": "The trap note says the member \"says the office is on the sixteenth floor\", but t18 says \"I'm on 16. Not 60\". The sixteen/sixty contrast works and is noticeable, but the member pre-empts the confusion himself. That makes it easier than a true stress-based trap. The joke \"the lifts are painfully slow, so I always remember\" is slightly contrived. The form also needs 'there is a lift', which is only implied by the plural \"lifts\".",
-          "suggestion": "Accept '16th' and 'sixteenth' too. Optionally make the lift mention explicit, e.g. \"there's a lift, but it's painfully slow\"."
-        },
-        {
-          "question_id": "q09",
-          "category": "consistency",
-          "severity": "info",
-          "message": "The note says \"mentioning eighty nearby\", but the transcript says 280 (\"two hundred and eighty\"), which is then withdrawn for 218 (\"eighteen\"). The eighteen/eighty contrast is a valid trap, and the broken-locker explanation is natural. The £10 deposit and \"lockers are free\" are consistent with the form.",
-          "suggestion": "Correct the writer's note to say 280 versus 218."
-        },
-        {
-          "question_id": "q10",
-          "category": "trap",
-          "severity": "info",
-          "message": "The key labels this a 'paraphrase' trap, but the member says the answer verbatim (\"Direct debit, I think\"). The receptionist's \"something automatic\" is the paraphrase. It is only mildly tricky: the form already says fees are monthly, and 'card' is offered as a distractor. The 'I think' hedge is natural. 'Bank transfer' or 'standing order' could be written by a weaker candidate, but the exact phrase is spoken, so the item is fair.",
-          "suggestion": "Fix the trap label (distractor, not paraphrase). Accept 'Direct Debit' case-insensitively."
-        },
-        {
-          "question_id": "q02",
-          "category": "evidence",
-          "severity": "info",
-          "message": "The note says the street name is \"confirmed by the receptionist\", but t11 does not repeat 'Kestrel Lane'. It is stated once only (t10). The answer is still unique and the evidence quote is correct. 'Old library' is a harmless distractor. A candidate who writes only 'Kestrel' may be marked wrong.",
-          "suggestion": "Fix the note. Decide whether bare 'Kestrel' should be accepted."
-        },
-        {
-          "question_id": "q01",
-          "category": "naturalness",
-          "severity": "info",
-          "message": "The self-correction is natural and uses a plausible reason (the sister's flat). However, t9-t10 contain an odd exchange: the receptionist asks \"Is it near the river?\" and the member answers \"Not far from it, no.\" That answer is self-contradictory, and it is irrelevant to any question.",
-          "suggestion": "Change t10 to something like \"No, it's nowhere near the river. It's Kestrel Lane...\""
-        },
-        {
-          "question_id": "q06",
-          "category": "consistency",
-          "severity": "info",
-          "message": "The form says \"a free induction session\", but the transcript says only \"a short induction session with every new member\" (t19). 'Free' is never stated, so the form adds a fact that the audio does not support. The Monday-to-Thursday self-correction itself is clear and fair.",
-          "suggestion": "Add \"free\" at t19, e.g. \"a short, free induction session\", or remove 'free' from the form."
-        },
-        {
-          "question_id": null,
-          "category": "naturalness",
-          "severity": "warn",
-          "message": "Error-then-correction patterns recur too often. q01 (62 then 52), q04 (640 then 614), q05 (16 versus 60), q06 (Monday then Thursday) and q09 (280 then 218) all use a \"sorry, I mean...\" device, so about half the test relies on corrections. The writer also repeats the pattern within a turn (\"Not 60, obviously\"). This makes the speakers sound scripted and makes the test unusually hard and uniform for Section 1. Real IELTS Section 1 usually has only one or two corrections. Small talk (weather, keyboard, cousin, bakery) is natural, but the corrections are not.",
-          "suggestion": "Keep self-correction for q01 and q06 or q09. Turn the others into straightforward answers or into a different trap (spelling, a distractor offered by the other speaker)."
+          "message": "（測試用）Spelling is given once only.",
+          "suggestion": ""
         },
         {
           "question_id": null,
           "category": "other",
           "severity": "info",
-          "message": "Overall the transcript is internally consistent. The joining fee, address, phone, floor, start day, preferred time, goal, locker and payment all match the form, and every quoted evidence line appears at the stated turn. All ten blind answers match the key. The time limit of 'two words and/or a number' is respected.",
+          "message": "（測試用）Overall fine.",
           "suggestion": ""
         }
       ]
@@ -713,7 +657,7 @@
         "source": "blind",
         "rule": "B2",
         "question_id": "q07",
-        "message": "盲答認為還有可能的答案：lunch break",
+        "message": "盲答認為還有可能的答案：early morning",
         "ai_ruling": "problem"
       }
     ]

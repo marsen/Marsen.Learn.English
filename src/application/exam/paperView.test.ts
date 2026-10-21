@@ -4,7 +4,7 @@ import { toPaperView } from "./paperView";
 
 const fixture = JSON.parse(
   readFileSync(
-    new URL("../examSet/fixtures/set.needs-human.json", import.meta.url),
+    new URL("../../../tests/fixtures/set.sample.json", import.meta.url),
     "utf8",
   ),
 );
@@ -12,7 +12,7 @@ const fixture = JSON.parse(
 describe("toPaperView", () => {
   it("應該依段落分組，空格依序編號 1–10", () => {
     const v = toPaperView(fixture.paper);
-    expect(v.title).toBe("Fitness Club Registration");
+    expect(v.title).toBe("Sample Sports Club Registration");
     const blanks = v.sections
       .flatMap((s) => s.rows.flatMap((r) => r.parts))
       .filter((p) => p.kind === "blank");

@@ -10,7 +10,10 @@ import { NodeSha256 } from "@/infrastructure/crypto/nodeSha256";
 
 const sha256 = new NodeSha256();
 const fixture = JSON.parse(
-  readFileSync(new URL("./fixtures/set.needs-human.json", import.meta.url), "utf8"),
+  readFileSync(
+    new URL("../../../tests/fixtures/set.sample.json", import.meta.url),
+    "utf8",
+  ),
 );
 
 /** 產生一份錄音與對應的 set.json（錄音雜湊、大小會對得上） */
@@ -45,7 +48,7 @@ describe("UploadExamSet", () => {
     const r = await upload(admin, bundle());
     expect(r).toEqual({
       ok: true,
-      setId: "s1-gym-0001",
+      setId: "s1-sample-0001",
       title: fixture.title,
       aiVerdict: "needs_human",
     });
@@ -63,7 +66,7 @@ describe("UploadExamSet", () => {
     expect(saved.timing.events.every((e) => !("text" in e) && !("speaker" in e))).toBe(
       true,
     );
-    expect(sets.privateOf("s1-gym-0001")?.answers).toEqual(fixture.answers);
+    expect(sets.privateOf("s1-sample-0001")?.answers).toEqual(fixture.answers);
   });
 
   it("應該擋下沒有上傳權限的帳號（只有老師、學生）", async () => {

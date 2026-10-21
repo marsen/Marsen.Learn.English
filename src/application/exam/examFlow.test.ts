@@ -20,7 +20,7 @@ import { NodeSha256 } from "@/infrastructure/crypto/nodeSha256";
 const sha256 = new NodeSha256();
 const fixture = JSON.parse(
   readFileSync(
-    new URL("../examSet/fixtures/set.needs-human.json", import.meta.url),
+    new URL("../../../tests/fixtures/set.sample.json", import.meta.url),
     "utf8",
   ),
 );
@@ -164,15 +164,15 @@ describe("SubmitExam", () => {
     const r = await start(student, "s1-members");
     if (!r.ok) throw new Error(r.reason);
     const id = r.sheet.attemptId;
-    expect(await submit(student, id, { q01: " 52 ", q99: "hack" })).toEqual({
+    expect(await submit(student, id, { q01: " 37 ", q99: "hack" })).toEqual({
       ok: true,
       attemptId: id,
     });
     const saved = await attempts.findById(id);
-    expect(saved?.answers?.q01).toBe("52");
+    expect(saved?.answers?.q01).toBe("37");
     expect(saved?.answers && "q99" in saved.answers).toBe(false);
     expect(Object.keys(saved?.answers ?? {})).toHaveLength(10);
-    expect(await submit(student, id, { q01: "62" })).toEqual({
+    expect(await submit(student, id, { q01: "47" })).toEqual({
       ok: false,
       reason: "already_submitted",
     });
@@ -194,7 +194,7 @@ describe("SubmitExam", () => {
   it("應該讓路人交自己的試寫卷", async () => {
     const r = await start(guest, "s1-public");
     if (!r.ok) throw new Error(r.reason);
-    expect((await submit(guest, r.sheet.attemptId, { q01: "52" })).ok).toBe(true);
+    expect((await submit(guest, r.sheet.attemptId, { q01: "37" })).ok).toBe(true);
   });
 });
 
@@ -221,22 +221,22 @@ describe("批改與結果", () => {
     const r = await start(student, "s1-members");
     if (!r.ok) throw new Error(r.reason);
     const id = r.sheet.attemptId;
-    // q01 標準答案 52（只寫數字）、q02 Kestrel Lane、q07 lunchtime（也接受 lunch time）
+    // q01 標準答案 37（只寫數字）、q02 Maple Court、q07 morning（也接受 mornings）
     await submit(student, id, {
-      q01: "52",
-      q02: "kestrel lane",
-      q07: "lunch time",
-      q03: "Holinwick",
+      q01: "37",
+      q02: "maple court",
+      q07: "mornings",
+      q03: "Brantwod",
     });
     const v = await result(student, id);
     expect(v?.total).toBe(10);
     expect(v?.score).toBe(3);
     const byQ = Object.fromEntries((v?.results ?? []).map((x) => [x.questionId, x]));
-    expect(byQ.q01).toMatchObject({ number: 1, correct: true, expected: "52" });
+    expect(byQ.q01).toMatchObject({ number: 1, correct: true, expected: "37" });
     expect(byQ.q03).toMatchObject({
       correct: false,
-      given: "Holinwick",
-      expected: "Hollinwick",
+      given: "Brantwod",
+      expected: "Brantwood",
     });
     expect(byQ.q04.correct).toBe(false);
   });
@@ -254,7 +254,7 @@ describe("批改與結果", () => {
   it("應該讓路人看自己試寫的分數與對錯，但看不到正解", async () => {
     const r = await start(guest, "s1-public");
     if (!r.ok) throw new Error(r.reason);
-    await submit(guest, r.sheet.attemptId, { q01: "52" });
+    await submit(guest, r.sheet.attemptId, { q01: "37" });
     const v = await result(guest, r.sheet.attemptId);
     expect(v?.score).toBe(1);
     expect(v?.answerKeyVisible).toBe(false);
@@ -275,7 +275,7 @@ describe("批改與結果", () => {
   it("應該讓路人註冊後，把試寫的作答移到帳號名下並看到正解", async () => {
     const r = await start(guest, "s1-public");
     if (!r.ok) throw new Error(r.reason);
-    await submit(guest, r.sheet.attemptId, { q01: "52" });
+    await submit(guest, r.sheet.attemptId, { q01: "37" });
     const other = await start(guest, "s1-public", "browser-2");
     if (!other.ok) throw new Error(other.reason);
 
@@ -286,7 +286,7 @@ describe("批改與結果", () => {
     expect(claimed).toEqual([r.sheet.attemptId]);
     const v = await result(student, r.sheet.attemptId);
     expect(v?.answerKeyVisible).toBe(true);
-    expect(v?.results[0].expected).toBe("52");
+    expect(v?.results[0].expected).toBe("37");
     // 移走之後，路人身分就看不到了；別的瀏覽器的作答不受影響
     expect(await result(guest, r.sheet.attemptId)).toBeNull();
     expect((await attempts.findById(other.sheet.attemptId))?.accountId).toBeNull();
@@ -311,7 +311,7 @@ describe("ListMyAttempts", () => {
     const second = await start(student, "s1-public");
     const unfinished = await start(student, "s1-public");
     if (!first.ok || !second.ok || !unfinished.ok) throw new Error("start");
-    await submit(student, first.sheet.attemptId, { q01: "52" });
+    await submit(student, first.sheet.attemptId, { q01: "37" });
     await new Promise((r) => setTimeout(r, 5));
     await submit(student, second.sheet.attemptId, {});
     const list = await history(student);
@@ -336,7 +336,7 @@ describe("ListMyAttempts", () => {
   it("應該包含註冊前以路人身分試寫、後來移過來的作答", async () => {
     const r = await start(guest, "s1-public");
     if (!r.ok) throw new Error(r.reason);
-    await submit(guest, r.sheet.attemptId, { q01: "52" });
+    await submit(guest, r.sheet.attemptId, { q01: "37" });
     await new ClaimGuestAttempts(attempts).execute({
       accountId: "student",
       guestIds: [BROWSER],
@@ -351,7 +351,7 @@ describe("跨裝置認領", () => {
   it("應該在 A 瀏覽器寫考卷、B 裝置（沒有路人識別）點連結時，作答仍移到新帳號", async () => {
     const r = await start(guest, "s1-public", "browser-A");
     if (!r.ok) throw new Error(r.reason);
-    await submit(guest, r.sheet.attemptId, { q01: "52" }, "browser-A");
+    await submit(guest, r.sheet.attemptId, { q01: "37" }, "browser-A");
     // 點連結的 B 裝置沒有 cookie（null）；登入碼裡記的是 A
     const claimed = await new ClaimGuestAttempts(attempts).execute({
       accountId: "student",
