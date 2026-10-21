@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { and, count, desc, eq, gte } from "drizzle-orm";
 import {
   isExamAccess,
   isExamSetStatus,
@@ -14,6 +14,7 @@ import {
   type TeacherReview,
 } from "@/domain/examSet/review";
 import { createDb, type Db } from "@/infrastructure/db/client";
+import { isUuid } from "./uuid";
 import { examSetPrivates, examSetReviews, examSets } from "@/infrastructure/db/schema";
 
 type Row = typeof examSets.$inferSelect;
@@ -91,5 +92,19 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
 
   async setAccess(setId: string, access: ExamAccess): Promise<void> {
     await this.db.update(examSets).set({ access }).where(eq(examSets.setId, setId));
+  }
+
+  async countReviewsBy(reviewerId: string, since: Date): Promise<number> {
+    if (!isUuid(reviewerId)) return 0;
+    const [row] = await this.db
+      .select({ n: count() })
+      .from(examSetReviews)
+      .where(
+        and(
+          eq(examSetReviews.reviewerId, reviewerId),
+          gte(examSetReviews.reviewedAt, since),
+        ),
+      );
+    return row?.n ?? 0;
   }
 }

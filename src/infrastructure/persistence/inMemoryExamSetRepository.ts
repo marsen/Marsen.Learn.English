@@ -54,4 +54,10 @@ export class InMemoryExamSetRepository implements ExamSetRepository {
   privateOf(setId: string): ExamSetPrivate | undefined {
     return this.privates.get(setId);
   }
+
+  async countReviewsBy(reviewerId: string, since: Date): Promise<number> {
+    return [...this.reviews.values()].filter(
+      (r) => r.reviewerId === reviewerId && r.reviewedAt >= since,
+    ).length;
+  }
 }

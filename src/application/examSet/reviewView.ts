@@ -166,3 +166,8 @@ export function buildReviewView(
     review,
   };
 }
+
+/** AI 審稿提出幾個疑點（總覽用；格式不對當作 0） */
+export function countAiFindings(provenance: JsonObject): number {
+  return findingsSchema.parse(provenance).ai_review?.findings?.length ?? 0;
+}

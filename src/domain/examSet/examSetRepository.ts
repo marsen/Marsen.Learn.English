@@ -14,4 +14,6 @@ export interface ExamSetRepository {
   /** 存審稿並同步更新題組狀態（同一個交易） */
   saveReview(review: TeacherReview): Promise<void>;
   setAccess(setId: string, access: ExamAccess): Promise<void>;
+  /** 某位老師從 since 之後審了幾套（每套只算最新一次審稿） */
+  countReviewsBy(reviewerId: string, since: Date): Promise<number>;
 }
