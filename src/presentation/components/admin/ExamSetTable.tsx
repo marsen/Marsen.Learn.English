@@ -1,6 +1,10 @@
-import type { ExamAccess, ExamSet } from "@/domain/examSet/examSet";
+import type { ExamSet } from "@/domain/examSet/examSet";
 import { statusTagsOf } from "@/domain/examSet/statusTags";
-import { ACCESS_HINTS, ACCESS_LABELS } from "@/presentation/lib/examSetLabels";
+import {
+  ACCESS_HINTS,
+  ACCESS_LABELS,
+  ACCESS_ORDER,
+} from "@/presentation/lib/examSetLabels";
 import { StatusTags } from "./StatusTags";
 
 type Props = {
@@ -9,7 +13,12 @@ type Props = {
   setAccessAction?: (formData: FormData) => Promise<void>;
 };
 
-const other = (a: ExamAccess): ExamAccess => (a === "public" ? "members" : "public");
+/** 目前選中的那一格的顏色 */
+const ACCESS_ACTIVE: Record<ExamSet["access"], string> = {
+  unlisted: "bg-muted font-semibold text-foreground",
+  members: "bg-primary font-semibold text-primary-foreground",
+  public: "bg-accent font-semibold text-accent-foreground",
+};
 
 export function ExamSetTable({ sets, setAccessAction }: Props) {
   if (sets.length === 0) return <p className="text-muted-foreground">還沒有題組。</p>;
@@ -41,20 +50,38 @@ export function ExamSetTable({ sets, setAccessAction }: Props) {
                 <StatusTags tags={statusTagsOf(s)} />
               </td>
               <td className="px-4 py-3">
-                <span className="whitespace-nowrap" title={ACCESS_HINTS[s.access]}>
-                  {ACCESS_LABELS[s.access]}
-                </span>
-                {setAccessAction && (
-                  <form action={setAccessAction} className="block">
+                {setAccessAction ? (
+                  <form
+                    action={setAccessAction}
+                    className="inline-flex overflow-hidden rounded-full ring-1 ring-border ring-inset"
+                  >
                     <input type="hidden" name="setId" value={s.setId} />
-                    <input type="hidden" name="access" value={other(s.access)} />
-                    <button
-                      type="submit"
-                      className="text-xs whitespace-nowrap text-primary underline"
-                    >
-                      改成{ACCESS_LABELS[other(s.access)]}
-                    </button>
+                    {ACCESS_ORDER.map((a) => {
+                      const current = a === s.access;
+                      return (
+                        <button
+                          key={a}
+                          type="submit"
+                          name="access"
+                          value={a}
+                          disabled={current}
+                          aria-pressed={current}
+                          title={ACCESS_HINTS[a]}
+                          className={`px-3 py-1 text-xs whitespace-nowrap transition-colors ${
+                            current
+                              ? ACCESS_ACTIVE[a]
+                              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                          }`}
+                        >
+                          {ACCESS_LABELS[a]}
+                        </button>
+                      );
+                    })}
                   </form>
+                ) : (
+                  <span className="whitespace-nowrap" title={ACCESS_HINTS[s.access]}>
+                    {ACCESS_LABELS[s.access]}
+                  </span>
                 )}
               </td>
               <td className="px-4 py-3 whitespace-nowrap text-muted-foreground">

@@ -24,6 +24,12 @@ describe("canTake", () => {
     expect(canTake(["admin", "teacher"], { ...approved, access: "members" })).toBe(true);
   });
 
+  it("應該不讓任何人寫下架的考卷", () => {
+    for (const roles of [[], ["student"], ["teacher"], ["admin", "teacher"]] as const) {
+      expect(canTake(roles, { ...approved, access: "unlisted" })).toBe(false);
+    }
+  });
+
   it("應該不讓任何人寫待審稿或不合格的考卷", () => {
     for (const status of ["pending_review", "rejected"] as const) {
       expect(canTake(["student"], { status, access: "public" })).toBe(false);

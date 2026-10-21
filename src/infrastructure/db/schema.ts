@@ -55,7 +55,7 @@ export const examSets = pgTable("exam_sets", {
   audioKey: text("audio_key").notNull(),
   aiVerdict: text("ai_verdict").notNull(), // 'pass' | 'needs_human'
   status: text("status").notNull(), // 'pending_review' | 'approved' | 'rejected'
-  access: text("access").notNull().default("members"), // 'public' | 'members'
+  access: text("access").notNull().default("members"), // 'public' | 'members' | 'unlisted'
   uploadedBy: uuid("uploaded_by")
     .notNull()
     .references(() => accounts.id),

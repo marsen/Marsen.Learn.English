@@ -12,14 +12,19 @@ export const STATUS_LABELS: Record<ExamSetStatus, string> = {
   rejected: "不合格",
 };
 
+/** 選項排列順序：下架 → 上架 → 公開 */
+export const ACCESS_ORDER: readonly ExamAccess[] = ["unlisted", "members", "public"];
+
 export const ACCESS_LABELS: Record<ExamAccess, string> = {
+  unlisted: "下架",
+  members: "上架",
   public: "公開",
-  members: "會員",
 };
 
 export const ACCESS_HINTS: Record<ExamAccess, string> = {
-  public: "路人（沒登入）也能寫",
-  members: "登入的學生、老師才能寫",
+  unlisted: "下架：誰都不能考",
+  members: "上架：登入的學生、老師能考",
+  public: "公開：誰都能試考，沒登入也行（通常只開一套）",
 };
 
 const TRAP_LABELS: Record<string, string> = {

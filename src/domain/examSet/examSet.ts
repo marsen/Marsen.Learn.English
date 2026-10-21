@@ -22,7 +22,8 @@ export function isExamSetStatus(v: string): v is ExamSetStatus {
  * 考卷開放對象：public＝路人也能寫；members＝要登入的會員（學生、老師）才能寫。
  * 新上傳的預設是 members，由管理員改成 public。
  */
-export const EXAM_ACCESSES = ["public", "members"] as const;
+/** public：誰都能試考（沒登入也行）；members：上架給會員；unlisted：下架，誰都不能考 */
+export const EXAM_ACCESSES = ["public", "members", "unlisted"] as const;
 
 export type ExamAccess = (typeof EXAM_ACCESSES)[number];
 
