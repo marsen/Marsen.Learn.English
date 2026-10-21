@@ -44,7 +44,7 @@ function build(): Container {
 function devAccounts(): AccountRepository {
   const repo = new InMemoryAccountRepository([
     {
-      id: "dev-admin",
+      id: "00000000-0000-4000-8000-000000000001",
       email: DEV_SEED_EMAIL,
       roles: ["admin", "teacher"],
       createdAt: new Date(),

@@ -4,6 +4,7 @@ import type { AttemptRepository } from "@/domain/exam/attemptRepository";
 import type { GradeResult } from "@/domain/exam/grading";
 import { createDb, type Db } from "@/infrastructure/db/client";
 import { examAttempts } from "@/infrastructure/db/schema";
+import { isUuid } from "./uuid";
 
 type Row = typeof examAttempts.$inferSelect;
 
@@ -32,6 +33,7 @@ export class DrizzleAttemptRepository implements AttemptRepository {
   }
 
   async findById(id: string): Promise<Attempt | null> {
+    if (!isUuid(id)) return null;
     const [row] = await this.db
       .select()
       .from(examAttempts)

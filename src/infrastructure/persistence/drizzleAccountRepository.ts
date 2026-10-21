@@ -4,6 +4,7 @@ import type { AccountRepository } from "@/domain/account/accountRepository";
 import { isRole, type Role } from "@/domain/account/role";
 import { createDb, type Db } from "@/infrastructure/db/client";
 import { accountRoles, accounts } from "@/infrastructure/db/schema";
+import { isUuid } from "./uuid";
 
 type Row = typeof accounts.$inferSelect;
 
@@ -11,6 +12,7 @@ export class DrizzleAccountRepository implements AccountRepository {
   constructor(private readonly db: Db = createDb()) {}
 
   async findById(id: string): Promise<Account | null> {
+    if (!isUuid(id)) return null;
     const [row] = await this.db
       .select()
       .from(accounts)
