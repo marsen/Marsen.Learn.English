@@ -21,6 +21,18 @@ export type TeacherReview = {
   reviewedAt: Date;
 };
 
+/**
+ * 審稿紀錄：每送出一次審稿就記一筆，不會被改判或刪題組蓋掉（算老師費用用）。
+ * 題組名稱記當時的，題組刪掉後也看得到。
+ */
+export type ReviewRecord = {
+  setId: string;
+  setTitle: string;
+  reviewerId: string;
+  decision: ReviewDecision;
+  reviewedAt: Date;
+};
+
 export const MAX_NOTE_LENGTH = 2000;
 
 export function isReviewDecision(v: unknown): v is ReviewDecision {

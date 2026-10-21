@@ -1,12 +1,17 @@
 import type { ExamAccess, ExamSet, ExamSetPrivate } from "@/domain/examSet/examSet";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
-import { statusAfter, type TeacherReview } from "@/domain/examSet/review";
+import {
+  statusAfter,
+  type ReviewRecord,
+  type TeacherReview,
+} from "@/domain/examSet/review";
 
 /** 記憶體版題組 repository（測試、沒有資料庫的本機開發）。 */
 export class InMemoryExamSetRepository implements ExamSetRepository {
   private readonly sets = new Map<string, ExamSet>();
   private readonly privates = new Map<string, ExamSetPrivate>();
   private readonly reviews = new Map<string, TeacherReview>();
+  private readonly records: ReviewRecord[] = [];
 
   async exists(setId: string): Promise<boolean> {
     return this.sets.has(setId);
@@ -42,6 +47,13 @@ export class InMemoryExamSetRepository implements ExamSetRepository {
     const set = this.sets.get(review.setId);
     if (!set) throw new Error(`沒有題組 ${review.setId}`);
     this.reviews.set(review.setId, structuredClone(review));
+    this.records.push({
+      setId: review.setId,
+      setTitle: set.title,
+      reviewerId: review.reviewerId,
+      decision: review.decision,
+      reviewedAt: review.reviewedAt,
+    });
     set.status = statusAfter(review.decision);
   }
 
@@ -56,9 +68,17 @@ export class InMemoryExamSetRepository implements ExamSetRepository {
   }
 
   async countReviewsBy(reviewerId: string, since: Date): Promise<number> {
-    return [...this.reviews.values()].filter(
-      (r) => r.reviewerId === reviewerId && r.reviewedAt >= since,
-    ).length;
+    const setIds = this.records
+      .filter((r) => r.reviewerId === reviewerId && r.reviewedAt >= since)
+      .map((r) => r.setId);
+    return new Set(setIds).size;
+  }
+
+  async listReviewRecords(from: Date, to: Date): Promise<ReviewRecord[]> {
+    return this.records
+      .filter((r) => r.reviewedAt >= from && r.reviewedAt < to)
+      .sort((a, b) => b.reviewedAt.getTime() - a.reviewedAt.getTime())
+      .map((r) => structuredClone(r));
   }
 
   async delete(setId: string): Promise<void> {

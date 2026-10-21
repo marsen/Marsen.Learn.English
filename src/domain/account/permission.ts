@@ -12,13 +12,14 @@ export const PERMISSIONS = [
   "viewAnswerKey", // 看正解（路人要註冊才看得到）
   "keepRecords", // 考試紀錄
   "manageRoles", // 管理權限
+  "viewReviewLog", // 看審稿紀錄（每位老師審了幾套，算老師費用用）
 ] as const;
 
 export type Permission = (typeof PERMISSIONS)[number];
 
 /** 角色 → 功能 對照表（2026-10-19 與 Marsen 確認；2026-10-20 加上設定考卷開放對象） */
 export const ROLE_PERMISSIONS: Readonly<Record<Role, readonly Permission[]>> = {
-  admin: ["uploadSets", "setExamAccess", "manageRoles"],
+  admin: ["uploadSets", "setExamAccess", "manageRoles", "viewReviewLog"],
   teacher: ["reviewSets", "takeExam", "viewResult", "viewAnswerKey", "keepRecords"],
   student: ["takeExam", "viewResult", "viewAnswerKey", "keepRecords"],
 };

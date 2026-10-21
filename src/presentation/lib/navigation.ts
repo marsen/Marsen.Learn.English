@@ -12,7 +12,8 @@ export type NavItem = {
   group: "learn" | "manage";
 };
 
-export type NavIcon = "home" | "exam" | "history" | "sets" | "upload" | "accounts";
+export type NavIcon =
+  "home" | "exam" | "history" | "sets" | "upload" | "reviews" | "accounts";
 
 const ITEMS: (NavItem & { needs: Permission[] | "any" })[] = [
   { href: "/admin", label: "總覽", icon: "home", group: "learn", needs: "any" },
@@ -37,6 +38,13 @@ const ITEMS: (NavItem & { needs: Permission[] | "any" })[] = [
     icon: "upload",
     group: "manage",
     needs: ["uploadSets"],
+  },
+  {
+    href: "/admin/reviews",
+    label: "審稿紀錄",
+    icon: "reviews",
+    group: "manage",
+    needs: ["viewReviewLog"],
   },
   {
     href: "/admin/accounts",

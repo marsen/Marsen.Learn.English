@@ -5,6 +5,7 @@ import { GetTeacherDashboard } from "@/application/dashboard/teacherDashboard";
 import { GetAdminDashboard } from "@/application/dashboard/adminDashboard";
 import { DeleteExamSet } from "@/application/examSet/deleteExamSet";
 import { getAccountRepository } from "@/infrastructure/di/authContainer";
+import { GetReviewLog } from "@/application/dashboard/reviewLog";
 import { ClaimGuestAttempts } from "@/application/exam/claimGuestAttempts";
 import { GetAttemptResult } from "@/application/exam/getAttemptResult";
 import { ListAvailableExams } from "@/application/exam/listAvailableExams";
@@ -134,4 +135,8 @@ export function getAdminDashboard(): GetAdminDashboard {
 export function deleteExamSet(): DeleteExamSet {
   const c = container();
   return new DeleteExamSet(c.sets, c.attempts, c.storage);
+}
+
+export function getReviewLog(): GetReviewLog {
+  return new GetReviewLog(container().sets, getAccountRepository());
 }

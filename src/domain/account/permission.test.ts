@@ -16,6 +16,7 @@ describe("permissionsOf", () => {
       "uploadSets",
       "viewAnswerKey",
       "viewResult",
+      "viewReviewLog",
     ]);
   });
 });

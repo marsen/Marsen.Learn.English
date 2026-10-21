@@ -27,6 +27,12 @@ const P: Record<NavIcon, React.ReactNode> = {
       <path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" />
     </>
   ),
+  reviews: (
+    <>
+      <rect x="5" y="3" width="14" height="18" rx="2" />
+      <path d="M9 3v2h6V3M9 11l2 2 4-4M9 17h6" />
+    </>
+  ),
   accounts: (
     <>
       <circle cx="9" cy="8" r="3.5" />

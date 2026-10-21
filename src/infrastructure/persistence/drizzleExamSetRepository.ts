@@ -1,4 +1,4 @@
-import { and, count, desc, eq, gte } from "drizzle-orm";
+import { and, countDistinct, desc, eq, gte, lt } from "drizzle-orm";
 import {
   isExamAccess,
   isExamSetStatus,
@@ -11,11 +11,17 @@ import { isAiVerdict } from "@/domain/examSet/bundle";
 import {
   isReviewDecision,
   statusAfter,
+  type ReviewRecord,
   type TeacherReview,
 } from "@/domain/examSet/review";
 import { createDb, type Db } from "@/infrastructure/db/client";
 import { isUuid } from "./uuid";
-import { examSetPrivates, examSetReviews, examSets } from "@/infrastructure/db/schema";
+import {
+  examReviewLog,
+  examSetPrivates,
+  examSetReviews,
+  examSets,
+} from "@/infrastructure/db/schema";
 
 type Row = typeof examSets.$inferSelect;
 
@@ -78,11 +84,24 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
 
   async saveReview(review: TeacherReview): Promise<void> {
     const { setId, ...rest } = review;
+    const [set] = await this.db
+      .select({ title: examSets.title })
+      .from(examSets)
+      .where(eq(examSets.setId, setId))
+      .limit(1);
+    if (!set) throw new Error(`沒有題組 ${setId}`);
     await this.db.batch([
       this.db
         .insert(examSetReviews)
         .values(review)
         .onConflictDoUpdate({ target: examSetReviews.setId, set: rest }),
+      this.db.insert(examReviewLog).values({
+        setId,
+        setTitle: set.title,
+        reviewerId: review.reviewerId,
+        decision: review.decision,
+        reviewedAt: review.reviewedAt,
+      }),
       this.db
         .update(examSets)
         .set({ status: statusAfter(review.decision) })
@@ -97,15 +116,32 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
   async countReviewsBy(reviewerId: string, since: Date): Promise<number> {
     if (!isUuid(reviewerId)) return 0;
     const [row] = await this.db
-      .select({ n: count() })
-      .from(examSetReviews)
+      .select({ n: countDistinct(examReviewLog.setId) })
+      .from(examReviewLog)
       .where(
         and(
-          eq(examSetReviews.reviewerId, reviewerId),
-          gte(examSetReviews.reviewedAt, since),
+          eq(examReviewLog.reviewerId, reviewerId),
+          gte(examReviewLog.reviewedAt, since),
         ),
       );
     return row?.n ?? 0;
+  }
+
+  async listReviewRecords(from: Date, to: Date): Promise<ReviewRecord[]> {
+    const rows = await this.db
+      .select({
+        setId: examReviewLog.setId,
+        setTitle: examReviewLog.setTitle,
+        reviewerId: examReviewLog.reviewerId,
+        decision: examReviewLog.decision,
+        reviewedAt: examReviewLog.reviewedAt,
+      })
+      .from(examReviewLog)
+      .where(and(gte(examReviewLog.reviewedAt, from), lt(examReviewLog.reviewedAt, to)))
+      .orderBy(desc(examReviewLog.reviewedAt));
+    return rows.flatMap(({ decision, ...r }) =>
+      isReviewDecision(decision) ? [{ ...r, decision }] : [],
+    );
   }
 
   async delete(setId: string): Promise<void> {

@@ -23,12 +23,13 @@ describe("navItemsFor", () => {
       "/admin",
       "/admin/sets",
       "/admin/sets/upload",
+      "/admin/reviews",
       "/admin/accounts",
     ]);
   });
 
   it("應該讓管理員兼老師看到全部", () => {
-    expect(hrefs(["admin", "teacher"])).toHaveLength(6);
+    expect(hrefs(["admin", "teacher"])).toHaveLength(7);
   });
 });
 

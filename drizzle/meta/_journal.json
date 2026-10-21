@@ -50,6 +50,13 @@
       "when": 1792471496903,
       "tag": "0006_login_token_guest_ip",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792579889584,
+      "tag": "0007_review_log",
+      "breakpoints": true
     }
   ]
 }

@@ -3,6 +3,7 @@ import { can } from "@/domain/account/permission";
 import type { AiVerdict } from "@/domain/examSet/examSet";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import { countAiFindings } from "@/application/examSet/reviewView";
+import { startOfMonthInTaipei } from "@/application/shared/taipeiMonth";
 
 export type PendingSetView = {
   setId: string;
@@ -19,14 +20,6 @@ export type TeacherDashboardView = {
   /** 這位老師這個月（台灣時間）審了幾套 */
   reviewedThisMonth: number;
 };
-
-const TAIPEI_OFFSET_MS = 8 * 60 * 60 * 1000;
-
-/** 台灣時間這個月 1 號 00:00（台灣沒有日光節約） */
-export function startOfMonthInTaipei(now: Date): Date {
-  const t = new Date(now.getTime() + TAIPEI_OFFSET_MS);
-  return new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth(), 1) - TAIPEI_OFFSET_MS);
-}
 
 /** 老師的總覽：有審稿權限才看得到。 */
 export class GetTeacherDashboard {

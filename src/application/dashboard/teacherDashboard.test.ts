@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
-import { GetTeacherDashboard, startOfMonthInTaipei } from "./teacherDashboard";
+import { GetTeacherDashboard } from "./teacherDashboard";
 import { UploadExamSet } from "@/application/examSet/uploadExamSet";
 import { ReviewExamSet } from "@/application/examSet/reviewExamSet";
 import type { Account } from "@/domain/account/account";
@@ -79,17 +79,5 @@ describe("GetTeacherDashboard", () => {
   it("應該不給沒有審稿權限的人看（管理員、學生）", async () => {
     expect(await dashboard(admin)).toBeNull();
     expect(await dashboard(student)).toBeNull();
-  });
-});
-
-describe("startOfMonthInTaipei", () => {
-  it("應該用台灣時間算月初", () => {
-    expect(startOfMonthInTaipei(new Date("2026-10-21T09:00:00Z")).toISOString()).toBe(
-      "2026-09-30T16:00:00.000Z",
-    );
-    // UTC 還是 10/31，台灣已經是 11/1
-    expect(startOfMonthInTaipei(new Date("2026-10-31T17:00:00Z")).toISOString()).toBe(
-      "2026-10-31T16:00:00.000Z",
-    );
   });
 });

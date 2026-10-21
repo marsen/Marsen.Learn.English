@@ -6,6 +6,7 @@ import {
   primaryKey,
   integer,
   jsonb,
+  index,
 } from "drizzle-orm/pg-core";
 import type { JsonObject, PublicTiming } from "@/domain/examSet/examSet";
 import type { QuestionNote } from "@/domain/examSet/review";
@@ -85,6 +86,25 @@ export const examSetReviews = pgTable("exam_set_reviews", {
   questionNotes: jsonb("question_notes").$type<QuestionNote[]>().notNull(),
   reviewedAt: timestamp("reviewed_at", { withTimezone: true }).notNull(),
 });
+
+/**
+ * 審稿紀錄：每送出一次審稿就記一筆（算老師費用用）。
+ * set_id 不設外鍵，題組刪掉後紀錄還在；題組名稱記當時的。
+ */
+export const examReviewLog = pgTable(
+  "exam_review_log",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    setId: text("set_id").notNull(),
+    setTitle: text("set_title").notNull(),
+    reviewerId: uuid("reviewer_id")
+      .notNull()
+      .references(() => accounts.id),
+    decision: text("decision").notNull(), // 'approved' | 'rejected'
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }).notNull(),
+  },
+  (t) => [index("exam_review_log_reviewed_at_idx").on(t.reviewedAt)],
+);
 
 /** 作答。路人的作答 account_id 為空。 */
 export const examAttempts = pgTable("exam_attempts", {

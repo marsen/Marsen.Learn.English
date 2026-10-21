@@ -17,4 +17,5 @@ export const PERMISSION_LABELS: Record<Permission, string> = {
   viewAnswerKey: "看正解",
   keepRecords: "考試紀錄",
   manageRoles: "管理權限",
+  viewReviewLog: "看審稿紀錄",
 };
