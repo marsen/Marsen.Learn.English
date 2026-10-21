@@ -37,6 +37,11 @@ app（路由／Server Action，薄）→ presentation → application → domain
 - **格式**：Prettier（`pnpm format`）
 - **UI**：顏色、字型只用 `globals.css` 的 token（`primary`、`muted`…），不寫死顏色；目前是暫用樣式，之後會整體改
 - 溝通語言：中文
+- 回覆規則：
+  - 直接給結果，不要前言、不要總結
+  - 使用工具後，只回報結果，不描述過程
+  - 除非使用者主動問，否則不解釋在做什麼
+  - 程式碼和資料維持完整精確，只壓縮自然語言
 
 ## 本機開發
 
