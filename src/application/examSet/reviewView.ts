@@ -171,3 +171,10 @@ export function buildReviewView(
 export function countAiFindings(provenance: JsonObject): number {
   return findingsSchema.parse(provenance).ai_review?.findings?.length ?? 0;
 }
+
+/** 每一題的陷阱類型（學生總覽算「最常錯的題型」用；格式不對當作沒有） */
+export function trapsOf(answers: JsonObject): Map<string, string | null> {
+  const parsed = answerCardSchema.safeParse(answers);
+  if (!parsed.success) return new Map();
+  return new Map(parsed.data.answers.map((a) => [a.question_id, a.trap ?? null]));
+}

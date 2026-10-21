@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { AccountSummary } from "@/presentation/components/AccountSummary";
 import { AdminDashboard } from "@/presentation/components/dashboard/AdminDashboard";
+import { StudentDashboard } from "@/presentation/components/dashboard/StudentDashboard";
 import { TeacherDashboard } from "@/presentation/components/dashboard/TeacherDashboard";
 import { requireAccount } from "@/infrastructure/auth/currentAccount";
 import {
   getAdminDashboard,
+  getStudentDashboard,
   getTeacherDashboard,
 } from "@/infrastructure/di/examSetContainer";
 import { deleteExamSetAction, setExamAccessAction } from "@/app/actions/examSet";
@@ -13,7 +15,8 @@ export const metadata: Metadata = { title: "總覽", robots: { index: false } };
 
 /**
  * 總覽：依角色顯示不同內容，優先序 老師 ＞ 管理員 ＞ 學生。
- * 同時是老師和管理員的帳號兩塊都看得到（老師的在上面）。學生的還沒做，先顯示帳號資訊。
+ * - 同時是老師和管理員的帳號兩塊都看得到（老師的在上面）
+ * - 學生的總覽只給不是老師、管理員的帳號（老師也能考試，但總覽以審稿為主）
  */
 export default async function DashboardPage({
   searchParams,
@@ -27,6 +30,10 @@ export default async function DashboardPage({
     getTeacherDashboard().execute({ actor: account, now }),
     getAdminDashboard().execute({ actor: account }),
   ]);
+  const studentView =
+    teacherView || adminView
+      ? null
+      : await getStudentDashboard().execute({ actor: account });
   const both = teacherView && adminView;
 
   return (
@@ -53,7 +60,8 @@ export default async function DashboardPage({
           />
         </div>
       )}
-      {!teacherView && !adminView && (
+      {studentView && <StudentDashboard view={studentView} />}
+      {!teacherView && !adminView && !studentView && (
         <div className="mt-6">
           <AccountSummary account={account} />
         </div>

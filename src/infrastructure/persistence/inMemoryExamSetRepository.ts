@@ -75,7 +75,9 @@ export class InMemoryExamSetRepository implements ExamSetRepository {
   }
 
   async listReviewRecords(from: Date, to: Date): Promise<ReviewRecord[]> {
-    return this.records
+    // 先反過來：同一毫秒的紀錄也是後記的在前
+    return [...this.records]
+      .reverse()
       .filter((r) => r.reviewedAt >= from && r.reviewedAt < to)
       .sort((a, b) => b.reviewedAt.getTime() - a.reviewedAt.getTime())
       .map((r) => structuredClone(r));
