@@ -40,6 +40,8 @@ app（路由／Server Action，薄）→ presentation → application → domain
 
 ## 本機開發
 
+開發伺服器固定用 **3100** port（`pnpm dev`），避免跟其他專案（Arsenal、Becca 用 3000）撞在一起；`SITE_URL` 也要是 3100，登入連結才會連回這裡。
+
 不用任何金鑰：沒設 `DATABASE_URL` 用記憶體資料（自動建好 admin@marsen.me 管理員＋老師），
 沒設 `RESEND_API_KEY` 時登入連結直接顯示在登入頁。
 
