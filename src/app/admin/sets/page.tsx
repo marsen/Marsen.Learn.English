@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { Page, PageHeader } from "@/presentation/components/ui/Page";
+import { ButtonLink } from "@/presentation/components/ui/Button";
 import { ExamSetTable } from "@/presentation/components/admin/ExamSetTable";
 import { can } from "@/domain/account/permission";
 import { requireAccount } from "@/infrastructure/auth/currentAccount";
@@ -14,24 +16,23 @@ export default async function ExamSetsPage() {
   if (!sets) redirect("/admin?denied=1");
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-12">
-      <div className="mt-4 mb-6 flex items-center justify-between">
-        <h1 className="font-display text-2xl font-semibold">題組</h1>
-        {can(account.roles, "uploadSets") && (
-          <a
-            href="/admin/sets/upload"
-            className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
-          >
-            上傳題組
-          </a>
-        )}
-      </div>
+    <Page width="lg">
+      <PageHeader
+        title="題組"
+        actions={
+          can(account.roles, "uploadSets") && (
+            <ButtonLink href="/admin/sets/upload" size="sm">
+              上傳題組
+            </ButtonLink>
+          )
+        }
+      />
       <ExamSetTable
         sets={sets}
         setAccessAction={
           can(account.roles, "setExamAccess") ? setExamAccessAction : undefined
         }
       />
-    </main>
+    </Page>
   );
 }

@@ -4,6 +4,8 @@ import { useActionState, useRef } from "react";
 import type { ReviewView } from "@/application/examSet/reviewView";
 import { timeMark } from "@/domain/examSet/review";
 import type { ReviewFormState } from "@/presentation/components/formStates";
+import { Alert } from "@/presentation/components/ui/Alert";
+import { Button } from "@/presentation/components/ui/Button";
 import {
   aiRulingLabel,
   answerPolicyLabel,
@@ -56,13 +58,9 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
             <label htmlFor="audioNote" className="text-sm font-medium">
               錄音建議（選填）
             </label>
-            <button
-              type="button"
-              onClick={insertTime}
-              className="rounded border border-border px-2 py-1 text-xs"
-            >
+            <Button variant="secondary" size="sm" onClick={insertTime}>
               插入目前時間
-            </button>
+            </Button>
           </div>
           <textarea
             id="audioNote"
@@ -203,22 +201,12 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
           />
         </label>
         {state.problems && state.problems.length > 0 && (
-          <ul className="list-disc rounded-lg bg-destructive/10 py-3 pr-4 pl-8 text-sm text-destructive">
-            {state.problems.map((p) => (
-              <li key={p}>{p}</li>
-            ))}
-          </ul>
+          <Alert tone="error">{state.problems}</Alert>
         )}
-        {state.saved && (
-          <p className="rounded-lg bg-card px-4 py-3 text-sm">已儲存審稿。</p>
-        )}
-        <button
-          type="submit"
-          disabled={isPending}
-          className="justify-self-start rounded-lg bg-primary px-6 py-2.5 font-medium text-primary-foreground disabled:opacity-60"
-        >
+        {state.saved && <Alert>已儲存審稿。</Alert>}
+        <Button type="submit" disabled={isPending} className="justify-self-start">
           {isPending ? "儲存中…" : prev ? "更新審稿" : "送出審稿"}
-        </button>
+        </Button>
       </section>
     </form>
   );

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Page, PageHeader } from "@/presentation/components/ui/Page";
+import { Alert } from "@/presentation/components/ui/Alert";
 import { AccountSummary } from "@/presentation/components/AccountSummary";
 import { AdminDashboard } from "@/presentation/components/dashboard/AdminDashboard";
 import { StudentDashboard } from "@/presentation/components/dashboard/StudentDashboard";
@@ -37,12 +39,12 @@ export default async function DashboardPage({
   const both = teacherView && adminView;
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-5 py-12">
-      <h1 className="mb-2 text-2xl font-bold">總覽</h1>
+    <Page width="lg">
+      <PageHeader title="總覽" />
       {denied && (
-        <p className="mb-6 rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <Alert tone="error" className="mb-6">
           你的帳號沒有剛才那個功能的權限。
-        </p>
+        </Alert>
       )}
       {teacherView && (
         <>
@@ -66,6 +68,6 @@ export default async function DashboardPage({
           <AccountSummary account={account} />
         </div>
       )}
-    </main>
+    </Page>
   );
 }

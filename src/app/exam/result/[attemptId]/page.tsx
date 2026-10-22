@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Page, PageHeader } from "@/presentation/components/ui/Page";
 import { ExamResult } from "@/presentation/components/exam/ExamResult";
 import { LoginForm } from "@/presentation/components/LoginForm";
 import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
@@ -19,8 +20,8 @@ export default async function ResultPage({
   const result = await getAttemptResult().execute({ actor, guestId, attemptId });
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12">
-      <h1 className="mt-4 mb-6 font-display text-2xl font-semibold">批改結果</h1>
+    <Page>
+      <PageHeader title="批改結果" />
       {!result && <p>找不到這次作答的結果。</p>}
       {result && !result.answerKeyVisible && (
         <section className="mb-8 rounded-xl border border-primary/40 bg-white p-5">
@@ -33,6 +34,6 @@ export default async function ResultPage({
         </section>
       )}
       {result && <ExamResult result={result} />}
-    </main>
+    </Page>
   );
 }
