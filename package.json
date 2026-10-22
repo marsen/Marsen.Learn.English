@@ -18,6 +18,7 @@
     "db:seed": "node --env-file=.env.local scripts/db-seed.mjs",
     "audio:to-r2": "node --env-file=.env.local scripts/r2-upload-audio.mjs",
     "audio-gate:deploy": "node scripts/deploy-audio-gate.mjs",
+    "deploy:cloud-run": "node scripts/deploy-cloud-run.mjs",
     "prepare": "husky"
   },
   "dependencies": {

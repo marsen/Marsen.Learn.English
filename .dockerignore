@@ -1,0 +1,11 @@
+# 不進映像檔的東西（體積、機密）
+node_modules
+.next
+.data
+.git
+.env
+.env*.local
+workers
+legacy-backup
+*.log
+.DS_Store
