@@ -18,11 +18,24 @@
 
 ## 之後每次更新
 
-`pnpm deploy:cloud-run`（會沿用目前的網址）
+- **自動**：推上 main、CI 通過後，GitHub Actions 自動部署（`.github/workflows/deploy.yml`）
+- **手動**：`pnpm deploy:cloud-run`（沿用目前的網址和設定；`.env.local` 改過的變數會一起更新上去）
 
-## 換成自己的網域（例如 learn.marsen.me）
+## 設定自動部署（只要做一次）
 
-接好網域後：`pnpm deploy:cloud-run https://learn.marsen.me`（登入信的連結會用這個網址）
+`bash scripts/setup-github-deploy.sh`
+
+- 建部署專用的服務帳號 `github-deployer`，只給部署需要的權限
+- 用 Workload Identity Federation：GitHub 不存任何 GCP 金鑰，而且只有這個 repo 的 main 能部署
+- 有裝 `gh` 會自動設定 GitHub 的 repository variables（`GCP_PROJECT`、`GCP_DEPLOY_SA`、`GCP_WIF_PROVIDER`）
+- 自動部署不會改環境變數；改了 `.env.local` 的機密要上線，執行一次手動部署
+
+## 接上自己的網域（例如 learn.marsen.me）
+
+1. 驗證網域擁有權（一次）：`gcloud domains verify marsen.me`，照網頁指示在 Cloudflare 加 TXT 記錄
+2. `bash scripts/setup-custom-domain.sh map learn.marsen.me`，把印出來的記錄加到 Cloudflare DNS（DNS only，灰色雲）
+3. 等 https://learn.marsen.me 打得開（憑證 15 分鐘到 1 小時）
+4. `bash scripts/setup-custom-domain.sh switch learn.marsen.me`（登入信改用這個網址）
 
 ## 設定
 

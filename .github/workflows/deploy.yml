@@ -1,0 +1,47 @@
+name: Deploy
+
+# main 的 CI 通過後，自動部署到 Cloud Run（也可以在 GitHub 手動按 Run workflow）。
+# 環境變數存在 Cloud Run 服務上，這裡不帶任何機密；登入 GCP 用 Workload Identity Federation（沒有金鑰）。
+# 第一次設定：scripts/setup-github-deploy.sh
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy-cloud-run
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Auth to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SA }}
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v3
+
+      - name: Deploy to Cloud Run
+        run: >
+          gcloud run deploy learn-english
+          --source .
+          --region asia-east1
+          --project ${{ vars.GCP_PROJECT }}
+          --quiet

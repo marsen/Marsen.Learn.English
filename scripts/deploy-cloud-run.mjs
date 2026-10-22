@@ -46,17 +46,28 @@ if (!project) {
   process.exit(1);
 }
 
-const existingUrl = (() => {
+// 服務已經存在：沿用它現在的 SITE_URL（接了自己的網域後，不會被改回 run.app 網址）
+const existing = (() => {
   try {
-    return sh(
-      `gcloud run services describe ${SERVICE} --region ${REGION} --format "value(status.url)"`,
-      { stdio: ["ignore", "pipe", "ignore"] },
+    const svc = JSON.parse(
+      sh(`gcloud run services describe ${SERVICE} --region ${REGION} --format json`, {
+        stdio: ["ignore", "pipe", "ignore"],
+      }),
     );
+    const envs = svc.spec?.template?.spec?.containers?.[0]?.env ?? [];
+    return {
+      url: svc.status?.url ?? "",
+      siteUrl: envs.find((e) => e.name === "SITE_URL")?.value ?? "",
+    };
   } catch {
-    return "";
+    return null;
   }
 })();
-const siteUrl = process.argv[2] || existingUrl || "https://pending.invalid";
+const siteUrl =
+  process.argv[2] ||
+  (existing?.siteUrl && !existing.siteUrl.includes(".invalid") ? existing.siteUrl : "") ||
+  existing?.url ||
+  "https://pending.invalid";
 
 const env = { SITE_URL: siteUrl };
 for (const k of [...REQUIRED, ...OPTIONAL]) if (vars[k]) env[k] = vars[k];
@@ -91,7 +102,7 @@ try {
 }
 
 // 第一次部署沒給網址：換成 Cloud Run 給的網址（登入信的連結要用）
-if (!process.argv[2] && !existingUrl) {
+if (!process.argv[2] && !existing) {
   const url = sh(
     `gcloud run services describe ${SERVICE} --region ${REGION} --format "value(status.url)"`,
   );
