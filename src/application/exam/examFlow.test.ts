@@ -15,6 +15,7 @@ import type { Role } from "@/domain/account/role";
 import { InMemoryExamSetRepository } from "@/infrastructure/persistence/inMemoryExamSetRepository";
 import { InMemoryAttemptRepository } from "@/infrastructure/persistence/inMemoryAttemptRepository";
 import { InMemoryAudioStorage } from "@/infrastructure/storage/inMemoryAudioStorage";
+import { InMemoryRateLimiter } from "@/infrastructure/limits/inMemoryRateLimiter";
 import { NodeSha256 } from "@/infrastructure/crypto/nodeSha256";
 
 const sha256 = new NodeSha256();
@@ -201,12 +202,22 @@ describe("SubmitExam", () => {
 
 describe("GetExamSetAudio（考生）", () => {
   it("應該讓考生聽能考的考卷，聽不到不能考的", async () => {
-    const get = new GetExamSetAudio(sets, storage);
-    expect(await get.execute({ actor: guest, setId: "s1-public" })).not.toBeNull();
-    expect(await get.execute({ actor: guest, setId: "s1-members" })).toBeNull();
-    expect(await get.execute({ actor: student, setId: "s1-members" })).not.toBeNull();
-    expect(await get.execute({ actor: student, setId: "s1-pending" })).toBeNull();
-    expect(await get.execute({ actor: teacher, setId: "s1-pending" })).not.toBeNull();
+    const get = new GetExamSetAudio(sets, storage, new InMemoryRateLimiter());
+    expect(
+      await get.execute({ actor: guest, setId: "s1-public", requester: null }),
+    ).not.toBeNull();
+    expect(
+      await get.execute({ actor: guest, setId: "s1-members", requester: null }),
+    ).toBeNull();
+    expect(
+      await get.execute({ actor: student, setId: "s1-members", requester: null }),
+    ).not.toBeNull();
+    expect(
+      await get.execute({ actor: student, setId: "s1-pending", requester: null }),
+    ).toBeNull();
+    expect(
+      await get.execute({ actor: teacher, setId: "s1-pending", requester: null }),
+    ).not.toBeNull();
   });
 });
 

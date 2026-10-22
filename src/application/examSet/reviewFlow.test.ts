@@ -8,6 +8,7 @@ import type { Account } from "@/domain/account/account";
 import type { Role } from "@/domain/account/role";
 import { InMemoryExamSetRepository } from "@/infrastructure/persistence/inMemoryExamSetRepository";
 import { InMemoryAudioStorage } from "@/infrastructure/storage/inMemoryAudioStorage";
+import { InMemoryRateLimiter } from "@/infrastructure/limits/inMemoryRateLimiter";
 import { NodeSha256 } from "@/infrastructure/crypto/nodeSha256";
 
 const sha256 = new NodeSha256();
@@ -139,21 +140,31 @@ describe("ReviewExamSet", () => {
 
 describe("GetExamSetAudio", () => {
   it("應該只讓老師聽錄音", async () => {
-    const get = new GetExamSetAudio(sets, storage);
-    expect(await get.execute({ actor: teacher, setId: SET })).toEqual({
+    const get = new GetExamSetAudio(sets, storage, new InMemoryRateLimiter());
+    expect(await get.execute({ actor: teacher, setId: SET, requester: null })).toEqual({
       kind: "bytes",
       bytes: audio,
     });
-    expect(await get.execute({ actor: admin, setId: SET })).toBeNull();
-    expect(await get.execute({ actor: student, setId: SET })).toBeNull();
+    expect(await get.execute({ actor: admin, setId: SET, requester: null })).toBeNull();
+    expect(await get.execute({ actor: student, setId: SET, requester: null })).toBeNull();
+  });
+
+  it("應該限制同一個人拿網址的次數（超過回 limited）", async () => {
+    storage.urlBase = "https://r2.example";
+    const get = new GetExamSetAudio(sets, storage, new InMemoryRateLimiter());
+    const ask = (requester: string) =>
+      get.execute({ actor: teacher, setId: SET, requester });
+    for (let i = 0; i < 20; i += 1) expect((await ask("t1"))?.kind).toBe("url");
+    expect(await ask("t1")).toEqual({ kind: "limited" });
+    expect((await ask("t2"))?.kind).toBe("url");
   });
 
   it("應該在儲存空間支援時給短效網址，而且權限照樣先檢查", async () => {
     storage.urlBase = "https://r2.example";
-    const get = new GetExamSetAudio(sets, storage);
-    const r = await get.execute({ actor: teacher, setId: SET });
+    const get = new GetExamSetAudio(sets, storage, new InMemoryRateLimiter());
+    const r = await get.execute({ actor: teacher, setId: SET, requester: null });
     expect(r?.kind).toBe("url");
-    expect(r?.kind === "url" && r.url).toMatch(/^https:\/\/r2\.example\/.+\?ttl=3600$/);
-    expect(await get.execute({ actor: student, setId: SET })).toBeNull();
+    expect(r?.kind === "url" && r.url).toMatch(/^https:\/\/r2\.example\/.+\?ttl=600$/);
+    expect(await get.execute({ actor: student, setId: SET, requester: null })).toBeNull();
   });
 });

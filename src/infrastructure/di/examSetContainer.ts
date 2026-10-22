@@ -1,6 +1,7 @@
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import type { AttemptRepository } from "@/domain/exam/attemptRepository";
-import type { AudioStorage } from "@/application/examSet/ports";
+import type { AudioStorage, RateLimiter } from "@/application/examSet/ports";
+import { InMemoryRateLimiter } from "@/infrastructure/limits/inMemoryRateLimiter";
 import { GetTeacherDashboard } from "@/application/dashboard/teacherDashboard";
 import { GetAdminDashboard } from "@/application/dashboard/adminDashboard";
 import { DeleteExamSet } from "@/application/examSet/deleteExamSet";
@@ -38,6 +39,7 @@ type Container = {
   sets: ExamSetRepository;
   attempts: AttemptRepository;
   storage: AudioStorage;
+  limiter: RateLimiter;
 };
 
 const globalStore = globalThis as unknown as { __examContainer?: Container };
@@ -58,6 +60,7 @@ function build(): Container {
       ? new DrizzleAttemptRepository()
       : new InMemoryAttemptRepository(),
     storage: buildStorage(),
+    limiter: new InMemoryRateLimiter(),
   };
 }
 
@@ -91,7 +94,7 @@ export function reviewExamSet(): ReviewExamSet {
 
 export function getExamSetAudio(): GetExamSetAudio {
   const c = container();
-  return new GetExamSetAudio(c.sets, c.storage);
+  return new GetExamSetAudio(c.sets, c.storage, c.limiter);
 }
 
 export function setExamAccess(): SetExamAccess {

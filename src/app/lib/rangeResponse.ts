@@ -42,11 +42,20 @@ export function audioResponse(request: Request, bytes: Uint8Array): Response {
   });
 }
 
-/** 把錄音送給瀏覽器：有短效網址就轉過去（不快取這個轉址），沒有就由網站自己送 */
+/** 把錄音送給瀏覽器：有網址就轉過去（不快取這個轉址），沒有就由網站自己送；拿太多次回 429 */
 export function audioSourceResponse(
   request: Request,
-  source: { kind: "url"; url: string } | { kind: "bytes"; bytes: Uint8Array },
+  source:
+    | { kind: "url"; url: string }
+    | { kind: "bytes"; bytes: Uint8Array }
+    | { kind: "limited" },
 ): Response {
+  if (source.kind === "limited") {
+    return new Response("Too many requests", {
+      status: 429,
+      headers: { "Retry-After": "600", "Cache-Control": "no-store" },
+    });
+  }
   if (source.kind === "url") {
     return new Response(null, {
       status: 302,
