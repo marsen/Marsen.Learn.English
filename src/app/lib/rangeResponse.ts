@@ -7,8 +7,8 @@ export function audioResponse(request: Request, bytes: Uint8Array): Response {
   const headers = {
     "Content-Type": "audio/mpeg",
     "Accept-Ranges": "bytes",
-    // 錄音的 key 含內容雜湊，同一個網址內容不會變：讓瀏覽器快取一天，重聽、拖進度條不用重新下載
-    "Cache-Control": "private, max-age=86400",
+    // 同一套題的錄音不會變（題組編號不能重複上傳）：讓瀏覽器快取 30 天，重聽、拖進度條、重考都不用重新下載
+    "Cache-Control": "private, max-age=2592000",
   };
   const match = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get("range") ?? "");
   if (!match || (match[1] === "" && match[2] === "")) {
