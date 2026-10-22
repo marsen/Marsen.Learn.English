@@ -23,6 +23,9 @@ const schema = z.object({
   R2_ACCESS_KEY_ID: z.string().min(1).optional(),
   R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
   R2_BUCKET: z.string().min(1).optional(),
+  // 錄音經 Cloudflare 各地節點送出（workers/audio-gate）；要先設定 R2，兩個要一起設定
+  AUDIO_CDN_BASE: z.string().url().optional(),
+  AUDIO_PASS_SECRET: z.string().min(16).optional(),
   NODE_ENV: z.enum(["development", "production", "test"]).optional(),
 });
 
@@ -48,6 +51,12 @@ if (r2Values.some(Boolean) && !r2Values.every(Boolean)) {
     "[env] R2_ACCOUNT_ID、R2_ACCESS_KEY_ID、R2_SECRET_ACCESS_KEY、R2_BUCKET 要一起設定",
   );
 }
+if (Boolean(_env.AUDIO_CDN_BASE) !== Boolean(_env.AUDIO_PASS_SECRET)) {
+  throw new Error("[env] AUDIO_CDN_BASE、AUDIO_PASS_SECRET 要一起設定");
+}
+if (_env.AUDIO_CDN_BASE && !r2Values.every(Boolean)) {
+  throw new Error("[env] 用 AUDIO_CDN_BASE 之前要先設定 R2（錄音存在 R2）");
+}
 
 export const env = {
   siteUrl: _env.SITE_URL,
@@ -68,6 +77,10 @@ export const env = {
           secretAccessKey: _env.R2_SECRET_ACCESS_KEY,
           bucket: _env.R2_BUCKET,
         }
+      : undefined,
+  audioCdn:
+    _env.AUDIO_CDN_BASE && _env.AUDIO_PASS_SECRET
+      ? { base: _env.AUDIO_CDN_BASE, secret: _env.AUDIO_PASS_SECRET }
       : undefined,
   isProduction: _env.NODE_ENV === "production",
 } as const;

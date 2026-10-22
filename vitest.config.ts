@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 export default defineConfig({
   test: {
     environment: "node",
-    include: ["src/**/*.test.{ts,tsx}"],
+    include: ["src/**/*.test.{ts,tsx}", "workers/**/*.test.ts"],
     setupFiles: ["./vitest.setup.ts"],
   },
   resolve: {

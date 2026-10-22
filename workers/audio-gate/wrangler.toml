@@ -1,0 +1,15 @@
+# Cloudflare Workers：audio-gate（考試錄音的各地節點）
+# 部署：在這個資料夾執行 npx wrangler@4 deploy（第一次會要你登入 Cloudflare）
+name = "audio-gate"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+# 錄音的網域（marsen.me 的 DNS 要在 Cloudflare 上）
+routes = [{ pattern = "audio.marsen.me", custom_domain = true }]
+
+# 讀錄音的 R2 bucket（名稱要跟網站 .env.local 的 R2_BUCKET 一樣）
+[[r2_buckets]]
+binding = "AUDIO"
+bucket_name = "learn-english-audio"
+
+# 密鑰不寫在這裡，用指令設定：npx wrangler@4 secret put AUDIO_PASS_SECRET
