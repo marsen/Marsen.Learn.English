@@ -18,3 +18,6 @@ next-env.d.ts
 
 # 本機上傳的音檔
 .data/
+
+# Cloudflare wrangler 的暫存
+.wrangler/
