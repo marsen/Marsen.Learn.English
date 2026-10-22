@@ -49,6 +49,14 @@ export function cleanNote(raw: string | null | undefined): string | null {
   return t === "" ? null : t;
 }
 
+/** 審稿內容的問題（代碼）；畫面再轉成使用者的語言 */
+export type ReviewProblem =
+  | { code: "decisionRequired" }
+  | { code: "commentTooLong"; max: number }
+  | { code: "audioNoteTooLong"; max: number }
+  | { code: "unknownQuestion"; questionId: string }
+  | { code: "questionNoteTooLong"; questionId: string; max: number };
+
 /** 檢查審稿內容；回傳所有問題，空陣列代表可以存 */
 export function reviewProblems(input: {
   decision: unknown;
@@ -56,17 +64,18 @@ export function reviewProblems(input: {
   audioNote: string | null;
   questionNotes: QuestionNote[];
   knownQuestionIds: readonly string[];
-}): string[] {
-  const problems: string[] = [];
-  if (!isReviewDecision(input.decision)) problems.push("請選擇合格或不合格");
+}): ReviewProblem[] {
+  const max = MAX_NOTE_LENGTH;
+  const problems: ReviewProblem[] = [];
+  if (!isReviewDecision(input.decision)) problems.push({ code: "decisionRequired" });
   const tooLong = (s: string | null) => s !== null && s.length > MAX_NOTE_LENGTH;
-  if (tooLong(input.comment)) problems.push(`整體意見最多 ${MAX_NOTE_LENGTH} 字`);
-  if (tooLong(input.audioNote)) problems.push(`錄音建議最多 ${MAX_NOTE_LENGTH} 字`);
+  if (tooLong(input.comment)) problems.push({ code: "commentTooLong", max });
+  if (tooLong(input.audioNote)) problems.push({ code: "audioNoteTooLong", max });
   for (const n of input.questionNotes) {
     if (!input.knownQuestionIds.includes(n.questionId))
-      problems.push(`沒有這一題：${n.questionId}`);
+      problems.push({ code: "unknownQuestion", questionId: n.questionId });
     if (tooLong(n.note))
-      problems.push(`${n.questionId} 的建議最多 ${MAX_NOTE_LENGTH} 字`);
+      problems.push({ code: "questionNoteTooLong", questionId: n.questionId, max });
   }
   return problems;
 }

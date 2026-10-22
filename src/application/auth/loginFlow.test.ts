@@ -128,7 +128,7 @@ describe("寄信保護", () => {
     expect((await request("a@example.com")).ok).toBe(true);
     tick(30);
     const r = await request("a@example.com");
-    expect(r).toEqual({ ok: false, error: "剛寄過，請等 30 秒再試" });
+    expect(r).toEqual({ ok: false, error: { code: "cooldown", seconds: 30 } });
     tick(30);
     expect((await request("a@example.com")).ok).toBe(true);
     expect(mailer.sent).toHaveLength(2);
@@ -155,7 +155,7 @@ describe("寄信保護", () => {
   it("應該在 24 小時內寄滿 95 封後擋下新 email，但已有帳號照常寄", async () => {
     for (let i = 0; i < 95; i++) await request(`u${i}@example.com`);
     const blocked = await request("late@example.com");
-    expect(blocked).toEqual({ ok: false, error: "今天註冊人數已滿，請明天再來" });
+    expect(blocked).toEqual({ ok: false, error: { code: "signupsFull" } });
     expect((await request("admin@marsen.me")).ok).toBe(true);
     tick(24 * 3600);
     expect((await request("late@example.com")).ok).toBe(true);

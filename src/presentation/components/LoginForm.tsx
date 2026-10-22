@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import type { LoginFormState } from "./formStates";
 import { Alert } from "./ui/Alert";
 import { Button } from "./ui/Button";
+import { loginErrorText } from "@/presentation/lib/errorMessages";
 
 type Props = {
   action: (prev: LoginFormState, formData: FormData) => Promise<LoginFormState>;
@@ -34,7 +35,7 @@ export function LoginForm({ action, submitLabel = "寄登入連結給我" }: Pro
 
   return (
     <form action={formAction} className="grid gap-4">
-      {state.error && <Alert tone="error">{state.error}</Alert>}
+      {state.error && <Alert tone="error">{loginErrorText(state.error)}</Alert>}
       <div>
         <label htmlFor="email" className="mb-1 block font-medium">
           Email

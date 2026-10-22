@@ -1,9 +1,9 @@
 import type { AccountRepository } from "@/domain/account/accountRepository";
 import type { LoginTokenRepository } from "@/domain/auth/loginTokenRepository";
 import type { Clock, SecretTokens } from "./ports";
-import type { VerifyLoginLinkResult } from "./authResult";
+import type { LoginError, VerifyLoginLinkResult } from "./authResult";
 
-const INVALID = "登入連結無效或已過期，請重新申請";
+const INVALID: LoginError = { code: "invalidLink" };
 
 /**
  * 用登入連結裡的碼完成登入：碼只能用一次、過期就失效。
