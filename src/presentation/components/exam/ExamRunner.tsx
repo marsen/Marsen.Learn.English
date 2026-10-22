@@ -31,6 +31,9 @@ type Stage = "intro" | "running" | "submitting" | "submitted";
  * 考試流程：說明 → 開始（錄音只播一次，不能暫停、倒轉）→ 邊聽邊填 → 錄音結束自動交卷，或自己按交卷。
  * 看題停頓、最後檢查都照錄音時間軸。
  */
+/** 錄音出錯時最多自動重試幾次（成功播放後重新計算） */
+const MAX_AUDIO_RETRIES = 3;
+
 export function ExamRunner({ title, audioUrl, start, submit }: Props) {
   const [stage, setStage] = useState<Stage>("intro");
   const [sheet, setSheet] = useState<ExamSheet | null>(null);
@@ -89,10 +92,34 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
       if (v) setPhase(v);
     });
     audio.addEventListener("ended", () => handIn(r.sheet.attemptId));
-    audio.addEventListener("error", () =>
-      setError("錄音播放失敗，你可以繼續作答，再自己按交卷。"),
-    );
-    audio.play().catch(() => setError("錄音沒辦法自動播放，請重新整理後再試一次。"));
+    // 播放出錯（例如 R2 短效網址過期、網路斷一下）：回網站拿新的網址，從原本的秒數接著播
+    let retries = 0;
+    audio.addEventListener("error", () => {
+      if (retries >= MAX_AUDIO_RETRIES) {
+        setError("錄音播放失敗，你可以繼續作答，再自己按交卷。");
+        return;
+      }
+      retries += 1;
+      const at = audio.currentTime;
+      audio.src = audioUrl;
+      audio.addEventListener(
+        "loadedmetadata",
+        () => {
+          audio.currentTime = at;
+          audio.play().catch(() => setError("錄音中斷了，請重新整理後再試一次。"));
+        },
+        { once: true },
+      );
+      audio.load();
+    });
+    audio.addEventListener("playing", () => {
+      retries = 0;
+    });
+    // 只有瀏覽器擋自動播放才提示；載入失敗由上面的 error 自動重試處理
+    audio.play().catch((e: unknown) => {
+      if (e instanceof DOMException && e.name === "NotAllowedError")
+        setError("錄音沒辦法自動播放，請重新整理後再試一次。");
+    });
   };
 
   if (stage === "intro") {
