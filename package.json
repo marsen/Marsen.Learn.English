@@ -17,6 +17,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "node --env-file=.env.local scripts/db-seed.mjs",
     "audio:to-r2": "node --env-file=.env.local scripts/r2-upload-audio.mjs",
+    "audio-gate:deploy": "node scripts/deploy-audio-gate.mjs",
     "prepare": "husky"
   },
   "dependencies": {

@@ -9,23 +9,12 @@
 ## 第一次設定
 
 1. **R2 bucket**：照網站的步驟建好（名稱寫在 `wrangler.toml` 的 `bucket_name`）
-2. **產生密鑰**（網站和這支程式共用一把）：
-   ```
-   node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
-   ```
-3. **部署**（在這個資料夾）：
-   ```
-   npx wrangler@4 login
-   npx wrangler@4 secret put AUDIO_PASS_SECRET   # 貼上第 2 步的密鑰
-   npx wrangler@4 deploy
-   ```
-   會自動把 `audio.marsen.me` 接到這支程式（`marsen.me` 的 DNS 要在 Cloudflare 上）
-4. **網站 `.env.local`** 加上：
-   ```
-   AUDIO_CDN_BASE=https://audio.marsen.me
-   AUDIO_PASS_SECRET=第 2 步的密鑰
-   ```
-5. **流量限制**：Cloudflare 後台 → marsen.me → Security → WAF → Rate limiting rules，
+2. **部署**：在專案根目錄執行 `pnpm audio-gate:deploy`
+   - 第一次會打開瀏覽器請你登入 Cloudflare
+   - 會自動產生密鑰、部署、設定密鑰，並把 `AUDIO_CDN_BASE`、`AUDIO_PASS_SECRET` 加進 `.env.local`
+   - `audio.marsen.me` 會自動接到這支程式（`marsen.me` 的 DNS 要在同一個 Cloudflare 帳號）
+3. 重開 `pnpm dev`
+4. **流量限制**：Cloudflare 後台 → marsen.me → Security → WAF → Rate limiting rules，
    新增一條：Hostname 等於 `audio.marsen.me`，同一個 IP 超過一定次數就擋（免費方案只能建一條，可選的時間區間以後台為準）
 
 ## 費用
