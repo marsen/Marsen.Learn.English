@@ -201,7 +201,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
           />
         </label>
         {state.problems && state.problems.length > 0 && (
-          <Alert tone="error">{state.problems}</Alert>
+          <Alert tone="error" items={state.problems} />
         )}
         {state.saved && <Alert>已儲存審稿。</Alert>}
         <Button type="submit" disabled={isPending} className="justify-self-start">
