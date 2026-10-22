@@ -27,12 +27,12 @@ import { DrizzleExamSetRepository } from "@/infrastructure/persistence/drizzleEx
 import { InMemoryExamSetRepository } from "@/infrastructure/persistence/inMemoryExamSetRepository";
 import { InMemoryAudioStorage } from "@/infrastructure/storage/inMemoryAudioStorage";
 import { LocalAudioStorage } from "@/infrastructure/storage/localAudioStorage";
+import { R2AudioStorage } from "@/infrastructure/storage/r2AudioStorage";
 
 /**
  * Composition Root（題組、考試）。
  * - 有 DATABASE_URL → Drizzle；沒有 → 記憶體
- * - 有 AUDIO_LOCAL_DIR → 存本機資料夾；沒有且非正式環境 → 記憶體
- *   （正式環境的雲端儲存等接上 Neon Object Storage 時再加）
+ * - 錄音：有 R2 設定 → Cloudflare R2；有 AUDIO_LOCAL_DIR → 本機資料夾；都沒有且非正式環境 → 記憶體
  */
 type Container = {
   sets: ExamSetRepository;
@@ -43,6 +43,7 @@ type Container = {
 const globalStore = globalThis as unknown as { __examContainer?: Container };
 
 function buildStorage(): AudioStorage {
+  if (env.r2) return new R2AudioStorage(env.r2);
   if (env.audioLocalDir) return new LocalAudioStorage(env.audioLocalDir);
   if (env.isProduction) throw new Error("[env] 正式環境還沒有設定音檔儲存空間");
   return new InMemoryAudioStorage();

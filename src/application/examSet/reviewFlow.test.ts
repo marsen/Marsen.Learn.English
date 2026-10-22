@@ -140,8 +140,20 @@ describe("ReviewExamSet", () => {
 describe("GetExamSetAudio", () => {
   it("應該只讓老師聽錄音", async () => {
     const get = new GetExamSetAudio(sets, storage);
-    expect(await get.execute({ actor: teacher, setId: SET })).toEqual(audio);
+    expect(await get.execute({ actor: teacher, setId: SET })).toEqual({
+      kind: "bytes",
+      bytes: audio,
+    });
     expect(await get.execute({ actor: admin, setId: SET })).toBeNull();
+    expect(await get.execute({ actor: student, setId: SET })).toBeNull();
+  });
+
+  it("應該在儲存空間支援時給短效網址，而且權限照樣先檢查", async () => {
+    storage.urlBase = "https://r2.example";
+    const get = new GetExamSetAudio(sets, storage);
+    const r = await get.execute({ actor: teacher, setId: SET });
+    expect(r?.kind).toBe("url");
+    expect(r?.kind === "url" && r.url).toMatch(/^https:\/\/r2\.example\/.+\?ttl=3600$/);
     expect(await get.execute({ actor: student, setId: SET })).toBeNull();
   });
 });

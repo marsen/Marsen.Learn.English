@@ -7,7 +7,8 @@ export function audioResponse(request: Request, bytes: Uint8Array): Response {
   const headers = {
     "Content-Type": "audio/mpeg",
     "Accept-Ranges": "bytes",
-    "Cache-Control": "private, no-store",
+    // 錄音的 key 含內容雜湊，同一個網址內容不會變：讓瀏覽器快取一天，重聽、拖進度條不用重新下載
+    "Cache-Control": "private, max-age=86400",
   };
   const match = /^bytes=(\d*)-(\d*)$/.exec(request.headers.get("range") ?? "");
   if (!match || (match[1] === "" && match[2] === "")) {
@@ -39,4 +40,18 @@ export function audioResponse(request: Request, bytes: Uint8Array): Response {
       "Content-Range": `bytes ${start}-${end}/${total}`,
     },
   });
+}
+
+/** 把錄音送給瀏覽器：有短效網址就轉過去（不快取這個轉址），沒有就由網站自己送 */
+export function audioSourceResponse(
+  request: Request,
+  source: { kind: "url"; url: string } | { kind: "bytes"; bytes: Uint8Array },
+): Response {
+  if (source.kind === "url") {
+    return new Response(null, {
+      status: 302,
+      headers: { Location: source.url, "Cache-Control": "private, no-store" },
+    });
+  }
+  return audioResponse(request, source.bytes);
 }

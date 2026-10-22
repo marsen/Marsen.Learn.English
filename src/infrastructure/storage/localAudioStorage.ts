@@ -31,4 +31,8 @@ export class LocalAudioStorage implements AudioStorage {
       throw new Error(`[storage] 不合法的 key：${key}`);
     return path;
   }
+
+  async downloadUrl(): Promise<string | null> {
+    return null;
+  }
 }

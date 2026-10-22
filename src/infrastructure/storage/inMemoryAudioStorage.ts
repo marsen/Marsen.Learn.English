@@ -15,4 +15,11 @@ export class InMemoryAudioStorage implements AudioStorage {
   async delete(key: string): Promise<void> {
     this.files.delete(key);
   }
+
+  /** 測試用：設定後 downloadUrl 會回假的短效網址（模擬 R2） */
+  urlBase: string | null = null;
+
+  async downloadUrl(key: string, ttlSeconds: number): Promise<string | null> {
+    return this.urlBase ? `${this.urlBase}/${key}?ttl=${ttlSeconds}` : null;
+  }
 }

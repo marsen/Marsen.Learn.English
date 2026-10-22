@@ -18,6 +18,11 @@ const schema = z.object({
   MAIL_FROM: z.string().min(1).optional(),
   // 本機開發：上傳的音檔存在這個資料夾（相對專案根目錄）
   AUDIO_LOCAL_DIR: z.string().min(1).optional(),
+  // 錄音存 Cloudflare R2（四個要一起設定）；有設定就優先用 R2
+  R2_ACCOUNT_ID: z.string().min(1).optional(),
+  R2_ACCESS_KEY_ID: z.string().min(1).optional(),
+  R2_SECRET_ACCESS_KEY: z.string().min(1).optional(),
+  R2_BUCKET: z.string().min(1).optional(),
   NODE_ENV: z.enum(["development", "production", "test"]).optional(),
 });
 
@@ -32,6 +37,18 @@ if (!parsed.success) {
 
 const _env = parsed.data;
 
+const r2Values = [
+  _env.R2_ACCOUNT_ID,
+  _env.R2_ACCESS_KEY_ID,
+  _env.R2_SECRET_ACCESS_KEY,
+  _env.R2_BUCKET,
+];
+if (r2Values.some(Boolean) && !r2Values.every(Boolean)) {
+  throw new Error(
+    "[env] R2_ACCOUNT_ID、R2_ACCESS_KEY_ID、R2_SECRET_ACCESS_KEY、R2_BUCKET 要一起設定",
+  );
+}
+
 export const env = {
   siteUrl: _env.SITE_URL,
   databaseUrl: _env.DATABASE_URL,
@@ -40,5 +57,17 @@ export const env = {
   resendApiKey: _env.RESEND_API_KEY,
   mailFrom: _env.MAIL_FROM,
   audioLocalDir: _env.AUDIO_LOCAL_DIR,
+  r2:
+    _env.R2_ACCOUNT_ID &&
+    _env.R2_ACCESS_KEY_ID &&
+    _env.R2_SECRET_ACCESS_KEY &&
+    _env.R2_BUCKET
+      ? {
+          accountId: _env.R2_ACCOUNT_ID,
+          accessKeyId: _env.R2_ACCESS_KEY_ID,
+          secretAccessKey: _env.R2_SECRET_ACCESS_KEY,
+          bucket: _env.R2_BUCKET,
+        }
+      : undefined,
   isProduction: _env.NODE_ENV === "production",
 } as const;

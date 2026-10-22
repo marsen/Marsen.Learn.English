@@ -16,10 +16,12 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "node --env-file=.env.local scripts/db-seed.mjs",
+    "audio:to-r2": "node --env-file=.env.local scripts/r2-upload-audio.mjs",
     "prepare": "husky"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
+    "aws4fetch": "1.0.20",
     "drizzle-orm": "^0.45.2",
     "jose": "^6.2.3",
     "next": "16.2.7",
