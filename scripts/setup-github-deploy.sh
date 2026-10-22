@@ -17,6 +17,17 @@ SA_NAME="github-deployer"
 NUM="$(gcloud projects describe "${PROJECT}" --format='value(projectNumber)')"
 SA="${SA_NAME}@${PROJECT}.iam.gserviceaccount.com"
 RUNTIME_SA="${NUM}-compute@developer.gserviceaccount.com"
+# 新建的服務帳號要一點時間才會在各處生效：失敗就等 10 秒重試，最多 6 次
+retry() {
+  local n=0
+  until "$@"; do
+    n=$((n + 1))
+    [ "${n}" -ge 6 ] && return 1
+    echo "（剛建立的帳號還沒生效，10 秒後重試…）"
+    sleep 10
+  done
+}
+
 echo "專案：${PROJECT}（${NUM}）　GitHub：${REPO}"
 
 echo "1/5 啟用需要的服務"
@@ -29,11 +40,11 @@ gcloud iam service-accounts describe "${SA}" --project "${PROJECT}" >/dev/null 2
 
 echo "3/5 給部署需要的權限"
 for role in roles/run.sourceDeveloper roles/serviceusage.serviceUsageConsumer; do
-  gcloud projects add-iam-policy-binding "${PROJECT}" --condition=None --quiet \
+  retry gcloud projects add-iam-policy-binding "${PROJECT}" --condition=None --quiet \
     --member "serviceAccount:${SA}" --role "$role" >/dev/null
 done
 # 部署時要用執行服務的那個帳號（預設的 compute 帳號）
-gcloud iam service-accounts add-iam-policy-binding "${RUNTIME_SA}" --project "${PROJECT}" --quiet \
+retry gcloud iam service-accounts add-iam-policy-binding "${RUNTIME_SA}" --project "${PROJECT}" --quiet \
   --member "serviceAccount:${SA}" --role roles/iam.serviceAccountUser >/dev/null
 
 echo "4/5 設定 Workload Identity Federation（只允許 ${REPO} 的 main）"
@@ -48,7 +59,7 @@ gcloud iam workload-identity-pools providers describe "${PROVIDER}" --location g
     --issuer-uri "https://token.actions.githubusercontent.com" \
     --attribute-mapping "google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.ref=assertion.ref" \
     --attribute-condition "assertion.repository=='${REPO}' && assertion.ref=='refs/heads/main'"
-gcloud iam service-accounts add-iam-policy-binding "${SA}" --project "${PROJECT}" --quiet \
+retry gcloud iam service-accounts add-iam-policy-binding "${SA}" --project "${PROJECT}" --quiet \
   --role roles/iam.workloadIdentityUser \
   --member "principalSet://iam.googleapis.com/projects/${NUM}/locations/global/workloadIdentityPools/${POOL}/attribute.repository/${REPO}" >/dev/null
 
