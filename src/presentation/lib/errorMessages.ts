@@ -9,8 +9,12 @@ export function loginErrorText(e: LoginError): string {
   switch (e.code) {
     case "invalidEmail":
       return "email 格式不對";
-    case "invalidLink":
-      return "登入連結無效或已過期，請重新申請";
+    case "malformedCode":
+      return "登入碼是 6 位數字";
+    case "wrongCode":
+      return `登入碼不對，還可以再試 ${e.remaining} 次`;
+    case "codeExpired":
+      return "這組登入碼已經失效（過期、用過或輸錯太多次），請重新寄一組";
     case "cooldown":
       return `剛寄過，請等 ${e.seconds} 秒再試`;
     case "emailHourlyLimit":

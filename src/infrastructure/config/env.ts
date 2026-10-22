@@ -7,7 +7,7 @@
 import { z } from "zod";
 
 const schema = z.object({
-  // 站台對外網址，登入連結用它組出來
+  // 站台對外網址
   SITE_URL: z.string().url(),
   // 資料庫；沒設定時用記憶體資料（開發用）
   DATABASE_URL: z.string().min(1).optional(),

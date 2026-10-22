@@ -3,6 +3,7 @@ import { can } from "@/domain/account/permission";
 import type { LoginTokenRepository } from "@/domain/auth/loginTokenRepository";
 import { isValidEmail, normalizeEmail } from "@/domain/auth/email";
 import { loginTokenExpiry } from "@/domain/auth/loginToken";
+import { codeHashOf } from "./loginCode";
 import {
   alertThresholdReached,
   sendBlockReason,
@@ -11,30 +12,29 @@ import {
   PROVIDER_DAILY_LIMIT,
 } from "@/domain/auth/sendLimits";
 import type { Clock, LoginMailer, SecretTokens } from "./ports";
-import type { RequestLoginLinkResult } from "./authResult";
+import type { RequestLoginCodeResult } from "./authResult";
 
 /**
- * 申請登入連結（也是註冊）：任何 email 都會收到信。
- * 帳號在點了連結、證明信箱是自己的之後才建立（見 VerifyLoginLink），打錯的 email 不會留下帳號。
+ * 申請登入碼（也是註冊）：任何 email 都會收到一組 6 位數登入碼。
+ * 帳號在輸入正確的登入碼、證明信箱是自己的之後才建立（見 VerifyLoginCode），打錯的 email 不會留下帳號。
  * 寄信有次數限制（見 domain/auth/sendLimits），寄到 50、80 封時通知管理員。
  */
-export class RequestLoginLink {
+export class RequestLoginCode {
   constructor(
     private readonly accounts: AccountRepository,
     private readonly tokens: LoginTokenRepository,
     private readonly secrets: SecretTokens,
     private readonly mailer: LoginMailer,
-    private readonly siteUrl: string,
     private readonly now: Clock = () => new Date(),
   ) {}
 
   async execute(input: {
     email: string;
-    /** 申請的瀏覽器（路人識別）；在別的裝置點連結時，靠它把路人作答移過去 */
+    /** 申請的瀏覽器（路人識別）；登入後靠它把路人作答移過去 */
     guestId?: string | null;
     /** 申請者 IP 的雜湊 */
     ipHash?: string | null;
-  }): Promise<RequestLoginLinkResult> {
+  }): Promise<RequestLoginCodeResult> {
     const email = normalizeEmail(input.email);
     if (!isValidEmail(email)) return { ok: false, error: { code: "invalidEmail" } };
 
@@ -60,20 +60,20 @@ export class RequestLoginLink {
     });
     if (blocked) return { ok: false, error: blocked };
 
-    const token = this.secrets.generate();
+    const code = this.secrets.generateCode();
     await this.tokens.save({
-      tokenHash: this.secrets.hash(token),
+      tokenHash: this.secrets.hash(this.secrets.generate()),
+      codeHash: codeHashOf(this.secrets, email, code),
       email,
       expiresAt: loginTokenExpiry(now),
       usedAt: null,
       createdAt: now,
+      failedAttempts: 0,
       guestId: input.guestId ?? null,
       ipHash,
     });
 
-    const link = new URL("/auth/verify", this.siteUrl);
-    link.searchParams.set("token", token);
-    await this.mailer.sendLoginLink(email, link.toString());
+    await this.mailer.sendLoginCode(email, code);
 
     const reached = alertThresholdReached(sentLastDay + 1);
     if (reached !== null) await this.notifyAdmins(reached);

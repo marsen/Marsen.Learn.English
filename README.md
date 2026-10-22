@@ -17,7 +17,7 @@ pnpm db:migrate   # 在 Neon 建好所有資料表
 pnpm db:seed      # 建立 admin@marsen.me（管理員＋老師）
 ```
 
-用 `admin@marsen.me` 登入：按「寄登入連結給我」→ 頁面會出現「直接開登入連結」（開發模式不真的寄信）→ 按「完成登入」。
+用 `admin@marsen.me` 登入：按「寄登入碼給我」→ 頁面會直接顯示登入碼（開發模式不真的寄信）→ 輸入登入碼。
 
 ```bash
 pnpm test     # 單元測試
