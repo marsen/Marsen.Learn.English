@@ -11,6 +11,12 @@ SERVICE="learn-english"
 REGION="asia-east1"
 PROJECT="$(gcloud config get-value project 2>/dev/null)"
 
+# 網域對應要用 gcloud beta；沒裝的話 gcloud 會停下來問要不要安裝（被隱藏就會像當掉一樣）
+if [ "${STEP}" = "map" ] && ! gcloud beta --help >/dev/null 2>&1 </dev/null; then
+  echo "需要 gcloud 的 beta 元件，先執行：gcloud components install beta"
+  exit 1
+fi
+
 case "${STEP}" in
   map)
     if ! gcloud domains list-user-verified --format='value(id)' | grep -qx "${ROOT}"; then
