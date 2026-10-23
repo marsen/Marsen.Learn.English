@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import type { LoginFormState, VerifyCodeFormState } from "./formStates";
 import { Alert } from "./ui/Alert";
 import { Button } from "./ui/Button";
@@ -23,7 +23,7 @@ type Props = {
   submitLabel?: string;
 };
 
-const field = "w-full rounded-lg border border-border bg-white px-3 py-2 text-base";
+const field = "w-full rounded-lg border border-border bg-surface px-3 py-2 text-base";
 
 /**
  * 登入／註冊：兩步驟。
@@ -93,7 +93,8 @@ export function LoginForm({
           type="email"
           required
           autoComplete="email"
-          defaultValue={sent.sentTo}
+          // 送出後 React 會把表單重設回 defaultValue：失敗時要留著剛剛輸入的 email
+          defaultValue={sent.email ?? sent.sentTo}
           className={field}
         />
       </div>
@@ -107,6 +108,11 @@ export function LoginForm({
 /** 第二步：輸入登入碼（6 格，填滿自動送出；輸錯就清空重來） */
 function CodeStep({ email, verifyCode }: { email: string; verifyCode: VerifyAction }) {
   const [verified, verifyAction, verifying] = useActionState(verifyCode, {});
+  // 一次只送一個：填滿自動送出的同時又按了登入／Enter，第二次會多扣一次猜錯次數
+  const submitted = useRef(false);
+  useEffect(() => {
+    submitted.current = false;
+  }, [verified]);
   // 每次送出拿到新結果就換一個 key：方格清空、游標回第一格、重新播放晃動
   const [lastResult, setLastResult] = useState(verified);
   const [round, setRound] = useState(0);
@@ -115,9 +121,16 @@ function CodeStep({ email, verifyCode }: { email: string; verifyCode: VerifyActi
     setRound((r) => r + 1);
   }
   return (
-    <form action={verifyAction} className="grid gap-4">
+    <form
+      action={verifyAction}
+      onSubmit={(e) => {
+        if (submitted.current) e.preventDefault();
+        submitted.current = true;
+      }}
+      className="grid gap-4"
+    >
       {verified.error && (
-        <Alert tone="error" className="text-base font-medium ring-1 ring-destructive/40">
+        <Alert tone="error" size="md" className="font-medium ring-1 ring-destructive/40">
           {loginErrorText(verified.error)}
         </Alert>
       )}

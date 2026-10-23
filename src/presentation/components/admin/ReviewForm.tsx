@@ -22,7 +22,7 @@ type Props = {
   action: (prev: ReviewFormState, formData: FormData) => Promise<ReviewFormState>;
 };
 
-const box = "w-full rounded-lg border border-border bg-white px-3 py-2 text-sm";
+const box = "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm";
 
 /** 老師審稿：聽錄音、看每一題的答案與 AI 示警，寫建議，判合格／不合格。 */
 export function ReviewForm({ view, audioUrl, action }: Props) {
@@ -127,7 +127,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
           {view.questions.map((q, i) => (
             <li
               key={q.questionId}
-              className="rounded-xl border border-border bg-white p-4"
+              className="rounded-xl border border-border bg-surface p-4"
             >
               <div className="flex flex-wrap items-baseline gap-x-3">
                 <span className="font-semibold">第 {i + 1} 題</span>
@@ -170,7 +170,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
         </ol>
       </section>
 
-      <section className="grid gap-3 rounded-xl border border-border bg-white p-4">
+      <section className="grid gap-3 rounded-xl border border-border bg-surface p-4">
         <h2 className="text-lg font-semibold">判定</h2>
         <div className="flex gap-6">
           <label className="flex items-center gap-2">

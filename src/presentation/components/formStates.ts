@@ -5,6 +5,8 @@ import type { ReviewError } from "@/application/examSet/reviewExamSet";
 /** 申請登入碼：寄出後記下寄到哪個 email；開發模式（沒有寄信服務）會直接給登入碼 */
 export type LoginFormState = {
   error?: LoginError;
+  /** 剛剛送出的 email（失敗時用來保留輸入） */
+  email?: string;
   sentTo?: string;
   /** 寄出的時間（毫秒）；每寄一次都不同，畫面用它重設輸入登入碼的步驟 */
   sentAt?: number;

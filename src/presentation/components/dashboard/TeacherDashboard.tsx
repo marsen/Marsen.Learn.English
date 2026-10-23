@@ -35,7 +35,7 @@ export function TeacherDashboard({
             </p>
           )}
         </div>
-        <div className="rounded-2xl border border-border bg-white p-5">
+        <div className="rounded-2xl border border-border bg-surface p-5">
           <p className="text-sm text-muted-foreground">你這個月審了</p>
           <p className="mt-1 text-4xl font-bold">
             {view.reviewedThisMonth} <span className="text-base font-medium">套</span>

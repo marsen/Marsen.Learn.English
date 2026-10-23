@@ -43,7 +43,7 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
         </div>
         <Link
           href="/exam"
-          className="rounded-2xl border border-border bg-white p-6 transition-colors hover:bg-muted"
+          className="rounded-2xl border border-border bg-surface p-6 transition-colors hover:bg-muted"
         >
           <p className="text-sm text-muted-foreground">還沒考過的考卷</p>
           <p className="mt-1 text-5xl font-bold">
@@ -62,20 +62,20 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
           <EmptyState>考完第一張，這裡就會出現你的成績。</EmptyState>
         ) : (
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-2xl border border-border bg-white p-5">
+            <div className="rounded-2xl border border-border bg-surface p-5">
               <p className="text-sm text-muted-foreground">考了</p>
               <p className="mt-1 text-3xl font-bold">
                 {view.attemptCount} <span className="text-base font-medium">次</span>
               </p>
             </div>
-            <div className="rounded-2xl border border-border bg-white p-5">
+            <div className="rounded-2xl border border-border bg-surface p-5">
               <p className="text-sm text-muted-foreground">平均答對</p>
               <p className="mt-1 text-3xl font-bold">
                 {view.averagePercent}
                 <span className="text-base font-medium">%</span>
               </p>
             </div>
-            <div className="rounded-2xl border border-border bg-white p-5">
+            <div className="rounded-2xl border border-border bg-surface p-5">
               <p className="text-sm text-muted-foreground">最近一次</p>
               {last && (
                 <p className="mt-1 text-3xl font-bold">
@@ -85,7 +85,7 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
               )}
             </div>
 
-            <div className="rounded-2xl border border-border bg-white p-5 sm:col-span-3">
+            <div className="rounded-2xl border border-border bg-surface p-5 sm:col-span-3">
               <p className="mb-4 text-sm text-muted-foreground">
                 最近 {view.recent.length} 次
               </p>
@@ -129,7 +129,10 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
           <p className="mb-3 text-sm text-muted-foreground">練習時特別留意這幾種陷阱。</p>
           <ul className="grid gap-3 sm:grid-cols-3">
             {view.weakTraps.map((t) => (
-              <li key={t.trap} className="rounded-2xl border border-border bg-white p-5">
+              <li
+                key={t.trap}
+                className="rounded-2xl border border-border bg-surface p-5"
+              >
                 <p className="font-semibold">{trapLabel(t.trap)}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   錯 <b className="text-destructive">{t.wrong}</b> / {t.seen} 題

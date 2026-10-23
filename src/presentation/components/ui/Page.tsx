@@ -66,7 +66,7 @@ export function CardPage({
 }) {
   return (
     <main className="flex flex-1 items-center justify-center px-4 py-20">
-      <div className="w-full max-w-sm rounded-2xl border border-border bg-white p-8">
+      <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-8">
         <h1 className="font-display text-2xl font-semibold">{title}</h1>
         {description && (
           <p className="mt-1 mb-6 text-sm text-muted-foreground">{description}</p>

@@ -47,7 +47,7 @@ function AccountRow({
 }) {
   const [state, formAction, isPending] = useActionState(action, {});
   return (
-    <li className="rounded-xl border border-border bg-white p-4">
+    <li className="rounded-xl border border-border bg-surface p-4">
       <form action={formAction} className="flex flex-wrap items-center gap-x-6 gap-y-2">
         <input type="hidden" name="accountId" value={account.id} />
         <span className="min-w-56 font-medium">
@@ -76,7 +76,7 @@ export function AccountManager({ accounts, selfId, setRoles, addAccount }: Props
   const [addState, addFormAction, adding] = useActionState(addAccount, {});
   return (
     <div className="grid gap-8">
-      <section className="rounded-xl border border-border bg-white p-4">
+      <section className="rounded-xl border border-border bg-surface p-4">
         <h2 className="mb-3 font-semibold">新增帳號</h2>
         <form
           action={addFormAction}

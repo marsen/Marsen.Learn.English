@@ -62,7 +62,7 @@ export class RequestLoginCode {
 
     const code = this.secrets.generateCode();
     await this.tokens.save({
-      tokenHash: this.secrets.hash(this.secrets.generate()),
+      tokenHash: this.secrets.generate(),
       codeHash: codeHashOf(this.secrets, email, code),
       email,
       expiresAt: loginTokenExpiry(now),
