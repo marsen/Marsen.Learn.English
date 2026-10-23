@@ -67,13 +67,13 @@
       "notLoggedIn": "Please log in first",
       "forbidden": "Your account doesn't have permission to review",
       "setNotFound": "This set couldn't be found",
-      "decisionRequired": "Please choose Pass or Fail",
       "commentTooLong": "Overall comments can be at most {max} characters",
       "unknownQuestion": "No such question: {questionId}",
       "noteTooLong": "Each comment can be at most {max} characters",
       "unknownAiNote": "One of the AI comments couldn't be found. Please reload the page and try again",
       "editedAiNoteEmpty": "An edited AI comment can't be empty. Delete it instead",
-      "badPayload": "Your review couldn't be sent. Please reload the page and try again"
+      "badPayload": "Your review couldn't be sent. Please reload the page and try again",
+      "verdictMissing": "{count, plural, one {# item hasn't} other {# items haven't}} been checked yet"
     }
   },
   "dashboard": {
@@ -193,8 +193,6 @@
     "wrongValue": "(wrong answer heard first in the recording: {value})",
     "note": "Writer's note",
     "decision": "Decision",
-    "approved": "Pass",
-    "rejected": "Fail",
     "comment": "Overall comments (optional)",
     "saved": "Review saved.",
     "update": "Update review",
@@ -202,7 +200,7 @@
     "wholeSetHint": "Comments that aren't about one question, e.g. the story doesn't add up, or the whole recording is too fast.",
     "playFrom": "Listen from where the answer to question {n} is said",
     "answerDetails": "Answer details and where it's said",
-    "evidence": "Said at",
+    "evidence": "Where it's said",
     "noComments": "No comments yet",
     "addComment": "+ Add comment",
     "commentPlaceholder": "Write a suggestion…",
@@ -222,11 +220,20 @@
     "transcriptHint": "Click a time to jump there. The line being played is highlighted.",
     "noTranscript": "This set was packed before transcripts were included, so the ▶ buttons and the transcript aren't available.",
     "unsavedComment": "You have a comment you haven't saved. Press OK (or Cancel) on it first.",
-    "close": "Collapse (Esc)",
+    "close": "Close (Esc)",
     "showAiOriginal": "Show the AI's original",
-    "chipAi": "AI {count}",
-    "chipTeacher": "Teacher {count}",
+    "chipAi": "{count} AI",
+    "chipTeacher": "{count} teacher",
     "chipDeleted": "{count} deleted",
-    "aiSeverity": "AI · {severity}"
+    "aiSeverity": "AI · {severity}",
+    "needsFixing": "Needs fixing",
+    "notChecked": "Not checked yet",
+    "verdictGroup": "Is this OK?",
+    "summaryOk": "{count} OK",
+    "summaryBad": "{count, plural, one {# problem} other {# problems}}",
+    "summaryJoin": " · ",
+    "pending": "{count} left to check",
+    "resultPass": "→ Pass",
+    "resultFail": "→ Fail"
   }
 }

@@ -30,6 +30,9 @@ type Props = {
   aiActions: ReadonlyMap<string, DraftAiAction>;
   notes: DraftNote[];
   active: boolean;
+  /** 判定：true＝OK，false＝有問題，undefined＝還沒判 */
+  verdict: boolean | undefined;
+  onVerdict: (ok: boolean) => void;
   editing: Editing | null;
   /** 打開的意見框有沒存的字，老師又想做別的事：在框下面提醒 */
   warnUnsaved: boolean;
@@ -56,6 +59,27 @@ const DOT: Record<Severity, string> = {
   warn: "bg-primary",
   block: "bg-destructive",
 };
+/** 判定的記號：✓ OK、✗ 有問題、○ 還沒判 */
+export function VerdictMark({ verdict }: { verdict: boolean | undefined }) {
+  const t = useTranslations("review");
+  const [mark, cls, label] =
+    verdict === true
+      ? ["✓", "text-accent", t("ok")]
+      : verdict === false
+        ? ["✗", "text-destructive", t("needsFixing")]
+        : ["○", "text-muted-foreground", t("notChecked")];
+  return (
+    <span
+      role="img"
+      aria-label={label}
+      title={label}
+      className={`text-xs font-bold ${cls}`}
+    >
+      {mark}
+    </span>
+  );
+}
+
 const BAR: Record<Severity, string> = {
   info: "border-muted-foreground/40",
   warn: "border-primary",
@@ -103,6 +127,7 @@ export function NoteCard(p: Props) {
         title={firstText ? firstText.slice(0, 80) : undefined}
         className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-0.5 text-[0.8125rem] whitespace-nowrap text-muted-foreground hover:border-primary"
       >
+        <VerdictMark verdict={p.verdict} />
         <b className="text-heading">{name}</b>
         {sum.worst && (
           <span className={`h-2 w-2 shrink-0 rounded-full ${DOT[sum.worst]}`} />
@@ -130,6 +155,31 @@ export function NoteCard(p: Props) {
         >
           ✕
         </button>
+      </div>
+      <div
+        role="group"
+        aria-label={r("verdictGroup")}
+        className="flex flex-wrap items-center gap-1.5"
+      >
+        <Button
+          size="xs"
+          variant={p.verdict === true ? "success" : "secondary"}
+          aria-pressed={p.verdict === true}
+          onClick={() => p.onVerdict(true)}
+        >
+          ✓ {r("ok")}
+        </Button>
+        <Button
+          size="xs"
+          variant={p.verdict === false ? "danger" : "secondary"}
+          aria-pressed={p.verdict === false}
+          onClick={() => p.onVerdict(false)}
+        >
+          ✗ {r("needsFixing")}
+        </Button>
+        {p.verdict === undefined && (
+          <span className="text-xs text-muted-foreground">{r("notChecked")}</span>
+        )}
       </div>
       {q && (
         <>

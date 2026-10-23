@@ -1,3 +1,4 @@
+import { verdictsFor } from "../../../tests/reviewVerdicts";
 import { describe, it, expect, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import { UploadExamSet } from "./uploadExamSet";
@@ -51,7 +52,12 @@ const review = (
   actor: Account,
   input: Partial<Parameters<ReviewExamSet["execute"]>[0]>,
 ) =>
-  new ReviewExamSet(sets).execute({ actor, setId: SET, decision: "approved", ...input });
+  new ReviewExamSet(sets).execute({
+    actor,
+    setId: SET,
+    verdicts: verdictsFor("approved"),
+    ...input,
+  });
 
 describe("GetExamSetForReview", () => {
   it("應該給老師看到每一題的標準答案、題目位置與 AI 示警", async () => {
@@ -102,7 +108,7 @@ describe("GetExamSetForReview", () => {
 });
 
 describe("ReviewExamSet", () => {
-  it("應該讓老師判合格，並記下整體意見、每題與整套的意見、對 AI 意見的處理", async () => {
+  it("應該在每一項都 OK 時合格，並記下判定、整體意見、每題與整套的意見、對 AI 意見的處理", async () => {
     const r = await review(teacher, {
       comment: " 整體不錯 ",
       notes: [
@@ -120,6 +126,7 @@ describe("ReviewExamSet", () => {
     expect(await sets.findReview(SET)).toMatchObject({
       reviewerId: "teacher",
       decision: "approved",
+      verdicts: verdictsFor("approved"),
       comment: "整體不錯",
       notes: [
         { target: null, text: "[01:23] 這句太快" },
@@ -130,8 +137,8 @@ describe("ReviewExamSet", () => {
   });
 
   it("應該可以改判，以最後一次為準", async () => {
-    await review(teacher, { decision: "approved" });
-    await review(teacher, { decision: "rejected", comment: "答案卡太窄" });
+    await review(teacher, { verdicts: verdictsFor("approved") });
+    await review(teacher, { verdicts: verdictsFor("rejected"), comment: "答案卡太窄" });
     expect((await sets.findById(SET))?.status).toBe("rejected");
     expect((await sets.findReview(SET))?.comment).toBe("答案卡太窄");
   });
@@ -143,8 +150,25 @@ describe("ReviewExamSet", () => {
     expect((await sets.findById(SET))?.status).toBe("pending_review");
   });
 
-  it("應該擋下沒選判定、對不存在小題的意見、不存在的 AI 意見", async () => {
-    expect((await review(teacher, { decision: undefined })).ok).toBe(false);
+  it("應該在有一項有問題時不合格，即使那題沒有意見", async () => {
+    const verdicts = verdictsFor("approved").map((v) =>
+      v.target === "q05" ? { ...v, ok: false } : v,
+    );
+    expect(await review(teacher, { verdicts })).toEqual({ ok: true });
+    expect((await sets.findById(SET))?.status).toBe("rejected");
+  });
+
+  it("應該在有意見但每一項都 OK 時照樣合格（意見留給管理員看）", async () => {
+    await review(teacher, { notes: [{ target: "q03", text: "可以再慢一點" }] });
+    expect((await sets.findById(SET))?.status).toBe("approved");
+    expect((await sets.findReview(SET))?.notes).toEqual([
+      { target: "q03", text: "可以再慢一點" },
+    ]);
+  });
+
+  it("應該擋下還有項目沒判、對不存在小題的意見、不存在的 AI 意見", async () => {
+    const r0 = await review(teacher, { verdicts: verdictsFor("approved").slice(1) });
+    expect(r0).toEqual({ ok: false, problems: [{ code: "verdictMissing", count: 1 }] });
     expect((await review(teacher, { notes: [{ target: "q99", text: "x" }] })).ok).toBe(
       false,
     );
@@ -158,13 +182,21 @@ describe("ReviewExamSet", () => {
 
 describe("parseReviewPayload", () => {
   it("應該讀出審稿頁送來的意見，格式不對回傳 null", () => {
-    const ok = { notes: [{ target: null, text: "a" }], aiActions: [] };
+    const ok = {
+      verdicts: [{ target: null, ok: true }],
+      notes: [{ target: null, text: "a" }],
+      aiActions: [],
+    };
     expect(parseReviewPayload(JSON.stringify(ok))).toEqual(ok);
     expect(parseReviewPayload("{oops")).toBeNull();
     expect(parseReviewPayload(null)).toBeNull();
     expect(
       parseReviewPayload(
-        JSON.stringify({ notes: [], aiActions: [{ ref: "x", action: "kept" }] }),
+        JSON.stringify({
+          verdicts: [],
+          notes: [],
+          aiActions: [{ ref: "x", action: "kept" }],
+        }),
       ),
     ).toBeNull();
   });

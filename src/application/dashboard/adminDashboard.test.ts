@@ -1,3 +1,4 @@
+import { verdictsFor } from "../../../tests/reviewVerdicts";
 import { describe, it, expect, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import { GetAdminDashboard } from "./adminDashboard";
@@ -50,7 +51,7 @@ const review = (setId: string, decision: "approved" | "rejected", comment?: stri
   new ReviewExamSet(sets).execute({
     actor: teacher,
     setId,
-    decision,
+    verdicts: verdictsFor(decision),
     comment,
     notes: decision === "rejected" ? [{ target: "q07", text: "答案卡太窄" }] : [],
   });

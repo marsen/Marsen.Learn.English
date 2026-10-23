@@ -17,6 +17,10 @@ export function reviewFeedback(view: ReviewView, reviewerEmail: string | null): 
   const review = view.review;
   const actions = new Map((review?.aiActions ?? []).map((a) => [a.ref, a]));
   const notes = review?.notes ?? [];
+  const verdictOf = (target: string | null) => {
+    const v = review?.verdicts.find((x) => x.target === target);
+    return v ? (v.ok ? "OK" : "NEEDS FIXING") : "not checked";
+  };
 
   const aiLine = (n: AiNote) => {
     const source =
@@ -51,11 +55,17 @@ export function reviewFeedback(view: ReviewView, reviewerEmail: string | null): 
     );
   if (review?.comment) lines.push(`Overall comment: ${review.comment}`);
 
-  lines.push("", "## Whole set / audio", ...orNone(commentsFor(null), "- (none)"));
+  lines.push(
+    "",
+    `## Whole set / audio · teacher: ${verdictOf(null)}`,
+    ...orNone(commentsFor(null), "- (none)"),
+  );
 
   lines.push("", "## Questions");
   for (const q of view.questions) {
-    lines.push(`### ${q.questionId} · Q${q.number}${q.label ? ` · ${q.label}` : ""}`);
+    lines.push(
+      `### ${q.questionId} · Q${q.number}${q.label ? ` · ${q.label}` : ""} · teacher: ${verdictOf(q.questionId)}`,
+    );
     const facts = [
       `Answer: ${q.answer}${q.accepted.length > 0 ? ` (also accepted: ${q.accepted.join(", ")})` : ""}`,
       q.answerType && `type ${q.answerType}`,

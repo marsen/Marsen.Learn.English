@@ -6,7 +6,8 @@ import {
   cleanAiActions,
   cleanNote,
   cleanNotes,
-  isReviewDecision,
+  cleanVerdicts,
+  decisionFrom,
   reviewProblems,
   type ReviewProblem,
 } from "@/domain/examSet/review";
@@ -22,7 +23,8 @@ export type ReviewError =
 export type ReviewExamSetResult = { ok: true } | { ok: false; problems: ReviewError[] };
 
 export type ReviewInput = {
-  decision: unknown;
+  /** 每一題、整套的判定（target 是題號，null＝整套）；全部 OK 才合格 */
+  verdicts?: { target: string | null; ok: boolean }[];
   comment?: string | null;
   /** 老師的意見；target 是題號，null＝整套／錄音 */
   notes?: { target: string | null; text: string }[];
@@ -31,6 +33,7 @@ export type ReviewInput = {
 };
 
 const payloadSchema = z.object({
+  verdicts: z.array(z.object({ target: z.string().nullable(), ok: z.boolean() })),
   notes: z.array(z.object({ target: z.string().nullable(), text: z.string() })),
   aiActions: z.array(
     z.object({
@@ -44,7 +47,7 @@ const payloadSchema = z.object({
 /** 審稿頁送來的意見（JSON 字串）；格式不對回傳 null */
 export function parseReviewPayload(
   json: string | null,
-): Pick<Required<ReviewInput>, "notes" | "aiActions"> | null {
+): Pick<Required<ReviewInput>, "verdicts" | "notes" | "aiActions"> | null {
   if (!json) return null;
   try {
     const r = payloadSchema.safeParse(JSON.parse(json));
@@ -55,8 +58,8 @@ export function parseReviewPayload(
 }
 
 /**
- * 老師審稿：判定合格／不合格，可附整體意見、每題或整套的意見，並保留、改寫或刪除 AI 的意見。
- * 可以重複審稿，以最後一次為準。題組狀態跟著判定改。
+ * 老師審稿：每一題和整套都判 OK 或有問題（全部 OK 才合格），可附整體意見、每題或整套的意見，
+ * 並保留、改寫或刪除 AI 的意見。可以重複審稿，以最後一次為準。題組狀態跟著結果改。
  */
 export class ReviewExamSet {
   constructor(
@@ -79,22 +82,23 @@ export class ReviewExamSet {
     const comment = cleanNote(input.comment);
     const notes = cleanNotes(input.notes ?? []);
     const aiActions = cleanAiActions(input.aiActions ?? []);
+    const verdicts = cleanVerdicts(input.verdicts ?? []);
     const view = buildReviewView(set, secret, null);
     const problems = reviewProblems({
-      decision: input.decision,
+      verdicts,
       comment,
       notes,
       aiActions,
       knownQuestionIds: view.questions.map((q) => q.questionId),
       knownAiRefs: view.aiNotes.map((n) => n.ref),
     });
-    if (problems.length > 0 || !isReviewDecision(input.decision))
-      return { ok: false, problems };
+    if (problems.length > 0) return { ok: false, problems };
 
     await this.sets.saveReview({
       setId: input.setId,
       reviewerId: input.actor.id,
-      decision: input.decision,
+      decision: decisionFrom(verdicts),
+      verdicts,
       comment,
       notes,
       aiActions,

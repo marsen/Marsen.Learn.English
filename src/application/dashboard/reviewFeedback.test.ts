@@ -41,6 +41,10 @@ const review: TeacherReview = {
   setId: b.set_id,
   reviewerId: "t",
   decision: "rejected",
+  verdicts: [
+    { target: null, ok: true },
+    { target: "q07", ok: false },
+  ],
   comment: "Fix q07",
   notes: [
     { target: null, text: "[01:23] too fast" },
@@ -73,7 +77,10 @@ describe("reviewFeedback", () => {
     expect(text).toContain("teacher rewrote] Teacher: Rewrite the line instead");
     expect(text).toContain("teacher says NOT a problem: fine as is]");
     expect(text).toContain("teacher agrees]");
-    expect(text).toMatch(/### q01 · Q1 · Address\nAnswer: 37/);
+    expect(text).toMatch(/### q01 · Q1 · Address · teacher: not checked\nAnswer: 37/);
+    expect(text).toContain("q07 · Q7");
+    expect(text).toMatch(/### q07 · Q7 [^\n]*· teacher: NEEDS FIXING/);
+    expect(text).toContain("## Whole set / audio · teacher: OK");
     expect(text).toContain("## Transcript");
     expect(text).toContain("t1 ");
   });

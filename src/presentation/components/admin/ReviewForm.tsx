@@ -40,7 +40,8 @@ const newKey = () => `n${(nextKey += 1)}`;
 
 /**
  * 老師審稿：像批改考卷一樣，考卷填好標準答案，每題旁邊是 AI 的意見和老師的意見。
- * 老師可以保留、改寫、刪除 AI 的意見，替任何一題或整套加意見，最後判合格／不合格一起送出。
+ * 老師可以保留、改寫、刪除 AI 的意見，替任何一題或整套加意見；每一題和整套都要判 OK 或有問題，
+ * 全部 OK 才合格，全部判完才能送出。
  */
 export function ReviewForm({ view, audioUrl, action }: Props) {
   const t = useTranslations();
@@ -62,6 +63,22 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
         ]),
       ),
   );
+  // 每一題、整套的判定（key：題號或 SET）：true＝OK，false＝有問題，沒有＝還沒判。
+  // 預設：上次審過就沿用；舊審稿沒有逐題判定時，合格的全部當 OK；
+  // 其他情況 AI 沒提意見的題目預設 OK，整套和 AI 有提意見的題目要老師點
+  const [verdicts, setVerdicts] = useState<Map<string, boolean>>(() => {
+    if (prev && prev.verdicts.length > 0)
+      return new Map(prev.verdicts.map((v) => [v.target ?? SET, v.ok]));
+    const all = [SET, ...view.questions.map((q) => q.questionId)];
+    if (prev?.decision === "approved") return new Map(all.map((k) => [k, true]));
+    return new Map(
+      view.questions
+        .filter((q) => !view.aiNotes.some((n) => n.questionId === q.questionId))
+        .map((q) => [q.questionId, true]),
+    );
+  });
+  const judge = (target: string, ok: boolean) =>
+    setVerdicts((m) => new Map(m).set(target, ok));
   const [editing, setEditing] = useState<Editing | null>(null);
   const [active, setActive] = useState<string | null>(null);
 
@@ -85,6 +102,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
   };
 
   const payload = JSON.stringify({
+    verdicts: [...verdicts].map(([key, ok]) => ({ target: targetOf(key), ok })),
     notes: notes.map((n) => ({ target: n.target, text: n.text })),
     aiActions: [...aiActions].map(([ref, a]) => ({
       ref,
@@ -145,6 +163,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
         (id) =>
           (counts.get(id) ?? 0) > 0 ||
           aiOf(id).length > 0 ||
+          verdicts.get(id) !== true ||
           active === id ||
           (editing?.kind === "new" && editing.target === id),
       ),
@@ -204,6 +223,22 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
     );
   };
 
+  // ---------- 判定的摘要、待處理 ----------
+  const allTargets = [SET, ...view.questions.map((q) => q.questionId)];
+  const pending = allTargets.filter((k) => !verdicts.has(k));
+  const okCount = allTargets.filter((k) => verdicts.get(k) === true).length;
+  const badCount = allTargets.filter((k) => verdicts.get(k) === false).length;
+  /** 依序跳到下一個還沒判的項目（從目前展開的那題往後找，繞回開頭），展開並捲過去 */
+  const nextPending = () => {
+    if (pending.length === 0) return;
+    const from = active ? allTargets.indexOf(active) : -1;
+    const order = [...allTargets.slice(from + 1), ...allTargets.slice(0, from + 1)];
+    const k = order.find((x) => !verdicts.has(x) && x !== active) ?? pending[0];
+    if (active !== k) select(k);
+    // 寬螢幕捲到考卷上的空格（卡就在旁邊），窄的捲到卡
+    scrollTo.current = k;
+  };
+
   // Esc 收起
   const collapseRef = useRef(collapse);
   useEffect(() => {
@@ -226,9 +261,10 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
   useEffect(() => {
     const target = scrollTo.current;
     scrollTo.current = null;
-    if (!target || window.matchMedia(SIDE_BY_SIDE).matches) return;
+    if (!target) return;
+    const wide = window.matchMedia(SIDE_BY_SIDE).matches;
     document
-      .querySelector(`[data-card="${target}"]`)
+      .querySelector(wide ? `[data-anchor="${target}"]` : `[data-card="${target}"]`)
       ?.scrollIntoView({ behavior: "smooth", block: "center" });
   });
 
@@ -356,6 +392,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
           paper={view.paper}
           questions={questions}
           active={active}
+          verdicts={verdicts}
           listening={listening}
           counts={counts}
           onSelect={selectFromPaper}
@@ -374,6 +411,8 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
                 aiActions={aiActions}
                 notes={notesOf(target)}
                 active={active === target}
+                verdict={verdicts.get(target)}
+                onVerdict={(ok) => judge(target, ok)}
                 editing={editing}
                 warnUnsaved={hintFor !== null && hintFor === editing}
                 setEditing={(e) => {
@@ -410,26 +449,23 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
 
       <section className="grid gap-3 rounded-xl border border-border bg-surface p-4">
         <h2 className="text-lg font-semibold">{r("decision")}</h2>
-        <div className="flex gap-6">
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="decision"
-              value="approved"
-              defaultChecked={prev?.decision === "approved"}
-            />
-            {r("approved")}
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="decision"
-              value="rejected"
-              defaultChecked={prev?.decision === "rejected"}
-            />
-            {r("rejected")}
-          </label>
-        </div>
+        {/* 全部 OK 才合格；有一項有問題就不合格；還有沒判的就不能送出 */}
+        <p>
+          {[
+            r("summaryOk", { count: okCount }),
+            r("summaryBad", { count: badCount }),
+          ].join(r("summaryJoin"))}
+          {pending.length > 0 ? (
+            <>
+              {r("summaryJoin")}
+              <PendingLink count={pending.length} onClick={nextPending} label={r} />
+            </>
+          ) : (
+            <b className={`ml-2 ${badCount > 0 ? "text-destructive" : "text-accent"}`}>
+              {badCount > 0 ? r("resultFail") : r("resultPass")}
+            </b>
+          )}
+        </p>
         <label className="text-sm">
           <span className="mb-1 block font-medium">{r("comment")}</span>
           <textarea
@@ -443,10 +479,36 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
           <Alert tone="error" items={state.problems.map((p) => reviewErrorText(t, p))} />
         )}
         {state.saved && <Alert>{r("saved")}</Alert>}
-        <Button type="submit" disabled={isPending} className="justify-self-start">
-          {isPending ? t("common.saving") : prev ? r("update") : r("submit")}
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button type="submit" disabled={isPending || pending.length > 0}>
+            {isPending ? t("common.saving") : prev ? r("update") : r("submit")}
+          </Button>
+          {pending.length > 0 && (
+            <PendingLink count={pending.length} onClick={nextPending} label={r} />
+          )}
+        </div>
       </section>
     </form>
+  );
+}
+
+/** 「3 項待處理」：點了跳到下一個還沒判的項目 */
+function PendingLink({
+  count,
+  onClick,
+  label,
+}: {
+  count: number;
+  onClick: () => void;
+  label: (key: string, values?: Record<string, string | number>) => string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="font-semibold text-primary-hover underline"
+    >
+      {label("pending", { count })}
+    </button>
   );
 }

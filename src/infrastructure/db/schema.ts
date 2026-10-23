@@ -9,7 +9,12 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import type { JsonObject, PublicTiming, Transcript } from "@/domain/examSet/examSet";
-import type { AiNoteAction, QuestionNote, ReviewNote } from "@/domain/examSet/review";
+import type {
+  AiNoteAction,
+  ItemVerdict,
+  QuestionNote,
+  ReviewNote,
+} from "@/domain/examSet/review";
 import type { QuestionResult } from "@/domain/exam/grading";
 
 /** 帳號。以 email 識別（存正規化後的小寫）。 */
@@ -95,6 +100,8 @@ export const examSetReviews = pgTable("exam_set_reviews", {
   notes: jsonb("notes").$type<ReviewNote[]>(),
   // 老師對 AI 意見的處理（保留的不記）；舊審稿是 null
   aiActions: jsonb("ai_actions").$type<AiNoteAction[]>(),
+  // 每一題、整套的判定（全部 OK 才合格）；舊審稿是 null
+  verdicts: jsonb("verdicts").$type<ItemVerdict[]>(),
   reviewedAt: timestamp("reviewed_at", { withTimezone: true }).notNull(),
 });
 

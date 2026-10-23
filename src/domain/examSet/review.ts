@@ -24,10 +24,19 @@ export type AiNoteAction = {
   text: string | null;
 };
 
+/**
+ * 老師對一題（或整套）的判定：ok＝沒問題，false＝有問題。target 是題號；null＝整套／錄音。
+ * 跟有沒有意見無關：有意見但判 OK 也算通過。
+ */
+export type ItemVerdict = { target: string | null; ok: boolean };
+
 export type TeacherReview = {
   setId: string;
   reviewerId: string;
+  /** 整套的結果：由每題、整套的判定算出來（全部 OK 才合格），見 decisionFrom */
   decision: ReviewDecision;
+  /** 每一題、整套的判定；舊審稿（還沒有逐題判定時）是空陣列 */
+  verdicts: ItemVerdict[];
   /** 整體意見 */
   comment: string | null;
   /** 老師的意見（每題的、整套的；可含 [mm:ss] 時間標記） */
@@ -67,6 +76,19 @@ export function statusAfter(decision: ReviewDecision): ExamSetStatus {
   return decision;
 }
 
+/** 全部 OK 才合格，有一項有問題就不合格 */
+export function decisionFrom(verdicts: readonly ItemVerdict[]): ReviewDecision {
+  return verdicts.every((v) => v.ok) ? "approved" : "rejected";
+}
+
+/** 還沒判的項目（整套是 null）；required 是這套題要判的全部項目 */
+export function missingVerdicts(
+  verdicts: readonly ItemVerdict[],
+  required: readonly (string | null)[],
+): (string | null)[] {
+  return required.filter((t) => !verdicts.some((v) => v.target === t));
+}
+
 /** 空白當作沒寫；太長回傳 null 由呼叫端報錯 */
 export function cleanNote(raw: string | null | undefined): string | null {
   const t = (raw ?? "").trim();
@@ -75,7 +97,7 @@ export function cleanNote(raw: string | null | undefined): string | null {
 
 /** 審稿內容的問題（代碼）；畫面再轉成使用者的語言 */
 export type ReviewProblem =
-  | { code: "decisionRequired" }
+  | { code: "verdictMissing"; count: number }
   | { code: "commentTooLong"; max: number }
   | { code: "unknownQuestion"; questionId: string }
   | { code: "noteTooLong"; max: number }
@@ -84,7 +106,7 @@ export type ReviewProblem =
 
 /** 檢查審稿內容；回傳所有問題（同一種只報一次），空陣列代表可以存 */
 export function reviewProblems(input: {
-  decision: unknown;
+  verdicts: ItemVerdict[];
   comment: string | null;
   notes: ReviewNote[];
   aiActions: AiNoteAction[];
@@ -96,7 +118,12 @@ export function reviewProblems(input: {
   const add = (p: ReviewProblem) => {
     if (!problems.some((x) => JSON.stringify(x) === JSON.stringify(p))) problems.push(p);
   };
-  if (!isReviewDecision(input.decision)) add({ code: "decisionRequired" });
+  // 每一題和整套都要判；不認得的題號也擋
+  for (const v of input.verdicts)
+    if (v.target !== null && !input.knownQuestionIds.includes(v.target))
+      add({ code: "unknownQuestion", questionId: v.target });
+  const missing = missingVerdicts(input.verdicts, [null, ...input.knownQuestionIds]);
+  if (missing.length > 0) add({ code: "verdictMissing", count: missing.length });
   const tooLong = (s: string | null) => s !== null && s.length > MAX_NOTE_LENGTH;
   if (tooLong(input.comment)) add({ code: "commentTooLong", max });
   for (const n of input.notes) {
@@ -118,6 +145,13 @@ export function cleanNotes(raw: { target: string | null; text: string }[]): Revi
     const text = cleanNote(n.text);
     return text ? [{ target: n.target, text }] : [];
   });
+}
+
+/** 判定：同一項只留最後一次 */
+export function cleanVerdicts(raw: readonly ItemVerdict[]): ItemVerdict[] {
+  const byTarget = new Map<string | null, ItemVerdict>();
+  for (const v of raw) byTarget.set(v.target, { target: v.target, ok: v.ok });
+  return [...byTarget.values()];
 }
 
 /** 對 AI 意見的處理：去掉空白；同一條只留最後一次 */

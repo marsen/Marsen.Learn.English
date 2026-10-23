@@ -67,13 +67,13 @@
       "notLoggedIn": "請先登入",
       "forbidden": "你的帳號沒有審稿的權限",
       "setNotFound": "找不到這套題",
-      "decisionRequired": "請選擇合格或不合格",
       "commentTooLong": "整體意見最多 {max} 字",
       "unknownQuestion": "沒有這一題：{questionId}",
       "noteTooLong": "每則意見最多 {max} 字",
       "unknownAiNote": "找不到其中一條 AI 意見，請重新整理頁面再試",
       "editedAiNoteEmpty": "改寫的 AI 意見不能是空白，不需要的話請刪除",
-      "badPayload": "審稿沒送出去，請重新整理頁面再試"
+      "badPayload": "審稿沒送出去，請重新整理頁面再試",
+      "verdictMissing": "還有 {count} 項沒判"
     }
   },
   "dashboard": {
@@ -193,8 +193,6 @@
     "wrongValue": "（錄音先出現的錯誤答案：{value}）",
     "note": "出題說明",
     "decision": "判定",
-    "approved": "合格",
-    "rejected": "不合格",
     "comment": "整體意見（選填）",
     "saved": "已儲存審稿。",
     "update": "更新審稿",
@@ -206,7 +204,7 @@
     "noComments": "還沒有意見",
     "addComment": "＋ 加意見",
     "commentPlaceholder": "寫下建議…",
-    "ok": "好",
+    "ok": "OK",
     "cancel": "取消",
     "edit": "修改",
     "delete": "刪除",
@@ -227,6 +225,15 @@
     "chipAi": "AI {count}",
     "chipTeacher": "老師 {count}",
     "chipDeleted": "已刪除 {count}",
-    "aiSeverity": "AI · {severity}"
+    "aiSeverity": "AI · {severity}",
+    "needsFixing": "有問題",
+    "notChecked": "還沒判",
+    "verdictGroup": "判定",
+    "summaryOk": "{count} 項 OK",
+    "summaryBad": "{count} 項有問題",
+    "summaryJoin": "、",
+    "pending": "{count} 項待處理",
+    "resultPass": "→ 合格",
+    "resultFail": "→ 不合格"
   }
 }

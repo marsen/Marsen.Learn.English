@@ -4,12 +4,15 @@ import { Fragment } from "react";
 import { useTranslations } from "next-intl";
 import type { PaperView } from "@/application/exam/paperView";
 import type { ReviewQuestion } from "@/application/examSet/reviewView";
+import { VerdictMark } from "./NoteCard";
 
 type Props = {
   paper: PaperView;
   questions: ReadonlyMap<string, ReviewQuestion>;
   /** 老師正在看的題目（或 "set"＝整套） */
   active: string | null;
+  /** 每題的判定：true＝OK，false＝有問題，沒有＝還沒判 */
+  verdicts: ReadonlyMap<string, boolean>;
   /** 錄音正在講答案的題目 */
   listening: string | null;
   /** 每題有幾則意見（刪掉的不算） */
@@ -46,6 +49,7 @@ export function ReviewPaper({
   paper,
   questions,
   active,
+  verdicts,
   listening,
   counts,
   onSelect,
@@ -78,6 +82,14 @@ export function ReviewPaper({
                       const n = counts.get(part.questionId) ?? 0;
                       const on = active === part.questionId;
                       const hearing = listening === part.questionId;
+                      const verdict = verdicts.get(part.questionId);
+                      // 還沒判：底線用虛線；有問題：紅色粗底線
+                      const line =
+                        verdict === undefined
+                          ? "border-dashed border-foreground"
+                          : verdict
+                            ? "border-foreground"
+                            : "border-b-2 border-destructive";
                       return (
                         <Fragment key={pi}>
                           <span className="whitespace-nowrap">
@@ -105,9 +117,12 @@ export function ReviewPaper({
                                 {part.number}
                               </span>
                               <span
-                                className={`inline-block min-w-28 border-b sm:min-w-40 border-foreground px-1 text-left leading-normal font-semibold ${on || hearing ? "bg-primary-soft" : "hover:bg-primary-soft"} ${hearing ? "outline-2 outline-primary" : ""}`}
+                                className={`inline-block min-w-28 border-b sm:min-w-40 ${line} px-1 text-left leading-normal font-semibold ${on || hearing ? "bg-primary-soft" : "hover:bg-primary-soft"} ${hearing ? "outline-2 outline-primary" : ""}`}
                               >
                                 {q?.answer ?? "?"}
+                              </span>
+                              <span className="ml-0.5">
+                                <VerdictMark verdict={verdict} />
                               </span>
                               {n > 0 && (
                                 <sup

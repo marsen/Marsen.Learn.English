@@ -88,6 +88,7 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
       comment: row.comment,
       notes: row.notes ?? fromLegacyNotes(row.audioNote, row.questionNotes),
       aiActions: row.aiActions ?? [],
+      verdicts: row.verdicts ?? [],
       reviewedAt: row.reviewedAt,
     };
   }

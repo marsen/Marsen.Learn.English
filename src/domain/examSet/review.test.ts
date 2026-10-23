@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import {
   aiNoteRef,
+  cleanVerdicts,
+  decisionFrom,
+  missingVerdicts,
   cleanAiActions,
   cleanNote,
   cleanNotes,
@@ -12,8 +15,13 @@ import {
   MAX_NOTE_LENGTH,
 } from "./review";
 
+const allOk = [
+  { target: null, ok: true },
+  { target: "q01", ok: true },
+  { target: "q02", ok: true },
+];
 const base = {
-  decision: "approved",
+  verdicts: allOk,
   comment: null,
   notes: [],
   aiActions: [],
@@ -22,7 +30,7 @@ const base = {
 };
 
 describe("reviewProblems", () => {
-  it("應該接受只有判定、沒有任何意見的審稿", () => {
+  it("應該接受每一項都判了、沒有任何意見的審稿", () => {
     expect(reviewProblems(base)).toEqual([]);
   });
 
@@ -42,10 +50,16 @@ describe("reviewProblems", () => {
     ).toEqual([]);
   });
 
-  it("應該要求選合格或不合格", () => {
-    expect(reviewProblems({ ...base, decision: "maybe" })).toEqual([
-      { code: "decisionRequired" },
-    ]);
+  it("應該要求每一題和整套都判過，報出還差幾項", () => {
+    expect(reviewProblems({ ...base, verdicts: [{ target: "q01", ok: false }] })).toEqual(
+      [{ code: "verdictMissing", count: 2 }],
+    );
+  });
+
+  it("應該擋下判了不存在的題目", () => {
+    expect(
+      reviewProblems({ ...base, verdicts: [...allOk, { target: "q99", ok: true }] }),
+    ).toEqual([{ code: "unknownQuestion", questionId: "q99" }]);
   });
 
   it("應該擋下不存在的小題與不存在的 AI 意見", () => {
@@ -159,5 +173,32 @@ describe("timeMark", () => {
   it("應該把秒數變成 [mm:ss]", () => {
     expect(timeMark(83.7)).toBe("[01:23]");
     expect(timeMark(0)).toBe("[00:00]");
+  });
+});
+
+describe("decisionFrom／cleanVerdicts／missingVerdicts", () => {
+  it("應該全部 OK 才合格，有一項有問題就不合格", () => {
+    expect(decisionFrom(allOk)).toBe("approved");
+    expect(decisionFrom([...allOk, { target: "q03", ok: false }])).toBe("rejected");
+  });
+
+  it("應該讓同一項只留最後一次判定", () => {
+    expect(
+      cleanVerdicts([
+        { target: "q01", ok: true },
+        { target: null, ok: true },
+        { target: "q01", ok: false },
+      ]),
+    ).toEqual([
+      { target: "q01", ok: false },
+      { target: null, ok: true },
+    ]);
+  });
+
+  it("應該列出還沒判的項目（整套是 null）", () => {
+    expect(missingVerdicts([{ target: "q01", ok: true }], [null, "q01", "q02"])).toEqual([
+      null,
+      "q02",
+    ]);
   });
 });

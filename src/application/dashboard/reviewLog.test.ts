@@ -1,3 +1,4 @@
+import { verdictsFor } from "../../../tests/reviewVerdicts";
 import { describe, it, expect, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import { GetReviewLog } from "./reviewLog";
@@ -48,7 +49,7 @@ async function addSet(setId: string) {
 }
 
 const review = (actor: Account, setId: string, decision: "approved" | "rejected") =>
-  new ReviewExamSet(sets).execute({ actor, setId, decision });
+  new ReviewExamSet(sets).execute({ actor, setId, verdicts: verdictsFor(decision) });
 
 const log = (actor: Account, month?: string) =>
   new GetReviewLog(sets, accounts).execute({ actor, month, now: new Date() });
