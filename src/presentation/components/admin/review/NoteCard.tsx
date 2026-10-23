@@ -6,6 +6,7 @@ import type { AiNote, ReviewQuestion } from "@/application/examSet/reviewView";
 import { Button } from "@/presentation/components/ui/Button";
 import { examSetLabel } from "@/presentation/lib/examSetLabels";
 import { clock } from "@/presentation/lib/reviewTime";
+import { aiSeverity, chipSummary, type Severity } from "@/presentation/lib/reviewNotes";
 import { TimeButton, TimeText } from "./TimeText";
 
 /** 老師的意見（畫面上的草稿；key 只給 React 用） */
@@ -40,13 +41,31 @@ type Props = {
   onAiEdit: (ref: string, text: string | null) => void;
   onAiDelete: (ref: string, reason: string) => void;
   onAiRestore: (ref: string) => void;
+  /** 點小標籤：展開這一張 */
   onSelect: () => void;
+  /** 按 ✕：收起來 */
+  onCollapse: () => void;
   currentTime: () => number;
   turnStarts: ReadonlyMap<string, number>;
   onSeek: (seconds: number) => void;
 };
 
-/** 批註卡：一題（或整套）的 AI 意見與老師的意見。 */
+/** 嚴重程度的顏色：提醒灰、注意橘、嚴重紅（小標籤的圓點、意見左邊的色條） */
+const DOT: Record<Severity, string> = {
+  info: "bg-muted-foreground/40",
+  warn: "bg-primary",
+  block: "bg-destructive",
+};
+const BAR: Record<Severity, string> = {
+  info: "border-muted-foreground/40",
+  warn: "border-primary",
+  block: "border-destructive",
+};
+
+/**
+ * 批註卡：一題（或整套）的 AI 意見與老師的意見。
+ * 沒在看的時候縮成一個小標籤（幾則 AI、幾則老師，圓點顏色＝最嚴重的 AI 意見），點了才展開。
+ */
 export function NoteCard(p: Props) {
   const t = useTranslations();
   const r = (key: string, values?: Record<string, string | number>) =>
@@ -58,18 +77,62 @@ export function NoteCard(p: Props) {
   const time = (text: string) => (
     <TimeText text={text} turnStarts={p.turnStarts} onSeek={p.onSeek} />
   );
+  const name = q ? r("questionN", { n: q.number }) : r("wholeSet");
+  const severityOf = (n: AiNote) => aiSeverity(n);
+  const isDeleted = (n: AiNote) => p.aiActions.get(n.ref)?.action === "deleted";
+
+  if (!p.active) {
+    const sum = chipSummary(
+      p.aiNotes.map((n) => ({ severity: severityOf(n), deleted: isDeleted(n) })),
+      p.notes.length,
+    );
+    const parts = [
+      sum.ai > 0 && r("chipAi", { count: sum.ai }),
+      sum.teacher > 0 && r("chipTeacher", { count: sum.teacher }),
+      sum.deleted > 0 && r("chipDeleted", { count: sum.deleted }),
+    ].filter(Boolean);
+    // 滑鼠移上去先瞄第一則
+    const firstAi = p.aiNotes.find((n) => !isDeleted(n));
+    const firstText = firstAi
+      ? (p.aiActions.get(firstAi.ref)?.text ?? firstAi.message)
+      : p.notes[0]?.text;
+    return (
+      <button
+        type="button"
+        onClick={p.onSelect}
+        title={firstText ? firstText.slice(0, 80) : undefined}
+        className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-0.5 text-[0.8125rem] whitespace-nowrap text-muted-foreground hover:border-primary"
+      >
+        <b className="text-heading">{name}</b>
+        {sum.worst && (
+          <span className={`h-2 w-2 shrink-0 rounded-full ${DOT[sum.worst]}`} />
+        )}
+        <span>{parts.length > 0 ? parts.join(" · ") : r("noComments")}</span>
+      </button>
+    );
+  }
 
   return (
-    <div
-      onClick={p.onSelect}
-      className={`grid gap-2 rounded-xl border bg-surface p-3 text-sm leading-relaxed ${p.active ? "border-primary ring-3 ring-primary-soft" : "border-border"}`}
-    >
-      {q ? (
+    <div className="grid gap-2 rounded-xl border border-primary bg-surface p-3 text-sm leading-relaxed ring-3 ring-primary-soft">
+      <div className="flex items-center gap-2">
+        <b className="text-heading">{name}</b>
+        {!q && (
+          <span title={r("wholeSetHint")} className="cursor-help text-muted-foreground">
+            ⓘ
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={p.onCollapse}
+          aria-label={r("close")}
+          title={r("close")}
+          className="ml-auto grid h-7 w-7 place-items-center rounded-full text-xs text-muted-foreground ring-1 ring-border ring-inset hover:bg-muted"
+        >
+          ✕
+        </button>
+      </div>
+      {q && (
         <>
-          <div className="flex flex-wrap items-baseline gap-2">
-            <b className="text-heading">{r("questionN", { n: q.number })}</b>
-            <span className="font-semibold">{q.answer}</span>
-          </div>
           <details className="text-xs">
             <summary className="cursor-pointer text-muted-foreground">
               {r("answerDetails")}
@@ -112,22 +175,13 @@ export function NoteCard(p: Props) {
             </dl>
           </details>
         </>
-      ) : (
-        <>
-          <b className="text-heading">{r("wholeSet")}</b>
-          <p className="-mt-1 text-xs text-muted-foreground">{r("wholeSetHint")}</p>
-        </>
       )}
 
       {p.aiNotes.map((n) => {
         const a = p.aiActions.get(n.ref);
         const deleted = a?.action === "deleted";
         const edited = a?.action === "edited";
-        const who = n.kind === "warning" ? r("byChecker") : r("byAi");
-        const tags =
-          n.kind === "warning"
-            ? [n.warningId, n.rule, n.aiRuling ? label("aiRuling", n.aiRuling) : null]
-            : [label("category", n.category), label("severity", n.severity)];
+        const severity = severityOf(n);
         if (p.editing?.kind === "aiEdit" && p.editing.ref === n.ref)
           return (
             <Editor
@@ -144,11 +198,12 @@ export function NoteCard(p: Props) {
         return (
           <div
             key={n.ref}
-            className={`grid gap-1 rounded-lg px-3 py-2 ${deleted ? "bg-muted text-muted-foreground" : "bg-card"}`}
+            className={`grid gap-1 rounded-lg border-l-3 px-3 py-2 ${BAR[severity]} ${deleted ? "bg-muted text-muted-foreground" : "bg-card"}`}
           >
             <div className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
-              <span className="font-bold text-primary-hover">{who}</span>
-              <span>{tags.filter(Boolean).join(" · ")}</span>
+              <span className="font-bold text-primary-hover">
+                {r("aiSeverity", { severity: label("severity", severity) })}
+              </span>
               {edited && (
                 <span className="rounded bg-muted px-1.5">{r("editedTag")}</span>
               )}
@@ -166,8 +221,10 @@ export function NoteCard(p: Props) {
               </p>
             )}
             {edited && (
-              <p className="border-t border-dashed border-border pt-1 text-xs text-muted-foreground">
-                {r("aiOriginal", { text: "" })}
+              <details className="text-xs text-muted-foreground">
+                <summary className="cursor-pointer text-primary-hover">
+                  {r("showAiOriginal")}
+                </summary>
                 {time(n.message)}
                 {n.suggestion && (
                   <>
@@ -176,7 +233,7 @@ export function NoteCard(p: Props) {
                     {time(n.suggestion)}
                   </>
                 )}
-              </p>
+              </details>
             )}
             {deleted && a.text && (
               <p className="border-t border-dashed border-border pt-1 text-xs">
@@ -251,7 +308,10 @@ export function NoteCard(p: Props) {
             onSave={(text) => p.onSaveNote(n.key, p.target, text)}
           />
         ) : (
-          <div key={n.key} className="grid gap-1 rounded-lg bg-accent-soft px-3 py-2">
+          <div
+            key={n.key}
+            className="grid gap-1 rounded-lg border-l-3 border-accent bg-accent-soft px-3 py-2"
+          >
             <span className="text-xs font-bold text-accent">{r("byTeacher")}</span>
             <p className="whitespace-pre-wrap">{time(n.text)}</p>
             <div className="flex flex-wrap gap-1.5">

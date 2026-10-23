@@ -183,7 +183,7 @@
     "audio": "Recording",
     "insertTime": "Insert current time",
     "questionN": "Question {n}",
-    "wholeSet": "Whole set / recording",
+    "wholeSet": "Whole set",
     "suggestion": "Suggestion: {text}",
     "answer": "Answer",
     "accepted": "Also accepted",
@@ -214,16 +214,19 @@
     "revertToAi": "Back to the AI's wording",
     "deleteReasonPlaceholder": "Why doesn't this need fixing? (optional, the AI will see it)",
     "byTeacher": "Teacher",
-    "byChecker": "Checker",
-    "byAi": "AI review",
     "editedTag": "Edited by teacher",
     "deletedTag": "Deleted by teacher",
-    "aiOriginal": "AI's original: {text}",
     "deleteReason": "Reason: {text}",
     "commentCount": "{count, plural, one {# comment} other {# comments}}",
     "transcript": "Transcript",
     "transcriptHint": "Click a time to jump there. The line being played is highlighted.",
     "noTranscript": "This set was packed before transcripts were included, so the ▶ buttons and the transcript aren't available.",
-    "unsavedComment": "You have a comment you haven't saved. Press OK (or Cancel) on it first."
+    "unsavedComment": "You have a comment you haven't saved. Press OK (or Cancel) on it first.",
+    "close": "Collapse (Esc)",
+    "showAiOriginal": "Show the AI's original",
+    "chipAi": "AI {count}",
+    "chipTeacher": "Teacher {count}",
+    "chipDeleted": "{count} deleted",
+    "aiSeverity": "AI · {severity}"
   }
 }

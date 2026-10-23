@@ -183,7 +183,7 @@
     "audio": "錄音",
     "insertTime": "插入目前時間",
     "questionN": "第 {n} 題",
-    "wholeSet": "整套／錄音",
+    "wholeSet": "整套",
     "suggestion": "建議：{text}",
     "answer": "標準答案",
     "accepted": "也算對的寫法",
@@ -214,16 +214,19 @@
     "revertToAi": "改回 AI 原文",
     "deleteReasonPlaceholder": "為什麼不用改？（選填，會一起給 AI）",
     "byTeacher": "老師",
-    "byChecker": "程式示警",
-    "byAi": "AI 審稿",
     "editedTag": "老師改過",
     "deletedTag": "老師刪除",
-    "aiOriginal": "AI 原文：{text}",
     "deleteReason": "刪除原因：{text}",
     "commentCount": "{count} 則意見",
     "transcript": "逐字稿",
     "transcriptHint": "點時間跳過去聽，正在播的那句會亮起來。",
     "noTranscript": "這套題打包時還沒有逐字稿，所以沒有 ▶ 和逐字稿。",
-    "unsavedComment": "有一則意見還沒存，請先按「好」（或「取消」）。"
+    "unsavedComment": "有一則意見還沒存，請先按「好」（或「取消」）。",
+    "close": "收起（Esc）",
+    "showAiOriginal": "看 AI 原文",
+    "chipAi": "AI {count}",
+    "chipTeacher": "老師 {count}",
+    "chipDeleted": "已刪除 {count}",
+    "aiSeverity": "AI · {severity}"
   }
 }

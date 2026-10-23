@@ -175,11 +175,47 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
     return true;
   };
 
-  const select = (target: string) => {
-    setActive(target);
-    if (target !== SET && notesOf(target).length === 0 && aiOf(target).length === 0)
-      startEditing({ kind: "new", target });
+  /** 收起展開的卡（✕、再點一次同一題、Esc）；有沒存的意見就先擋下來 */
+  const collapse = () => {
+    if (active === null) return;
+    if (hasUnsaved()) {
+      showUnsaved();
+      return;
+    }
+    setActive(null);
+    setEditing(null);
   };
+
+  /** 展開一題；再點一次同一題就收起。換題時有沒存的意見就先擋下來 */
+  const select = (target: string) => {
+    if (active === target) {
+      collapse();
+      return;
+    }
+    if (editing !== null && hasUnsaved()) {
+      showUnsaved();
+      return;
+    }
+    setActive(target);
+    setEditing(
+      target !== SET && notesOf(target).length === 0 && aiOf(target).length === 0
+        ? { kind: "new", target }
+        : null,
+    );
+  };
+
+  // Esc 收起
+  const collapseRef = useRef(collapse);
+  useEffect(() => {
+    collapseRef.current = collapse;
+  });
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") collapseRef.current();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   // 窄螢幕：點空格後捲到那張卡
   const scrollTo = useRef<string | null>(null);
@@ -224,10 +260,15 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
       );
       const tops = stackCards(
         cardEls.map((el, i) => ({
-          want: anchors[i] ? anchors[i].top + anchors[i].height / 2 - M.top - 18 : 0,
+          want: anchors[i]
+            ? anchors[i].top +
+              anchors[i].height / 2 -
+              M.top -
+              Math.min(18, el.offsetHeight / 2)
+            : 0,
           height: el.offsetHeight,
         })),
-        10,
+        6,
       );
       const ns = "http://www.w3.org/2000/svg";
       const shapes: SVGElement[] = [];
@@ -240,7 +281,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
         const y1 = a.bottom - B.top + 3;
         const xm = paperRight - B.left + 8;
         const x2 = M.left - B.left;
-        const y2 = M.top - B.top + tops[i] + 18;
+        const y2 = M.top - B.top + tops[i] + Math.min(18, el.offsetHeight / 2);
         const on = active === el.dataset.card;
         const path = document.createElementNS(ns, "path");
         path.setAttribute(
@@ -347,7 +388,8 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
                   setAi(ref, { action: "deleted", text: reason })
                 }
                 onAiRestore={(ref) => setAi(ref, null)}
-                onSelect={() => setActive(target)}
+                onSelect={() => select(target)}
+                onCollapse={collapse}
                 currentTime={currentTime}
                 turnStarts={turnStarts}
                 onSeek={(s) => seek(s)}
