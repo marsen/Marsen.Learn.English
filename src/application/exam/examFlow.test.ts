@@ -360,11 +360,11 @@ describe("ListMyAttempts", () => {
 });
 
 describe("跨裝置認領", () => {
-  it("應該在 A 瀏覽器寫考卷、B 裝置（沒有路人識別）點連結時，作答仍移到新帳號", async () => {
+  it("應該在 A 瀏覽器寫考卷、B 裝置（沒有路人識別）輸入登入碼時，作答仍移到新帳號", async () => {
     const r = await start(guest, "s1-public", "browser-A");
     if (!r.ok) throw new Error(r.reason);
     await submit(guest, r.sheet.attemptId, { q01: "37" }, "browser-A");
-    // 點連結的 B 裝置沒有 cookie（null）；登入碼裡記的是 A
+    // 輸入登入碼的 B 裝置沒有 cookie（null）；登入碼裡記的是 A
     const claimed = await new ClaimGuestAttempts(attempts).execute({
       accountId: "student",
       guestIds: ["browser-A", null],

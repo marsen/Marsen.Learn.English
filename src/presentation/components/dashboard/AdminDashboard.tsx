@@ -9,6 +9,10 @@ import { StatusTags } from "@/presentation/components/admin/StatusTags";
 import { CopyButton } from "./CopyButton";
 import { DeleteSetButton } from "./DeleteSetButton";
 import { TopicChart } from "./TopicChart";
+import { Button, ButtonLink, buttonClass } from "@/presentation/components/ui/Button";
+import { EmptyState } from "@/presentation/components/ui/EmptyState";
+import { Table, Td, Tr } from "@/presentation/components/ui/Table";
+import { formatDay } from "@/presentation/lib/format";
 
 type Props = {
   view: AdminDashboardView;
@@ -16,14 +20,7 @@ type Props = {
   deleteAction: (formData: FormData) => Promise<void>;
 };
 
-const day = (d: Date | null) =>
-  d
-    ? d.toLocaleDateString("zh-TW", {
-        timeZone: "Asia/Taipei",
-        month: "numeric",
-        day: "numeric",
-      })
-    : "";
+const day = (d: Date | null) => (d ? formatDay(d) : "");
 
 const who = (r: ReviewedSetView) => r.reviewerEmail ?? "老師";
 
@@ -44,7 +41,7 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
         {kpis.map((k) => (
           <div
             key={k.label}
-            className={`rounded-2xl border border-border bg-white p-4 ${k.tone}`}
+            className={`rounded-2xl border border-border bg-surface p-4 ${k.tone}`}
           >
             <p className="text-sm text-muted-foreground">{k.label}</p>
             <p className="mt-1 text-3xl font-bold">{k.n}</p>
@@ -55,56 +52,46 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
       <h2 className="mt-10 mb-1 text-lg font-semibold text-heading">可以上架</h2>
       <p className="mb-3 text-sm text-muted-foreground">老師已通過、目前還是下架。</p>
       {view.readyToList.length === 0 ? (
-        <p className="rounded-2xl border border-border bg-white px-5 py-6 text-center text-muted-foreground">
-          沒有等著上架的題組。
-        </p>
+        <EmptyState>沒有等著上架的題組。</EmptyState>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-border bg-white">
-          <table className="w-full text-left text-sm">
-            <tbody>
-              {view.readyToList.map((r) => (
-                <tr key={r.set.setId} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3 font-mono whitespace-nowrap">
-                    <Link
-                      href={`/admin/sets/${r.set.setId}`}
-                      className="text-primary underline"
-                    >
-                      {r.set.setId}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3">{r.set.title}</td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <StatusTags tags={statusTagsOf(r.set)} />
-                  </td>
-                  <td className="px-4 py-3 text-xs whitespace-nowrap text-muted-foreground">
-                    {who(r)} {day(r.reviewedAt)} 通過
-                  </td>
-                  <td className="px-4 py-3 text-right whitespace-nowrap">
-                    <form action={setAccessAction} className="inline-flex gap-2">
-                      <input type="hidden" name="setId" value={r.set.setId} />
-                      <button
-                        type="submit"
-                        name="access"
-                        value="members"
-                        className="rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary-hover"
-                      >
-                        上架
-                      </button>
-                      <button
-                        type="submit"
-                        name="access"
-                        value="public"
-                        className="btn-ghost"
-                      >
-                        設為公開
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table>
+          {view.readyToList.map((r) => (
+            <Tr key={r.set.setId}>
+              <Td className="font-mono whitespace-nowrap">
+                <Link
+                  href={`/admin/sets/${r.set.setId}`}
+                  className="text-primary underline"
+                >
+                  {r.set.setId}
+                </Link>
+              </Td>
+              <Td>{r.set.title}</Td>
+              <Td className="whitespace-nowrap">
+                <StatusTags tags={statusTagsOf(r.set)} />
+              </Td>
+              <Td className="text-xs whitespace-nowrap text-muted-foreground">
+                {who(r)} {day(r.reviewedAt)} 通過
+              </Td>
+              <Td align="right" className="whitespace-nowrap">
+                <form action={setAccessAction} className="inline-flex gap-2">
+                  <input type="hidden" name="setId" value={r.set.setId} />
+                  <Button type="submit" name="access" value="members" size="sm">
+                    上架
+                  </Button>
+                  <Button
+                    type="submit"
+                    name="access"
+                    value="public"
+                    variant="secondary"
+                    size="sm"
+                  >
+                    設為公開
+                  </Button>
+                </form>
+              </Td>
+            </Tr>
+          ))}
+        </Table>
       )}
 
       <h2 className="mt-10 mb-1 text-lg font-semibold text-heading">有問題</h2>
@@ -112,15 +99,13 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
         老師退回的題組。修好就上傳新版本，修不了就刪掉。
       </p>
       {view.rejected.length === 0 ? (
-        <p className="rounded-2xl border border-border bg-white px-5 py-6 text-center text-muted-foreground">
-          沒有被退回的題組。
-        </p>
+        <EmptyState>沒有被退回的題組。</EmptyState>
       ) : (
         <div className="grid gap-3">
           {view.rejected.map((r) => (
             <article
               key={r.set.setId}
-              className="rounded-2xl border border-destructive/30 bg-white p-5"
+              className="rounded-2xl border border-destructive/30 bg-surface p-5"
             >
               <div className="flex flex-wrap items-center gap-2">
                 <Link
@@ -142,15 +127,15 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
                 {r.reviewerEmail && (
                   <a
                     href={`mailto:${r.reviewerEmail}?subject=${encodeURIComponent(`題組 ${r.set.setId} 審稿討論`)}`}
-                    className="btn-ghost"
+                    className={buttonClass({ variant: "secondary", size: "sm" })}
                   >
                     💬 找老師討論
                   </a>
                 )}
                 <CopyButton text={feedbackText(r)} label="📋 複製回饋（貼給 AI）" />
-                <Link href="/admin/sets/upload" className="btn-ghost">
+                <ButtonLink href="/admin/sets/upload" variant="secondary" size="sm">
                   ⬆︎ 上傳修正版
-                </Link>
+                </ButtonLink>
                 <DeleteSetButton setId={r.set.setId} action={deleteAction} />
               </div>
             </article>

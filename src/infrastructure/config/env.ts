@@ -7,16 +7,16 @@
 import { z } from "zod";
 
 const schema = z.object({
-  // 站台對外網址，登入連結用它組出來
+  // 站台對外網址
   SITE_URL: z.string().url(),
-  // 資料庫；沒設定時用記憶體資料（開發用）
-  DATABASE_URL: z.string().min(1).optional(),
+  // 資料庫（Neon）；本機和正式環境都一定要有，沒有就啟動失敗
+  DATABASE_URL: z.string().min(1),
   AUTH_SECRET: z.string().min(1),
   AUTH_TOKEN_TTL: z.string().min(1),
   // 寄信（Resend）；沒設定時改用開發用寄信（只限非正式環境）
   RESEND_API_KEY: z.string().min(1).optional(),
   MAIL_FROM: z.string().min(1).optional(),
-  // 本機開發：上傳的音檔存在這個資料夾（相對專案根目錄）
+  // 本機開發：上傳的音檔存在這個資料夾（相對專案根目錄）；沒設定 R2 時一定要有
   AUDIO_LOCAL_DIR: z.string().min(1).optional(),
   // 錄音存 Cloudflare R2（四個要一起設定）；有設定就優先用 R2
   R2_ACCOUNT_ID: z.string().min(1).optional(),

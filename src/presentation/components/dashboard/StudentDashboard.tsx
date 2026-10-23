@@ -1,16 +1,13 @@
 import Link from "next/link";
 import type { StudentDashboardView } from "@/application/dashboard/studentDashboard";
 import { trapLabel } from "@/presentation/lib/examSetLabels";
+import { ButtonLink } from "@/presentation/components/ui/Button";
+import { EmptyState } from "@/presentation/components/ui/EmptyState";
+import { formatDay } from "@/presentation/lib/format";
+import { DELETED_SET_TITLE } from "@/presentation/lib/errorMessages";
 
 const pct = (score: number, total: number) =>
   total > 0 ? Math.round((score / total) * 100) : 0;
-
-const day = (d: Date) =>
-  d.toLocaleDateString("zh-TW", {
-    timeZone: "Asia/Taipei",
-    month: "numeric",
-    day: "numeric",
-  });
 
 /** 學生總覽：繼續練習、還有幾張沒考、我的成績、最常錯的題型。 */
 export function StudentDashboard({ view }: { view: StudentDashboardView }) {
@@ -34,12 +31,9 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
                 {rec.questionCount} 題
                 {rec.bestPercent !== null && ` ・ 上次最好 ${rec.bestPercent} 分`}
               </p>
-              <Link
-                href={`/exam/${rec.setId}`}
-                className="mt-4 inline-block rounded-full bg-primary px-6 py-2 font-medium text-primary-foreground transition-transform hover:scale-105 hover:bg-primary-hover"
-              >
+              <ButtonLink href={`/exam/${rec.setId}`} className="mt-4">
                 {rec.reason === "new" ? "開始練習" : "再挑戰"}
-              </Link>
+              </ButtonLink>
             </>
           ) : (
             <p className="text-muted-foreground">
@@ -49,7 +43,7 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
         </div>
         <Link
           href="/exam"
-          className="rounded-2xl border border-border bg-white p-6 transition-colors hover:bg-muted"
+          className="rounded-2xl border border-border bg-surface p-6 transition-colors hover:bg-muted"
         >
           <p className="text-sm text-muted-foreground">還沒考過的考卷</p>
           <p className="mt-1 text-5xl font-bold">
@@ -65,25 +59,23 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
       <div>
         <h2 className="mb-3 text-lg font-semibold">我的成績</h2>
         {view.attemptCount === 0 ? (
-          <p className="rounded-2xl border border-border bg-white px-5 py-6 text-center text-muted-foreground">
-            考完第一張，這裡就會出現你的成績。
-          </p>
+          <EmptyState>考完第一張，這裡就會出現你的成績。</EmptyState>
         ) : (
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-2xl border border-border bg-white p-5">
+            <div className="rounded-2xl border border-border bg-surface p-5">
               <p className="text-sm text-muted-foreground">考了</p>
               <p className="mt-1 text-3xl font-bold">
                 {view.attemptCount} <span className="text-base font-medium">次</span>
               </p>
             </div>
-            <div className="rounded-2xl border border-border bg-white p-5">
+            <div className="rounded-2xl border border-border bg-surface p-5">
               <p className="text-sm text-muted-foreground">平均答對</p>
               <p className="mt-1 text-3xl font-bold">
                 {view.averagePercent}
                 <span className="text-base font-medium">%</span>
               </p>
             </div>
-            <div className="rounded-2xl border border-border bg-white p-5">
+            <div className="rounded-2xl border border-border bg-surface p-5">
               <p className="text-sm text-muted-foreground">最近一次</p>
               {last && (
                 <p className="mt-1 text-3xl font-bold">
@@ -93,7 +85,7 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
               )}
             </div>
 
-            <div className="rounded-2xl border border-border bg-white p-5 sm:col-span-3">
+            <div className="rounded-2xl border border-border bg-surface p-5 sm:col-span-3">
               <p className="mb-4 text-sm text-muted-foreground">
                 最近 {view.recent.length} 次
               </p>
@@ -107,7 +99,7 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
                     >
                       <Link
                         href={`/exam/result/${r.attemptId}`}
-                        title={`${r.title}：${r.score} / ${r.total}`}
+                        title={`${r.title ?? DELETED_SET_TITLE}：${r.score} / ${r.total}`}
                         className="group flex h-full flex-col justify-end"
                       >
                         <span className="mb-1 text-center text-xs font-semibold">
@@ -118,7 +110,7 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
                           style={{ height: `${Math.max(p, 3)}%` }}
                         />
                         <span className="mt-1 text-center text-xs text-muted-foreground">
-                          {day(r.submittedAt)}
+                          {formatDay(r.submittedAt)}
                         </span>
                       </Link>
                     </li>
@@ -137,7 +129,10 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
           <p className="mb-3 text-sm text-muted-foreground">練習時特別留意這幾種陷阱。</p>
           <ul className="grid gap-3 sm:grid-cols-3">
             {view.weakTraps.map((t) => (
-              <li key={t.trap} className="rounded-2xl border border-border bg-white p-5">
+              <li
+                key={t.trap}
+                className="rounded-2xl border border-border bg-surface p-5"
+              >
                 <p className="font-semibold">{trapLabel(t.trap)}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   錯 <b className="text-destructive">{t.wrong}</b> / {t.seen} 題

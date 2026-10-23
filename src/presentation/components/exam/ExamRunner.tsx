@@ -7,6 +7,8 @@ import type {
   SubmitExamResult,
 } from "@/application/exam/examResult";
 import { ExamPaper } from "./ExamPaper";
+import { Alert } from "@/presentation/components/ui/Alert";
+import { Button } from "@/presentation/components/ui/Button";
 import {
   eventAt,
   formatClock,
@@ -129,14 +131,10 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
           《{title}》。按下開始後錄音會直接播放，<b>只播一次，不能暫停或倒轉</b>
           ，跟正式考試一樣。 錄音裡有看題時間和最後檢查時間，錄音結束會自動交卷。
         </p>
-        {error && <p className="text-destructive">{error}</p>}
-        <button
-          type="button"
-          onClick={begin}
-          className="justify-self-start rounded-lg bg-primary px-6 py-2.5 font-medium text-primary-foreground"
-        >
+        {error && <Alert tone="error">{error}</Alert>}
+        <Button onClick={begin} className="justify-self-start">
           開始考試
-        </button>
+        </Button>
       </div>
     );
   }
@@ -144,7 +142,7 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
   if (stage === "submitted") {
     return (
       <div className="grid gap-2">
-        <p className="rounded-lg bg-card px-4 py-3">已交卷，正在打開批改結果…</p>
+        <Alert>已交卷，正在打開批改結果…</Alert>
       </div>
     );
   }
@@ -166,7 +164,7 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
       >
         {status}
       </p>
-      {error && <p className="text-destructive">{error}</p>}
+      {error && <Alert tone="error">{error}</Alert>}
       {sheet && (
         <ExamPaper
           paper={sheet.paper}
@@ -176,14 +174,13 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
           highlight={phase?.kind === "read" ? phase.questions : null}
         />
       )}
-      <button
-        type="button"
+      <Button
         disabled={stage !== "running" || !sheet}
         onClick={() => sheet && handIn(sheet.attemptId)}
-        className="justify-self-start rounded-lg bg-primary px-6 py-2.5 font-medium text-primary-foreground disabled:opacity-60"
+        className="justify-self-start"
       >
         {stage === "submitting" ? "交卷中…" : "交卷"}
-      </button>
+      </Button>
     </div>
   );
 }

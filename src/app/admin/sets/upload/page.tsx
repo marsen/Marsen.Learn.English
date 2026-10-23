@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Page, PageHeader } from "@/presentation/components/ui/Page";
 import { BatchUploadForm } from "@/presentation/components/admin/BatchUploadForm";
 import { requirePermission } from "@/infrastructure/auth/currentAccount";
 import { uploadExamSetAction } from "@/app/actions/examSet";
@@ -9,15 +10,15 @@ export default async function UploadSetPage() {
   await requirePermission("uploadSets");
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-12">
-      <h1 className="text-2xl font-bold">上傳題組</h1>
-      <p className="mt-1 mb-8 text-sm text-muted-foreground">
-        AI 有疑慮的題組也可以上傳，會交給老師審稿。
-      </p>
+    <Page>
+      <PageHeader
+        title="上傳題組"
+        description="AI 有疑慮的題組也可以上傳，會交給老師審稿。"
+      />
 
       <section className="rounded-2xl border border-border bg-surface p-6">
         <BatchUploadForm action={uploadExamSetAction} />
       </section>
-    </main>
+    </Page>
   );
 }

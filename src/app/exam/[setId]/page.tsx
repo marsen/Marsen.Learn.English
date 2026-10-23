@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Page } from "@/presentation/components/ui/Page";
 import { ExamRunner } from "@/presentation/components/exam/ExamRunner";
 import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
 import { listAvailableExams } from "@/infrastructure/di/examSetContainer";
@@ -19,18 +20,16 @@ export default async function ExamPage({
   );
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12">
+    <Page>
       {exam ? (
-        <div className="mt-4">
-          <ExamRunner
-            title={exam.title}
-            audioUrl={`/exam/${setId}/audio`}
-            start={startExamAction.bind(null, setId)}
-            submit={submitExamAction}
-          />
-        </div>
+        <ExamRunner
+          title={exam.title}
+          audioUrl={`/exam/${setId}/audio`}
+          start={startExamAction.bind(null, setId)}
+          submit={submitExamAction}
+        />
       ) : (
-        <p className="mt-6">
+        <p>
           這張考卷現在不能考。
           {!actor && (
             <>
@@ -43,6 +42,6 @@ export default async function ExamPage({
           )}
         </p>
       )}
-    </main>
+    </Page>
   );
 }

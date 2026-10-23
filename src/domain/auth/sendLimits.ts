@@ -30,23 +30,29 @@ export type SendFacts = {
   hasAccount: boolean;
 };
 
-/** 回傳不能寄的原因（中文）；可以寄回 null */
-export function sendBlockReason(f: SendFacts): string | null {
+/** 不能寄的原因（代碼）；畫面再轉成使用者的語言 */
+export type SendBlock =
+  | { code: "cooldown"; seconds: number }
+  | { code: "emailHourlyLimit" }
+  | { code: "ipHourlyLimit" }
+  | { code: "signupsFull" };
+
+/** 回傳不能寄的原因；可以寄回 null */
+export function sendBlockReason(f: SendFacts): SendBlock | null {
   if (f.lastSentToEmail) {
     const waited = (f.now.getTime() - f.lastSentToEmail.getTime()) / 1000;
     if (waited < EMAIL_COOLDOWN_SECONDS) {
-      const left = Math.ceil(EMAIL_COOLDOWN_SECONDS - waited);
-      return `剛寄過，請等 ${left} 秒再試`;
+      return { code: "cooldown", seconds: Math.ceil(EMAIL_COOLDOWN_SECONDS - waited) };
     }
   }
   if (f.emailSentLastHour >= EMAIL_MAX_PER_HOUR) {
-    return "這個 email 這小時寄太多次了，請一小時後再試";
+    return { code: "emailHourlyLimit" };
   }
   if (f.ipSentLastHour !== null && f.ipSentLastHour >= IP_MAX_PER_HOUR) {
-    return "這個網路這小時申請太多次了，請一小時後再試";
+    return { code: "ipHourlyLimit" };
   }
   if (!f.hasAccount && f.sentLastDay >= DAILY_SIGNUP_CUTOFF) {
-    return "今天註冊人數已滿，請明天再來";
+    return { code: "signupsFull" };
   }
   return null;
 }

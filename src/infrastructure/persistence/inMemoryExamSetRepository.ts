@@ -6,7 +6,7 @@ import {
   type TeacherReview,
 } from "@/domain/examSet/review";
 
-/** 記憶體版題組 repository（測試、沒有資料庫的本機開發）。 */
+/** 記憶體版題組 repository（只給測試用；網站本身一律用資料庫）。 */
 export class InMemoryExamSetRepository implements ExamSetRepository {
   private readonly sets = new Map<string, ExamSet>();
   private readonly privates = new Map<string, ExamSetPrivate>();

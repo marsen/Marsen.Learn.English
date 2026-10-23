@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/presentation/components/ui/Button";
 
 type Props = {
   setId: string;
@@ -13,28 +14,21 @@ export function DeleteSetButton({ setId, action }: Props) {
 
   if (!confirming)
     return (
-      <button
-        type="button"
-        onClick={() => setConfirming(true)}
-        className="btn-ghost text-destructive"
-      >
+      <Button variant="dangerSecondary" size="sm" onClick={() => setConfirming(true)}>
         刪除
-      </button>
+      </Button>
     );
 
   return (
     <form action={action} className="inline-flex items-center gap-2">
       <input type="hidden" name="setId" value={setId} />
       <span className="text-sm text-destructive">確定整套刪掉？刪了就救不回來</span>
-      <button
-        type="submit"
-        className="rounded-full bg-destructive px-3 py-1.5 text-sm font-medium text-white"
-      >
+      <Button type="submit" variant="danger" size="sm">
         確定刪除
-      </button>
-      <button type="button" onClick={() => setConfirming(false)} className="btn-ghost">
+      </Button>
+      <Button variant="secondary" size="sm" onClick={() => setConfirming(false)}>
         取消
-      </button>
+      </Button>
     </form>
   );
 }

@@ -8,6 +8,7 @@ import {
   pairBundles,
   type BundlePair,
 } from "@/presentation/lib/bundlePairs";
+import { Button } from "@/presentation/components/ui/Button";
 
 type Props = {
   action: (prev: UploadSetFormState, formData: FormData) => Promise<UploadSetFormState>;
@@ -117,14 +118,9 @@ export function BatchUploadForm({ action }: Props) {
             ))}
           </ul>
           <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={start}
-              disabled={running || waiting === 0}
-              className="rounded-full bg-primary px-6 py-2.5 font-medium text-primary-foreground transition hover:scale-105 hover:bg-primary-hover disabled:opacity-60 disabled:hover:scale-100"
-            >
+            <Button onClick={start} disabled={running || waiting === 0}>
               {running ? "上傳中…" : `上傳 ${waiting} 套`}
-            </button>
+            </Button>
             {!running && done > 0 && (
               <a href="/admin/sets" className="text-sm text-primary underline">
                 完成 {done} 套，去題組清單 →

@@ -34,9 +34,11 @@ app（路由／Server Action，薄）→ presentation → application → domain
 - **main**：沒有 Marsen 同意，不得 commit、合併或推送到 `main`
 - **驗收**：`pnpm lint` + `pnpm test` + `pnpm build` 都要過
 - **環境變數**：集中 `src/infrastructure/config/env.ts`、Zod fail-fast、不在 code 寫預設值
+- **migration**：自動部署會先跑 migration 再上線，所以 migration 要讓舊版程式還能用（刪欄位、改名分兩次上線，見 `docs/deploy-cloud-run.md`）
 - **測試**：Vitest，測試檔跟原始碼放一起（`*.test.ts`），描述用中文；domain／application 必測
 - **格式**：Prettier（`pnpm format`）
 - **UI**：顏色、字型只用 `globals.css` 的 token（`primary`、`muted`…），不寫死顏色；目前是暫用樣式，之後會整體改
+  - 用共用元件（`presentation/components/ui/`）時，`className` 只放排版（間距、對齊、寬度），顏色、字級用元件參數（`variant`、`size`）；沒有合適的參數就加一個。原因：同一種屬性有兩個 Tailwind class 時，生效的是 CSS 裡排後面的，不是 className 裡寫後面的
 - 溝通語言：中文
 - 回覆規則：
   - 直接給結果，不要前言、不要總結
@@ -46,10 +48,12 @@ app（路由／Server Action，薄）→ presentation → application → domain
 
 ## 本機開發
 
-開發伺服器固定用 **3100** port（`pnpm dev`），避免跟其他專案（Arsenal、Becca 用 3000）撞在一起；`SITE_URL` 也要是 3100，登入連結才會連回這裡。
+開發伺服器固定用 **3100** port（`pnpm dev`），避免跟其他專案（Arsenal、Becca 用 3000）撞在一起；`SITE_URL` 也設成 3100。
 
-不用任何金鑰：沒設 `DATABASE_URL` 用記憶體資料（自動建好 admin@marsen.me 管理員＋老師），
-沒設 `RESEND_API_KEY` 時登入連結直接顯示在登入頁。
+一定要有資料庫：`DATABASE_URL` 沒設定就啟動失敗（本機和正式環境都一樣，不再有記憶體資料模式）。
+本機連開發用的資料庫（Neon 的 dev branch），不要連正式資料庫；第一次用 `pnpm db:migrate`、`pnpm db:seed` 建好資料表和 admin@marsen.me。
+錄音沒設定 R2 時要設 `AUDIO_LOCAL_DIR`。沒設 `RESEND_API_KEY` 時登入碼直接顯示在登入頁。
+記憶體版 repository（`infrastructure/persistence/inMemory*`）只給測試用。
 
 ## 舊版
 

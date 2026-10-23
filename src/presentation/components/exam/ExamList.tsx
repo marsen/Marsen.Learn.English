@@ -1,15 +1,15 @@
 import type { AvailableExam } from "@/application/exam/examResult";
+import { EmptyState } from "@/presentation/components/ui/EmptyState";
 
 export function ExamList({ exams }: { exams: AvailableExam[] }) {
-  if (exams.length === 0)
-    return <p className="text-muted-foreground">目前沒有可以寫的考卷。</p>;
+  if (exams.length === 0) return <EmptyState>目前沒有可以寫的考卷。</EmptyState>;
   return (
     <ul className="grid gap-3">
       {exams.map((e) => (
         <li key={e.setId}>
           <a
             href={`/exam/${e.setId}`}
-            className="flex items-center justify-between rounded-xl border border-border bg-white px-4 py-3"
+            className="flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3"
           >
             <span>
               {e.title}

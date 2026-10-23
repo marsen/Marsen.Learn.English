@@ -1,4 +1,6 @@
-import Link from "next/link";
+import { ButtonLink } from "@/presentation/components/ui/Button";
+import { EmptyState } from "@/presentation/components/ui/EmptyState";
+import { Table, Td, Th, Tr } from "@/presentation/components/ui/Table";
 import type { TeacherDashboardView } from "@/application/dashboard/teacherDashboard";
 import { StatusTags } from "@/presentation/components/admin/StatusTags";
 import { waitedLabel } from "@/presentation/lib/waiting";
@@ -33,7 +35,7 @@ export function TeacherDashboard({
             </p>
           )}
         </div>
-        <div className="rounded-2xl border border-border bg-white p-5">
+        <div className="rounded-2xl border border-border bg-surface p-5">
           <p className="text-sm text-muted-foreground">你這個月審了</p>
           <p className="mt-1 text-4xl font-bold">
             {view.reviewedThisMonth} <span className="text-base font-medium">套</span>
@@ -45,52 +47,40 @@ export function TeacherDashboard({
         待審清單（最舊的在上面）
       </h2>
       {view.pending.length === 0 ? (
-        <p className="rounded-2xl border border-border bg-white px-5 py-8 text-center text-muted-foreground">
-          目前沒有要審的題組，辛苦了。
-        </p>
+        <EmptyState>目前沒有要審的題組，辛苦了。</EmptyState>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-border bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-border text-muted-foreground">
-              <tr>
-                <th className="px-4 py-3 font-medium">題組</th>
-                <th className="px-4 py-3 font-medium">標題</th>
-                <th className="px-4 py-3 font-medium">AI 怎麼說</th>
-                <th className="px-4 py-3 font-medium">等了</th>
-                <th className="px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody>
-              {view.pending.map((s) => (
-                <tr key={s.setId} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3 font-mono whitespace-nowrap text-primary">
-                    {s.setId}
-                  </td>
-                  <td className="px-4 py-3">{s.title}</td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <StatusTags tags={[s.aiVerdict === "pass" ? "AIP" : "AI_WARN"]} />
-                    {s.aiVerdict !== "pass" && s.findingCount > 0 && (
-                      <span className="ml-2 text-xs text-muted-foreground">
-                        {s.findingCount} 個疑點
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    {waitedLabel(s.uploadedAt, now)}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <Link
-                      href={`/admin/sets/${s.setId}`}
-                      className="inline-block rounded-full bg-primary px-4 py-1.5 text-sm font-medium whitespace-nowrap text-primary-foreground hover:bg-primary-hover"
-                    >
-                      開始審稿
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table
+          head={
+            <>
+              <Th>題組</Th>
+              <Th>標題</Th>
+              <Th>AI 怎麼說</Th>
+              <Th>等了</Th>
+              <Th />
+            </>
+          }
+        >
+          {view.pending.map((s) => (
+            <Tr key={s.setId}>
+              <Td className="font-mono whitespace-nowrap text-primary">{s.setId}</Td>
+              <Td>{s.title}</Td>
+              <Td className="whitespace-nowrap">
+                <StatusTags tags={[s.aiVerdict === "pass" ? "AIP" : "AI_WARN"]} />
+                {s.aiVerdict !== "pass" && s.findingCount > 0 && (
+                  <span className="ml-2 text-xs text-muted-foreground">
+                    {s.findingCount} 個疑點
+                  </span>
+                )}
+              </Td>
+              <Td className="whitespace-nowrap">{waitedLabel(s.uploadedAt, now)}</Td>
+              <Td align="right">
+                <ButtonLink href={`/admin/sets/${s.setId}`} size="sm">
+                  開始審稿
+                </ButtonLink>
+              </Td>
+            </Tr>
+          ))}
+        </Table>
       )}
     </section>
   );

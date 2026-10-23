@@ -4,6 +4,9 @@ import { useActionState, useRef } from "react";
 import type { ReviewView } from "@/application/examSet/reviewView";
 import { timeMark } from "@/domain/examSet/review";
 import type { ReviewFormState } from "@/presentation/components/formStates";
+import { Alert } from "@/presentation/components/ui/Alert";
+import { Button } from "@/presentation/components/ui/Button";
+import { reviewErrorText } from "@/presentation/lib/errorMessages";
 import {
   aiRulingLabel,
   answerPolicyLabel,
@@ -19,7 +22,7 @@ type Props = {
   action: (prev: ReviewFormState, formData: FormData) => Promise<ReviewFormState>;
 };
 
-const box = "w-full rounded-lg border border-border bg-white px-3 py-2 text-sm";
+const box = "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm";
 
 /** 老師審稿：聽錄音、看每一題的答案與 AI 示警，寫建議，判合格／不合格。 */
 export function ReviewForm({ view, audioUrl, action }: Props) {
@@ -56,13 +59,9 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
             <label htmlFor="audioNote" className="text-sm font-medium">
               錄音建議（選填）
             </label>
-            <button
-              type="button"
-              onClick={insertTime}
-              className="rounded border border-border px-2 py-1 text-xs"
-            >
+            <Button variant="secondary" size="sm" onClick={insertTime}>
               插入目前時間
-            </button>
+            </Button>
           </div>
           <textarea
             id="audioNote"
@@ -128,7 +127,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
           {view.questions.map((q, i) => (
             <li
               key={q.questionId}
-              className="rounded-xl border border-border bg-white p-4"
+              className="rounded-xl border border-border bg-surface p-4"
             >
               <div className="flex flex-wrap items-baseline gap-x-3">
                 <span className="font-semibold">第 {i + 1} 題</span>
@@ -171,7 +170,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
         </ol>
       </section>
 
-      <section className="grid gap-3 rounded-xl border border-border bg-white p-4">
+      <section className="grid gap-3 rounded-xl border border-border bg-surface p-4">
         <h2 className="text-lg font-semibold">判定</h2>
         <div className="flex gap-6">
           <label className="flex items-center gap-2">
@@ -203,22 +202,12 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
           />
         </label>
         {state.problems && state.problems.length > 0 && (
-          <ul className="list-disc rounded-lg bg-destructive/10 py-3 pr-4 pl-8 text-sm text-destructive">
-            {state.problems.map((p) => (
-              <li key={p}>{p}</li>
-            ))}
-          </ul>
+          <Alert tone="error" items={state.problems.map(reviewErrorText)} />
         )}
-        {state.saved && (
-          <p className="rounded-lg bg-card px-4 py-3 text-sm">已儲存審稿。</p>
-        )}
-        <button
-          type="submit"
-          disabled={isPending}
-          className="justify-self-start rounded-lg bg-primary px-6 py-2.5 font-medium text-primary-foreground disabled:opacity-60"
-        >
+        {state.saved && <Alert>已儲存審稿。</Alert>}
+        <Button type="submit" disabled={isPending} className="justify-self-start">
           {isPending ? "儲存中…" : prev ? "更新審稿" : "送出審稿"}
-        </button>
+        </Button>
       </section>
     </form>
   );

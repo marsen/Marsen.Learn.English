@@ -18,6 +18,8 @@ jobs:
       SITE_URL: http://localhost:3000
       AUTH_SECRET: ci-secret
       AUTH_TOKEN_TTL: 7d
+      # 佔位值：建置和測試不會真的連線
+      DATABASE_URL: postgresql://ci:ci@db.invalid/ci
 
     steps:
       - name: Checkout

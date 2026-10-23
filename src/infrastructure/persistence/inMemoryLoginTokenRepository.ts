@@ -2,7 +2,7 @@ import type { LoginToken } from "@/domain/auth/loginToken";
 import { isUsable } from "@/domain/auth/loginToken";
 import type { LoginTokenRepository } from "@/domain/auth/loginTokenRepository";
 
-/** 記憶體版登入碼 repository（測試、沒有資料庫的本機開發）。 */
+/** 記憶體版登入碼 repository（只給測試用；網站本身一律用資料庫）。 */
 export class InMemoryLoginTokenRepository implements LoginTokenRepository {
   private readonly tokens = new Map<string, LoginToken>();
 
@@ -10,14 +10,25 @@ export class InMemoryLoginTokenRepository implements LoginTokenRepository {
     this.tokens.set(token.tokenHash, { ...token });
   }
 
-  async consume(
-    tokenHash: string,
-    now: Date,
-  ): Promise<{ email: string; guestId: string | null } | null> {
+  async latestByEmail(email: string): Promise<LoginToken | null> {
+    const mine = [...this.tokens.values()].filter((t) => t.email === email);
+    if (mine.length === 0) return null;
+    const latest = mine.reduce((a, b) => (b.createdAt > a.createdAt ? b : a));
+    return { ...latest };
+  }
+
+  async consume(tokenHash: string, now: Date): Promise<boolean> {
     const token = this.tokens.get(tokenHash);
-    if (!token || !isUsable(token, now)) return null;
+    if (!token || !isUsable(token, now)) return false;
     token.usedAt = now;
-    return { email: token.email, guestId: token.guestId };
+    return true;
+  }
+
+  async recordFailedAttempt(tokenHash: string): Promise<number> {
+    const token = this.tokens.get(tokenHash);
+    if (!token) return 0;
+    token.failedAttempts += 1;
+    return token.failedAttempts;
   }
 
   async countSince(since: Date): Promise<number> {

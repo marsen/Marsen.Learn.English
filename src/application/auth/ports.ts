@@ -2,15 +2,16 @@
  * application 層需要、由 infrastructure 實作的外部能力（port）。
  */
 
-/** 寄信：登入信，以及給管理員的通知 */
+/** 寄信：登入碼，以及給管理員的通知 */
 export interface LoginMailer {
-  sendLoginLink(to: string, link: string): Promise<void>;
+  sendLoginCode(to: string, code: string): Promise<void>;
   sendAdminNotice(to: string, subject: string, text: string): Promise<void>;
 }
 
-/** 產生一次性登入碼與它的雜湊 */
+/** 產生隨機識別、6 位數登入碼，以及雜湊 */
 export interface SecretTokens {
   generate(): string;
+  generateCode(): string;
   hash(token: string): string;
 }
 

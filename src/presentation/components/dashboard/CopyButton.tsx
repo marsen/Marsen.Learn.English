@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/presentation/components/ui/Button";
 
 /** 複製一段文字到剪貼簿（例如老師的回饋，貼給 AI） */
 export function CopyButton({ text, label }: { text: string; label: string }) {
@@ -17,8 +18,8 @@ export function CopyButton({ text, label }: { text: string; label: string }) {
   };
 
   return (
-    <button type="button" onClick={copy} className="btn-ghost">
+    <Button variant="secondary" size="sm" onClick={copy}>
       {copied ? "已複製 ✓" : label}
-    </button>
+    </Button>
   );
 }

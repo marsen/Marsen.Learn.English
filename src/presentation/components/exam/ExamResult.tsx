@@ -1,4 +1,5 @@
 import type { AttemptResultView } from "@/application/exam/examResult";
+import { Table, Td, Th, Tr } from "@/presentation/components/ui/Table";
 
 /** 批改結果：分數、每題你寫的與正解。 */
 export function ExamResult({ result }: { result: AttemptResultView }) {
@@ -10,42 +11,36 @@ export function ExamResult({ result }: { result: AttemptResultView }) {
           {result.score} / {result.total}
         </p>
       </div>
-      <div className="overflow-x-auto rounded-xl border border-border bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="border-b border-border text-muted-foreground">
-            <tr>
-              <th className="px-4 py-3 font-medium">題號</th>
-              <th className="px-4 py-3 font-medium">你寫的</th>
-              {result.answerKeyVisible && <th className="px-4 py-3 font-medium">正解</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {result.results.map((r) => (
-              <tr
-                key={r.questionId}
-                className={`border-b border-border last:border-0 ${r.correct ? "" : "bg-destructive/5"}`}
-              >
-                <td className="px-4 py-3 whitespace-nowrap">
-                  {r.number} {r.correct ? "✓" : "✗"}
-                </td>
-                <td className={`px-4 py-3 ${r.given ? "" : "text-muted-foreground"}`}>
-                  {r.given || "（空白）"}
-                </td>
-                {result.answerKeyVisible && (
-                  <td className="px-4 py-3">
-                    {r.expected}
-                    {r.accepted.length > 0 && (
-                      <span className="ml-2 text-muted-foreground">
-                        （也算對：{r.accepted.join("、")}）
-                      </span>
-                    )}
-                  </td>
+      <Table
+        head={
+          <>
+            <Th>題號</Th>
+            <Th>你寫的</Th>
+            {result.answerKeyVisible && <Th>正解</Th>}
+          </>
+        }
+      >
+        {result.results.map((r) => (
+          <Tr key={r.questionId} className={r.correct ? undefined : "bg-destructive/5"}>
+            <Td className="whitespace-nowrap">
+              {r.number} {r.correct ? "✓" : "✗"}
+            </Td>
+            <Td className={r.given ? undefined : "text-muted-foreground"}>
+              {r.given || "（空白）"}
+            </Td>
+            {result.answerKeyVisible && (
+              <Td>
+                {r.expected}
+                {r.accepted.length > 0 && (
+                  <span className="ml-2 text-muted-foreground">
+                    （也算對：{r.accepted.join("、")}）
+                  </span>
                 )}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+              </Td>
+            )}
+          </Tr>
+        ))}
+      </Table>
     </div>
   );
 }

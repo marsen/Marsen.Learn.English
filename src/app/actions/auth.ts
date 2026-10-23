@@ -5,13 +5,13 @@ import { redirect } from "next/navigation";
 import { normalizeEmail } from "@/domain/auth/email";
 import type {
   LoginFormState,
-  VerifyFormState,
+  VerifyCodeFormState,
 } from "@/presentation/components/formStates";
 import { SESSION_COOKIE, createSessionToken } from "@/infrastructure/auth/session";
 import {
-  devLoginLinkFor,
-  requestLoginLink,
-  verifyLoginLink,
+  devLoginCodeFor,
+  requestLoginCode,
+  verifyLoginCode,
 } from "@/infrastructure/di/authContainer";
 import { env } from "@/infrastructure/config/env";
 import { readGuestId } from "@/infrastructure/auth/guestKey";
@@ -22,27 +22,35 @@ import { can } from "@/domain/account/permission";
 
 const SEVEN_DAYS = 60 * 60 * 24 * 7;
 
-export async function requestLoginLinkAction(
-  _prev: LoginFormState,
+export async function requestLoginCodeAction(
+  prev: LoginFormState,
   formData: FormData,
 ): Promise<LoginFormState> {
-  const email = String(formData.get("email") ?? "");
-  const result = await requestLoginLink().execute({
+  const email = normalizeEmail(String(formData.get("email") ?? ""));
+  const result = await requestLoginCode().execute({
     email,
-    // 記下申請的瀏覽器：路人在電腦寫考卷、在手機點連結，作答也能移過去
+    // 記下申請的瀏覽器：登入後把路人作答移到帳號名下
     guestId: await readGuestId(),
     ipHash: await clientIpHash(),
   });
-  if (!result.ok) return { error: result.error };
-  return { sent: true, devLink: devLoginLinkFor(normalizeEmail(email)) ?? undefined };
+  // 重寄失敗時留在輸入登入碼的步驟（上一組碼可能還能用）
+  if (!result.ok)
+    return { error: result.error, email, sentTo: prev.sentTo, sentAt: prev.sentAt };
+  return {
+    sentTo: email,
+    sentAt: Date.now(),
+    devCode: devLoginCodeFor(email) ?? undefined,
+  };
 }
 
-export async function verifyLoginLinkAction(
-  _prev: VerifyFormState,
+export async function verifyLoginCodeAction(
+  _prev: VerifyCodeFormState,
   formData: FormData,
-): Promise<VerifyFormState> {
-  const token = String(formData.get("token") ?? "");
-  const result = await verifyLoginLink().execute({ token });
+): Promise<VerifyCodeFormState> {
+  const result = await verifyLoginCode().execute({
+    email: String(formData.get("email") ?? ""),
+    code: String(formData.get("code") ?? ""),
+  });
   if (!result.ok) return { error: result.error };
 
   const session = await createSessionToken(result.accountId);
@@ -55,7 +63,7 @@ export async function verifyLoginLinkAction(
   });
 
   // 路人註冊／登入：把路人作答移到帳號名下，直接帶去看最近一次的完整結果（含正解）。
-  // 兩個來源都認領：申請連結的那個瀏覽器（可能是另一台裝置），以及現在點連結的這個瀏覽器。
+  // 兩個來源都認領：申請登入碼時的瀏覽器，以及現在輸入登入碼的這個瀏覽器（通常是同一個）。
   const claimed = await claimGuestAttempts().execute({
     accountId: result.accountId,
     guestIds: [result.guestId, await readGuestId()],
