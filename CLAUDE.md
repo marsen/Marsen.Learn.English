@@ -38,6 +38,7 @@ app（路由／Server Action，薄）→ presentation → application → domain
 - **測試**：Vitest，測試檔跟原始碼放一起（`*.test.ts`），描述用中文；domain／application 必測
 - **格式**：Prettier（`pnpm format`）
 - **UI**：顏色、字型只用 `globals.css` 的 token（`primary`、`muted`…），不寫死顏色；目前是暫用樣式，之後會整體改
+  - 用共用元件（`presentation/components/ui/`）時，`className` 只放排版（間距、對齊、寬度），顏色、字級用元件參數（`variant`、`size`）；沒有合適的參數就加一個。原因：同一種屬性有兩個 Tailwind class 時，生效的是 CSS 裡排後面的，不是 className 裡寫後面的
 - 溝通語言：中文
 - 回覆規則：
   - 直接給結果，不要前言、不要總結
