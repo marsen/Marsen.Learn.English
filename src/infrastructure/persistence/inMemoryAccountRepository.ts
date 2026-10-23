@@ -3,7 +3,7 @@ import type { Account } from "@/domain/account/account";
 import type { AccountRepository } from "@/domain/account/accountRepository";
 import type { Role } from "@/domain/account/role";
 
-/** 記憶體版帳號 repository（測試、沒有資料庫的本機開發）。 */
+/** 記憶體版帳號 repository（只給測試用；網站本身一律用資料庫）。 */
 export class InMemoryAccountRepository implements AccountRepository {
   constructor(private readonly accounts: Account[] = []) {}
 

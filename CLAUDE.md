@@ -48,8 +48,10 @@ app（路由／Server Action，薄）→ presentation → application → domain
 
 開發伺服器固定用 **3100** port（`pnpm dev`），避免跟其他專案（Arsenal、Becca 用 3000）撞在一起；`SITE_URL` 也要是 3100，登入連結才會連回這裡。
 
-不用任何金鑰：沒設 `DATABASE_URL` 用記憶體資料（自動建好 admin@marsen.me 管理員＋老師），
-沒設 `RESEND_API_KEY` 時登入連結直接顯示在登入頁。
+一定要有資料庫：`DATABASE_URL` 沒設定就啟動失敗（本機和正式環境都一樣，不再有記憶體資料模式）。
+本機連開發用的資料庫（Neon 的 dev branch），不要連正式資料庫；第一次用 `pnpm db:migrate`、`pnpm db:seed` 建好資料表和 admin@marsen.me。
+錄音沒設定 R2 時要設 `AUDIO_LOCAL_DIR`。沒設 `RESEND_API_KEY` 時登入連結直接顯示在登入頁。
+記憶體版 repository（`infrastructure/persistence/inMemory*`）只給測試用。
 
 ## 舊版
 
