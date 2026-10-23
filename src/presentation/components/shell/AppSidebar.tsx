@@ -15,7 +15,7 @@ type Props = {
   setLocale: (locale: string) => Promise<void>;
 };
 
-/** 登入後的側邊欄：只列出這個帳號有權限的頁面。桌機固定在左邊，手機收成上方選單。 */
+/** 登入後的側邊欄：只列出這個帳號有權限的頁面。桌機固定在左邊，手機收成上方列＋選單。 */
 export function AppSidebar({ items, email, roleLabel, logout, setLocale }: Props) {
   const t = useTranslations();
   const pathname = usePathname();
@@ -52,72 +52,108 @@ export function AppSidebar({ items, email, roleLabel, logout, setLocale }: Props
     );
   });
 
-  const footer = (
-    <div className="border-t border-border pt-4">
-      <p className="truncate px-3 text-sm font-medium text-heading" title={email}>
+  const logoutButton = (
+    <form action={logout}>
+      <button
+        type="submit"
+        className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-muted-foreground hover:bg-muted"
+      >
+        <LogoutIcon />
+        {t("nav.logout")}
+      </button>
+    </form>
+  );
+
+  const account = (
+    <div className="px-3">
+      <p className="truncate text-sm font-medium text-heading" title={email}>
         {email}
       </p>
-      <p className="px-3 text-xs text-muted-foreground">{roleLabel}</p>
-      <form action={logout}>
-        <button
-          type="submit"
-          className="mt-3 w-full rounded-xl px-3 py-2 text-left text-sm text-muted-foreground hover:bg-muted"
-        >
-          {t("nav.logout")}
-        </button>
-      </form>
-      <LanguageSwitcher setLocale={setLocale} className="mt-2 px-3" />
+      <p className="text-xs text-muted-foreground">{roleLabel}</p>
     </div>
   );
 
   const brand = (
-    <a href="/" className="flex items-center gap-2 px-3 font-semibold text-heading">
-      <span className="grid h-8 w-8 place-items-center rounded-xl bg-primary-soft text-primary-hover">
+    <a
+      href="/"
+      className="flex min-w-0 items-center gap-2 px-3 font-semibold text-heading"
+    >
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary-hover">
         <NavIconSvg name="exam" />
       </span>
-      {t("common.brand")}
+      <span className="leading-tight">{t("common.brand")}</span>
     </a>
   );
 
   return (
     <>
-      {/* 桌機 */}
+      {/* 桌機：品牌和語言在上，帳號和登出在下 */}
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-border bg-surface/70 px-3 py-6 md:flex">
-        <div className="mb-8">{brand}</div>
+        <div className="mb-8 flex items-center justify-between gap-1">
+          {brand}
+          <LanguageSwitcher setLocale={setLocale} />
+        </div>
         <nav className="flex-1 overflow-y-auto">{links}</nav>
-        {footer}
+        <div className="grid gap-2 border-t border-border pt-4">
+          {account}
+          {logoutButton}
+        </div>
       </aside>
 
-      {/* 手機 */}
+      {/* 手機：上方列放品牌、語言、選單；選單打開時帳號和登出在最上面 */}
       <div className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur md:hidden">
-        <div className="flex items-center justify-between px-2 py-3">
+        <div className="flex items-center justify-between gap-1 px-2 py-2">
           {brand}
-          <button
-            type="button"
-            onClick={() => setOpen((o) => !o)}
-            aria-label={t("nav.openMenu")}
-            aria-expanded={open}
-            className="rounded-lg p-2"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              className="h-6 w-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={1.8}
-              strokeLinecap="round"
+          <div className="flex shrink-0 items-center gap-1">
+            <LanguageSwitcher setLocale={setLocale} />
+            <button
+              type="button"
+              onClick={() => setOpen((o) => !o)}
+              aria-label={t("nav.openMenu")}
+              aria-expanded={open}
+              className="grid h-11 w-11 place-items-center rounded-lg hover:bg-muted"
             >
-              <path d="M4 7h16M4 12h16M4 17h16" />
-            </svg>
-          </button>
+              <svg
+                viewBox="0 0 24 24"
+                className="h-6 w-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.8}
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <path d="M4 7h16M4 12h16M4 17h16" />
+              </svg>
+            </button>
+          </div>
         </div>
         {open && (
           <div className="border-t border-border px-3 py-4">
+            <div className="mb-4 grid gap-2 border-b border-border pb-4">
+              {account}
+              {logoutButton}
+            </div>
             <nav onClick={() => setOpen(false)}>{links}</nav>
-            {footer}
           </div>
         )}
       </div>
     </>
+  );
+}
+
+function LogoutIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-5 w-5 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l-5-5 5-5M5 12h11" />
+    </svg>
   );
 }

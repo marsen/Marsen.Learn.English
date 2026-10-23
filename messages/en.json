@@ -36,6 +36,7 @@
     },
     "logout": "Log out",
     "openMenu": "Open menu",
+    "login": "Log in",
     "loginOrSignup": "Log in / Sign up"
   },
   "login": {

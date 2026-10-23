@@ -21,7 +21,7 @@ export default async function LoginPage() {
     <CardPage
       title={t("title")}
       description={t("description")}
-      footer={<LanguageSwitcher setLocale={setLocaleAction} />}
+      corner={<LanguageSwitcher setLocale={setLocaleAction} />}
     >
       <LoginForm
         requestCode={requestLoginCodeAction}
