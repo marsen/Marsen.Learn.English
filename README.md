@@ -6,7 +6,7 @@
 
 ```bash
 pnpm install
-cp .env.example .env.local   # 填 AUTH_SECRET（說明在檔案裡）
+cp .env.example .env.local   # 填 DATABASE_URL（開發用的 Neon dev branch）、AUTH_SECRET（說明在檔案裡）
 pnpm dev                     # http://localhost:3100/login
 ```
 

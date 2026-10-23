@@ -3,7 +3,7 @@ import type { Attempt } from "@/domain/exam/attempt";
 import type { AttemptRepository } from "@/domain/exam/attemptRepository";
 import type { GradeResult } from "@/domain/exam/grading";
 
-/** 記憶體版作答 repository（測試、沒有資料庫的本機開發）。 */
+/** 記憶體版作答 repository（只給測試用；網站本身一律用資料庫）。 */
 export class InMemoryAttemptRepository implements AttemptRepository {
   private readonly attempts = new Map<string, Attempt>();
 

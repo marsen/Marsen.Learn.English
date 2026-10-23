@@ -19,7 +19,8 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1 \
     SITE_URL=http://build.invalid \
     AUTH_SECRET=build-only-placeholder \
-    AUTH_TOKEN_TTL=7d
+    AUTH_TOKEN_TTL=7d \
+    DATABASE_URL=postgresql://build:build@db.invalid/build
 RUN pnpm exec next build
 
 # 3. 執行：只帶 standalone 伺服器和靜態檔

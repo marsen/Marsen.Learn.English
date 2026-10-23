@@ -1,6 +1,6 @@
 import type { AudioStorage } from "@/application/examSet/ports";
 
-/** 記憶體版音檔儲存（測試、沒有設定儲存空間的本機開發）。 */
+/** 記憶體版音檔儲存（只給測試用；網站本身用 R2 或本機資料夾）。 */
 export class InMemoryAudioStorage implements AudioStorage {
   readonly files = new Map<string, { bytes: Uint8Array; contentType: string }>();
 

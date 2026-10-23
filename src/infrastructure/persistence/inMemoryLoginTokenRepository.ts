@@ -2,7 +2,7 @@ import type { LoginToken } from "@/domain/auth/loginToken";
 import { isUsable } from "@/domain/auth/loginToken";
 import type { LoginTokenRepository } from "@/domain/auth/loginTokenRepository";
 
-/** 記憶體版登入碼 repository（測試、沒有資料庫的本機開發）。 */
+/** 記憶體版登入碼 repository（只給測試用；網站本身一律用資料庫）。 */
 export class InMemoryLoginTokenRepository implements LoginTokenRepository {
   private readonly tokens = new Map<string, LoginToken>();
 

@@ -14,44 +14,18 @@ import { DevMailer } from "@/infrastructure/mail/devMailer";
 import { ResendMailer } from "@/infrastructure/mail/resendMailer";
 import { DrizzleAccountRepository } from "@/infrastructure/persistence/drizzleAccountRepository";
 import { DrizzleLoginTokenRepository } from "@/infrastructure/persistence/drizzleLoginTokenRepository";
-import { InMemoryAccountRepository } from "@/infrastructure/persistence/inMemoryAccountRepository";
-import { InMemoryLoginTokenRepository } from "@/infrastructure/persistence/inMemoryLoginTokenRepository";
 
 /**
  * Composition Root（登入／帳號）。
- * - 有 DATABASE_URL → Drizzle（Neon）；沒有 → 記憶體，並預建 admin@marsen.me（管理員＋老師）。
- * - 有 RESEND_API_KEY → 真的寄信；沒有且非正式環境 → DevMailer（連結顯示在登入頁）。
- * 記憶體物件放在 globalThis，讓開發伺服器重新載入模組時資料不會不見。
+ * - 資料一律存在資料庫（Drizzle + Neon），本機也一樣；沒有 DATABASE_URL 在 env 驗證時就啟動失敗。
+ * - 有 RESEND_API_KEY → 真的寄信；沒有且非正式環境 → DevMailer（登入連結顯示在登入頁）。
+ * 物件放在模組裡，改程式熱更新時跟著換新。
  */
 type Container = {
   accounts: AccountRepository;
   tokens: LoginTokenRepository;
   mailer: LoginMailer;
 };
-
-const DEV_SEED_EMAIL = "admin@marsen.me";
-
-const globalStore = globalThis as unknown as { __authContainer?: Container };
-
-function build(): Container {
-  const accounts = env.databaseUrl ? new DrizzleAccountRepository() : devAccounts();
-  const tokens = env.databaseUrl
-    ? new DrizzleLoginTokenRepository()
-    : new InMemoryLoginTokenRepository();
-  return { accounts, tokens, mailer: buildMailer() };
-}
-
-function devAccounts(): AccountRepository {
-  const repo = new InMemoryAccountRepository([
-    {
-      id: "00000000-0000-4000-8000-000000000001",
-      email: DEV_SEED_EMAIL,
-      roles: ["admin", "teacher"],
-      createdAt: new Date(),
-    },
-  ]);
-  return repo;
-}
 
 function buildMailer(): LoginMailer {
   if (env.resendApiKey) {
@@ -62,12 +36,14 @@ function buildMailer(): LoginMailer {
   return new DevMailer();
 }
 
-/** 有資料庫：放模組裡，熱更新時跟著換新；沒有資料庫：放 globalThis，記憶體資料才不會不見 */
-let dbContainer: Container | undefined;
+let built: Container | undefined;
 
 function container(): Container {
-  if (env.databaseUrl) return (dbContainer ??= build());
-  return (globalStore.__authContainer ??= build());
+  return (built ??= {
+    accounts: new DrizzleAccountRepository(),
+    tokens: new DrizzleLoginTokenRepository(),
+    mailer: buildMailer(),
+  });
 }
 
 const secrets = new CryptoSecretTokens();
