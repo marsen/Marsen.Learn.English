@@ -30,7 +30,7 @@ export function PageHeader({
   title: ReactNode;
   description?: ReactNode;
   /** 上一層：{ href, label } */
-  back?: { href: string; label: string };
+  back?: { href: string; label: ReactNode };
   /** 標題右邊的按鈕 */
   actions?: ReactNode;
 }) {
@@ -54,18 +54,21 @@ export function PageHeader({
   );
 }
 
-/** 置中的小卡片頁（登入、完成登入） */
+/** 置中的小卡片頁（登入）；corner 放在畫面右上角（例如語言切換） */
 export function CardPage({
   title,
   description,
+  corner,
   children,
 }: {
   title: ReactNode;
   description?: ReactNode;
+  corner?: ReactNode;
   children: ReactNode;
 }) {
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-20">
+    <main className="relative flex flex-1 items-center justify-center px-4 py-20">
+      {corner && <div className="absolute top-3 right-3">{corner}</div>}
       <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-8">
         <h1 className="font-display text-2xl font-semibold">{title}</h1>
         {description && (

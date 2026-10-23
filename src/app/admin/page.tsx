@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Page, PageHeader } from "@/presentation/components/ui/Page";
 import { Alert } from "@/presentation/components/ui/Alert";
+import { Msg } from "@/presentation/components/Msg";
+import { DocumentTitle } from "@/presentation/components/DocumentTitle";
 import { AccountSummary } from "@/presentation/components/AccountSummary";
 import { AdminDashboard } from "@/presentation/components/dashboard/AdminDashboard";
 import { StudentDashboard } from "@/presentation/components/dashboard/StudentDashboard";
@@ -13,7 +16,10 @@ import {
 } from "@/infrastructure/di/examSetContainer";
 import { deleteExamSetAction, setExamAccessAction } from "@/app/actions/examSet";
 
-export const metadata: Metadata = { title: "總覽", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("dashboard");
+  return { title: t("title"), robots: { index: false } };
+}
 
 /**
  * 總覽：依角色顯示不同內容，優先序 老師 ＞ 管理員 ＞ 學生。
@@ -37,24 +43,32 @@ export default async function DashboardPage({
       ? null
       : await getStudentDashboard().execute({ actor: account });
   const both = teacherView && adminView;
-
   return (
     <Page width="lg">
-      <PageHeader title="總覽" />
+      <DocumentTitle id="dashboard.title" />
+      <PageHeader title={<Msg id="dashboard.title" />} />
       {denied && (
         <Alert tone="error" className="mb-6">
-          你的帳號沒有剛才那個功能的權限。
+          <Msg id="dashboard.denied" />
         </Alert>
       )}
       {teacherView && (
         <>
-          {both && <h2 className="mt-6 text-xl font-semibold">審稿</h2>}
+          {both && (
+            <h2 className="mt-6 text-xl font-semibold">
+              <Msg id="dashboard.reviewHeading" />
+            </h2>
+          )}
           <TeacherDashboard view={teacherView} now={now} />
         </>
       )}
       {adminView && (
         <div className={both ? "mt-16 border-t border-border pt-10" : "mt-6"}>
-          {both && <h2 className="mb-6 text-xl font-semibold">管理</h2>}
+          {both && (
+            <h2 className="mb-6 text-xl font-semibold">
+              <Msg id="dashboard.manageHeading" />
+            </h2>
+          )}
           <AdminDashboard
             view={adminView}
             setAccessAction={setExamAccessAction}

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Page, PageHeader } from "@/presentation/components/ui/Page";
-import { formatFullDateTime } from "@/presentation/lib/format";
+import { Msg } from "@/presentation/components/Msg";
+import { DocumentTitle } from "@/presentation/components/DocumentTitle";
+import { ReviewMeta } from "@/presentation/components/admin/ReviewMeta";
 import { ReviewForm } from "@/presentation/components/admin/ReviewForm";
 import { StatusTags } from "@/presentation/components/admin/StatusTags";
 import { statusTagsOf } from "@/domain/examSet/statusTags";
@@ -9,7 +12,10 @@ import { requireAccount } from "@/infrastructure/auth/currentAccount";
 import { getExamSetForReview } from "@/infrastructure/di/examSetContainer";
 import { reviewExamSetAction } from "@/app/actions/examSet";
 
-export const metadata: Metadata = { title: "審稿", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("review");
+  return { title: t("metaTitle"), robots: { index: false } };
+}
 
 export default async function ReviewPage({
   params,
@@ -24,19 +30,22 @@ export default async function ReviewPage({
     notFound();
   }
   const { view } = result;
-
   return (
     <Page>
+      <DocumentTitle id="review.metaTitle" />
       <PageHeader
-        back={{ href: "/admin/sets", label: "題組" }}
+        back={{ href: "/admin/sets", label: <Msg id="review.back" /> }}
         title={view.set.title}
         description={
           <>
             <div className="mb-2">
               <StatusTags tags={statusTagsOf(view.set)} />
             </div>
-            <span className="font-mono">{view.set.setId}</span> · {view.set.questionCount}{" "}
-            題{view.review && ` · 上次審稿 ${formatFullDateTime(view.review.reviewedAt)}`}
+            <ReviewMeta
+              setId={view.set.setId}
+              questionCount={view.set.questionCount}
+              reviewedAt={view.review?.reviewedAt ?? null}
+            />
           </>
         }
       />

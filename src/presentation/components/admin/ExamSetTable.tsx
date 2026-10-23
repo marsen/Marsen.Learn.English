@@ -1,10 +1,9 @@
+"use client";
+
 import type { ExamSet } from "@/domain/examSet/examSet";
 import { statusTagsOf } from "@/domain/examSet/statusTags";
-import {
-  ACCESS_HINTS,
-  ACCESS_LABELS,
-  ACCESS_ORDER,
-} from "@/presentation/lib/examSetLabels";
+import { useLocale, useTranslations } from "next-intl";
+import { ACCESS_ORDER } from "@/presentation/lib/examSetLabels";
 import { StatusTags } from "./StatusTags";
 import { EmptyState } from "@/presentation/components/ui/EmptyState";
 import { Table, Td, Th, Tr } from "@/presentation/components/ui/Table";
@@ -24,18 +23,20 @@ const ACCESS_ACTIVE: Record<ExamSet["access"], string> = {
 };
 
 export function ExamSetTable({ sets, setAccessAction }: Props) {
-  if (sets.length === 0) return <EmptyState>還沒有題組。</EmptyState>;
+  const t = useTranslations();
+  const locale = useLocale();
+  if (sets.length === 0) return <EmptyState>{t("sets.empty")}</EmptyState>;
 
   return (
     <Table
       head={
         <>
-          <Th>題組</Th>
-          <Th>標題</Th>
-          <Th>題數</Th>
-          <Th>審核狀態</Th>
-          <Th>開放對象</Th>
-          <Th>上傳時間</Th>
+          <Th>{t("sets.colSet")}</Th>
+          <Th>{t("sets.colTitle")}</Th>
+          <Th>{t("sets.colCount")}</Th>
+          <Th>{t("sets.colStatus")}</Th>
+          <Th>{t("sets.colAccess")}</Th>
+          <Th>{t("sets.colUploaded")}</Th>
         </>
       }
     >
@@ -68,26 +69,29 @@ export function ExamSetTable({ sets, setAccessAction }: Props) {
                       value={a}
                       disabled={current}
                       aria-pressed={current}
-                      title={ACCESS_HINTS[a]}
+                      title={t(`examSet.accessHint.${a}`)}
                       className={`px-3 py-1 text-xs whitespace-nowrap transition-colors ${
                         current
                           ? ACCESS_ACTIVE[a]
                           : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       }`}
                     >
-                      {ACCESS_LABELS[a]}
+                      {t(`examSet.access.${a}`)}
                     </button>
                   );
                 })}
               </form>
             ) : (
-              <span className="whitespace-nowrap" title={ACCESS_HINTS[s.access]}>
-                {ACCESS_LABELS[s.access]}
+              <span
+                className="whitespace-nowrap"
+                title={t(`examSet.accessHint.${s.access}`)}
+              >
+                {t(`examSet.access.${s.access}`)}
               </span>
             )}
           </Td>
           <Td className="whitespace-nowrap text-muted-foreground">
-            {formatDateTime(s.uploadedAt)}
+            {formatDateTime(s.uploadedAt, locale)}
           </Td>
         </Tr>
       ))}

@@ -1,0 +1,207 @@
+{
+  "common": {
+    "brand": "無限雅思聽力",
+    "language": "語言",
+    "languageNames": {
+      "zh-TW": "繁體中文",
+      "en": "English"
+    },
+    "saving": "儲存中…",
+    "sending": "寄送中…",
+    "setsUnit": "套",
+    "none": "（沒有）",
+    "listSeparator": "、",
+    "parenthesized": "（{text}）"
+  },
+  "roles": {
+    "admin": "管理員",
+    "teacher": "老師",
+    "student": "學生",
+    "none": "（沒有角色）",
+    "separator": "、"
+  },
+  "nav": {
+    "groups": {
+      "learn": "學習",
+      "manage": "管理"
+    },
+    "items": {
+      "home": "總覽",
+      "exam": "考卷",
+      "history": "我的考試紀錄",
+      "sets": "題組與審稿",
+      "upload": "上傳題組",
+      "reviews": "審稿紀錄",
+      "accounts": "管理權限"
+    },
+    "logout": "登出",
+    "openMenu": "開啟選單",
+    "login": "登入",
+    "loginOrSignup": "登入／註冊"
+  },
+  "login": {
+    "title": "登入／註冊",
+    "description": "輸入 email，我們會寄一組登入碼給你，不用密碼。第一次使用會自動建立帳號。",
+    "email": "Email",
+    "sendCode": "寄登入碼給我",
+    "sent": "登入碼已寄到 <b>{email}</b>，請到信箱查看（{minutes} 分鐘內有效）。",
+    "devCode": "開發模式（沒有設定寄信服務）：登入碼是 {code}",
+    "code": "登入碼",
+    "submit": "登入",
+    "submitting": "登入中…",
+    "resend": "重寄一組",
+    "changeEmail": "換一個 email"
+  },
+  "errors": {
+    "login": {
+      "invalidEmail": "email 格式不對",
+      "malformedCode": "登入碼是 6 位數字",
+      "wrongCode": "登入碼不對，還可以再試 {remaining} 次",
+      "codeExpired": "這組登入碼已經失效（過期、用過或輸錯太多次），請重新寄一組",
+      "cooldown": "剛寄過，請等 {seconds} 秒再試",
+      "emailHourlyLimit": "這個 email 這小時寄太多次了，請一小時後再試",
+      "ipHourlyLimit": "這個網路這小時申請太多次了，請一小時後再試",
+      "signupsFull": "今天註冊人數已滿，請明天再來"
+    },
+    "review": {
+      "notLoggedIn": "請先登入",
+      "forbidden": "你的帳號沒有審稿的權限",
+      "setNotFound": "找不到這套題",
+      "decisionRequired": "請選擇合格或不合格",
+      "commentTooLong": "整體意見最多 {max} 字",
+      "audioNoteTooLong": "錄音建議最多 {max} 字",
+      "unknownQuestion": "沒有這一題：{questionId}",
+      "questionNoteTooLong": "{questionId} 的建議最多 {max} 字"
+    }
+  },
+  "dashboard": {
+    "title": "總覽",
+    "denied": "你的帳號沒有剛才那個功能的權限。",
+    "reviewHeading": "審稿",
+    "manageHeading": "管理"
+  },
+  "teacherDashboard": {
+    "intro": "別的老師審完的題組會自動從清單消失，不會重複審。",
+    "pending": "等你審的題組",
+    "oldestToday": "最舊的是今天上傳的",
+    "oldestWaited": "最久的已經等了 {waited}",
+    "reviewedThisMonth": "你這個月審了",
+    "listTitle": "待審清單（最舊的在上面）",
+    "empty": "目前沒有要審的題組，辛苦了。",
+    "colSet": "題組",
+    "colTitle": "標題",
+    "colAi": "AI 怎麼說",
+    "colWaited": "等了",
+    "findings": "{count} 個疑點",
+    "startReview": "開始審稿"
+  },
+  "waited": {
+    "today": "今天",
+    "days": "{days} 天"
+  },
+  "examSet": {
+    "aiVerdict": {
+      "pass": "AI 審稿通過",
+      "needs_human": "AI 有疑慮，需要老師看"
+    },
+    "access": {
+      "unlisted": "下架",
+      "members": "上架",
+      "public": "公開"
+    },
+    "accessHint": {
+      "unlisted": "下架：誰都不能考",
+      "members": "上架：登入的學生、老師能考",
+      "public": "公開：誰都能試考，沒登入也行（通常只開一套）"
+    },
+    "statusTag": {
+      "FULL_PASS": "全 PASS：AI 與老師都通過",
+      "AIP": "AI 審稿通過",
+      "AI_WARN": "AI 有疑慮，請老師留意",
+      "TP": "老師審稿通過（考得到）",
+      "TR": "老師退回（考不到）",
+      "WAIT": "待審：還沒有老師審過（考不到）"
+    },
+    "trap": {
+      "none": "無",
+      "similar_numbers": "相近數字（例如 15／50）",
+      "spelling": "拼字（錄音逐字母唸）",
+      "distractor": "干擾資訊（有提到但不是答案）",
+      "paraphrase": "換句話說（錄音和題目用不同說法）",
+      "self_correction": "說錯再更正"
+    },
+    "answerPolicy": {
+      "exact_word": "照錄音裡的字",
+      "digits_only": "只寫數字",
+      "number_word": "數字或英文數字都算對",
+      "date_equivalence": "日期寫法不拘"
+    },
+    "answerType": {
+      "word": "單字",
+      "name_spelled": "拼出的名字",
+      "phone": "電話號碼",
+      "number": "數字",
+      "place": "地點"
+    },
+    "aiRuling": {
+      "problem": "AI 判定：有問題",
+      "ok": "AI 判定：沒問題"
+    },
+    "severity": {
+      "info": "提醒",
+      "warn": "注意",
+      "block": "嚴重"
+    },
+    "category": {
+      "ambiguity": "答案不夠明確",
+      "evidence": "錄音裡找不到依據",
+      "trap": "干擾陷阱",
+      "naturalness": "對話不自然",
+      "consistency": "前後不一致",
+      "difficulty": "難度",
+      "other": "其他"
+    }
+  },
+  "sets": {
+    "title": "題組",
+    "upload": "上傳題組",
+    "empty": "還沒有題組。",
+    "colSet": "題組",
+    "colTitle": "標題",
+    "colCount": "題數",
+    "colStatus": "審核狀態",
+    "colAccess": "開放對象",
+    "colUploaded": "上傳時間"
+  },
+  "review": {
+    "metaTitle": "審稿",
+    "back": "題組",
+    "questionCount": "{count} 題",
+    "lastReviewed": "上次審稿 {time}",
+    "audio": "錄音",
+    "audioNote": "錄音建議（選填）",
+    "insertTime": "插入目前時間",
+    "audioNotePlaceholder": "例如：[01:23] 這句講太快，聽不清楚門牌號碼",
+    "aiWarnings": "AI 提出的疑慮",
+    "aiFindings": "AI 審稿的其他發現",
+    "questionN": "第 {n} 題",
+    "wholeSet": "整套",
+    "suggestion": "建議：{text}",
+    "questions": "每一題",
+    "answer": "標準答案",
+    "accepted": "也算對的寫法",
+    "answerType": "答案類型",
+    "answerPolicy": "答案規則",
+    "trap": "干擾陷阱",
+    "wrongValue": "（錄音先出現的錯誤答案：{value}）",
+    "note": "出題說明",
+    "questionNote": "這題的建議（選填）",
+    "decision": "判定",
+    "approved": "合格",
+    "rejected": "不合格",
+    "comment": "整體意見（選填）",
+    "saved": "已儲存審稿。",
+    "update": "更新審稿",
+    "submit": "送出審稿"
+  }
+}

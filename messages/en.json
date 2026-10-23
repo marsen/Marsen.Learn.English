@@ -1,0 +1,207 @@
+{
+  "common": {
+    "brand": "Infinite Listening",
+    "language": "Language",
+    "languageNames": {
+      "zh-TW": "繁體中文",
+      "en": "English"
+    },
+    "saving": "Saving…",
+    "sending": "Sending…",
+    "setsUnit": "sets",
+    "none": "(none)",
+    "listSeparator": ", ",
+    "parenthesized": "({text})"
+  },
+  "roles": {
+    "admin": "Admin",
+    "teacher": "Teacher",
+    "student": "Student",
+    "none": "(no role)",
+    "separator": ", "
+  },
+  "nav": {
+    "groups": {
+      "learn": "Learn",
+      "manage": "Manage"
+    },
+    "items": {
+      "home": "Dashboard",
+      "exam": "Tests",
+      "history": "My test history",
+      "sets": "Sets & reviews",
+      "upload": "Upload sets",
+      "reviews": "Review log",
+      "accounts": "Permissions"
+    },
+    "logout": "Log out",
+    "openMenu": "Open menu",
+    "login": "Log in",
+    "loginOrSignup": "Log in / Sign up"
+  },
+  "login": {
+    "title": "Log in / Sign up",
+    "description": "Enter your email and we'll send you a login code. No password needed. Your account is created automatically the first time.",
+    "email": "Email",
+    "sendCode": "Send me a login code",
+    "sent": "We sent a login code to <b>{email}</b>. Check your inbox (valid for {minutes} minutes).",
+    "devCode": "Dev mode (no email service configured): the login code is {code}",
+    "code": "Login code",
+    "submit": "Log in",
+    "submitting": "Logging in…",
+    "resend": "Send a new code",
+    "changeEmail": "Use a different email"
+  },
+  "errors": {
+    "login": {
+      "invalidEmail": "Please enter a valid email address",
+      "malformedCode": "The login code is 6 digits",
+      "wrongCode": "Wrong code. {remaining, plural, one {# try} other {# tries}} left",
+      "codeExpired": "This code no longer works (expired, already used, or too many wrong tries). Please request a new one",
+      "cooldown": "A code was just sent. Please wait {seconds} seconds and try again",
+      "emailHourlyLimit": "Too many codes sent to this email this hour. Please try again in an hour",
+      "ipHourlyLimit": "Too many requests from this network this hour. Please try again in an hour",
+      "signupsFull": "Sign-ups are full for today. Please come back tomorrow"
+    },
+    "review": {
+      "notLoggedIn": "Please log in first",
+      "forbidden": "Your account doesn't have permission to review",
+      "setNotFound": "This set couldn't be found",
+      "decisionRequired": "Please choose Pass or Fail",
+      "commentTooLong": "Overall comments can be at most {max} characters",
+      "audioNoteTooLong": "Audio notes can be at most {max} characters",
+      "unknownQuestion": "No such question: {questionId}",
+      "questionNoteTooLong": "The note for {questionId} can be at most {max} characters"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "denied": "Your account doesn't have permission for that page.",
+    "reviewHeading": "Review",
+    "manageHeading": "Manage"
+  },
+  "teacherDashboard": {
+    "intro": "Sets reviewed by another teacher disappear from your list automatically, so nothing gets reviewed twice.",
+    "pending": "Sets waiting for your review",
+    "oldestToday": "The oldest was uploaded today",
+    "oldestWaited": "The oldest has been waiting {waited}",
+    "reviewedThisMonth": "You reviewed this month",
+    "listTitle": "To review (oldest first)",
+    "empty": "Nothing to review right now. Thank you!",
+    "colSet": "Set",
+    "colTitle": "Title",
+    "colAi": "AI check",
+    "colWaited": "Waiting",
+    "findings": "{count, plural, one {# issue} other {# issues}}",
+    "startReview": "Start review"
+  },
+  "waited": {
+    "today": "today",
+    "days": "{days, plural, one {# day} other {# days}}"
+  },
+  "examSet": {
+    "aiVerdict": {
+      "pass": "Passed AI review",
+      "needs_human": "AI has concerns, needs a teacher"
+    },
+    "access": {
+      "unlisted": "Unlisted",
+      "members": "Listed",
+      "public": "Public"
+    },
+    "accessHint": {
+      "unlisted": "Unlisted: nobody can take it",
+      "members": "Listed: logged-in students and teachers can take it",
+      "public": "Public: anyone can try it, even without logging in (usually just one set)"
+    },
+    "statusTag": {
+      "FULL_PASS": "All passed: AI and teacher both approved",
+      "AIP": "Passed AI review",
+      "AI_WARN": "AI has concerns, please take a closer look",
+      "TP": "Approved by a teacher (can be taken)",
+      "TR": "Rejected by a teacher (can't be taken)",
+      "WAIT": "Waiting: no teacher has reviewed it yet (can't be taken)"
+    },
+    "trap": {
+      "none": "None",
+      "similar_numbers": "Similar numbers (e.g. 15 / 50)",
+      "spelling": "Spelling (letters read out one by one)",
+      "distractor": "Distractor (mentioned, but not the answer)",
+      "paraphrase": "Paraphrase (recording and question use different words)",
+      "self_correction": "Self-correction (speaker corrects a mistake)"
+    },
+    "answerPolicy": {
+      "exact_word": "Same word as the recording",
+      "digits_only": "Digits only",
+      "number_word": "Digits or number words both accepted",
+      "date_equivalence": "Any date format accepted"
+    },
+    "answerType": {
+      "word": "Word",
+      "name_spelled": "Spelled name",
+      "phone": "Phone number",
+      "number": "Number",
+      "place": "Place"
+    },
+    "aiRuling": {
+      "problem": "AI verdict: problem",
+      "ok": "AI verdict: OK"
+    },
+    "severity": {
+      "info": "Note",
+      "warn": "Warning",
+      "block": "Serious"
+    },
+    "category": {
+      "ambiguity": "Answer not clear enough",
+      "evidence": "No support in the recording",
+      "trap": "Distractor trap",
+      "naturalness": "Unnatural conversation",
+      "consistency": "Inconsistency",
+      "difficulty": "Difficulty",
+      "other": "Other"
+    }
+  },
+  "sets": {
+    "title": "Sets",
+    "upload": "Upload sets",
+    "empty": "No sets yet.",
+    "colSet": "Set",
+    "colTitle": "Title",
+    "colCount": "Questions",
+    "colStatus": "Review status",
+    "colAccess": "Availability",
+    "colUploaded": "Uploaded"
+  },
+  "review": {
+    "metaTitle": "Review",
+    "back": "Sets",
+    "questionCount": "{count, plural, one {# question} other {# questions}}",
+    "lastReviewed": "Last reviewed {time}",
+    "audio": "Recording",
+    "audioNote": "Notes on the recording (optional)",
+    "insertTime": "Insert current time",
+    "audioNotePlaceholder": "e.g. [01:23] This line is too fast, the house number is hard to hear",
+    "aiWarnings": "Concerns raised by AI",
+    "aiFindings": "Other AI review findings",
+    "questionN": "Question {n}",
+    "wholeSet": "Whole set",
+    "suggestion": "Suggestion: {text}",
+    "questions": "Questions",
+    "answer": "Answer",
+    "accepted": "Also accepted",
+    "answerType": "Answer type",
+    "answerPolicy": "Answer rule",
+    "trap": "Trap",
+    "wrongValue": "(wrong answer heard first in the recording: {value})",
+    "note": "Writer's note",
+    "questionNote": "Notes on this question (optional)",
+    "decision": "Decision",
+    "approved": "Pass",
+    "rejected": "Fail",
+    "comment": "Overall comments (optional)",
+    "saved": "Review saved.",
+    "update": "Update review",
+    "submit": "Submit review"
+  }
+}

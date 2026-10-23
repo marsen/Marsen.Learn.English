@@ -1,13 +1,6 @@
 import type { Permission } from "@/domain/account/permission";
-import type { Role } from "@/domain/account/role";
 
-/** 畫面上顯示的中文名稱 */
-export const ROLE_LABELS: Record<Role, string> = {
-  admin: "管理員",
-  teacher: "老師",
-  student: "學生",
-};
-
+/** 功能名稱（只在管理員看的帳號摘要用；角色名稱在翻譯檔 roles.*） */
 export const PERMISSION_LABELS: Record<Permission, string> = {
   uploadSets: "上傳題目",
   reviewSets: "審稿（評估試卷是否合格）",

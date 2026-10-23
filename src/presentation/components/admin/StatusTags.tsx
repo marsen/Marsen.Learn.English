@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import type { StatusTag } from "@/domain/examSet/statusTags";
 
 // U+FE0E 強制文字樣式，符號才吃得到顏色
@@ -8,44 +9,36 @@ const CHECK = "✔︎";
 const CROSS = "✘";
 const WARN = "⚠︎";
 
-const TAGS: Record<
-  StatusTag,
-  { who: string; mark: string; title: string; className: string }
-> = {
+/** 說明文字在翻譯檔 examSet.statusTag.<代碼> */
+const TAGS: Record<StatusTag, { who: string; mark: string; className: string }> = {
   FULL_PASS: {
     who: "✅",
     mark: "",
-    title: "全 PASS：AI 與老師都通過",
     className: "bg-accent ring-accent",
   },
   AIP: {
     who: "🤖",
     mark: CHECK,
-    title: "AI 審稿通過",
     className: "bg-accent-soft/60 text-accent-hover ring-accent-soft",
   },
   AI_WARN: {
     who: "🤖",
     mark: WARN,
-    title: "AI 有疑慮，請老師留意",
     className: "bg-primary-soft/60 text-primary-hover ring-primary/30",
   },
   TP: {
     who: "🍵",
     mark: CHECK,
-    title: "老師審稿通過（考得到）",
     className: "bg-sky-50 text-sky-700 ring-sky-200",
   },
   TR: {
     who: "🍵",
     mark: CROSS,
-    title: "老師退回（考不到）",
     className: "bg-destructive/10 text-destructive ring-destructive/30",
   },
   WAIT: {
     who: "🍵",
     mark: "…",
-    title: "待審：還沒有老師審過（考不到）",
     className: "bg-muted text-muted-foreground ring-border",
   },
 };
@@ -62,7 +55,9 @@ export function StatusTags({ tags }: { tags: StatusTag[] }) {
 }
 
 function Tag({ tag }: { tag: StatusTag }) {
-  const { who, mark, title, className } = TAGS[tag];
+  const t = useTranslations("examSet.statusTag");
+  const { who, mark, className } = TAGS[tag];
+  const title = t(tag);
   // 提示框用 fixed 定位，才不會被表格的 overflow 裁掉
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const show = (e: React.SyntheticEvent<HTMLSpanElement>) => {

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { UploadSetFormState } from "@/presentation/components/formStates";
-import { AI_VERDICT_LABELS } from "@/presentation/lib/examSetLabels";
+import { useTranslations } from "next-intl";
 import {
   folderLabel,
   pairBundles,
@@ -25,6 +25,7 @@ type Row = {
  * 每套各自成功或失敗，互不影響；同一套已上傳過的會顯示原因、不會重複建立。
  */
 export function BatchUploadForm({ action }: Props) {
+  const t = useTranslations("examSet.aiVerdict");
   const [rows, setRows] = useState<Row[]>([]);
   const [running, setRunning] = useState(false);
 
@@ -58,7 +59,7 @@ export function BatchUploadForm({ action }: Props) {
         if (r.uploaded) {
           update(i, {
             state: "done",
-            message: `已上傳：${r.uploaded.title}，${AI_VERDICT_LABELS[r.uploaded.aiVerdict]}`,
+            message: `已上傳：${r.uploaded.title}，${t(r.uploaded.aiVerdict)}`,
           });
         } else {
           update(i, {

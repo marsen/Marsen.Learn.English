@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import type { LoginFormState, VerifyCodeFormState } from "./formStates";
 import { Alert } from "./ui/Alert";
 import { Button } from "./ui/Button";
@@ -20,6 +21,7 @@ type VerifyAction = (
 type Props = {
   requestCode: RequestAction;
   verifyCode: VerifyAction;
+  /** 第一步按鈕的文字；沒給就用「寄登入碼給我」 */
   submitLabel?: string;
 };
 
@@ -30,11 +32,8 @@ const field = "w-full rounded-lg border border-border bg-surface px-3 py-2 text-
  * 1. 輸入 email → 寄一組 6 位數登入碼
  * 2. 在同一個畫面輸入登入碼 → 登入（第一次用的 email 會自動建立帳號）
  */
-export function LoginForm({
-  requestCode,
-  verifyCode,
-  submitLabel = "寄登入碼給我",
-}: Props) {
+export function LoginForm({ requestCode, verifyCode, submitLabel }: Props) {
+  const t = useTranslations();
   const [sent, requestAction, requesting] = useActionState(requestCode, {});
   // 寄出後想換 email：回到第一步；寄出新的一組就回到第二步
   const [changingEmail, setChangingEmail] = useState(false);
@@ -48,13 +47,14 @@ export function LoginForm({
     return (
       <div className="grid gap-4">
         <Alert>
-          登入碼已寄到 <b>{sent.sentTo}</b>，請到信箱查看（{LOGIN_TOKEN_TTL_MINUTES}{" "}
-          分鐘內有效）。
+          {t.rich("login.sent", {
+            email: sent.sentTo,
+            minutes: LOGIN_TOKEN_TTL_MINUTES,
+            b: (chunks) => <b>{chunks}</b>,
+          })}
         </Alert>
-        {sent.error && <Alert tone="error">{loginErrorText(sent.error)}</Alert>}
-        {sent.devCode && (
-          <Alert>開發模式（沒有設定寄信服務）：登入碼是 {sent.devCode}</Alert>
-        )}
+        {sent.error && <Alert tone="error">{loginErrorText(t, sent.error)}</Alert>}
+        {sent.devCode && <Alert>{t("login.devCode", { code: sent.devCode })}</Alert>}
         {/* 每寄出一組新的碼就重新開始（清掉上一組的錯誤訊息） */}
         <CodeStep key={sent.sentAt} email={sent.sentTo} verifyCode={verifyCode} />
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
@@ -65,7 +65,7 @@ export function LoginForm({
               disabled={requesting}
               className="text-primary underline disabled:opacity-60"
             >
-              {requesting ? "寄送中…" : "重寄一組"}
+              {requesting ? t("common.sending") : t("login.resend")}
             </button>
           </form>
           <button
@@ -73,7 +73,7 @@ export function LoginForm({
             onClick={() => setChangingEmail(true)}
             className="text-primary underline"
           >
-            換一個 email
+            {t("login.changeEmail")}
           </button>
         </div>
       </div>
@@ -82,10 +82,10 @@ export function LoginForm({
 
   return (
     <form action={requestAction} className="grid gap-4">
-      {sent.error && <Alert tone="error">{loginErrorText(sent.error)}</Alert>}
+      {sent.error && <Alert tone="error">{loginErrorText(t, sent.error)}</Alert>}
       <div>
         <label htmlFor="email" className="mb-1 block font-medium">
-          Email
+          {t("login.email")}
         </label>
         <input
           id="email"
@@ -99,7 +99,7 @@ export function LoginForm({
         />
       </div>
       <Button type="submit" disabled={requesting}>
-        {requesting ? "寄送中…" : submitLabel}
+        {requesting ? t("common.sending") : (submitLabel ?? t("login.sendCode"))}
       </Button>
     </form>
   );
@@ -107,6 +107,7 @@ export function LoginForm({
 
 /** 第二步：輸入登入碼（6 格，填滿自動送出；輸錯就清空重來） */
 function CodeStep({ email, verifyCode }: { email: string; verifyCode: VerifyAction }) {
+  const t = useTranslations();
   const [verified, verifyAction, verifying] = useActionState(verifyCode, {});
   // 一次只送一個：填滿自動送出的同時又按了登入／Enter，第二次會多扣一次猜錯次數
   const submitted = useRef(false);
@@ -131,13 +132,13 @@ function CodeStep({ email, verifyCode }: { email: string; verifyCode: VerifyActi
     >
       {verified.error && (
         <Alert tone="error" size="md" className="font-medium ring-1 ring-destructive/40">
-          {loginErrorText(verified.error)}
+          {loginErrorText(t, verified.error)}
         </Alert>
       )}
       <input type="hidden" name="email" value={email} />
       <div>
         <label htmlFor="code-0" className="mb-2 block font-medium">
-          登入碼
+          {t("login.code")}
         </label>
         <CodeInput
           key={round}
@@ -145,11 +146,11 @@ function CodeStep({ email, verifyCode }: { email: string; verifyCode: VerifyActi
           length={LOGIN_CODE_LENGTH}
           invalid={Boolean(verified.error)}
           disabled={verifying}
-          label="登入碼"
+          label={t("login.code")}
         />
       </div>
       <Button type="submit" disabled={verifying}>
-        {verifying ? "登入中…" : "登入"}
+        {verifying ? t("login.submitting") : t("login.submit")}
       </Button>
     </form>
   );
