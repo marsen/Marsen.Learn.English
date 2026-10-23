@@ -369,7 +369,8 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
     >
       <input type="hidden" name="payload" value={payload} />
 
-      <div className="sticky top-14 z-10 -mx-4 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
+      {/* 錄音列黏在頂端列下面：手機頂端列 61px（AppSidebar 上下 py-2＋選單按鈕 h-11＋底線），電腦 h-14 */}
+      <div className="sticky top-[61px] z-10 -mx-4 border-b border-border bg-background/95 px-4 py-2 backdrop-blur md:top-14">
         <audio
           ref={audioRef}
           controls
