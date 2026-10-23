@@ -33,7 +33,7 @@ export function ExamPaper({ paper, answers, onChange, disabled, highlight }: Pro
   const lit = (n: number) => highlight !== null && n >= highlight[0] && n <= highlight[1];
 
   return (
-    <div className="rounded-xl border border-border bg-white px-5 py-4 leading-loose">
+    <div className="rounded-xl border border-border bg-surface px-5 py-4 leading-loose">
       <h2 className="my-3 text-center font-semibold">{paper.title}</h2>
       {paper.instruction && <Instruction text={paper.instruction} />}
       {paper.sections.map((section, si) => {

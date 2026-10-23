@@ -97,7 +97,7 @@ export function CodeInput({ name, length, invalid, disabled, label }: Props) {
             fillFrom(i, e.clipboardData.getData("text"));
           }}
           onFocus={(e) => e.target.select()}
-          className={`h-14 w-full min-w-0 rounded-lg border-2 bg-white text-center font-mono text-2xl font-semibold transition-colors focus:outline-none disabled:opacity-60 ${
+          className={`h-14 w-full min-w-0 rounded-lg border-2 bg-surface text-center font-mono text-2xl font-semibold transition-colors focus:outline-none disabled:opacity-60 ${
             invalid
               ? "border-destructive text-destructive"
               : "border-border focus:border-primary"

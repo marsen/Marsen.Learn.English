@@ -35,7 +35,7 @@ export async function requestLoginCodeAction(
   });
   // 重寄失敗時留在輸入登入碼的步驟（上一組碼可能還能用）
   if (!result.ok)
-    return { error: result.error, sentTo: prev.sentTo, sentAt: prev.sentAt };
+    return { error: result.error, email, sentTo: prev.sentTo, sentAt: prev.sentAt };
   return {
     sentTo: email,
     sentAt: Date.now(),

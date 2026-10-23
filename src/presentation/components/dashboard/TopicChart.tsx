@@ -10,7 +10,7 @@ const FAKE_TOPICS: { label: string; count: number }[] = [
 export function TopicChart() {
   const max = Math.max(1, ...FAKE_TOPICS.map((t) => t.count));
   return (
-    <div className="rounded-2xl border border-border bg-white p-5">
+    <div className="rounded-2xl border border-border bg-surface p-5">
       <ul className="grid gap-2">
         {FAKE_TOPICS.map((t) => (
           <li

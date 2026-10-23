@@ -23,6 +23,7 @@
   --accent-soft: #d1fae5; /* emerald-100 */
   --accent-foreground: #ffffff;
   --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, "PingFang TC", "Noto Sans TC",
     "Microsoft JhengHei", sans-serif;
@@ -46,6 +47,7 @@
   --color-accent-soft: var(--accent-soft);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --font-sans: var(--font-sans);
   --font-display: var(--font-sans);
 }

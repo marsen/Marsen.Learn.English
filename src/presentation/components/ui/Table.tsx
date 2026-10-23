@@ -6,7 +6,7 @@ import type { ReactNode, ThHTMLAttributes, TdHTMLAttributes } from "react";
  */
 export function Table({ head, children }: { head?: ReactNode; children: ReactNode }) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-border bg-white">
+    <div className="overflow-x-auto rounded-2xl border border-border bg-surface">
       <table className="w-full text-left text-sm">
         {head && (
           <thead className="border-b border-border text-muted-foreground">

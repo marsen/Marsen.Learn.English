@@ -14,12 +14,7 @@ export function DeleteSetButton({ setId, action }: Props) {
 
   if (!confirming)
     return (
-      <Button
-        variant="secondary"
-        size="sm"
-        className="text-destructive"
-        onClick={() => setConfirming(true)}
-      >
+      <Button variant="dangerSecondary" size="sm" onClick={() => setConfirming(true)}>
         刪除
       </Button>
     );

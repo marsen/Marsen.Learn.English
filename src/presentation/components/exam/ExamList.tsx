@@ -9,7 +9,7 @@ export function ExamList({ exams }: { exams: AvailableExam[] }) {
         <li key={e.setId}>
           <a
             href={`/exam/${e.setId}`}
-            className="flex items-center justify-between rounded-xl border border-border bg-white px-4 py-3"
+            className="flex items-center justify-between rounded-xl border border-border bg-surface px-4 py-3"
           >
             <span>
               {e.title}

@@ -41,7 +41,7 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
         {kpis.map((k) => (
           <div
             key={k.label}
-            className={`rounded-2xl border border-border bg-white p-4 ${k.tone}`}
+            className={`rounded-2xl border border-border bg-surface p-4 ${k.tone}`}
           >
             <p className="text-sm text-muted-foreground">{k.label}</p>
             <p className="mt-1 text-3xl font-bold">{k.n}</p>
@@ -105,7 +105,7 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
           {view.rejected.map((r) => (
             <article
               key={r.set.setId}
-              className="rounded-2xl border border-destructive/30 bg-white p-5"
+              className="rounded-2xl border border-destructive/30 bg-surface p-5"
             >
               <div className="flex flex-wrap items-center gap-2">
                 <Link
