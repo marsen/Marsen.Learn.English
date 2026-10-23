@@ -4,6 +4,7 @@ import { trapLabel } from "@/presentation/lib/examSetLabels";
 import { ButtonLink } from "@/presentation/components/ui/Button";
 import { EmptyState } from "@/presentation/components/ui/EmptyState";
 import { formatDay } from "@/presentation/lib/format";
+import { DELETED_SET_TITLE } from "@/presentation/lib/errorMessages";
 
 const pct = (score: number, total: number) =>
   total > 0 ? Math.round((score / total) * 100) : 0;
@@ -98,7 +99,7 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
                     >
                       <Link
                         href={`/exam/result/${r.attemptId}`}
-                        title={`${r.title}：${r.score} / ${r.total}`}
+                        title={`${r.title ?? DELETED_SET_TITLE}：${r.score} / ${r.total}`}
                         className="group flex h-full flex-col justify-end"
                       >
                         <span className="mb-1 text-center text-xs font-semibold">

@@ -21,13 +21,15 @@ describe("reviewProblems", () => {
   });
 
   it("應該要求選合格或不合格", () => {
-    expect(reviewProblems({ ...base, decision: "maybe" })).toHaveLength(1);
+    expect(reviewProblems({ ...base, decision: "maybe" })).toEqual([
+      { code: "decisionRequired" },
+    ]);
   });
 
   it("應該擋下不存在的小題", () => {
     expect(
       reviewProblems({ ...base, questionNotes: [{ questionId: "q99", note: "x" }] }),
-    ).toHaveLength(1);
+    ).toEqual([{ code: "unknownQuestion", questionId: "q99" }]);
   });
 
   it("應該擋下太長的意見、錄音建議與小題建議", () => {
@@ -39,7 +41,11 @@ describe("reviewProblems", () => {
         audioNote: long,
         questionNotes: [{ questionId: "q01", note: long }],
       }),
-    ).toHaveLength(3);
+    ).toEqual([
+      { code: "commentTooLong", max: MAX_NOTE_LENGTH },
+      { code: "audioNoteTooLong", max: MAX_NOTE_LENGTH },
+      { code: "questionNoteTooLong", questionId: "q01", max: MAX_NOTE_LENGTH },
+    ]);
   });
 });
 

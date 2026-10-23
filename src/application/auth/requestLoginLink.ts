@@ -36,7 +36,7 @@ export class RequestLoginLink {
     ipHash?: string | null;
   }): Promise<RequestLoginLinkResult> {
     const email = normalizeEmail(input.email);
-    if (!isValidEmail(email)) return { ok: false, error: "email 格式不對" };
+    if (!isValidEmail(email)) return { ok: false, error: { code: "invalidEmail" } };
 
     const now = this.now();
     const hourAgo = new Date(now.getTime() - HOUR_MS);

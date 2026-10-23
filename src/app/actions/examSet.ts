@@ -50,7 +50,7 @@ export async function reviewExamSetAction(
   formData: FormData,
 ): Promise<ReviewFormState> {
   const actor = await getCurrentAccount();
-  if (!actor) return { problems: ["請先登入"] };
+  if (!actor) return { problems: [{ code: "notLoggedIn" }] };
 
   const text = (key: string) => {
     const v = formData.get(key);

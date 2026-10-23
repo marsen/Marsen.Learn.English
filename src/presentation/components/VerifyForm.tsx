@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import type { VerifyFormState } from "./formStates";
 import { Alert } from "./ui/Alert";
 import { Button } from "./ui/Button";
+import { loginErrorText } from "@/presentation/lib/errorMessages";
 
 type Props = {
   token: string;
@@ -22,7 +23,7 @@ export function VerifyForm({ token, action }: Props) {
       <input type="hidden" name="token" value={token} />
       {state.error && (
         <Alert tone="error">
-          {state.error}{" "}
+          {loginErrorText(state.error)}{" "}
           <a href="/login" className="underline">
             重新申請
           </a>

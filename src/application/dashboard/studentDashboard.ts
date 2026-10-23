@@ -18,7 +18,8 @@ export type Recommendation = {
 
 export type RecentScore = {
   attemptId: string;
-  title: string;
+  /** 題組已刪除時為 null */
+  title: string | null;
   score: number;
   total: number;
   submittedAt: Date;
@@ -85,7 +86,7 @@ export class GetStudentDashboard {
       .reverse()
       .map((a) => ({
         attemptId: a.id,
-        title: byId.get(a.setId)?.title ?? "（已刪除的題組）",
+        title: byId.get(a.setId)?.title ?? null,
         score: a.result!.score,
         total: a.result!.total,
         submittedAt: a.submittedAt!,

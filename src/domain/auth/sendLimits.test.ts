@@ -25,7 +25,10 @@ describe("sendBlockReason", () => {
   });
 
   it("應該要同一個 email 兩封至少隔 60 秒", () => {
-    expect(sendBlockReason({ ...ok, lastSentToEmail: ago(30) })).toContain("30 秒");
+    expect(sendBlockReason({ ...ok, lastSentToEmail: ago(30) })).toEqual({
+      code: "cooldown",
+      seconds: 30,
+    });
     expect(sendBlockReason({ ...ok, lastSentToEmail: ago(60) })).toBeNull();
   });
 
@@ -33,22 +36,24 @@ describe("sendBlockReason", () => {
     expect(
       sendBlockReason({ ...ok, emailSentLastHour: EMAIL_MAX_PER_HOUR - 1 }),
     ).toBeNull();
-    expect(sendBlockReason({ ...ok, emailSentLastHour: EMAIL_MAX_PER_HOUR })).toContain(
-      "太多次",
-    );
+    expect(sendBlockReason({ ...ok, emailSentLastHour: EMAIL_MAX_PER_HOUR })).toEqual({
+      code: "emailHourlyLimit",
+    });
   });
 
   it("應該擋下同一個 IP 每小時超過 20 封；不知道 IP 時不檢查", () => {
     expect(sendBlockReason({ ...ok, ipSentLastHour: IP_MAX_PER_HOUR - 1 })).toBeNull();
-    expect(sendBlockReason({ ...ok, ipSentLastHour: IP_MAX_PER_HOUR })).toContain("網路");
+    expect(sendBlockReason({ ...ok, ipSentLastHour: IP_MAX_PER_HOUR })).toEqual({
+      code: "ipHourlyLimit",
+    });
     expect(sendBlockReason({ ...ok, ipSentLastHour: null })).toBeNull();
   });
 
   it("應該在全站 24 小時達 95 封時只擋新 email，已有帳號照常寄", () => {
     expect(sendBlockReason({ ...ok, sentLastDay: DAILY_SIGNUP_CUTOFF - 1 })).toBeNull();
-    expect(sendBlockReason({ ...ok, sentLastDay: DAILY_SIGNUP_CUTOFF })).toContain(
-      "今天註冊人數已滿",
-    );
+    expect(sendBlockReason({ ...ok, sentLastDay: DAILY_SIGNUP_CUTOFF })).toEqual({
+      code: "signupsFull",
+    });
     expect(
       sendBlockReason({ ...ok, sentLastDay: DAILY_SIGNUP_CUTOFF, hasAccount: true }),
     ).toBeNull();

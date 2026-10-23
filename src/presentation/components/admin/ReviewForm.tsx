@@ -6,6 +6,7 @@ import { timeMark } from "@/domain/examSet/review";
 import type { ReviewFormState } from "@/presentation/components/formStates";
 import { Alert } from "@/presentation/components/ui/Alert";
 import { Button } from "@/presentation/components/ui/Button";
+import { reviewErrorText } from "@/presentation/lib/errorMessages";
 import {
   aiRulingLabel,
   answerPolicyLabel,
@@ -201,7 +202,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
           />
         </label>
         {state.problems && state.problems.length > 0 && (
-          <Alert tone="error" items={state.problems} />
+          <Alert tone="error" items={state.problems.map(reviewErrorText)} />
         )}
         {state.saved && <Alert>已儲存審稿。</Alert>}
         <Button type="submit" disabled={isPending} className="justify-self-start">
