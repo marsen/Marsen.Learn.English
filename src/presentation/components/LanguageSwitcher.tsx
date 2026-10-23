@@ -1,14 +1,8 @@
 "use client";
 
-import { useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { LOCALES } from "@/domain/i18n/locale";
-
-type Props = {
-  /** Server Action：把選到的語言記下來 */
-  setLocale: (locale: string) => Promise<void>;
-};
+import { useSetLocale } from "./LocaleProvider";
 
 /** 按鈕上顯示的目前語言（用該語言自己的寫法，看不懂介面的人也認得） */
 const SHORT: Record<string, string> = { "zh-TW": "中文", en: "EN" };
@@ -16,33 +10,22 @@ const SHORT: Record<string, string> = { "zh-TW": "中文", en: "EN" };
 /**
  * 介面語言切換：地球圖示＋目前語言＋向下箭頭。全站都放在畫面右上角。
  * 底層是透明的原生下拉選單蓋在按鈕上：手機點了會跳出系統的選擇器，字大好點、不會被畫面邊緣切掉。
+ * 切換在瀏覽器直接完成（LocaleProvider），不用重新整理。
  */
-export function LanguageSwitcher({ setLocale }: Props) {
+export function LanguageSwitcher() {
   const t = useTranslations("common");
   const current = useLocale();
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const setLocale = useSetLocale();
 
   return (
-    <label
-      className={`relative inline-flex h-11 min-w-11 cursor-pointer items-center justify-center gap-1.5 rounded-lg px-2 text-sm text-foreground/80 hover:bg-muted focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary ${
-        pending ? "opacity-60" : ""
-      }`}
-    >
+    <label className="relative inline-flex h-11 min-w-11 cursor-pointer items-center justify-center gap-1.5 rounded-lg px-2 text-sm text-foreground/80 hover:bg-muted focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-primary">
       <GlobeIcon />
       <span className="font-medium">{SHORT[current] ?? current}</span>
       <ChevronIcon />
       <select
         aria-label={t("language")}
         value={current}
-        disabled={pending}
-        onChange={(e) => {
-          const next = e.target.value;
-          startTransition(async () => {
-            await setLocale(next);
-            router.refresh();
-          });
-        }}
+        onChange={(e) => setLocale(e.target.value)}
         className="absolute inset-0 cursor-pointer opacity-0"
       >
         {LOCALES.map((l) => (

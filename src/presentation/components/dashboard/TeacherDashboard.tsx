@@ -1,3 +1,5 @@
+"use client";
+
 import { useTranslations } from "next-intl";
 import type { TeacherDashboardView } from "@/application/dashboard/teacherDashboard";
 import { StatusTags } from "@/presentation/components/admin/StatusTags";

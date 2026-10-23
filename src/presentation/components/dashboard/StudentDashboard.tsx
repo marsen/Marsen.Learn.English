@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import type { StudentDashboardView } from "@/application/dashboard/studentDashboard";
 import { useTranslations } from "next-intl";

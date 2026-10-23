@@ -1,3 +1,5 @@
+"use client";
+
 import type { Account } from "@/domain/account/account";
 import { PERMISSIONS, permissionsOf } from "@/domain/account/permission";
 import { useTranslations } from "next-intl";

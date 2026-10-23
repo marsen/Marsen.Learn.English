@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Page, PageHeader } from "@/presentation/components/ui/Page";
 import { Alert } from "@/presentation/components/ui/Alert";
+import { Msg } from "@/presentation/components/Msg";
+import { DocumentTitle } from "@/presentation/components/DocumentTitle";
 import { AccountSummary } from "@/presentation/components/AccountSummary";
 import { AdminDashboard } from "@/presentation/components/dashboard/AdminDashboard";
 import { StudentDashboard } from "@/presentation/components/dashboard/StudentDashboard";
@@ -41,25 +43,32 @@ export default async function DashboardPage({
       ? null
       : await getStudentDashboard().execute({ actor: account });
   const both = teacherView && adminView;
-  const t = await getTranslations("dashboard");
-
   return (
     <Page width="lg">
-      <PageHeader title={t("title")} />
+      <DocumentTitle id="dashboard.title" />
+      <PageHeader title={<Msg id="dashboard.title" />} />
       {denied && (
         <Alert tone="error" className="mb-6">
-          {t("denied")}
+          <Msg id="dashboard.denied" />
         </Alert>
       )}
       {teacherView && (
         <>
-          {both && <h2 className="mt-6 text-xl font-semibold">{t("reviewHeading")}</h2>}
+          {both && (
+            <h2 className="mt-6 text-xl font-semibold">
+              <Msg id="dashboard.reviewHeading" />
+            </h2>
+          )}
           <TeacherDashboard view={teacherView} now={now} />
         </>
       )}
       {adminView && (
         <div className={both ? "mt-16 border-t border-border pt-10" : "mt-6"}>
-          {both && <h2 className="mb-6 text-xl font-semibold">{t("manageHeading")}</h2>}
+          {both && (
+            <h2 className="mb-6 text-xl font-semibold">
+              <Msg id="dashboard.manageHeading" />
+            </h2>
+          )}
           <AdminDashboard
             view={adminView}
             setAccessAction={setExamAccessAction}

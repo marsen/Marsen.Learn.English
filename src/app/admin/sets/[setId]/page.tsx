@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { Page, PageHeader } from "@/presentation/components/ui/Page";
-import { formatFullDateTime } from "@/presentation/lib/format";
+import { Msg } from "@/presentation/components/Msg";
+import { DocumentTitle } from "@/presentation/components/DocumentTitle";
+import { ReviewMeta } from "@/presentation/components/admin/ReviewMeta";
 import { ReviewForm } from "@/presentation/components/admin/ReviewForm";
 import { StatusTags } from "@/presentation/components/admin/StatusTags";
 import { statusTagsOf } from "@/domain/examSet/statusTags";
@@ -28,23 +30,22 @@ export default async function ReviewPage({
     notFound();
   }
   const { view } = result;
-  const t = await getTranslations("review");
-  const locale = await getLocale();
-
   return (
     <Page>
+      <DocumentTitle id="review.metaTitle" />
       <PageHeader
-        back={{ href: "/admin/sets", label: t("back") }}
+        back={{ href: "/admin/sets", label: <Msg id="review.back" /> }}
         title={view.set.title}
         description={
           <>
             <div className="mb-2">
               <StatusTags tags={statusTagsOf(view.set)} />
             </div>
-            <span className="font-mono">{view.set.setId}</span> ·{" "}
-            {t("questionCount", { count: view.set.questionCount })}
-            {view.review &&
-              ` · ${t("lastReviewed", { time: formatFullDateTime(view.review.reviewedAt, locale) })}`}
+            <ReviewMeta
+              setId={view.set.setId}
+              questionCount={view.set.questionCount}
+              reviewedAt={view.review?.reviewedAt ?? null}
+            />
           </>
         }
       />

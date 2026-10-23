@@ -48,7 +48,10 @@ app（路由／Server Action，薄）→ presentation → application → domain
 
 ## 多語系
 
-- 套件 next-intl，網址不帶語言：cookie（使用者手動切換）→ 瀏覽器語言 → 英文（`src/domain/i18n/locale.ts`）
+- 套件 next-intl，網址不帶語言：第一次由伺服器決定 cookie（使用者手動切換過）→ 瀏覽器語言 → 英文（`src/domain/i18n/locale.ts`），不會閃
+- **切換在瀏覽器完成**（`presentation/components/LocaleProvider.tsx`）：不回伺服器、不重新產生頁面。所有語言的翻譯檔一開始就一起送到瀏覽器
+- **有翻譯文字的元件一律是瀏覽器端元件（`"use client"`）**，資料由頁面（伺服器端）查好用 props 傳進去；頁面裡要放一句翻譯就用 `<Msg id="…" />`。伺服器端只有 `generateMetadata` 可以用 `getTranslations`，其他地方用了測試會擋（`presentation/lib/i18nRules.test.ts`）
+- 頁籤標題：`generateMetadata` 給第一次載入，頁面再放 `<DocumentTitle id="…" />` 讓切換時跟著變
 - 翻譯檔 `messages/<語言>.json`，每種語言的 key 要一樣（有測試檢查）
 - 老師、學生、路人會看到的文字一律放翻譯檔；只有管理員看的頁面暫時維持中文
 - 後端只回錯誤代碼，文字在翻譯檔 `errors.*`

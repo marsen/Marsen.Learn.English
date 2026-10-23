@@ -30,7 +30,7 @@ export function PageHeader({
   title: ReactNode;
   description?: ReactNode;
   /** 上一層：{ href, label } */
-  back?: { href: string; label: string };
+  back?: { href: string; label: ReactNode };
   /** 標題右邊的按鈕 */
   actions?: ReactNode;
 }) {

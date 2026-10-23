@@ -1,3 +1,5 @@
+"use client";
+
 import type { ExamSet } from "@/domain/examSet/examSet";
 import { statusTagsOf } from "@/domain/examSet/statusTags";
 import { useLocale, useTranslations } from "next-intl";

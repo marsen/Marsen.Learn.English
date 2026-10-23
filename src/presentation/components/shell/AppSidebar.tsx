@@ -6,18 +6,20 @@ import { activeHref, type NavItem } from "@/presentation/lib/navigation";
 import { useTranslations } from "next-intl";
 import { NavIconSvg } from "./NavIcons";
 import { LanguageSwitcher } from "@/presentation/components/LanguageSwitcher";
+import type { Role } from "@/domain/account/role";
 
 type Props = {
   items: NavItem[];
   email: string;
-  roleLabel: string;
+  roles: readonly Role[];
   logout: () => Promise<void>;
-  setLocale: (locale: string) => Promise<void>;
 };
 
 /** 登入後的側邊欄：只列出這個帳號有權限的頁面。桌機固定在左邊，手機收成上方列＋選單。 */
-export function AppSidebar({ items, email, roleLabel, logout, setLocale }: Props) {
+export function AppSidebar({ items, email, roles, logout }: Props) {
   const t = useTranslations();
+  const roleLabel =
+    roles.map((r) => t(`roles.${r}`)).join(t("roles.separator")) || t("roles.none");
   const pathname = usePathname();
   const active = activeHref(items, pathname);
   const [open, setOpen] = useState(false);
@@ -102,7 +104,7 @@ export function AppSidebar({ items, email, roleLabel, logout, setLocale }: Props
         <div className="flex items-center justify-between gap-1 px-2 py-2">
           {brand}
           <div className="flex shrink-0 items-center gap-1">
-            <LanguageSwitcher setLocale={setLocale} />
+            <LanguageSwitcher />
             <button
               type="button"
               onClick={() => setOpen((o) => !o)}

@@ -5,6 +5,9 @@
 export const LOCALES = ["zh-TW", "en"] as const;
 export type Locale = (typeof LOCALES)[number];
 
+/** 使用者手動選的語言存在這個 cookie（瀏覽器寫、伺服器讀） */
+export const LOCALE_COOKIE = "locale";
+
 /** 不是中文也不是英文的瀏覽器，先顯示英文 */
 export const FALLBACK_LOCALE: Locale = "en";
 
