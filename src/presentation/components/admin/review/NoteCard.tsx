@@ -30,6 +30,8 @@ type Props = {
   notes: DraftNote[];
   active: boolean;
   editing: Editing | null;
+  /** 打開的意見框有沒存的字，老師又想做別的事：在框下面提醒 */
+  warnUnsaved: boolean;
   setEditing: (e: Editing | null) => void;
   /** key 是 null＝新增 */
   onSaveNote: (key: string | null, target: string, text: string) => void;
@@ -129,6 +131,7 @@ export function NoteCard(p: Props) {
         if (p.editing?.kind === "aiEdit" && p.editing.ref === n.ref)
           return (
             <Editor
+              warn={p.warnUnsaved}
               key={n.ref}
               initial={edited ? a.text : n.message}
               placeholder={r("commentPlaceholder")}
@@ -182,6 +185,7 @@ export function NoteCard(p: Props) {
             )}
             {p.editing?.kind === "aiDelete" && p.editing.ref === n.ref ? (
               <Editor
+                warn={p.warnUnsaved}
                 initial=""
                 placeholder={r("deleteReasonPlaceholder")}
                 saveLabel={r("delete")}
@@ -237,6 +241,7 @@ export function NoteCard(p: Props) {
       {p.notes.map((n) =>
         p.editing?.kind === "note" && p.editing.key === n.key ? (
           <Editor
+            warn={p.warnUnsaved}
             key={n.key}
             initial={n.text}
             placeholder={r("commentPlaceholder")}
@@ -275,6 +280,7 @@ export function NoteCard(p: Props) {
 
       {isNew ? (
         <Editor
+          warn={p.warnUnsaved}
           initial=""
           placeholder={r("commentPlaceholder")}
           withTime
@@ -308,6 +314,7 @@ function Editor({
   saveLabel,
   danger = false,
   allowEmpty = false,
+  warn = false,
 }: {
   initial: string;
   placeholder: string;
@@ -318,6 +325,7 @@ function Editor({
   saveLabel?: string;
   danger?: boolean;
   allowEmpty?: boolean;
+  warn?: boolean;
 }) {
   const t = useTranslations("review");
   const ref = useRef<HTMLTextAreaElement>(null);
@@ -336,7 +344,7 @@ function Editor({
     else onCancel();
   };
   return (
-    <div className="grid gap-1.5">
+    <div data-editing className="grid gap-1.5">
       <textarea
         ref={ref}
         rows={3}
@@ -345,6 +353,11 @@ function Editor({
         placeholder={placeholder}
         className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
       />
+      {warn && (
+        <p role="alert" className="text-xs text-destructive">
+          {t("unsavedComment")}
+        </p>
+      )}
       <div className="flex flex-wrap gap-1.5">
         {withTime && (
           <Button variant="secondary" size="xs" onClick={insertTime}>

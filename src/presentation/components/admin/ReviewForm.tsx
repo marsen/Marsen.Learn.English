@@ -150,10 +150,35 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
       ),
   ];
 
+  // ---------- 還沒按「好」的意見 ----------
+  // 正在寫的意見框裡有改過、還沒存的字，就不能換去寫別的、也不能送出，免得字不見
+  // 提醒只掛在當時打開的那個意見框；換了意見框（editing 換成新物件）提醒就自然消失
+  const [hintFor, setHintFor] = useState<Editing | null>(null);
+  const openEditor = () => document.querySelector<HTMLElement>("[data-editing] textarea");
+  const hasUnsaved = () => {
+    const el = openEditor() as HTMLTextAreaElement | null;
+    return !!el && el.value.trim() !== "" && el.value !== el.defaultValue;
+  };
+  const showUnsaved = () => {
+    setHintFor(editing);
+    const el = openEditor();
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    el?.focus({ preventScroll: true });
+  };
+  /** 換去寫別的；目前的意見框有沒存的字就擋下來 */
+  const startEditing = (e: Editing | null) => {
+    if (e !== null && editing !== null && hasUnsaved()) {
+      showUnsaved();
+      return false;
+    }
+    setEditing(e);
+    return true;
+  };
+
   const select = (target: string) => {
     setActive(target);
     if (target !== SET && notesOf(target).length === 0 && aiOf(target).length === 0)
-      setEditing({ kind: "new", target });
+      startEditing({ kind: "new", target });
   };
 
   // 窄螢幕：點空格後捲到那張卡
@@ -254,7 +279,17 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
   });
 
   return (
-    <form action={formAction} className="grid gap-6">
+    <form
+      action={formAction}
+      onSubmit={(e) => {
+        // 有沒按「好」的意見就先不送，提醒老師；意見框是空的或沒改過就直接關掉
+        if (hasUnsaved()) {
+          e.preventDefault();
+          showUnsaved();
+        } else if (editing !== null) setEditing(null);
+      }}
+      className="grid gap-6"
+    >
       <input type="hidden" name="payload" value={payload} />
 
       <div className="sticky top-14 z-10 -mx-4 border-b border-border bg-background/95 px-4 py-2 backdrop-blur">
@@ -299,9 +334,9 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
                 notes={notesOf(target)}
                 active={active === target}
                 editing={editing}
+                warnUnsaved={hintFor !== null && hintFor === editing}
                 setEditing={(e) => {
-                  setEditing(e);
-                  setActive(target);
+                  if (startEditing(e)) setActive(target);
                 }}
                 onSaveNote={saveNote}
                 onRemoveNote={(key) => setNotes((ns) => ns.filter((n) => n.key !== key))}

@@ -223,6 +223,7 @@
     "commentCount": "{count, plural, one {# comment} other {# comments}}",
     "transcript": "Transcript",
     "transcriptHint": "Click a time to jump there. The line being played is highlighted.",
-    "noTranscript": "This set was packed before transcripts were included, so the ▶ buttons and the transcript aren't available."
+    "noTranscript": "This set was packed before transcripts were included, so the ▶ buttons and the transcript aren't available.",
+    "unsavedComment": "You have a comment you haven't saved. Press OK (or Cancel) on it first."
   }
 }

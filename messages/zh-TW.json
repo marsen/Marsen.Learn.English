@@ -223,6 +223,7 @@
     "commentCount": "{count} 則意見",
     "transcript": "逐字稿",
     "transcriptHint": "點時間跳過去聽，正在播的那句會亮起來。",
-    "noTranscript": "這套題打包時還沒有逐字稿，所以沒有 ▶ 和逐字稿。"
+    "noTranscript": "這套題打包時還沒有逐字稿，所以沒有 ▶ 和逐字稿。",
+    "unsavedComment": "有一則意見還沒存，請先按「好」（或「取消」）。"
   }
 }
