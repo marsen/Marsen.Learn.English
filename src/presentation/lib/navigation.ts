@@ -7,7 +7,7 @@ import type { Role } from "@/domain/account/role";
  */
 export type NavItem = {
   href: string;
-  label: string;
+  /** 顯示的名稱在翻譯檔 nav.items.<icon> */
   icon: NavIcon;
   group: "learn" | "manage";
 };
@@ -16,39 +16,34 @@ export type NavIcon =
   "home" | "exam" | "history" | "sets" | "upload" | "reviews" | "accounts";
 
 const ITEMS: (NavItem & { needs: Permission[] | "any" })[] = [
-  { href: "/admin", label: "總覽", icon: "home", group: "learn", needs: "any" },
-  { href: "/exam", label: "考卷", icon: "exam", group: "learn", needs: ["takeExam"] },
+  { href: "/admin", icon: "home", group: "learn", needs: "any" },
+  { href: "/exam", icon: "exam", group: "learn", needs: ["takeExam"] },
   {
     href: "/exam/history",
-    label: "我的考試紀錄",
     icon: "history",
     group: "learn",
     needs: ["keepRecords"],
   },
   {
     href: "/admin/sets",
-    label: "題組與審稿",
     icon: "sets",
     group: "manage",
     needs: ["uploadSets", "reviewSets"],
   },
   {
     href: "/admin/sets/upload",
-    label: "上傳題組",
     icon: "upload",
     group: "manage",
     needs: ["uploadSets"],
   },
   {
     href: "/admin/reviews",
-    label: "審稿紀錄",
     icon: "reviews",
     group: "manage",
     needs: ["viewReviewLog"],
   },
   {
     href: "/admin/accounts",
-    label: "管理權限",
     icon: "accounts",
     group: "manage",
     needs: ["manageRoles"],
@@ -58,7 +53,7 @@ const ITEMS: (NavItem & { needs: Permission[] | "any" })[] = [
 /** 這個帳號在側邊欄看得到的項目（needs 是陣列時，有其中一個權限就看得到） */
 export function navItemsFor(roles: readonly Role[]): NavItem[] {
   return ITEMS.filter((i) => i.needs === "any" || i.needs.some((p) => can(roles, p))).map(
-    (i) => ({ href: i.href, label: i.label, icon: i.icon, group: i.group }),
+    (i) => ({ href: i.href, icon: i.icon, group: i.group }),
   );
 }
 

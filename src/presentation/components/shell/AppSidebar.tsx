@@ -3,19 +3,21 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { activeHref, type NavItem } from "@/presentation/lib/navigation";
+import { useTranslations } from "next-intl";
 import { NavIconSvg } from "./NavIcons";
+import { LanguageSwitcher } from "@/presentation/components/LanguageSwitcher";
 
 type Props = {
   items: NavItem[];
   email: string;
   roleLabel: string;
   logout: () => Promise<void>;
+  setLocale: (locale: string) => Promise<void>;
 };
 
-const GROUP_LABEL = { learn: "學習", manage: "管理" } as const;
-
 /** 登入後的側邊欄：只列出這個帳號有權限的頁面。桌機固定在左邊，手機收成上方選單。 */
-export function AppSidebar({ items, email, roleLabel, logout }: Props) {
+export function AppSidebar({ items, email, roleLabel, logout, setLocale }: Props) {
+  const t = useTranslations();
   const pathname = usePathname();
   const active = activeHref(items, pathname);
   const [open, setOpen] = useState(false);
@@ -26,7 +28,7 @@ export function AppSidebar({ items, email, roleLabel, logout }: Props) {
     return (
       <div key={g} className="mb-6">
         <p className="mb-2 px-3 text-xs font-medium tracking-wider text-muted-foreground">
-          {GROUP_LABEL[g]}
+          {t(`nav.groups.${g}`)}
         </p>
         <ul className="grid gap-1">
           {group.map((i) => (
@@ -41,7 +43,7 @@ export function AppSidebar({ items, email, roleLabel, logout }: Props) {
                 }`}
               >
                 <NavIconSvg name={i.icon} />
-                {i.label}
+                {t(`nav.items.${i.icon}`)}
               </a>
             </li>
           ))}
@@ -61,9 +63,10 @@ export function AppSidebar({ items, email, roleLabel, logout }: Props) {
           type="submit"
           className="mt-3 w-full rounded-xl px-3 py-2 text-left text-sm text-muted-foreground hover:bg-muted"
         >
-          登出
+          {t("nav.logout")}
         </button>
       </form>
+      <LanguageSwitcher setLocale={setLocale} className="mt-2 px-3" />
     </div>
   );
 
@@ -72,7 +75,7 @@ export function AppSidebar({ items, email, roleLabel, logout }: Props) {
       <span className="grid h-8 w-8 place-items-center rounded-xl bg-primary-soft text-primary-hover">
         <NavIconSvg name="exam" />
       </span>
-      無限雅思聽力
+      {t("common.brand")}
     </a>
   );
 
@@ -92,7 +95,7 @@ export function AppSidebar({ items, email, roleLabel, logout }: Props) {
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
-            aria-label="開啟選單"
+            aria-label={t("nav.openMenu")}
             aria-expanded={open}
             className="rounded-lg p-2"
           >

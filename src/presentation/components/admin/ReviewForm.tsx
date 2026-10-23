@@ -7,14 +7,8 @@ import type { ReviewFormState } from "@/presentation/components/formStates";
 import { Alert } from "@/presentation/components/ui/Alert";
 import { Button } from "@/presentation/components/ui/Button";
 import { reviewErrorText } from "@/presentation/lib/errorMessages";
-import {
-  aiRulingLabel,
-  answerPolicyLabel,
-  answerTypeLabel,
-  categoryLabel,
-  severityLabel,
-  trapLabel,
-} from "@/presentation/lib/examSetLabels";
+import { useTranslations } from "next-intl";
+import { examSetLabel } from "@/presentation/lib/examSetLabels";
 
 type Props = {
   view: ReviewView;
@@ -26,6 +20,11 @@ const box = "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm
 
 /** 老師審稿：聽錄音、看每一題的答案與 AI 示警，寫建議，判合格／不合格。 */
 export function ReviewForm({ view, audioUrl, action }: Props) {
+  const t = useTranslations();
+  const r = (key: string, values?: Record<string, string | number>) =>
+    t(`review.${key}`, values);
+  const label = (kind: Parameters<typeof examSetLabel>[1], v: string | null) =>
+    examSetLabel(t, kind, v);
   const [state, formAction, isPending] = useActionState(action, {});
   const audioRef = useRef<HTMLAudioElement>(null);
   const audioNoteRef = useRef<HTMLTextAreaElement>(null);
@@ -46,7 +45,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
   return (
     <form action={formAction} className="grid gap-8">
       <section className="grid gap-3">
-        <h2 className="text-lg font-semibold">錄音</h2>
+        <h2 className="text-lg font-semibold">{r("audio")}</h2>
         <audio
           ref={audioRef}
           controls
@@ -57,10 +56,10 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
         <div>
           <div className="mb-1 flex items-center justify-between">
             <label htmlFor="audioNote" className="text-sm font-medium">
-              錄音建議（選填）
+              {r("audioNote")}
             </label>
             <Button variant="secondary" size="sm" onClick={insertTime}>
-              插入目前時間
+              {r("insertTime")}
             </Button>
           </div>
           <textarea
@@ -69,7 +68,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
             ref={audioNoteRef}
             rows={3}
             defaultValue={prev?.audioNote ?? ""}
-            placeholder="例如：[01:23] 這句講太快，聽不清楚門牌號碼"
+            placeholder={r("audioNotePlaceholder")}
             className={box}
           />
         </div>
@@ -77,7 +76,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
 
       {view.warnings.length > 0 && (
         <section className="grid gap-2">
-          <h2 className="text-lg font-semibold">AI 提出的疑慮</h2>
+          <h2 className="text-lg font-semibold">{r("aiWarnings")}</h2>
           <ul className="grid gap-2 text-sm">
             {view.warnings.map((w) => (
               <li key={w.id} className="rounded-lg bg-card px-4 py-3">
@@ -85,7 +84,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
                 {w.message}
                 {w.aiRuling && (
                   <span className="ml-2 text-muted-foreground">
-                    （{aiRulingLabel(w.aiRuling)}）
+                    {t("common.parenthesized", { text: label("aiRuling", w.aiRuling) })}
                   </span>
                 )}
               </li>
@@ -96,20 +95,22 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
 
       {view.findings.length > 0 && (
         <section className="grid gap-2">
-          <h2 className="text-lg font-semibold">AI 審稿的其他發現</h2>
+          <h2 className="text-lg font-semibold">{r("aiFindings")}</h2>
           <ul className="grid gap-2 text-sm">
             {view.findings.map((f, i) => {
               const n = view.questions.findIndex((q) => q.questionId === f.questionId);
               return (
                 <li key={i} className="rounded-lg bg-card px-4 py-3">
                   <div className="mb-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                    <span>{n >= 0 ? `第 ${n + 1} 題` : "整套"}</span>
-                    <span>· {severityLabel(f.severity)}</span>
-                    {f.category && <span>· {categoryLabel(f.category)}</span>}
+                    <span>{n >= 0 ? r("questionN", { n: n + 1 }) : r("wholeSet")}</span>
+                    <span>· {label("severity", f.severity)}</span>
+                    {f.category && <span>· {label("category", f.category)}</span>}
                   </div>
                   <p>{f.message}</p>
                   {f.suggestion && (
-                    <p className="mt-1 text-muted-foreground">建議：{f.suggestion}</p>
+                    <p className="mt-1 text-muted-foreground">
+                      {r("suggestion", { text: f.suggestion })}
+                    </p>
                   )}
                 </li>
               );
@@ -119,7 +120,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
       )}
 
       <section className="grid gap-3">
-        <h2 className="text-lg font-semibold">每一題</h2>
+        <h2 className="text-lg font-semibold">{r("questions")}</h2>
         {view.instruction && (
           <p className="text-sm italic text-muted-foreground">{view.instruction}</p>
         )}
@@ -130,34 +131,38 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
               className="rounded-xl border border-border bg-surface p-4"
             >
               <div className="flex flex-wrap items-baseline gap-x-3">
-                <span className="font-semibold">第 {i + 1} 題</span>
+                <span className="font-semibold">{r("questionN", { n: i + 1 })}</span>
                 <span className="text-sm text-muted-foreground">
                   {[q.section, q.label].filter(Boolean).join(" › ")}
                 </span>
               </div>
               <dl className="mt-2 grid grid-cols-[7rem_1fr] gap-x-3 gap-y-1 text-sm">
-                <dt className="text-muted-foreground">標準答案</dt>
+                <dt className="text-muted-foreground">{r("answer")}</dt>
                 <dd className="font-medium">{q.answer}</dd>
-                <dt className="text-muted-foreground">也算對的寫法</dt>
-                <dd>{q.accepted.length > 0 ? q.accepted.join("、") : "（沒有）"}</dd>
-                <dt className="text-muted-foreground">答案類型</dt>
-                <dd>{answerTypeLabel(q.answerType)}</dd>
-                <dt className="text-muted-foreground">答案規則</dt>
-                <dd>{answerPolicyLabel(q.answerPolicy)}</dd>
-                <dt className="text-muted-foreground">干擾陷阱</dt>
+                <dt className="text-muted-foreground">{r("accepted")}</dt>
                 <dd>
-                  {trapLabel(q.trap)}
-                  {q.wrongValue && `（錄音先出現的錯誤答案：${q.wrongValue}）`}
+                  {q.accepted.length > 0
+                    ? q.accepted.join(t("common.listSeparator"))
+                    : t("common.none")}
+                </dd>
+                <dt className="text-muted-foreground">{r("answerType")}</dt>
+                <dd>{label("answerType", q.answerType)}</dd>
+                <dt className="text-muted-foreground">{r("answerPolicy")}</dt>
+                <dd>{label("answerPolicy", q.answerPolicy)}</dd>
+                <dt className="text-muted-foreground">{r("trap")}</dt>
+                <dd>
+                  {label("trap", q.trap)}
+                  {q.wrongValue && ` ${r("wrongValue", { value: q.wrongValue })}`}
                 </dd>
                 {q.note && (
                   <>
-                    <dt className="text-muted-foreground">出題說明</dt>
+                    <dt className="text-muted-foreground">{r("note")}</dt>
                     <dd>{q.note}</dd>
                   </>
                 )}
               </dl>
               <label className="mt-3 block text-sm">
-                <span className="mb-1 block font-medium">這題的建議（選填）</span>
+                <span className="mb-1 block font-medium">{r("questionNote")}</span>
                 <textarea
                   name={`note:${q.questionId}`}
                   rows={2}
@@ -171,7 +176,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
       </section>
 
       <section className="grid gap-3 rounded-xl border border-border bg-surface p-4">
-        <h2 className="text-lg font-semibold">判定</h2>
+        <h2 className="text-lg font-semibold">{r("decision")}</h2>
         <div className="flex gap-6">
           <label className="flex items-center gap-2">
             <input
@@ -180,7 +185,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
               value="approved"
               defaultChecked={prev?.decision === "approved"}
             />
-            合格
+            {r("approved")}
           </label>
           <label className="flex items-center gap-2">
             <input
@@ -189,11 +194,11 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
               value="rejected"
               defaultChecked={prev?.decision === "rejected"}
             />
-            不合格
+            {r("rejected")}
           </label>
         </div>
         <label className="text-sm">
-          <span className="mb-1 block font-medium">整體意見（選填）</span>
+          <span className="mb-1 block font-medium">{r("comment")}</span>
           <textarea
             name="comment"
             rows={3}
@@ -202,11 +207,11 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
           />
         </label>
         {state.problems && state.problems.length > 0 && (
-          <Alert tone="error" items={state.problems.map(reviewErrorText)} />
+          <Alert tone="error" items={state.problems.map((p) => reviewErrorText(t, p))} />
         )}
-        {state.saved && <Alert>已儲存審稿。</Alert>}
+        {state.saved && <Alert>{r("saved")}</Alert>}
         <Button type="submit" disabled={isPending} className="justify-self-start">
-          {isPending ? "儲存中…" : prev ? "更新審稿" : "送出審稿"}
+          {isPending ? t("common.saving") : prev ? r("update") : r("submit")}
         </Button>
       </section>
     </form>

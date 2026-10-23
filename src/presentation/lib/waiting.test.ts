@@ -1,12 +1,12 @@
 import { describe, it, expect } from "vitest";
-import { waitedLabel } from "./waiting";
+import { waitedDays } from "./waiting";
 
-describe("waitedLabel", () => {
+describe("waitedDays", () => {
   const now = new Date("2026-10-21T10:00:00Z");
-  it("應該把未滿一天顯示成今天", () => {
-    expect(waitedLabel(new Date("2026-10-21T01:00:00Z"), now)).toBe("今天");
+  it("應該把未滿一天算成 0 天（今天）", () => {
+    expect(waitedDays(new Date("2026-10-21T01:00:00Z"), now)).toBe(0);
   });
-  it("應該顯示等了幾天", () => {
-    expect(waitedLabel(new Date("2026-10-17T09:00:00Z"), now)).toBe("4 天");
+  it("應該算出等了幾天", () => {
+    expect(waitedDays(new Date("2026-10-17T09:00:00Z"), now)).toBe(4);
   });
 });

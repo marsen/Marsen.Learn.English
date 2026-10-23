@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import type { Account } from "@/domain/account/account";
 import { ROLES } from "@/domain/account/role";
 import type { ManageFormState } from "@/presentation/components/formStates";
-import { ROLE_LABELS } from "@/presentation/lib/labels";
+import { useTranslations } from "next-intl";
 import { Button } from "@/presentation/components/ui/Button";
 
 type Action = (prev: ManageFormState, formData: FormData) => Promise<ManageFormState>;
@@ -19,6 +19,7 @@ function Messages({ state }: { state: ManageFormState }) {
 }
 
 function RoleCheckboxes({ checked }: { checked: readonly string[] }) {
+  const t = useTranslations("roles");
   return (
     <span className="flex flex-wrap gap-4">
       {ROLES.map((r) => (
@@ -29,7 +30,7 @@ function RoleCheckboxes({ checked }: { checked: readonly string[] }) {
             value={r}
             defaultChecked={checked.includes(r)}
           />
-          {ROLE_LABELS[r]}
+          {t(r)}
         </label>
       ))}
     </span>

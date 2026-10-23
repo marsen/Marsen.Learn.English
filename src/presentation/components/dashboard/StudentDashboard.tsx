@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { StudentDashboardView } from "@/application/dashboard/studentDashboard";
-import { trapLabel } from "@/presentation/lib/examSetLabels";
+import { useTranslations } from "next-intl";
+import { examSetLabel } from "@/presentation/lib/examSetLabels";
 import { ButtonLink } from "@/presentation/components/ui/Button";
 import { EmptyState } from "@/presentation/components/ui/EmptyState";
 import { formatDay } from "@/presentation/lib/format";
@@ -11,6 +12,7 @@ const pct = (score: number, total: number) =>
 
 /** 學生總覽：繼續練習、還有幾張沒考、我的成績、最常錯的題型。 */
 export function StudentDashboard({ view }: { view: StudentDashboardView }) {
+  const t = useTranslations();
   const rec = view.recommendation;
   const last = view.recent.at(-1);
 
@@ -128,14 +130,14 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
           <h2 className="mb-1 text-lg font-semibold">最常錯的題型</h2>
           <p className="mb-3 text-sm text-muted-foreground">練習時特別留意這幾種陷阱。</p>
           <ul className="grid gap-3 sm:grid-cols-3">
-            {view.weakTraps.map((t) => (
+            {view.weakTraps.map((w) => (
               <li
-                key={t.trap}
+                key={w.trap}
                 className="rounded-2xl border border-border bg-surface p-5"
               >
-                <p className="font-semibold">{trapLabel(t.trap)}</p>
+                <p className="font-semibold">{examSetLabel(t, "trap", w.trap)}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  錯 <b className="text-destructive">{t.wrong}</b> / {t.seen} 題
+                  錯 <b className="text-destructive">{w.wrong}</b> / {w.seen} 題
                 </p>
               </li>
             ))}

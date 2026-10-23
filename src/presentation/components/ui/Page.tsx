@@ -54,18 +54,20 @@ export function PageHeader({
   );
 }
 
-/** 置中的小卡片頁（登入、完成登入） */
+/** 置中的小卡片頁（登入）；footer 放在卡片下方（例如語言切換） */
 export function CardPage({
   title,
   description,
+  footer,
   children,
 }: {
   title: ReactNode;
   description?: ReactNode;
+  footer?: ReactNode;
   children: ReactNode;
 }) {
   return (
-    <main className="flex flex-1 items-center justify-center px-4 py-20">
+    <main className="flex flex-1 flex-col items-center justify-center px-4 py-20">
       <div className="w-full max-w-sm rounded-2xl border border-border bg-surface p-8">
         <h1 className="font-display text-2xl font-semibold">{title}</h1>
         {description && (
@@ -73,6 +75,7 @@ export function CardPage({
         )}
         {children}
       </div>
+      {footer && <div className="mt-4">{footer}</div>}
     </main>
   );
 }

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale } from "next-intl/server";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -6,12 +8,15 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const locale = await getLocale();
   return (
-    <html lang="zh-Hant">
-      <body className="flex min-h-screen flex-col">{children}</body>
+    <html lang={locale === "zh-TW" ? "zh-Hant" : locale}>
+      <body className="flex min-h-screen flex-col">
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      </body>
     </html>
   );
 }

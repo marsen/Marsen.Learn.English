@@ -1,9 +1,10 @@
+import { useTranslations } from "next-intl";
+import type { TeacherDashboardView } from "@/application/dashboard/teacherDashboard";
+import { StatusTags } from "@/presentation/components/admin/StatusTags";
 import { ButtonLink } from "@/presentation/components/ui/Button";
 import { EmptyState } from "@/presentation/components/ui/EmptyState";
 import { Table, Td, Th, Tr } from "@/presentation/components/ui/Table";
-import type { TeacherDashboardView } from "@/application/dashboard/teacherDashboard";
-import { StatusTags } from "@/presentation/components/admin/StatusTags";
-import { waitedLabel } from "@/presentation/lib/waiting";
+import { waitedDays } from "@/presentation/lib/waiting";
 
 /** 老師總覽：還沒審的題組（別的老師審完就會消失）、這個月審了幾套。 */
 export function TeacherDashboard({
@@ -13,49 +14,58 @@ export function TeacherDashboard({
   view: TeacherDashboardView;
   now: Date;
 }) {
+  const t = useTranslations();
   const oldest = view.pending[0];
+  const waited = (since: Date) => {
+    const days = waitedDays(since, now);
+    return days === 0 ? t("waited.today") : t("waited.days", { days });
+  };
 
   return (
     <section>
-      <p className="text-sm text-muted-foreground">
-        別的老師審完的題組會自動從清單消失，不會重複審。
-      </p>
+      <p className="text-sm text-muted-foreground">{t("teacherDashboard.intro")}</p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-primary/40 bg-primary-soft/40 p-5 sm:col-span-2">
-          <p className="text-sm text-primary-hover">等你審的題組</p>
+          <p className="text-sm text-primary-hover">{t("teacherDashboard.pending")}</p>
           <p className="mt-1 text-5xl font-bold text-heading">
-            {view.pending.length} <span className="text-lg font-medium">套</span>
+            {view.pending.length}{" "}
+            <span className="text-lg font-medium">{t("common.setsUnit")}</span>
           </p>
           {oldest && (
             <p className="mt-2 text-sm text-primary-hover">
-              {waitedLabel(oldest.uploadedAt, now) === "今天"
-                ? "最舊的是今天上傳的"
-                : `最久的已經等了 ${waitedLabel(oldest.uploadedAt, now)}`}
+              {waitedDays(oldest.uploadedAt, now) === 0
+                ? t("teacherDashboard.oldestToday")
+                : t("teacherDashboard.oldestWaited", {
+                    waited: waited(oldest.uploadedAt),
+                  })}
             </p>
           )}
         </div>
         <div className="rounded-2xl border border-border bg-surface p-5">
-          <p className="text-sm text-muted-foreground">你這個月審了</p>
+          <p className="text-sm text-muted-foreground">
+            {t("teacherDashboard.reviewedThisMonth")}
+          </p>
           <p className="mt-1 text-4xl font-bold">
-            {view.reviewedThisMonth} <span className="text-base font-medium">套</span>
+            {view.reviewedThisMonth}{" "}
+            <span className="text-base font-medium">{t("common.setsUnit")}</span>
           </p>
         </div>
       </div>
 
       <h2 className="mt-10 mb-3 text-lg font-semibold text-heading">
-        待審清單（最舊的在上面）
+        {t("teacherDashboard.listTitle")}
       </h2>
       {view.pending.length === 0 ? (
-        <EmptyState>目前沒有要審的題組，辛苦了。</EmptyState>
+        <EmptyState>{t("teacherDashboard.empty")}</EmptyState>
       ) : (
         <Table
           head={
             <>
-              <Th>題組</Th>
-              <Th>標題</Th>
-              <Th>AI 怎麼說</Th>
-              <Th>等了</Th>
+              <Th>{t("teacherDashboard.colSet")}</Th>
+              <Th>{t("teacherDashboard.colTitle")}</Th>
+              <Th>{t("teacherDashboard.colAi")}</Th>
+              <Th>{t("teacherDashboard.colWaited")}</Th>
               <Th />
             </>
           }
@@ -68,14 +78,14 @@ export function TeacherDashboard({
                 <StatusTags tags={[s.aiVerdict === "pass" ? "AIP" : "AI_WARN"]} />
                 {s.aiVerdict !== "pass" && s.findingCount > 0 && (
                   <span className="ml-2 text-xs text-muted-foreground">
-                    {s.findingCount} 個疑點
+                    {t("teacherDashboard.findings", { count: s.findingCount })}
                   </span>
                 )}
               </Td>
-              <Td className="whitespace-nowrap">{waitedLabel(s.uploadedAt, now)}</Td>
+              <Td className="whitespace-nowrap">{waited(s.uploadedAt)}</Td>
               <Td align="right">
                 <ButtonLink href={`/admin/sets/${s.setId}`} size="sm">
-                  開始審稿
+                  {t("teacherDashboard.startReview")}
                 </ButtonLink>
               </Td>
             </Tr>

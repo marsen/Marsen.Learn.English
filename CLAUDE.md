@@ -46,6 +46,14 @@ app（路由／Server Action，薄）→ presentation → application → domain
   - 除非使用者主動問，否則不解釋在做什麼
   - 程式碼和資料維持完整精確，只壓縮自然語言
 
+## 多語系
+
+- 套件 next-intl，網址不帶語言：cookie（使用者手動切換）→ 瀏覽器語言 → 英文（`src/domain/i18n/locale.ts`）
+- 翻譯檔 `messages/<語言>.json`，每種語言的 key 要一樣（有測試檢查）
+- 老師、學生、路人會看到的文字一律放翻譯檔；只有管理員看的頁面暫時維持中文
+- 後端只回錯誤代碼，文字在翻譯檔 `errors.*`
+- 共用的詞（按鈕、角色、題組狀態、陷阱類型…）放 `common`、`roles`、`examSet`，不要每頁各寫一份
+
 ## 本機開發
 
 開發伺服器固定用 **3100** port（`pnpm dev`），避免跟其他專案（Arsenal、Becca 用 3000）撞在一起；`SITE_URL` 也設成 3100。

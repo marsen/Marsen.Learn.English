@@ -1,19 +1,27 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { CardPage } from "@/presentation/components/ui/Page";
+import { LanguageSwitcher } from "@/presentation/components/LanguageSwitcher";
 import { LoginForm } from "@/presentation/components/LoginForm";
 import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
 import { requestLoginCodeAction, verifyLoginCodeAction } from "@/app/actions/auth";
+import { setLocaleAction } from "@/app/actions/locale";
 
-export const metadata: Metadata = { title: "登入／註冊", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("login");
+  return { title: t("title"), robots: { index: false } };
+}
 
 export default async function LoginPage() {
   // 已經登入就不用再登入，直接進總覽
   if (await getCurrentAccount()) redirect("/admin");
+  const t = await getTranslations("login");
   return (
     <CardPage
-      title="登入／註冊"
-      description="輸入 email，我們會寄一組登入碼給你，不用密碼。第一次使用會自動建立帳號。"
+      title={t("title")}
+      description={t("description")}
+      footer={<LanguageSwitcher setLocale={setLocaleAction} />}
     >
       <LoginForm
         requestCode={requestLoginCodeAction}
