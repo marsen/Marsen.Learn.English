@@ -12,7 +12,7 @@ export function GuestBar({
   return (
     <header className="border-b border-border bg-background/90">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-2 px-4 py-2 sm:px-5">
-        <a href="/" className="min-w-0 font-semibold leading-tight text-heading">
+        <a href="/" className="min-w-0 truncate font-semibold text-heading">
           {t("common.brand")}
         </a>
         <div className="flex shrink-0 items-center gap-1 sm:gap-3">

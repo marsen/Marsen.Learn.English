@@ -14,7 +14,7 @@ type Props = {
 const SHORT: Record<string, string> = { "zh-TW": "中文", en: "EN" };
 
 /**
- * 介面語言切換：地球圖示＋目前語言。
+ * 介面語言切換：地球圖示＋目前語言＋向下箭頭。全站都放在畫面右上角。
  * 底層是透明的原生下拉選單蓋在按鈕上：手機點了會跳出系統的選擇器，字大好點、不會被畫面邊緣切掉。
  */
 export function LanguageSwitcher({ setLocale }: Props) {
@@ -31,6 +31,7 @@ export function LanguageSwitcher({ setLocale }: Props) {
     >
       <GlobeIcon />
       <span className="font-medium">{SHORT[current] ?? current}</span>
+      <ChevronIcon />
       <select
         aria-label={t("language")}
         value={current}
@@ -51,6 +52,24 @@ export function LanguageSwitcher({ setLocale }: Props) {
         ))}
       </select>
     </label>
+  );
+}
+
+/** 向下的小箭頭：表示點了會展開選單 */
+function ChevronIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-3.5 w-3.5 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M6 9l6 6 6-6" />
+    </svg>
   );
 }
 

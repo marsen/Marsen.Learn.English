@@ -81,18 +81,15 @@ export function AppSidebar({ items, email, roleLabel, logout, setLocale }: Props
       <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-primary-soft text-primary-hover">
         <NavIconSvg name="exam" />
       </span>
-      <span className="leading-tight">{t("common.brand")}</span>
+      <span className="truncate">{t("common.brand")}</span>
     </a>
   );
 
   return (
     <>
-      {/* 桌機：品牌和語言在上，帳號和登出在下 */}
+      {/* 桌機：品牌在上，帳號和登出在下；語言切換在內容區的上方列（DesktopTopBar） */}
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-border bg-surface/70 px-3 py-6 md:flex">
-        <div className="mb-8 flex items-center justify-between gap-1">
-          {brand}
-          <LanguageSwitcher setLocale={setLocale} />
-        </div>
+        <div className="mb-8">{brand}</div>
         <nav className="flex-1 overflow-y-auto">{links}</nav>
         <div className="grid gap-2 border-t border-border pt-4">
           {account}

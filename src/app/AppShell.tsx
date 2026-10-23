@@ -1,5 +1,6 @@
 import { AppSidebar } from "@/presentation/components/shell/AppSidebar";
 import { GuestBar } from "@/presentation/components/shell/GuestBar";
+import { DesktopTopBar } from "@/presentation/components/shell/DesktopTopBar";
 import { navItemsFor } from "@/presentation/lib/navigation";
 import { getTranslations } from "next-intl/server";
 import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
@@ -28,7 +29,10 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         logout={logoutAction}
         setLocale={setLocaleAction}
       />
-      <div className="flex min-w-0 flex-1 flex-col">{children}</div>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <DesktopTopBar setLocale={setLocaleAction} />
+        {children}
+      </div>
     </div>
   );
 }
