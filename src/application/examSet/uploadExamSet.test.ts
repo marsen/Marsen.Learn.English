@@ -125,6 +125,75 @@ describe("UploadExamSet", () => {
   });
 });
 
+describe("UploadExamSet 逐字稿（set.json 2.1）", () => {
+  /** 照時間軸產生逐字稿，每題的出處依序指到一句 */
+  const withTranscript = (b: typeof fixture) => {
+    const turnIds: string[] = b.timing.events
+      .filter((e: { type: string }) => e.type === "turn")
+      .map((e: { id: string }) => e.id);
+    b.schema_minor = 1;
+    b.transcript = {
+      turns: turnIds.map((id) => ({ id, speaker: "A", text: `secret line ${id}` })),
+      evidence: b.answers.answers.map((a: { question_id: string }, i: number) => ({
+        question_id: a.question_id,
+        turn: turnIds[i * 2],
+        quote: `secret line ${turnIds[i * 2]}`,
+      })),
+    };
+  };
+
+  it("應該把逐字稿存在私密部分，公開部分看不到", async () => {
+    const r = await upload(admin, bundle(withTranscript));
+    expect(r.ok).toBe(true);
+    const [saved] = await sets.list();
+    expect(JSON.stringify(saved)).not.toContain("secret line");
+    const t = sets.privateOf("s1-sample-0001")?.transcript;
+    expect(t?.turns[0]).toEqual({ id: "t1", speaker: "A", text: "secret line t1" });
+    expect(t?.evidence[0]).toEqual({
+      questionId: "q01",
+      turn: "t1",
+      quote: "secret line t1",
+    });
+  });
+
+  it("應該照常收下沒有逐字稿的 2.0 題組，逐字稿是 null", async () => {
+    expect((await upload(admin, bundle())).ok).toBe(true);
+    expect(sets.privateOf("s1-sample-0001")?.transcript).toBeNull();
+  });
+
+  it("應該擋下跟時間軸對不上的逐字稿", async () => {
+    const r = await upload(
+      admin,
+      bundle((b) => {
+        withTranscript(b);
+        b.transcript.turns.pop();
+      }),
+    );
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.problems.join()).toContain("時間軸");
+    expect(await sets.list()).toHaveLength(0);
+  });
+
+  it("應該擋下大版號不是 2 的題組，小版號不影響", async () => {
+    expect(
+      (
+        await upload(
+          admin,
+          bundle((b) => (b.schema_version = 3)),
+        )
+      ).ok,
+    ).toBe(false);
+    expect(
+      (
+        await upload(
+          admin,
+          bundle((b) => (b.schema_minor = 7)),
+        )
+      ).ok,
+    ).toBe(true);
+  });
+});
+
 describe("ListExamSets", () => {
   it("應該讓管理員與老師看清單，學生看不到", async () => {
     await upload(admin, bundle());

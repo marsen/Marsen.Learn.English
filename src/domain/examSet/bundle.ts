@@ -1,10 +1,16 @@
-import type { AiVerdict, PublicTiming, TimingEvent } from "./examSet";
+import type { AiVerdict, PublicTiming, TimingEvent, Transcript } from "./examSet";
 
 /**
  * 打包檔（set.json）的規則：支援的版本、錄音完整性、時間軸去敏。
  * 不檢查題目品質（那是出題工具和老師審稿的事）。
  */
-/** 只支援 2（2 起 provenance.ai_review 帶 findings）。舊的打包檔在 Question.Generator 重新跑 bundle 即可 */
+/**
+ * 版本＝大版號 schema_version ＋ 小版號 schema_minor（沒有就是 0）。
+ * - 大版號：不相容的改動才升，網站只收 SUPPORTED_SCHEMA_VERSION（2 起 provenance.ai_review 帶 findings）
+ * - 小版號：相容的改動（加欄位）才升，網站全收；新欄位一律當作可有可無
+ *   - 2.1：加 transcript（逐字稿與每題答案的出處）
+ * 舊的打包檔在 Question.Generator 重新跑 bundle 即可。
+ */
 export const SUPPORTED_SCHEMA_VERSION = 2;
 
 /** 小於這個大小的錄音檔視為壞檔 */
@@ -73,4 +79,34 @@ export function toPublicTiming(raw: {
 /** 音檔在儲存空間的位置：帶雜湊前 8 碼，重傳不同錄音不會蓋掉舊檔 */
 export function audioKeyFor(setId: string, sha256: string): string {
   return `${setId}/audio-${sha256.slice(0, 8)}.mp3`;
+}
+
+/**
+ * 逐字稿要跟時間軸、答案卡對得上，不然審稿頁的「從答案那句開始聽」會跳錯地方。
+ * 回傳所有問題；空陣列代表沒問題。
+ */
+export function transcriptProblems(
+  t: Transcript,
+  timingTurnIds: readonly string[],
+  questionIds: readonly string[],
+): string[] {
+  const problems: string[] = [];
+  const turnIds = t.turns.map((x) => x.id);
+  if (
+    turnIds.length !== timingTurnIds.length ||
+    turnIds.some((id, i) => id !== timingTurnIds[i])
+  ) {
+    problems.push("transcript 的句子和時間軸對不上（句數或順序不同）");
+  }
+  for (const e of t.evidence) {
+    if (!questionIds.includes(e.questionId))
+      problems.push(`transcript.evidence 有答案卡沒有的題目：${e.questionId}`);
+    if (!turnIds.includes(e.turn))
+      problems.push(`transcript.evidence 的 ${e.questionId} 指到不存在的句子：${e.turn}`);
+  }
+  for (const q of questionIds) {
+    if (!t.evidence.some((e) => e.questionId === q))
+      problems.push(`transcript.evidence 缺少 ${q} 的出處`);
+  }
+  return problems;
 }

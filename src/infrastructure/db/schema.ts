@@ -8,7 +8,7 @@ import {
   jsonb,
   index,
 } from "drizzle-orm/pg-core";
-import type { JsonObject, PublicTiming } from "@/domain/examSet/examSet";
+import type { JsonObject, PublicTiming, Transcript } from "@/domain/examSet/examSet";
 import type { QuestionNote } from "@/domain/examSet/review";
 import type { QuestionResult } from "@/domain/exam/grading";
 
@@ -74,6 +74,8 @@ export const examSetPrivates = pgTable("exam_set_privates", {
     .references(() => examSets.setId, { onDelete: "cascade" }),
   answers: jsonb("answers").$type<JsonObject>().notNull(),
   provenance: jsonb("provenance").$type<JsonObject>().notNull(),
+  // 逐字稿與每題答案的出處（set.json 2.1 起）；更早打包的題組是 null
+  transcript: jsonb("transcript").$type<Transcript>(),
 });
 
 /** 老師審稿：一套題只留最新一次（以最後一次為準）。 */

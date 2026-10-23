@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { audioKeyFor, bundleProblems, toPublicTiming, type BundleFacts } from "./bundle";
+import {
+  audioKeyFor,
+  bundleProblems,
+  toPublicTiming,
+  transcriptProblems,
+  type BundleFacts,
+} from "./bundle";
 
 const audio = { bytes: 20_000, sha256: "abcdef1234567890" };
 const ok: BundleFacts = {
@@ -61,5 +67,39 @@ describe("audioKeyFor", () => {
     expect(audioKeyFor("s1-gym-0001", "abcdef1234567890")).toBe(
       "s1-gym-0001/audio-abcdef12.mp3",
     );
+  });
+});
+
+describe("transcriptProblems", () => {
+  const turns = ["t1", "t2", "t3"];
+  const t = {
+    turns: turns.map((id) => ({ id, speaker: "A", text: `line ${id}` })),
+    evidence: [
+      { questionId: "q01", turn: "t2", quote: "line t2" },
+      { questionId: "q02", turn: "t3", quote: "line t3" },
+    ],
+  };
+
+  it("應該讓跟時間軸、答案卡都對得上的逐字稿通過", () => {
+    expect(transcriptProblems(t, turns, ["q01", "q02"])).toEqual([]);
+  });
+
+  it("應該擋下句數或順序跟時間軸不同的逐字稿", () => {
+    expect(transcriptProblems(t, ["t1", "t2"], ["q01", "q02"])).toHaveLength(1);
+    expect(transcriptProblems(t, ["t2", "t1", "t3"], ["q01", "q02"])).toHaveLength(1);
+  });
+
+  it("應該擋下指到不存在的句子、多出或缺少題目的出處", () => {
+    const bad = {
+      ...t,
+      evidence: [
+        { questionId: "q01", turn: "t9", quote: "?" },
+        { questionId: "q99", turn: "t1", quote: "?" },
+      ],
+    };
+    const problems = transcriptProblems(bad, turns, ["q01", "q02"]);
+    expect(problems.join()).toContain("t9");
+    expect(problems.join()).toContain("q99");
+    expect(problems.join()).toContain("q02");
   });
 });
