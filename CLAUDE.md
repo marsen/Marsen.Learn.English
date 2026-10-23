@@ -34,6 +34,7 @@ app（路由／Server Action，薄）→ presentation → application → domain
 - **main**：沒有 Marsen 同意，不得 commit、合併或推送到 `main`
 - **驗收**：`pnpm lint` + `pnpm test` + `pnpm build` 都要過
 - **環境變數**：集中 `src/infrastructure/config/env.ts`、Zod fail-fast、不在 code 寫預設值
+- **migration**：自動部署會先跑 migration 再上線，所以 migration 要讓舊版程式還能用（刪欄位、改名分兩次上線，見 `docs/deploy-cloud-run.md`）
 - **測試**：Vitest，測試檔跟原始碼放一起（`*.test.ts`），描述用中文；domain／application 必測
 - **格式**：Prettier（`pnpm format`）
 - **UI**：顏色、字型只用 `globals.css` 的 token（`primary`、`muted`…），不寫死顏色；目前是暫用樣式，之後會整體改

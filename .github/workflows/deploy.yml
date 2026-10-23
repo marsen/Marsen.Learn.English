@@ -1,7 +1,9 @@
 name: Deploy
 
 # main 的 CI 通過後，自動部署到 Cloud Run（也可以在 GitHub 手動按 Run workflow）。
-# 環境變數存在 Cloud Run 服務上，這裡不帶任何機密；登入 GCP 用 Workload Identity Federation（沒有金鑰）。
+# 流程：資料庫 migration → 部署。migration 失敗就不部署。
+# DATABASE_URL 的唯一源頭是 GitHub Secret：每次部署都會同步到 Cloud Run。只改了 Secret 時，手動按 Run workflow 同步。
+# 其他環境變數存在 Cloud Run 服務上（見 docs/deploy-cloud-run.md）；登入 GCP 用 Workload Identity Federation（沒有金鑰）。
 # 第一次設定：scripts/setup-github-deploy.sh
 
 on:
@@ -23,11 +25,40 @@ jobs:
   deploy:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    env:
+      HUSKY: 0
     steps:
       - name: Checkout
         uses: actions/checkout@v7
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Check DATABASE_URL secret
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::GitHub Secret DATABASE_URL 沒有設定（Settings → Secrets and variables → Actions）"
+            exit 1
+          fi
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 先改資料庫再部署：新版程式上線時欄位已經在了（migration 要能跟舊版程式並存）
+      - name: Database migration
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: pnpm db:migrate
 
       - name: Auth to Google Cloud
         uses: google-github-actions/auth@v3
@@ -38,10 +69,15 @@ jobs:
       - name: Setup gcloud
         uses: google-github-actions/setup-gcloud@v3
 
+      # 只更新 DATABASE_URL，其他環境變數沿用服務上的設定。
+      # "^@@@^" 把分隔符號改成 @@@，避免連線字串裡的逗號被 gcloud 當成分隔
       - name: Deploy to Cloud Run
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: >
           gcloud run deploy learn-english
           --source .
           --region asia-east1
           --project ${{ vars.GCP_PROJECT }}
+          --update-env-vars "^@@@^DATABASE_URL=${DATABASE_URL}"
           --quiet
