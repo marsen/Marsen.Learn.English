@@ -1,17 +1,18 @@
 import type { LoginMailer } from "@/application/auth/ports";
+import { LOGIN_TOKEN_TTL_MINUTES } from "@/domain/auth/loginToken";
 
-/** 用 Resend API 寄登入信（不裝 SDK，直接呼叫 HTTP API）。 */
+/** 用 Resend API 寄登入碼（不裝 SDK，直接呼叫 HTTP API）。 */
 export class ResendMailer implements LoginMailer {
   constructor(
     private readonly apiKey: string,
     private readonly from: string,
   ) {}
 
-  async sendLoginLink(to: string, link: string): Promise<void> {
+  async sendLoginCode(to: string, code: string): Promise<void> {
     await this.send(
       to,
-      "你的登入連結",
-      `點下面的連結登入（15 分鐘內有效，只能用一次）：\n\n${link}\n\n如果不是你申請的，忽略這封信即可。`,
+      `你的登入碼：${code}`,
+      `你的登入碼是：\n\n${code}\n\n回到網站輸入這組數字就能登入（${LOGIN_TOKEN_TTL_MINUTES} 分鐘內有效，只能用一次）。\n如果不是你申請的，忽略這封信即可。`,
     );
   }
 

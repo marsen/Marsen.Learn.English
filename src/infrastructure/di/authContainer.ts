@@ -6,8 +6,8 @@ import {
   ListAccounts,
   SetAccountRoles,
 } from "@/application/account/manageAccounts";
-import { RequestLoginLink } from "@/application/auth/requestLoginLink";
-import { VerifyLoginLink } from "@/application/auth/verifyLoginLink";
+import { RequestLoginCode } from "@/application/auth/requestLoginCode";
+import { VerifyLoginCode } from "@/application/auth/verifyLoginCode";
 import { env } from "@/infrastructure/config/env";
 import { CryptoSecretTokens } from "@/infrastructure/auth/cryptoSecretTokens";
 import { DevMailer } from "@/infrastructure/mail/devMailer";
@@ -18,7 +18,7 @@ import { DrizzleLoginTokenRepository } from "@/infrastructure/persistence/drizzl
 /**
  * Composition Root（登入／帳號）。
  * - 資料一律存在資料庫（Drizzle + Neon），本機也一樣；沒有 DATABASE_URL 在 env 驗證時就啟動失敗。
- * - 有 RESEND_API_KEY → 真的寄信；沒有且非正式環境 → DevMailer（登入連結顯示在登入頁）。
+ * - 有 RESEND_API_KEY → 真的寄信；沒有且非正式環境 → DevMailer（登入碼顯示在登入頁）。
  * 物件放在模組裡，改程式熱更新時跟著換新。
  */
 type Container = {
@@ -52,20 +52,20 @@ export function getAccountRepository(): AccountRepository {
   return container().accounts;
 }
 
-export function requestLoginLink(): RequestLoginLink {
+export function requestLoginCode(): RequestLoginCode {
   const c = container();
-  return new RequestLoginLink(c.accounts, c.tokens, secrets, c.mailer, env.siteUrl);
+  return new RequestLoginCode(c.accounts, c.tokens, secrets, c.mailer);
 }
 
-export function verifyLoginLink(): VerifyLoginLink {
+export function verifyLoginCode(): VerifyLoginCode {
   const c = container();
-  return new VerifyLoginLink(c.accounts, c.tokens, secrets);
+  return new VerifyLoginCode(c.accounts, c.tokens, secrets);
 }
 
-/** 開發用：取得剛「寄出」的登入連結；有真的寄信服務時一律回 null */
-export function devLoginLinkFor(email: string): string | null {
+/** 開發用：取得剛「寄出」的登入碼；有真的寄信服務時一律回 null */
+export function devLoginCodeFor(email: string): string | null {
   const mailer = container().mailer;
-  return mailer instanceof DevMailer ? mailer.lastLinkFor(email) : null;
+  return mailer instanceof DevMailer ? mailer.lastCodeFor(email) : null;
 }
 
 export function listAccounts(): ListAccounts {

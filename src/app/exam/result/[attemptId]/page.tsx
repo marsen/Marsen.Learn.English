@@ -5,7 +5,7 @@ import { LoginForm } from "@/presentation/components/LoginForm";
 import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
 import { readGuestId } from "@/infrastructure/auth/guestKey";
 import { getAttemptResult } from "@/infrastructure/di/examSetContainer";
-import { requestLoginLinkAction } from "@/app/actions/auth";
+import { requestLoginCodeAction, verifyLoginCodeAction } from "@/app/actions/auth";
 
 export const metadata: Metadata = { title: "批改結果", robots: { index: false } };
 
@@ -28,9 +28,13 @@ export default async function ResultPage({
           <h2 className="font-semibold">想看正解？免費註冊就能看</h2>
           <p className="mt-1 mb-4 text-sm text-muted-foreground">
             輸入
-            email，點信裡的連結就完成註冊，這次的作答會保留在你的帳號裡，並看到每題正解。
+            email，再輸入信裡的登入碼就完成註冊，這次的作答會保留在你的帳號裡，並看到每題正解。
           </p>
-          <LoginForm action={requestLoginLinkAction} submitLabel="寄註冊連結給我" />
+          <LoginForm
+            requestCode={requestLoginCodeAction}
+            verifyCode={verifyLoginCodeAction}
+            submitLabel="寄註冊碼給我"
+          />
         </section>
       )}
       {result && <ExamResult result={result} />}

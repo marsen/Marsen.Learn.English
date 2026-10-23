@@ -11,13 +11,22 @@ describe("loginErrorText", () => {
   it("應該每個代碼都有文字", () => {
     for (const code of [
       "invalidEmail",
-      "invalidLink",
+      "malformedCode",
+      "codeExpired",
       "emailHourlyLimit",
       "ipHourlyLimit",
       "signupsFull",
     ] as const) {
       expect(loginErrorText({ code })).not.toBe("");
     }
+  });
+});
+
+describe("loginErrorText：登入碼", () => {
+  it("應該告訴使用者還可以再試幾次", () => {
+    expect(loginErrorText({ code: "wrongCode", remaining: 2 })).toBe(
+      "登入碼不對，還可以再試 2 次",
+    );
   });
 });
 

@@ -7,7 +7,7 @@
 import { z } from "zod";
 
 const schema = z.object({
-  // 站台對外網址，登入連結用它組出來
+  // 站台對外網址
   SITE_URL: z.string().url(),
   // 資料庫（Neon）；本機和正式環境都一定要有，沒有就啟動失敗
   DATABASE_URL: z.string().min(1),

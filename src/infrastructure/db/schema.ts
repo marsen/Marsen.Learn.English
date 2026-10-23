@@ -35,11 +35,15 @@ export const accountRoles = pgTable(
 /** 一次性登入碼。只存雜湊；用過就標 used_at。 */
 export const loginTokens = pgTable("login_tokens", {
   tokenHash: text("token_hash").primaryKey(),
+  // email＋6 位數登入碼的雜湊；舊版登入連結留下的資料為 null
+  codeHash: text("code_hash"),
   email: text("email").notNull(),
   expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   usedAt: timestamp("used_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-  // 申請連結的瀏覽器（路人識別的雜湊）：在別的裝置點連結也能把路人作答移過去
+  // 登入碼輸錯幾次（錯 3 次作廢）
+  failedAttempts: integer("failed_attempts").default(0).notNull(),
+  // 申請登入碼的瀏覽器（路人識別的雜湊）：登入後把路人作答移過去
   guestId: text("guest_id"),
   // 申請者 IP 的雜湊（不存原 IP）：限制同一個 IP 的寄送次數
   ipHash: text("ip_hash"),

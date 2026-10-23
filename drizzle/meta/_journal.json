@@ -57,6 +57,13 @@
       "when": 1792579889584,
       "tag": "0007_review_log",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792692300128,
+      "tag": "0008_login_code",
+      "breakpoints": true
     }
   ]
 }
