@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import type { LoginFormState, VerifyCodeFormState } from "./formStates";
 import { Alert } from "./ui/Alert";
 import { Button } from "./ui/Button";
+import { CodeInput } from "./CodeInput";
 import { LOGIN_CODE_LENGTH, LOGIN_TOKEN_TTL_MINUTES } from "@/domain/auth/loginToken";
 import { loginErrorText } from "@/presentation/lib/errorMessages";
 
@@ -103,27 +104,35 @@ export function LoginForm({
   );
 }
 
-/** 第二步：輸入登入碼 */
+/** 第二步：輸入登入碼（6 格，填滿自動送出；輸錯就清空重來） */
 function CodeStep({ email, verifyCode }: { email: string; verifyCode: VerifyAction }) {
   const [verified, verifyAction, verifying] = useActionState(verifyCode, {});
+  // 每次送出拿到新結果就換一個 key：方格清空、游標回第一格、重新播放晃動
+  const [lastResult, setLastResult] = useState(verified);
+  const [round, setRound] = useState(0);
+  if (verified !== lastResult) {
+    setLastResult(verified);
+    setRound((r) => r + 1);
+  }
   return (
     <form action={verifyAction} className="grid gap-4">
-      {verified.error && <Alert tone="error">{loginErrorText(verified.error)}</Alert>}
+      {verified.error && (
+        <Alert tone="error" className="text-base font-medium ring-1 ring-destructive/40">
+          {loginErrorText(verified.error)}
+        </Alert>
+      )}
       <input type="hidden" name="email" value={email} />
       <div>
-        <label htmlFor="code" className="mb-1 block font-medium">
+        <label htmlFor="code-0" className="mb-2 block font-medium">
           登入碼
         </label>
-        <input
-          id="code"
+        <CodeInput
+          key={round}
           name="code"
-          required
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          pattern={`\\d{${LOGIN_CODE_LENGTH}}`}
-          maxLength={LOGIN_CODE_LENGTH}
-          autoFocus
-          className={`${field} font-mono tracking-[0.4em]`}
+          length={LOGIN_CODE_LENGTH}
+          invalid={Boolean(verified.error)}
+          disabled={verifying}
+          label="登入碼"
         />
       </div>
       <Button type="submit" disabled={verifying}>
