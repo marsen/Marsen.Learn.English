@@ -1,16 +1,12 @@
 import Link from "next/link";
 import type { StudentDashboardView } from "@/application/dashboard/studentDashboard";
 import { trapLabel } from "@/presentation/lib/examSetLabels";
+import { ButtonLink } from "@/presentation/components/ui/Button";
+import { EmptyState } from "@/presentation/components/ui/EmptyState";
+import { formatDay } from "@/presentation/lib/format";
 
 const pct = (score: number, total: number) =>
   total > 0 ? Math.round((score / total) * 100) : 0;
-
-const day = (d: Date) =>
-  d.toLocaleDateString("zh-TW", {
-    timeZone: "Asia/Taipei",
-    month: "numeric",
-    day: "numeric",
-  });
 
 /** 學生總覽：繼續練習、還有幾張沒考、我的成績、最常錯的題型。 */
 export function StudentDashboard({ view }: { view: StudentDashboardView }) {
@@ -34,12 +30,9 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
                 {rec.questionCount} 題
                 {rec.bestPercent !== null && ` ・ 上次最好 ${rec.bestPercent} 分`}
               </p>
-              <Link
-                href={`/exam/${rec.setId}`}
-                className="mt-4 inline-block rounded-full bg-primary px-6 py-2 font-medium text-primary-foreground transition-transform hover:scale-105 hover:bg-primary-hover"
-              >
+              <ButtonLink href={`/exam/${rec.setId}`} className="mt-4">
                 {rec.reason === "new" ? "開始練習" : "再挑戰"}
-              </Link>
+              </ButtonLink>
             </>
           ) : (
             <p className="text-muted-foreground">
@@ -65,9 +58,7 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
       <div>
         <h2 className="mb-3 text-lg font-semibold">我的成績</h2>
         {view.attemptCount === 0 ? (
-          <p className="rounded-2xl border border-border bg-white px-5 py-6 text-center text-muted-foreground">
-            考完第一張，這裡就會出現你的成績。
-          </p>
+          <EmptyState>考完第一張，這裡就會出現你的成績。</EmptyState>
         ) : (
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-2xl border border-border bg-white p-5">
@@ -118,7 +109,7 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
                           style={{ height: `${Math.max(p, 3)}%` }}
                         />
                         <span className="mt-1 text-center text-xs text-muted-foreground">
-                          {day(r.submittedAt)}
+                          {formatDay(r.submittedAt)}
                         </span>
                       </Link>
                     </li>

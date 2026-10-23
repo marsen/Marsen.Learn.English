@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { Page, PageHeader } from "@/presentation/components/ui/Page";
 import { AttemptHistory } from "@/presentation/components/exam/AttemptHistory";
 import { requireAccount } from "@/infrastructure/auth/currentAccount";
 import { listMyAttempts } from "@/infrastructure/di/examSetContainer";
@@ -12,9 +13,9 @@ export default async function HistoryPage() {
   if (!records) redirect("/admin?denied=1");
 
   return (
-    <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-12">
-      <h1 className="mt-4 mb-6 font-display text-2xl font-semibold">我的考試紀錄</h1>
+    <Page>
+      <PageHeader title="我的考試紀錄" />
       <AttemptHistory records={records} />
-    </main>
+    </Page>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useActionState } from "react";
 import type { VerifyFormState } from "./formStates";
+import { Alert } from "./ui/Alert";
+import { Button } from "./ui/Button";
 
 type Props = {
   token: string;
@@ -19,20 +21,16 @@ export function VerifyForm({ token, action }: Props) {
     <form action={formAction} className="grid gap-4">
       <input type="hidden" name="token" value={token} />
       {state.error && (
-        <p className="rounded-lg bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <Alert tone="error">
           {state.error}{" "}
           <a href="/login" className="underline">
             重新申請
           </a>
-        </p>
+        </Alert>
       )}
-      <button
-        type="submit"
-        disabled={isPending}
-        className="rounded-lg bg-primary px-6 py-2.5 font-medium text-primary-foreground disabled:opacity-60"
-      >
+      <Button type="submit" disabled={isPending}>
         {isPending ? "登入中…" : "完成登入"}
-      </button>
+      </Button>
     </form>
   );
 }

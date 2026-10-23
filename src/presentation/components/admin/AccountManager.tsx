@@ -5,6 +5,7 @@ import type { Account } from "@/domain/account/account";
 import { ROLES } from "@/domain/account/role";
 import type { ManageFormState } from "@/presentation/components/formStates";
 import { ROLE_LABELS } from "@/presentation/lib/labels";
+import { Button } from "@/presentation/components/ui/Button";
 
 type Action = (prev: ManageFormState, formData: FormData) => Promise<ManageFormState>;
 
@@ -54,13 +55,9 @@ function AccountRow({
           {isSelf && <span className="ml-2 text-xs text-muted-foreground">（你）</span>}
         </span>
         <RoleCheckboxes checked={account.roles} />
-        <button
-          type="submit"
-          disabled={isPending}
-          className="rounded-lg border border-border px-3 py-1 text-sm disabled:opacity-60"
-        >
+        <Button type="submit" variant="secondary" size="sm" disabled={isPending}>
           {isPending ? "儲存中…" : "儲存"}
-        </button>
+        </Button>
         <Messages state={state} />
       </form>
     </li>
@@ -93,13 +90,9 @@ export function AccountManager({ accounts, selfId, setRoles, addAccount }: Props
             className="min-w-56 rounded-lg border border-border px-3 py-1.5"
           />
           <RoleCheckboxes checked={[]} />
-          <button
-            type="submit"
-            disabled={adding}
-            className="rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground disabled:opacity-60"
-          >
+          <Button type="submit" size="sm" disabled={adding}>
             新增
-          </button>
+          </Button>
           <Messages state={addState} />
         </form>
       </section>

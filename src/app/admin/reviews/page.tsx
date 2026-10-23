@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { Page, PageHeader } from "@/presentation/components/ui/Page";
 import { ReviewLog } from "@/presentation/components/admin/ReviewLog";
 import { requirePermission } from "@/infrastructure/auth/currentAccount";
 import { getReviewLog } from "@/infrastructure/di/examSetContainer";
@@ -17,12 +18,12 @@ export default async function ReviewLogPage({
   if (!view) redirect("/admin?denied=1");
 
   return (
-    <main className="mx-auto w-full max-w-5xl flex-1 px-5 py-12">
-      <h1 className="mb-1 text-2xl font-bold">審稿紀錄</h1>
-      <p className="mb-8 text-sm text-muted-foreground">
-        每送出一次審稿就記一筆，改判或刪掉題組都不會不見。月份照台灣時間算。
-      </p>
+    <Page width="lg">
+      <PageHeader
+        title="審稿紀錄"
+        description="每送出一次審稿就記一筆，改判或刪掉題組都不會不見。月份照台灣時間算。"
+      />
       <ReviewLog view={view} />
-    </main>
+    </Page>
   );
 }
