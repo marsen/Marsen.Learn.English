@@ -6,6 +6,7 @@ import type {
   UploadSetFormState,
 } from "@/presentation/components/formStates";
 import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
+import { parseReviewPayload } from "@/application/examSet/reviewExamSet";
 import {
   reviewExamSet,
   setExamAccess,
@@ -56,17 +57,16 @@ export async function reviewExamSetAction(
     const v = formData.get(key);
     return typeof v === "string" ? v : null;
   };
-  const questionNotes = [...formData.keys()]
-    .filter((k) => k.startsWith("note:"))
-    .map((k) => ({ questionId: k.slice("note:".length), note: text(k) }));
+  // 每題、整套的意見與對 AI 意見的處理，由審稿頁整理成 JSON 送來
+  const payload = parseReviewPayload(text("payload"));
+  if (!payload) return { problems: [{ code: "badPayload" }] };
 
   const result = await reviewExamSet().execute({
     actor,
     setId,
     decision: text("decision"),
     comment: text("comment"),
-    audioNote: text("audioNote"),
-    questionNotes,
+    ...payload,
   });
   if (!result.ok) return { problems: result.problems };
 

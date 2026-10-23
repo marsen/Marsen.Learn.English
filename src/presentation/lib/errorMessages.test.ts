@@ -31,9 +31,9 @@ describe("loginErrorText", () => {
 describe("reviewErrorText", () => {
   it("應該把題號與字數上限放進訊息", () => {
     const t = translators["zh-TW"];
-    expect(
-      reviewErrorText(t, { code: "questionNoteTooLong", questionId: "q03", max: 2000 }),
-    ).toBe("q03 的建議最多 2000 字");
+    expect(reviewErrorText(t, { code: "noteTooLong", max: 2000 })).toBe(
+      "每則意見最多 2000 字",
+    );
     expect(reviewErrorText(t, { code: "unknownQuestion", questionId: "q99" })).toBe(
       "沒有這一題：q99",
     );

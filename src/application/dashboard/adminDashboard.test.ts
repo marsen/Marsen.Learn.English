@@ -52,8 +52,7 @@ const review = (setId: string, decision: "approved" | "rejected", comment?: stri
     setId,
     decision,
     comment,
-    questionNotes:
-      decision === "rejected" ? [{ questionId: "q07", note: "答案卡太窄" }] : [],
+    notes: decision === "rejected" ? [{ target: "q07", text: "答案卡太窄" }] : [],
   });
 
 const dashboard = (actor: Account) =>

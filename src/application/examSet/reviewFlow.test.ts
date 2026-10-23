@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import { UploadExamSet } from "./uploadExamSet";
 import { GetExamSetForReview } from "./getExamSetForReview";
-import { ReviewExamSet } from "./reviewExamSet";
+import { ReviewExamSet, parseReviewPayload } from "./reviewExamSet";
 import { GetExamSetAudio } from "./getExamSetAudio";
 import type { Account } from "@/domain/account/account";
 import type { Role } from "@/domain/account/role";
@@ -66,14 +66,22 @@ describe("GetExamSetForReview", () => {
       trap: "self_correction",
       wrongValue: "47",
     });
-    expect(r.view.warnings[0]).toMatchObject({ questionId: "q07", aiRuling: "problem" });
-    expect(r.view.findings.length).toBeGreaterThan(0);
-    expect(r.view.findings[0]).toMatchObject({
+    expect(r.view.questions[0].number).toBe(1);
+    expect(r.view.paper.sections.length).toBeGreaterThan(0);
+    const warning = r.view.aiNotes.find((n) => n.kind === "warning");
+    expect(warning).toMatchObject({ questionId: "q07", aiRuling: "problem" });
+    expect(warning?.ref).toMatch(/^warning:/);
+    const finding = r.view.aiNotes.find((n) => n.kind === "finding");
+    expect(finding).toMatchObject({
+      ref: "finding:0",
       questionId: "q07",
       category: "ambiguity",
       severity: "warn",
     });
-    expect(r.view.findings[0].suggestion).toContain("early morning");
+    expect(finding?.suggestion).toContain("early morning");
+    // 2.0 的題組沒有逐字稿
+    expect(r.view.turns).toBeNull();
+    expect(r.view.questions[0].evidence).toBeNull();
     expect(r.view.review).toBeNull();
   });
 
@@ -94,13 +102,17 @@ describe("GetExamSetForReview", () => {
 });
 
 describe("ReviewExamSet", () => {
-  it("應該讓老師判合格，並記下整體意見、錄音建議與小題建議", async () => {
+  it("應該讓老師判合格，並記下整體意見、每題與整套的意見、對 AI 意見的處理", async () => {
     const r = await review(teacher, {
       comment: " 整體不錯 ",
-      audioNote: "[01:23] 這句太快",
-      questionNotes: [
-        { questionId: "q07", note: "early morning 也該算對" },
-        { questionId: "q01", note: "   " },
+      notes: [
+        { target: null, text: "[01:23] 這句太快" },
+        { target: "q07", text: "early morning 也該算對" },
+        { target: "q01", text: "   " },
+      ],
+      aiActions: [
+        { ref: "finding:0", action: "edited", text: " 同意，改逐字稿 " },
+        { ref: "finding:0", action: "deleted", text: "不用改" },
       ],
     });
     expect(r).toEqual({ ok: true });
@@ -109,8 +121,11 @@ describe("ReviewExamSet", () => {
       reviewerId: "teacher",
       decision: "approved",
       comment: "整體不錯",
-      audioNote: "[01:23] 這句太快",
-      questionNotes: [{ questionId: "q07", note: "early morning 也該算對" }],
+      notes: [
+        { target: null, text: "[01:23] 這句太快" },
+        { target: "q07", text: "early morning 也該算對" },
+      ],
+      aiActions: [{ ref: "finding:0", action: "deleted", text: "不用改" }],
     });
   });
 
@@ -128,13 +143,30 @@ describe("ReviewExamSet", () => {
     expect((await sets.findById(SET))?.status).toBe("pending_review");
   });
 
-  it("應該擋下沒選判定、或對不存在小題的建議", async () => {
+  it("應該擋下沒選判定、對不存在小題的意見、不存在的 AI 意見", async () => {
     expect((await review(teacher, { decision: undefined })).ok).toBe(false);
+    expect((await review(teacher, { notes: [{ target: "q99", text: "x" }] })).ok).toBe(
+      false,
+    );
     const r = await review(teacher, {
-      questionNotes: [{ questionId: "q99", note: "x" }],
+      aiActions: [{ ref: "finding:99", action: "deleted", text: null }],
     });
-    expect(r.ok).toBe(false);
+    expect(r).toEqual({ ok: false, problems: [{ code: "unknownAiNote" }] });
     expect((await sets.findById(SET))?.status).toBe("pending_review");
+  });
+});
+
+describe("parseReviewPayload", () => {
+  it("應該讀出審稿頁送來的意見，格式不對回傳 null", () => {
+    const ok = { notes: [{ target: null, text: "a" }], aiActions: [] };
+    expect(parseReviewPayload(JSON.stringify(ok))).toEqual(ok);
+    expect(parseReviewPayload("{oops")).toBeNull();
+    expect(parseReviewPayload(null)).toBeNull();
+    expect(
+      parseReviewPayload(
+        JSON.stringify({ notes: [], aiActions: [{ ref: "x", action: "kept" }] }),
+      ),
+    ).toBeNull();
   });
 });
 

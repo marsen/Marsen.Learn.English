@@ -9,7 +9,7 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import type { JsonObject, PublicTiming, Transcript } from "@/domain/examSet/examSet";
-import type { QuestionNote } from "@/domain/examSet/review";
+import type { AiNoteAction, QuestionNote, ReviewNote } from "@/domain/examSet/review";
 import type { QuestionResult } from "@/domain/exam/grading";
 
 /** 帳號。以 email 識別（存正規化後的小寫）。 */
@@ -88,8 +88,13 @@ export const examSetReviews = pgTable("exam_set_reviews", {
     .references(() => accounts.id),
   decision: text("decision").notNull(), // 'approved' | 'rejected'
   comment: text("comment"),
+  // 舊欄位：新版改用 notes，過渡期照樣寫（舊版程式還在讀），下一次上線再刪
   audioNote: text("audio_note"),
   questionNotes: jsonb("question_notes").$type<QuestionNote[]>().notNull(),
+  // 老師的意見（每題的、整套的）；舊審稿是 null，讀的時候從舊欄位轉
+  notes: jsonb("notes").$type<ReviewNote[]>(),
+  // 老師對 AI 意見的處理（保留的不記）；舊審稿是 null
+  aiActions: jsonb("ai_actions").$type<AiNoteAction[]>(),
   reviewedAt: timestamp("reviewed_at", { withTimezone: true }).notNull(),
 });
 

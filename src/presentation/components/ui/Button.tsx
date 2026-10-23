@@ -11,7 +11,7 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes } from "react";
  * className 只放排版（間距、對齊），不要放顏色、字級：同一種屬性有兩個 class 時，生效的是 CSS 裡排後面的，不是 className 裡寫後面的。
  */
 export type ButtonVariant = "primary" | "secondary" | "danger" | "dangerSecondary";
-export type ButtonSize = "sm" | "md";
+export type ButtonSize = "xs" | "sm" | "md";
 
 const BASE =
   "inline-flex items-center justify-center gap-1 rounded-full font-medium whitespace-nowrap transition-colors disabled:pointer-events-none disabled:opacity-60";
@@ -25,6 +25,7 @@ const VARIANTS: Record<ButtonVariant, string> = {
 };
 
 const SIZES: Record<ButtonSize, string> = {
+  xs: "px-3 py-1 text-xs",
   sm: "px-4 py-1.5 text-sm",
   md: "px-6 py-2.5",
 };

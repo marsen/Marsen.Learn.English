@@ -9,8 +9,10 @@ import {
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import { isAiVerdict } from "@/domain/examSet/bundle";
 import {
+  fromLegacyNotes,
   isReviewDecision,
   statusAfter,
+  toLegacyNotes,
   type ReviewRecord,
   type TeacherReview,
 } from "@/domain/examSet/review";
@@ -79,11 +81,21 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
       .where(eq(examSetReviews.setId, setId))
       .limit(1);
     if (!row || !isReviewDecision(row.decision)) return null;
-    return { ...row, decision: row.decision };
+    return {
+      setId: row.setId,
+      reviewerId: row.reviewerId,
+      decision: row.decision,
+      comment: row.comment,
+      notes: row.notes ?? fromLegacyNotes(row.audioNote, row.questionNotes),
+      aiActions: row.aiActions ?? [],
+      reviewedAt: row.reviewedAt,
+    };
   }
 
   async saveReview(review: TeacherReview): Promise<void> {
-    const { setId, ...rest } = review;
+    const { setId, ...fields } = review;
+    // 舊欄位過渡期照樣寫，讓還在跑的舊版程式讀得到
+    const rest = { ...fields, ...toLegacyNotes(review.notes) };
     const [set] = await this.db
       .select({ title: examSets.title })
       .from(examSets)
@@ -93,7 +105,7 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
     await this.db.batch([
       this.db
         .insert(examSetReviews)
-        .values(review)
+        .values({ setId, ...rest })
         .onConflictDoUpdate({ target: examSetReviews.setId, set: rest }),
       this.db.insert(examReviewLog).values({
         setId,

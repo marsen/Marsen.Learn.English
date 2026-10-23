@@ -3,7 +3,7 @@ import type { AccountRepository } from "@/domain/account/accountRepository";
 import { can } from "@/domain/account/permission";
 import type { ExamSet } from "@/domain/examSet/examSet";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
-import type { QuestionNote, TeacherReview } from "@/domain/examSet/review";
+import type { ReviewNote, TeacherReview } from "@/domain/examSet/review";
 
 export type ReviewedSetView = {
   set: ExamSet;
@@ -14,8 +14,8 @@ export type ReviewedSetView = {
 
 export type RejectedSetView = ReviewedSetView & {
   comment: string | null;
-  audioNote: string | null;
-  questionNotes: QuestionNote[];
+  /** 老師的意見；target 是題號，null＝整套／錄音 */
+  notes: ReviewNote[];
 };
 
 export type AdminDashboardView = {
@@ -80,8 +80,7 @@ export class GetAdminDashboard {
         reviewerEmail,
         reviewedAt,
         comment: review?.comment ?? null,
-        audioNote: review?.audioNote ?? null,
-        questionNotes: review?.questionNotes ?? [],
+        notes: review?.notes ?? [],
       }));
 
     return {
@@ -102,10 +101,12 @@ export class GetAdminDashboard {
 export function feedbackText(v: RejectedSetView): string {
   const lines = [`題組 ${v.set.setId}（${v.set.title}）老師審稿退回。`];
   if (v.comment) lines.push(`整體意見：${v.comment}`);
-  if (v.audioNote) lines.push(`錄音建議：${v.audioNote}`);
-  if (v.questionNotes.length > 0) {
+  for (const n of v.notes.filter((x) => x.target === null))
+    lines.push(`整套／錄音：${n.text}`);
+  const perQuestion = v.notes.filter((x) => x.target !== null);
+  if (perQuestion.length > 0) {
     lines.push("各題建議：");
-    for (const n of v.questionNotes) lines.push(`- ${n.questionId}：${n.note}`);
+    for (const n of perQuestion) lines.push(`- ${n.target}：${n.text}`);
   }
   return lines.join("\n");
 }
