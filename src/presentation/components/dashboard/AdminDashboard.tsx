@@ -1,8 +1,8 @@
 import Link from "next/link";
-import {
-  feedbackText,
-  type AdminDashboardView,
-  type ReviewedSetView,
+import type {
+  AdminDashboardView,
+  RejectedSetView,
+  ReviewedSetView,
 } from "@/application/dashboard/adminDashboard";
 import { statusTagsOf } from "@/domain/examSet/statusTags";
 import { StatusTags } from "@/presentation/components/admin/StatusTags";
@@ -23,6 +23,15 @@ type Props = {
 const day = (d: Date | null) => (d ? formatDay(d) : "");
 
 const who = (r: ReviewedSetView) => r.reviewerEmail ?? "老師";
+
+/** 卡片上只列老師寫的意見；AI 的意見、題目、逐字稿在複製的完整回饋裡 */
+const teacherComments = (r: RejectedSetView) =>
+  [
+    r.comment && `整體意見：${r.comment}`,
+    ...r.notes.map((n) => `${n.target ?? "整套／錄音"}：${n.text}`),
+  ]
+    .filter(Boolean)
+    .join("\n");
 
 /** 管理員總覽：可以上架、有問題、題目分類統計。 */
 export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
@@ -74,6 +83,7 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
               </Td>
               <Td align="right" className="whitespace-nowrap">
                 <form action={setAccessAction} className="inline-flex gap-2">
+                  <CopyButton text={r.feedback} label="📋 複製回饋" />
                   <input type="hidden" name="setId" value={r.set.setId} />
                   <Button type="submit" name="access" value="members" size="sm">
                     上架
@@ -121,7 +131,7 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
                 </span>
               </div>
               <pre className="mt-3 rounded-lg bg-muted px-4 py-3 font-sans text-sm whitespace-pre-wrap">
-                {feedbackText(r).split("\n").slice(1).join("\n") || "（老師沒有寫意見）"}
+                {teacherComments(r) || "（老師沒有寫意見）"}
               </pre>
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 {r.reviewerEmail && (
@@ -132,7 +142,7 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
                     💬 找老師討論
                   </a>
                 )}
-                <CopyButton text={feedbackText(r)} label="📋 複製回饋（貼給 AI）" />
+                <CopyButton text={r.feedback} label="📋 複製回饋（貼給 AI）" />
                 <ButtonLink href="/admin/sets/upload" variant="secondary" size="sm">
                   ⬆︎ 上傳修正版
                 </ButtonLink>

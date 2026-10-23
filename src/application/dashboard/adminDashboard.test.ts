@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
-import { GetAdminDashboard, feedbackText } from "./adminDashboard";
+import { GetAdminDashboard } from "./adminDashboard";
 import { UploadExamSet } from "@/application/examSet/uploadExamSet";
 import { ReviewExamSet } from "@/application/examSet/reviewExamSet";
 import { SetExamAccess } from "@/application/examSet/setExamAccess";
@@ -97,7 +97,14 @@ describe("GetAdminDashboard", () => {
     const [r] = (await dashboard(admin))?.rejected ?? [];
     expect(r.set.setId).toBe("s1-c");
     expect(r.comment).toBe("情境跟錄音對不上");
-    expect(feedbackText(r)).toContain("q07：答案卡太窄");
+    expect(r.notes).toEqual([{ target: "q07", text: "答案卡太窄" }]);
+    expect(r.feedback).toContain("Decision: REJECTED");
+    expect(r.feedback).toContain("- [Teacher] 答案卡太窄");
+  });
+
+  it("應該讓通過的題組也能複製回饋", async () => {
+    const [r] = (await dashboard(admin))?.readyToList ?? [];
+    expect(r.feedback).toContain("Decision: APPROVED");
   });
 
   it("應該不給沒有上架權限的人看（老師）", async () => {

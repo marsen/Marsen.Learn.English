@@ -1,12 +1,16 @@
 import type { Account } from "@/domain/account/account";
 import type { AccountRepository } from "@/domain/account/accountRepository";
 import { can } from "@/domain/account/permission";
-import type { ExamSet } from "@/domain/examSet/examSet";
+import type { ExamSet, ExamSetPrivate } from "@/domain/examSet/examSet";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import type { ReviewNote, TeacherReview } from "@/domain/examSet/review";
+import { buildReviewView } from "@/application/examSet/reviewView";
+import { reviewFeedback } from "./reviewFeedback";
 
 export type ReviewedSetView = {
   set: ExamSet;
+  /** 給 AI 看的完整回饋（題目、答案、AI 與老師的意見、逐字稿），管理員一鍵複製 */
+  feedback: string;
   /** 審稿老師的 email；帳號找不到就是 null */
   reviewerEmail: string | null;
   reviewedAt: Date | null;
@@ -59,26 +63,37 @@ export class GetAdminDashboard {
       return emails.get(id) ?? null;
     };
     const withReview = async (set: ExamSet) => {
-      const review: TeacherReview | null = await this.sets.findReview(set.setId);
+      const [review, secret] = await Promise.all([
+        this.sets.findReview(set.setId),
+        this.sets.findPrivate(set.setId),
+      ]);
+      const reviewerEmail = review ? await emailOf(review.reviewerId) : null;
       return {
         set,
         review,
-        reviewerEmail: review ? await emailOf(review.reviewerId) : null,
+        reviewerEmail,
         reviewedAt: review?.reviewedAt ?? null,
+        feedback: feedbackOf(set, secret, review, reviewerEmail),
       };
     };
     const time = (d: Date | null) => d?.getTime() ?? 0;
 
     const readyToList = (await Promise.all(ready.map(withReview)))
       .sort((a, b) => time(a.reviewedAt) - time(b.reviewedAt))
-      .map(({ set, reviewerEmail, reviewedAt }) => ({ set, reviewerEmail, reviewedAt }));
-
-    const rejectedViews = (await Promise.all(rejected.map(withReview)))
-      .sort((a, b) => time(b.reviewedAt) - time(a.reviewedAt))
-      .map(({ set, review, reviewerEmail, reviewedAt }) => ({
+      .map(({ set, reviewerEmail, reviewedAt, feedback }) => ({
         set,
         reviewerEmail,
         reviewedAt,
+        feedback,
+      }));
+
+    const rejectedViews = (await Promise.all(rejected.map(withReview)))
+      .sort((a, b) => time(b.reviewedAt) - time(a.reviewedAt))
+      .map(({ set, review, reviewerEmail, reviewedAt, feedback }) => ({
+        set,
+        reviewerEmail,
+        reviewedAt,
+        feedback,
         comment: review?.comment ?? null,
         notes: review?.notes ?? [],
       }));
@@ -97,16 +112,23 @@ export class GetAdminDashboard {
   }
 }
 
-/** 把老師的退回意見整理成一段文字，方便管理員貼給 AI */
-export function feedbackText(v: RejectedSetView): string {
-  const lines = [`題組 ${v.set.setId}（${v.set.title}）老師審稿退回。`];
-  if (v.comment) lines.push(`整體意見：${v.comment}`);
-  for (const n of v.notes.filter((x) => x.target === null))
-    lines.push(`整套／錄音：${n.text}`);
-  const perQuestion = v.notes.filter((x) => x.target !== null);
-  if (perQuestion.length > 0) {
-    lines.push("各題建議：");
-    for (const n of perQuestion) lines.push(`- ${n.target}：${n.text}`);
+/** 完整回饋；題組資料格式不對（整理不出審稿頁）時，退而只給老師寫的意見 */
+function feedbackOf(
+  set: ExamSet,
+  secret: ExamSetPrivate | null,
+  review: TeacherReview | null,
+  reviewerEmail: string | null,
+): string {
+  if (secret) {
+    try {
+      return reviewFeedback(buildReviewView(set, secret, review), reviewerEmail);
+    } catch {
+      // 落到下面的簡短版
+    }
   }
+  const lines = [`# Teacher review: ${set.setId} (${set.title})`];
+  if (review?.comment) lines.push(`Overall comment: ${review.comment}`);
+  for (const n of review?.notes ?? [])
+    lines.push(`- [${n.target ?? "whole set"}] ${n.text}`);
   return lines.join("\n");
 }
