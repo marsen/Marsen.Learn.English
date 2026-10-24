@@ -88,13 +88,6 @@ export const examSetReviews = pgTable("exam_set_reviews", {
     .references(() => accounts.id),
   decision: text("decision").notNull(), // 'approved' | 'rejected'
   comment: text("comment"),
-  // 舊欄位：程式已經不讀不寫（內容由 migration 0012 搬進 notes），下一次上線刪掉。
-  // question_notes 加預設值，新版不寫時才不會違反 not null；部署時還在跑的舊版照樣會寫
-  audioNote: text("audio_note"),
-  questionNotes: jsonb("question_notes")
-    .$type<{ questionId: string; note: string }[]>()
-    .notNull()
-    .default([]),
   // 老師的意見（每題的、整套的）；舊審稿是 null，讀的時候從舊欄位轉
   notes: jsonb("notes").$type<ReviewNote[]>(),
   // 老師對 AI 意見的處理（保留的不記）；舊審稿是 null
