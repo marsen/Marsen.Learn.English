@@ -1,14 +1,28 @@
 "use client";
 
-import { useActionState, useRef } from "react";
+import {
+  useActionState,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useTranslations } from "next-intl";
 import type { ReviewView } from "@/application/examSet/reviewView";
-import { timeMark } from "@/domain/examSet/review";
 import type { ReviewFormState } from "@/presentation/components/formStates";
 import { Alert } from "@/presentation/components/ui/Alert";
 import { Button } from "@/presentation/components/ui/Button";
 import { reviewErrorText } from "@/presentation/lib/errorMessages";
-import { useTranslations } from "next-intl";
-import { examSetLabel } from "@/presentation/lib/examSetLabels";
+import { questionAt, stackCards, turnAt } from "@/presentation/lib/reviewTime";
+import {
+  NoteCard,
+  type DraftAiAction,
+  type DraftNote,
+  type Editing,
+} from "./review/NoteCard";
+import { ReviewPaper } from "./review/ReviewPaper";
+import { Transcript } from "./review/Transcript";
 
 type Props = {
   view: ReviewView;
@@ -16,204 +30,486 @@ type Props = {
   action: (prev: ReviewFormState, formData: FormData) => Promise<ReviewFormState>;
 };
 
-const box = "w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm";
+/** 整套／錄音的批註卡代號（考卷上拉線到標題） */
+const SET = "set";
+/** 寬螢幕才把批註排在考卷旁邊、拉線；窄的排在考卷下面 */
+const SIDE_BY_SIDE = "(min-width: 1280px)";
 
-/** 老師審稿：聽錄音、看每一題的答案與 AI 示警，寫建議，判合格／不合格。 */
+let nextKey = 0;
+const newKey = () => `n${(nextKey += 1)}`;
+
+/**
+ * 老師審稿：像批改考卷一樣，考卷填好標準答案，每題旁邊是 AI 的意見和老師的意見。
+ * 老師可以保留、改寫、刪除 AI 的意見，替任何一題或整套加意見；每一題和整套都要判 OK 或有問題，
+ * 全部 OK 才合格，全部判完才能送出。
+ */
 export function ReviewForm({ view, audioUrl, action }: Props) {
   const t = useTranslations();
   const r = (key: string, values?: Record<string, string | number>) =>
     t(`review.${key}`, values);
-  const label = (kind: Parameters<typeof examSetLabel>[1], v: string | null) =>
-    examSetLabel(t, kind, v);
   const [state, formAction, isPending] = useActionState(action, {});
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const audioNoteRef = useRef<HTMLTextAreaElement>(null);
   const prev = view.review;
-  const prevNote = (qid: string) =>
-    prev?.questionNotes.find((n) => n.questionId === qid)?.note ?? "";
 
-  const insertTime = () => {
-    const el = audioNoteRef.current;
-    if (!el) return;
-    const mark = `${timeMark(audioRef.current?.currentTime ?? 0)} `;
-    const at = el.selectionStart ?? el.value.length;
-    el.value = el.value.slice(0, at) + mark + el.value.slice(at);
-    el.focus();
-    el.selectionStart = el.selectionEnd = at + mark.length;
+  // ---------- 草稿 ----------
+  const [notes, setNotes] = useState<DraftNote[]>(() =>
+    (prev?.notes ?? []).map((n) => ({ key: newKey(), target: n.target, text: n.text })),
+  );
+  const [aiActions, setAiActions] = useState<Map<string, DraftAiAction>>(
+    () =>
+      new Map(
+        (prev?.aiActions ?? []).map((a) => [
+          a.ref,
+          { action: a.action, text: a.text ?? "" },
+        ]),
+      ),
+  );
+  // 每一題、整套的判定（key：題號或 SET）：true＝OK，false＝有問題，沒有＝還沒判。
+  // 預設：上次審過就沿用；舊審稿沒有逐題判定時，合格的全部當 OK；
+  // 其他情況 AI 沒提意見的題目預設 OK，整套和 AI 有提意見的題目要老師點
+  const [verdicts, setVerdicts] = useState<Map<string, boolean>>(() => {
+    if (prev && prev.verdicts.length > 0)
+      return new Map(prev.verdicts.map((v) => [v.target ?? SET, v.ok]));
+    const all = [SET, ...view.questions.map((q) => q.questionId)];
+    if (prev?.decision === "approved") return new Map(all.map((k) => [k, true]));
+    return new Map(
+      view.questions
+        .filter((q) => !view.aiNotes.some((n) => n.questionId === q.questionId))
+        .map((q) => [q.questionId, true]),
+    );
+  });
+  const judge = (target: string, ok: boolean) =>
+    setVerdicts((m) => new Map(m).set(target, ok));
+  const [editing, setEditing] = useState<Editing | null>(null);
+  const [active, setActive] = useState<string | null>(null);
+
+  const targetOf = (key: string) => (key === SET ? null : key);
+  const saveNote = (key: string | null, target: string, text: string) => {
+    setNotes((ns) =>
+      key === null
+        ? [...ns, { key: newKey(), target: targetOf(target), text }]
+        : ns.map((n) => (n.key === key ? { ...n, text } : n)),
+    );
+    setEditing(null);
+  };
+  const setAi = (ref: string, a: DraftAiAction | null) => {
+    setAiActions((m) => {
+      const next = new Map(m);
+      if (a) next.set(ref, a);
+      else next.delete(ref);
+      return next;
+    });
+    setEditing(null);
   };
 
+  const payload = JSON.stringify({
+    verdicts: [...verdicts].map(([key, ok]) => ({ target: targetOf(key), ok })),
+    notes: notes.map((n) => ({ target: n.target, text: n.text })),
+    aiActions: [...aiActions].map(([ref, a]) => ({
+      ref,
+      action: a.action,
+      text: a.text || null,
+    })),
+  });
+
+  // ---------- 錄音 ----------
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [now, setNow] = useState(0);
+  const seek = (seconds: number, play = false) => {
+    const el = audioRef.current;
+    if (!el) return;
+    el.currentTime = seconds;
+    setNow(seconds);
+    if (play) el.play().catch(() => {});
+  };
+  const currentTime = () => audioRef.current?.currentTime ?? 0;
+
+  const questions = useMemo(
+    () => new Map(view.questions.map((q) => [q.questionId, q])),
+    [view.questions],
+  );
+  const turnStarts = useMemo(
+    () =>
+      new Map(
+        (view.turns ?? []).flatMap((x) => (x.start === null ? [] : [[x.id, x.start]])),
+      ),
+    [view.turns],
+  );
+  const ranges = view.questions.map((q) => ({
+    questionId: q.questionId,
+    start: q.evidence?.start ?? null,
+    end: q.evidence?.end ?? null,
+  }));
+  const listening = questionAt(ranges, now);
+  const currentTurn = view.turns ? turnAt(view.turns, now) : null;
+
+  // ---------- 批註卡 ----------
+  const aiOf = (target: string) =>
+    view.aiNotes.filter((n) => n.questionId === targetOf(target));
+  const notesOf = (target: string) => notes.filter((n) => n.target === targetOf(target));
+  const counts = new Map(
+    view.questions.map((q) => [
+      q.questionId,
+      notesOf(q.questionId).length +
+        aiOf(q.questionId).filter((n) => aiActions.get(n.ref)?.action !== "deleted")
+          .length,
+    ]),
+  );
+  // 整套一定有卡；題目有意見、正在看、正在新增意見的才出卡
+  const cards = [
+    SET,
+    ...view.questions
+      .map((q) => q.questionId)
+      .filter(
+        (id) =>
+          (counts.get(id) ?? 0) > 0 ||
+          aiOf(id).length > 0 ||
+          verdicts.get(id) !== true ||
+          active === id ||
+          (editing?.kind === "new" && editing.target === id),
+      ),
+  ];
+
+  // ---------- 還沒按「好」的意見 ----------
+  // 正在寫的意見框裡有改過、還沒存的字，就不能換去寫別的、也不能送出，免得字不見
+  // 提醒只掛在當時打開的那個意見框；換了意見框（editing 換成新物件）提醒就自然消失
+  const [hintFor, setHintFor] = useState<Editing | null>(null);
+  const openEditor = () => document.querySelector<HTMLElement>("[data-editing] textarea");
+  const hasUnsaved = () => {
+    const el = openEditor() as HTMLTextAreaElement | null;
+    return !!el && el.value.trim() !== "" && el.value !== el.defaultValue;
+  };
+  const showUnsaved = () => {
+    setHintFor(editing);
+    const el = openEditor();
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    el?.focus({ preventScroll: true });
+  };
+  /** 換去寫別的；目前的意見框有沒存的字就擋下來 */
+  const startEditing = (e: Editing | null) => {
+    if (e !== null && editing !== null && hasUnsaved()) {
+      showUnsaved();
+      return false;
+    }
+    setEditing(e);
+    return true;
+  };
+
+  /** 收起展開的卡（✕、再點一次同一題、Esc）；有沒存的意見就先擋下來 */
+  const collapse = () => {
+    if (active === null) return;
+    if (hasUnsaved()) {
+      showUnsaved();
+      return;
+    }
+    setActive(null);
+    setEditing(null);
+  };
+
+  /** 展開一題；再點一次同一題就收起。換題時有沒存的意見就先擋下來 */
+  const select = (target: string) => {
+    if (active === target) {
+      collapse();
+      return;
+    }
+    if (editing !== null && hasUnsaved()) {
+      showUnsaved();
+      return;
+    }
+    setActive(target);
+    setEditing(
+      target !== SET && notesOf(target).length === 0 && aiOf(target).length === 0
+        ? { kind: "new", target }
+        : null,
+    );
+  };
+
+  // ---------- 判定的摘要、待處理 ----------
+  const allTargets = [SET, ...view.questions.map((q) => q.questionId)];
+  const pending = allTargets.filter((k) => !verdicts.has(k));
+  const okCount = allTargets.filter((k) => verdicts.get(k) === true).length;
+  const badCount = allTargets.filter((k) => verdicts.get(k) === false).length;
+  /** 依序跳到下一個還沒判的項目（從目前展開的那題往後找，繞回開頭），展開並捲過去 */
+  const nextPending = () => {
+    if (pending.length === 0) return;
+    const from = active ? allTargets.indexOf(active) : -1;
+    const order = [...allTargets.slice(from + 1), ...allTargets.slice(0, from + 1)];
+    const k = order.find((x) => !verdicts.has(x) && x !== active) ?? pending[0];
+    if (active !== k) select(k);
+    // 寬螢幕捲到考卷上的空格（卡就在旁邊），窄的捲到卡
+    scrollTo.current = k;
+  };
+
+  // Esc 收起
+  const collapseRef = useRef(collapse);
+  useEffect(() => {
+    collapseRef.current = collapse;
+  });
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") collapseRef.current();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  // 窄螢幕：點空格後捲到那張卡
+  const scrollTo = useRef<string | null>(null);
+  const selectFromPaper = (target: string) => {
+    select(target);
+    scrollTo.current = target;
+  };
+  useEffect(() => {
+    const target = scrollTo.current;
+    scrollTo.current = null;
+    if (!target) return;
+    const wide = window.matchMedia(SIDE_BY_SIDE).matches;
+    document
+      .querySelector(wide ? `[data-anchor="${target}"]` : `[data-card="${target}"]`)
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  // ---------- 排位置、拉線（寬螢幕） ----------
+  const boardRef = useRef<HTMLDivElement>(null);
+  const marginRef = useRef<HTMLDivElement>(null);
+  const svgRef = useRef<SVGSVGElement>(null);
+
+  useLayoutEffect(() => {
+    const layout = () => {
+      const board = boardRef.current;
+      const margin = marginRef.current;
+      const svg = svgRef.current;
+      if (!board || !margin || !svg) return;
+      const cardEls = [...margin.querySelectorAll<HTMLElement>("[data-card]")];
+      if (!window.matchMedia(SIDE_BY_SIDE).matches) {
+        for (const el of cardEls) el.style.top = "";
+        margin.style.height = "";
+        svg.replaceChildren();
+        return;
+      }
+      const B = board.getBoundingClientRect();
+      const M = margin.getBoundingClientRect();
+      const paperRight = board.firstElementChild?.getBoundingClientRect().right ?? M.left;
+      const anchors = cardEls.map((el) =>
+        board
+          .querySelector(`[data-anchor="${el.dataset.card}"]`)
+          ?.getBoundingClientRect(),
+      );
+      const tops = stackCards(
+        cardEls.map((el, i) => ({
+          want: anchors[i]
+            ? anchors[i].top +
+              anchors[i].height / 2 -
+              M.top -
+              Math.min(18, el.offsetHeight / 2)
+            : 0,
+          height: el.offsetHeight,
+        })),
+        6,
+      );
+      const ns = "http://www.w3.org/2000/svg";
+      const shapes: SVGElement[] = [];
+      cardEls.forEach((el, i) => {
+        el.style.top = `${tops[i]}px`;
+        const a = anchors[i];
+        if (!a) return;
+        // 從空格底線下方出發，走行距的空隙，不壓到字
+        const x1 = a.right - B.left + 2;
+        const y1 = a.bottom - B.top + 3;
+        const xm = paperRight - B.left + 8;
+        const x2 = M.left - B.left;
+        const y2 = M.top - B.top + tops[i] + Math.min(18, el.offsetHeight / 2);
+        const on = active === el.dataset.card;
+        const path = document.createElementNS(ns, "path");
+        path.setAttribute(
+          "d",
+          `M${x1},${y1} H${xm} C${xm + 24},${y1} ${x2 - 24},${y2} ${x2},${y2}`,
+        );
+        path.setAttribute(
+          "class",
+          on
+            ? "fill-none stroke-primary stroke-2"
+            : "fill-none stroke-muted-foreground/40",
+        );
+        const dot = document.createElementNS(ns, "circle");
+        dot.setAttribute("cx", String(x1));
+        dot.setAttribute("cy", String(y1));
+        dot.setAttribute("r", "3");
+        dot.setAttribute("class", on ? "fill-primary" : "fill-muted-foreground/40");
+        shapes.push(path, dot);
+      });
+      const last = cardEls.at(-1);
+      margin.style.height = last ? `${tops[tops.length - 1] + last.offsetHeight}px` : "";
+      svg.replaceChildren(...shapes);
+    };
+    layout();
+    const ro = new ResizeObserver(layout);
+    if (marginRef.current) ro.observe(marginRef.current);
+    if (boardRef.current) ro.observe(boardRef.current);
+    window.addEventListener("resize", layout);
+    marginRef.current?.addEventListener("toggle", layout, true);
+    const margin = marginRef.current;
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", layout);
+      margin?.removeEventListener("toggle", layout, true);
+    };
+  });
+
   return (
-    <form action={formAction} className="grid gap-8">
-      <section className="grid gap-3">
-        <h2 className="text-lg font-semibold">{r("audio")}</h2>
+    <form
+      action={formAction}
+      onSubmit={(e) => {
+        // 有沒按「好」的意見就先不送，提醒老師；意見框是空的或沒改過就直接關掉
+        if (hasUnsaved()) {
+          e.preventDefault();
+          showUnsaved();
+        } else if (editing !== null) setEditing(null);
+      }}
+      className="grid gap-6"
+    >
+      <input type="hidden" name="payload" value={payload} />
+
+      {/* 錄音列黏在頂端列下面：手機頂端列 61px（AppSidebar 上下 py-2＋選單按鈕 h-11＋底線），電腦 h-14 */}
+      <div className="sticky top-[61px] z-10 -mx-4 border-b border-border bg-background/95 px-4 py-2 backdrop-blur md:top-14">
         <audio
           ref={audioRef}
           controls
           preload="metadata"
           src={audioUrl}
+          onTimeUpdate={(e) => setNow(e.currentTarget.currentTime)}
+          onSeeked={(e) => setNow(e.currentTarget.currentTime)}
           className="w-full"
         />
-        <div>
-          <div className="mb-1 flex items-center justify-between">
-            <label htmlFor="audioNote" className="text-sm font-medium">
-              {r("audioNote")}
-            </label>
-            <Button variant="secondary" size="sm" onClick={insertTime}>
-              {r("insertTime")}
-            </Button>
-          </div>
-          <textarea
-            id="audioNote"
-            name="audioNote"
-            ref={audioNoteRef}
-            rows={3}
-            defaultValue={prev?.audioNote ?? ""}
-            placeholder={r("audioNotePlaceholder")}
-            className={box}
-          />
-        </div>
-      </section>
-
-      {view.warnings.length > 0 && (
-        <section className="grid gap-2">
-          <h2 className="text-lg font-semibold">{r("aiWarnings")}</h2>
-          <ul className="grid gap-2 text-sm">
-            {view.warnings.map((w) => (
-              <li key={w.id} className="rounded-lg bg-card px-4 py-3">
-                {w.questionId && <span className="mr-2 font-mono">{w.questionId}</span>}
-                {w.message}
-                {w.aiRuling && (
-                  <span className="ml-2 text-muted-foreground">
-                    {t("common.parenthesized", { text: label("aiRuling", w.aiRuling) })}
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {view.findings.length > 0 && (
-        <section className="grid gap-2">
-          <h2 className="text-lg font-semibold">{r("aiFindings")}</h2>
-          <ul className="grid gap-2 text-sm">
-            {view.findings.map((f, i) => {
-              const n = view.questions.findIndex((q) => q.questionId === f.questionId);
-              return (
-                <li key={i} className="rounded-lg bg-card px-4 py-3">
-                  <div className="mb-1 flex flex-wrap gap-2 text-xs text-muted-foreground">
-                    <span>{n >= 0 ? r("questionN", { n: n + 1 }) : r("wholeSet")}</span>
-                    <span>· {label("severity", f.severity)}</span>
-                    {f.category && <span>· {label("category", f.category)}</span>}
-                  </div>
-                  <p>{f.message}</p>
-                  {f.suggestion && (
-                    <p className="mt-1 text-muted-foreground">
-                      {r("suggestion", { text: f.suggestion })}
-                    </p>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      )}
-
-      <section className="grid gap-3">
-        <h2 className="text-lg font-semibold">{r("questions")}</h2>
-        {view.instruction && (
-          <p className="text-sm italic text-muted-foreground">{view.instruction}</p>
+        {!view.turns && (
+          <p className="mt-1 text-xs text-muted-foreground">{r("noTranscript")}</p>
         )}
-        <ol className="grid gap-4">
-          {view.questions.map((q, i) => (
-            <li
-              key={q.questionId}
-              className="rounded-xl border border-border bg-surface p-4"
-            >
-              <div className="flex flex-wrap items-baseline gap-x-3">
-                <span className="font-semibold">{r("questionN", { n: i + 1 })}</span>
-                <span className="text-sm text-muted-foreground">
-                  {[q.section, q.label].filter(Boolean).join(" › ")}
-                </span>
-              </div>
-              <dl className="mt-2 grid grid-cols-[7rem_1fr] gap-x-3 gap-y-1 text-sm">
-                <dt className="text-muted-foreground">{r("answer")}</dt>
-                <dd className="font-medium">{q.answer}</dd>
-                <dt className="text-muted-foreground">{r("accepted")}</dt>
-                <dd>
-                  {q.accepted.length > 0
-                    ? q.accepted.join(t("common.listSeparator"))
-                    : t("common.none")}
-                </dd>
-                <dt className="text-muted-foreground">{r("answerType")}</dt>
-                <dd>{label("answerType", q.answerType)}</dd>
-                <dt className="text-muted-foreground">{r("answerPolicy")}</dt>
-                <dd>{label("answerPolicy", q.answerPolicy)}</dd>
-                <dt className="text-muted-foreground">{r("trap")}</dt>
-                <dd>
-                  {label("trap", q.trap)}
-                  {q.wrongValue && ` ${r("wrongValue", { value: q.wrongValue })}`}
-                </dd>
-                {q.note && (
-                  <>
-                    <dt className="text-muted-foreground">{r("note")}</dt>
-                    <dd>{q.note}</dd>
-                  </>
-                )}
-              </dl>
-              <label className="mt-3 block text-sm">
-                <span className="mb-1 block font-medium">{r("questionNote")}</span>
-                <textarea
-                  name={`note:${q.questionId}`}
-                  rows={2}
-                  defaultValue={prevNote(q.questionId)}
-                  className={box}
-                />
-              </label>
-            </li>
+      </div>
+
+      <div
+        ref={boardRef}
+        className="relative grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start xl:gap-12"
+      >
+        <ReviewPaper
+          paper={view.paper}
+          questions={questions}
+          active={active}
+          verdicts={verdicts}
+          listening={listening}
+          counts={counts}
+          onSelect={selectFromPaper}
+          onPlay={(id) => {
+            const start = questions.get(id)?.evidence?.start;
+            if (start != null) seek(start, true);
+          }}
+        />
+        <div ref={marginRef} className="relative grid min-w-0 gap-3 xl:block">
+          {cards.map((target) => (
+            <div key={target} data-card={target} className="xl:absolute xl:inset-x-0">
+              <NoteCard
+                target={target}
+                question={target === SET ? null : (questions.get(target) ?? null)}
+                aiNotes={aiOf(target)}
+                aiActions={aiActions}
+                notes={notesOf(target)}
+                active={active === target}
+                verdict={verdicts.get(target)}
+                onVerdict={(ok) => judge(target, ok)}
+                editing={editing}
+                warnUnsaved={hintFor !== null && hintFor === editing}
+                setEditing={(e) => {
+                  if (startEditing(e)) setActive(target);
+                }}
+                onSaveNote={saveNote}
+                onRemoveNote={(key) => setNotes((ns) => ns.filter((n) => n.key !== key))}
+                onAiEdit={(ref, text) =>
+                  setAi(ref, text === null ? null : { action: "edited", text })
+                }
+                onAiDelete={(ref, reason) =>
+                  setAi(ref, { action: "deleted", text: reason })
+                }
+                onAiRestore={(ref) => setAi(ref, null)}
+                onSelect={() => select(target)}
+                onCollapse={collapse}
+                currentTime={currentTime}
+                turnStarts={turnStarts}
+                onSeek={(s) => seek(s)}
+              />
+            </div>
           ))}
-        </ol>
-      </section>
+        </div>
+        <svg
+          ref={svgRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 hidden h-full w-full overflow-visible xl:block"
+        />
+      </div>
+
+      {view.turns && (
+        <Transcript turns={view.turns} current={currentTurn} onSeek={(s) => seek(s)} />
+      )}
 
       <section className="grid gap-3 rounded-xl border border-border bg-surface p-4">
         <h2 className="text-lg font-semibold">{r("decision")}</h2>
-        <div className="flex gap-6">
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="decision"
-              value="approved"
-              defaultChecked={prev?.decision === "approved"}
-            />
-            {r("approved")}
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="decision"
-              value="rejected"
-              defaultChecked={prev?.decision === "rejected"}
-            />
-            {r("rejected")}
-          </label>
-        </div>
+        {/* 全部 OK 才合格；有一項有問題就不合格；還有沒判的就不能送出 */}
+        <p>
+          {[
+            r("summaryOk", { count: okCount }),
+            r("summaryBad", { count: badCount }),
+          ].join(r("summaryJoin"))}
+          {pending.length > 0 ? (
+            <>
+              {r("summaryJoin")}
+              <PendingLink count={pending.length} onClick={nextPending} label={r} />
+            </>
+          ) : (
+            <b className={`ml-2 ${badCount > 0 ? "text-destructive" : "text-accent"}`}>
+              {badCount > 0 ? r("resultFail") : r("resultPass")}
+            </b>
+          )}
+        </p>
         <label className="text-sm">
           <span className="mb-1 block font-medium">{r("comment")}</span>
           <textarea
             name="comment"
             rows={3}
             defaultValue={prev?.comment ?? ""}
-            className={box}
+            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
           />
         </label>
         {state.problems && state.problems.length > 0 && (
           <Alert tone="error" items={state.problems.map((p) => reviewErrorText(t, p))} />
         )}
         {state.saved && <Alert>{r("saved")}</Alert>}
-        <Button type="submit" disabled={isPending} className="justify-self-start">
-          {isPending ? t("common.saving") : prev ? r("update") : r("submit")}
-        </Button>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button type="submit" disabled={isPending || pending.length > 0}>
+            {isPending ? t("common.saving") : prev ? r("update") : r("submit")}
+          </Button>
+          {pending.length > 0 && (
+            <PendingLink count={pending.length} onClick={nextPending} label={r} />
+          )}
+        </div>
       </section>
     </form>
+  );
+}
+
+/** 「3 項待處理」：點了跳到下一個還沒判的項目 */
+function PendingLink({
+  count,
+  onClick,
+  label,
+}: {
+  count: number;
+  onClick: () => void;
+  label: (key: string, values?: Record<string, string | number>) => string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="font-semibold text-primary-hover underline"
+    >
+      {label("pending", { count })}
+    </button>
   );
 }

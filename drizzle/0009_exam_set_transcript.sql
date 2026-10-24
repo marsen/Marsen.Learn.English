@@ -1,0 +1,1 @@
+ALTER TABLE "exam_set_privates" ADD COLUMN "transcript" jsonb;

@@ -5,7 +5,9 @@ import {
   bundleProblems,
   isAiVerdict,
   toPublicTiming,
+  transcriptProblems,
 } from "@/domain/examSet/bundle";
+import type { Transcript } from "@/domain/examSet/examSet";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import type { Sha256 } from "@/application/shared/ports";
 import type { AudioStorage } from "./ports";
@@ -18,6 +20,7 @@ import type { UploadExamSetResult } from "./examSetResult";
  * - 只有「上傳題目」權限的帳號能用
  * - AI 審稿有疑慮（needs_human）的照樣收下，狀態是「待老師審稿」
  * - 同一個 set_id 不能重複上傳
+ * - 逐字稿（2.1 起的 transcript）只存在私密部分，考生拿不到
  * 寫入順序：先存錄音、再存資料；資料存失敗時錄音只是多一個沒人用的檔案，不會出現「有題目沒錄音」。
  */
 export class UploadExamSet {
@@ -66,6 +69,33 @@ export class UploadExamSet {
     // 答案卡要能拿來批改（例如答案規則必須是認得的），不然上傳後考生交卷會批改不了
     const key = parseAnswerKey(b.answers);
     if (!key.ok) problems.push(...key.problems);
+    // 逐字稿（2.1 起）：可有可無；有的話要跟時間軸、答案卡對得上
+    const transcript: Transcript | null = b.transcript
+      ? {
+          turns: b.transcript.turns.map((t) => ({
+            id: t.id,
+            speaker: t.speaker,
+            text: t.text,
+          })),
+          evidence: b.transcript.evidence.map((e) => ({
+            questionId: e.question_id,
+            turn: e.turn,
+            quote: e.quote,
+          })),
+        }
+      : null;
+    if (transcript && key.ok) {
+      const timingTurnIds = b.timing.events
+        .filter((e) => e.type === "turn" && typeof e.id === "string")
+        .map((e) => e.id as string);
+      problems.push(
+        ...transcriptProblems(
+          transcript,
+          timingTurnIds,
+          key.entries.map((e) => e.questionId),
+        ),
+      );
+    }
     if (problems.length > 0 || !isAiVerdict(aiVerdict)) return { ok: false, problems };
 
     if (await this.sets.exists(b.set_id)) {
@@ -89,7 +119,7 @@ export class UploadExamSet {
         uploadedBy: input.actor.id,
         uploadedAt: this.now(),
       },
-      { setId: b.set_id, answers: b.answers, provenance: b.provenance },
+      { setId: b.set_id, answers: b.answers, provenance: b.provenance, transcript },
     );
     return { ok: true, setId: b.set_id, title: b.title, aiVerdict };
   }

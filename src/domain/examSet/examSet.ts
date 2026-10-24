@@ -65,10 +65,21 @@ export type ExamSet = {
   uploadedAt: Date;
 };
 
+/** 逐字稿的一句。id 對得上時間軸裡 type=turn 的事件（例如 t12） */
+export type TranscriptTurn = { id: string; speaker: string; text: string };
+
+/** 某一題的答案出自哪一句 */
+export type AnswerEvidence = { questionId: string; turn: string; quote: string };
+
+/** 逐字稿與每題答案的出處（set.json 2.1 起才有）。含答案線索，只給老師、管理員看 */
+export type Transcript = { turns: TranscriptTurn[]; evidence: AnswerEvidence[] };
+
 export type ExamSetPrivate = {
   setId: string;
   /** 標準答案卡（set.json 的 answers） */
   answers: JsonObject;
   /** 製作紀錄（含 AI 示警，可能提到答案） */
   provenance: JsonObject;
+  /** 逐字稿與答案出處；2.1 以前打包的題組沒有，是 null */
+  transcript: Transcript | null;
 };

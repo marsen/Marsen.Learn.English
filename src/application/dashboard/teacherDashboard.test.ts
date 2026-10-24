@@ -1,3 +1,4 @@
+import { verdictsFor } from "../../../tests/reviewVerdicts";
 import { describe, it, expect, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import { GetTeacherDashboard } from "./teacherDashboard";
@@ -58,7 +59,7 @@ describe("GetTeacherDashboard", () => {
     await new ReviewExamSet(sets).execute({
       actor: otherTeacher,
       setId: SET,
-      decision: "rejected",
+      verdicts: verdictsFor("rejected"),
     });
     expect((await dashboard(teacher))?.pending).toEqual([]);
     expect((await dashboard(teacher))?.reviewedThisMonth).toBe(0);
@@ -69,7 +70,7 @@ describe("GetTeacherDashboard", () => {
     await new ReviewExamSet(sets).execute({
       actor: teacher,
       setId: SET,
-      decision: "approved",
+      verdicts: verdictsFor("approved"),
     });
     const nextMonth = new Date();
     nextMonth.setUTCMonth(nextMonth.getUTCMonth() + 1, 15);

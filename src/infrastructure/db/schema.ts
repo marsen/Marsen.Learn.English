@@ -8,8 +8,13 @@ import {
   jsonb,
   index,
 } from "drizzle-orm/pg-core";
-import type { JsonObject, PublicTiming } from "@/domain/examSet/examSet";
-import type { QuestionNote } from "@/domain/examSet/review";
+import type { JsonObject, PublicTiming, Transcript } from "@/domain/examSet/examSet";
+import type {
+  AiNoteAction,
+  ItemVerdict,
+  QuestionNote,
+  ReviewNote,
+} from "@/domain/examSet/review";
 import type { QuestionResult } from "@/domain/exam/grading";
 
 /** 帳號。以 email 識別（存正規化後的小寫）。 */
@@ -74,6 +79,8 @@ export const examSetPrivates = pgTable("exam_set_privates", {
     .references(() => examSets.setId, { onDelete: "cascade" }),
   answers: jsonb("answers").$type<JsonObject>().notNull(),
   provenance: jsonb("provenance").$type<JsonObject>().notNull(),
+  // 逐字稿與每題答案的出處（set.json 2.1 起）；更早打包的題組是 null
+  transcript: jsonb("transcript").$type<Transcript>(),
 });
 
 /** 老師審稿：一套題只留最新一次（以最後一次為準）。 */
@@ -86,8 +93,15 @@ export const examSetReviews = pgTable("exam_set_reviews", {
     .references(() => accounts.id),
   decision: text("decision").notNull(), // 'approved' | 'rejected'
   comment: text("comment"),
+  // 舊欄位：新版改用 notes，過渡期照樣寫（舊版程式還在讀），下一次上線再刪
   audioNote: text("audio_note"),
   questionNotes: jsonb("question_notes").$type<QuestionNote[]>().notNull(),
+  // 老師的意見（每題的、整套的）；舊審稿是 null，讀的時候從舊欄位轉
+  notes: jsonb("notes").$type<ReviewNote[]>(),
+  // 老師對 AI 意見的處理（保留的不記）；舊審稿是 null
+  aiActions: jsonb("ai_actions").$type<AiNoteAction[]>(),
+  // 每一題、整套的判定（全部 OK 才合格）；舊審稿是 null
+  verdicts: jsonb("verdicts").$type<ItemVerdict[]>(),
   reviewedAt: timestamp("reviewed_at", { withTimezone: true }).notNull(),
 });
 

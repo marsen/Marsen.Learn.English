@@ -31,7 +31,7 @@ export default async function ReviewPage({
   }
   const { view } = result;
   return (
-    <Page>
+    <Page width="lg">
       <DocumentTitle id="review.metaTitle" />
       <PageHeader
         back={{ href: "/admin/sets", label: <Msg id="review.back" /> }}

@@ -1,3 +1,4 @@
+import { verdictsFor } from "../../../tests/reviewVerdicts";
 import { describe, it, expect, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import { UploadExamSet } from "@/application/examSet/uploadExamSet";
@@ -55,7 +56,11 @@ async function addSet(setId: string, decision?: "approved" | "rejected") {
   });
   await new SetExamAccess(sets).execute({ actor: admin, setId, access: "members" });
   if (decision)
-    await new ReviewExamSet(sets).execute({ actor: teacher, setId, decision });
+    await new ReviewExamSet(sets).execute({
+      actor: teacher,
+      setId,
+      verdicts: verdictsFor(decision),
+    });
 }
 
 /** 路人的瀏覽器識別：預設是同一個瀏覽器 */

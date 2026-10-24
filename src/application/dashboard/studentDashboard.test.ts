@@ -1,3 +1,4 @@
+import { verdictsFor } from "../../../tests/reviewVerdicts";
 import { describe, it, expect, beforeEach } from "vitest";
 import { readFileSync } from "node:fs";
 import { GetStudentDashboard } from "./studentDashboard";
@@ -51,7 +52,11 @@ async function addListedSet(setId: string) {
     setJsonText: JSON.stringify(b),
     audio,
   });
-  await new ReviewExamSet(sets).execute({ actor: teacher, setId, decision: "approved" });
+  await new ReviewExamSet(sets).execute({
+    actor: teacher,
+    setId,
+    verdicts: verdictsFor("approved"),
+  });
   await new SetExamAccess(sets).execute({ actor: admin, setId, access: "members" });
 }
 
