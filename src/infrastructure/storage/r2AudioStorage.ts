@@ -27,10 +27,17 @@ export class R2AudioStorage implements AudioStorage {
   }
 
   async put(key: string, bytes: Uint8Array, contentType: string): Promise<void> {
-    const res = await this.client.fetch(this.urlOf(key), {
+    // 先簽名、再用「網址＋原始 bytes」送出：client.fetch 會交出 Request 物件，Next.js 的 fetch
+    // 會把它重包成串流，送出時沒有 Content-Length，R2 回 411
+    const signed = await this.client.sign(this.urlOf(key), {
       method: "PUT",
       body: bytes as BodyInit,
       headers: { "Content-Type": contentType },
+    });
+    const res = await fetch(signed.url, {
+      method: "PUT",
+      headers: signed.headers,
+      body: bytes as BodyInit,
     });
     if (!res.ok) throw new Error(`[r2] 上傳失敗 ${res.status}：${key}`);
   }
