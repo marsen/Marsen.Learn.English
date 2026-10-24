@@ -6,9 +6,6 @@ import type { ExamSetStatus } from "./examSet";
  */
 export type ReviewDecision = "approved" | "rejected";
 
-/** 舊版的每題建議（資料庫舊欄位 question_notes 的格式；過渡期還會寫） */
-export type QuestionNote = { questionId: string; note: string };
-
 /** 老師自己寫的意見。target 是題號（q01…）；null＝整套／錄音，不屬於某一題 */
 export type ReviewNote = { target: string | null; text: string };
 
@@ -161,40 +158,6 @@ export function cleanAiActions(
   const byRef = new Map<string, AiNoteAction>();
   for (const a of raw) byRef.set(a.ref, { ...a, text: cleanNote(a.text) });
   return [...byRef.values()];
-}
-
-/**
- * 舊欄位（audio_note、question_notes）過渡期還要寫，讓還在跑的舊版程式讀得到：
- * 整套的意見併成錄音建議，每題的意見依題號合併。
- */
-export function toLegacyNotes(notes: ReviewNote[]): {
-  audioNote: string | null;
-  questionNotes: QuestionNote[];
-} {
-  const whole = notes.filter((n) => n.target === null).map((n) => n.text);
-  const byQuestion = new Map<string, string[]>();
-  for (const n of notes) {
-    if (n.target === null) continue;
-    byQuestion.set(n.target, [...(byQuestion.get(n.target) ?? []), n.text]);
-  }
-  return {
-    audioNote: whole.length > 0 ? whole.join("\n") : null,
-    questionNotes: [...byQuestion].map(([questionId, texts]) => ({
-      questionId,
-      note: texts.join("\n"),
-    })),
-  };
-}
-
-/** 新欄位還沒有資料的舊審稿：把錄音建議當整套的意見、每題建議當那一題的意見 */
-export function fromLegacyNotes(
-  audioNote: string | null,
-  questionNotes: QuestionNote[],
-): ReviewNote[] {
-  return [
-    ...(audioNote ? [{ target: null, text: audioNote }] : []),
-    ...questionNotes.map((n) => ({ target: n.questionId, text: n.note })),
-  ];
 }
 
 /** [mm:ss] 時間標記，給錄音建議用 */

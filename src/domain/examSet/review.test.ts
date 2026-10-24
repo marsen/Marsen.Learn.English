@@ -7,9 +7,7 @@ import {
   cleanAiActions,
   cleanNote,
   cleanNotes,
-  fromLegacyNotes,
   reviewProblems,
-  toLegacyNotes,
   statusAfter,
   timeMark,
   MAX_NOTE_LENGTH,
@@ -120,30 +118,6 @@ describe("cleanNotes／cleanAiActions", () => {
         { ref: "finding:0", action: "deleted", text: "  " },
       ]),
     ).toEqual([{ ref: "finding:0", action: "deleted", text: null }]);
-  });
-});
-
-describe("toLegacyNotes／fromLegacyNotes", () => {
-  it("應該把整套的意見併成錄音建議、每題意見依題號合併（給舊版程式讀）", () => {
-    expect(
-      toLegacyNotes([
-        { target: null, text: "A" },
-        { target: "q01", text: "B" },
-        { target: null, text: "C" },
-        { target: "q01", text: "D" },
-      ]),
-    ).toEqual({
-      audioNote: "A\nC",
-      questionNotes: [{ questionId: "q01", note: "B\nD" }],
-    });
-    expect(toLegacyNotes([])).toEqual({ audioNote: null, questionNotes: [] });
-  });
-
-  it("應該把舊審稿的錄音建議、每題建議轉成意見", () => {
-    expect(fromLegacyNotes("[01:00] 太快", [{ questionId: "q02", note: "x" }])).toEqual([
-      { target: null, text: "[01:00] 太快" },
-      { target: "q02", text: "x" },
-    ]);
   });
 });
 

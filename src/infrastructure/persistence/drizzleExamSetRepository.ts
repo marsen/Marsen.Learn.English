@@ -9,10 +9,8 @@ import {
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import { isAiVerdict } from "@/domain/examSet/bundle";
 import {
-  fromLegacyNotes,
   isReviewDecision,
   statusAfter,
-  toLegacyNotes,
   type ReviewRecord,
   type TeacherReview,
 } from "@/domain/examSet/review";
@@ -86,7 +84,8 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
       reviewerId: row.reviewerId,
       decision: row.decision,
       comment: row.comment,
-      notes: row.notes ?? fromLegacyNotes(row.audioNote, row.questionNotes),
+      // 舊審稿的錄音建議、每題建議已由 migration 0012 搬進 notes
+      notes: row.notes ?? [],
       aiActions: row.aiActions ?? [],
       verdicts: row.verdicts ?? [],
       reviewedAt: row.reviewedAt,
@@ -94,9 +93,7 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
   }
 
   async saveReview(review: TeacherReview): Promise<void> {
-    const { setId, ...fields } = review;
-    // 舊欄位過渡期照樣寫，讓還在跑的舊版程式讀得到
-    const rest = { ...fields, ...toLegacyNotes(review.notes) };
+    const { setId, ...rest } = review;
     const [set] = await this.db
       .select({ title: examSets.title })
       .from(examSets)
