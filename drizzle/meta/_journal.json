@@ -92,6 +92,13 @@
       "when": 1792814410525,
       "tag": "0012_stop_legacy_review_notes",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1792814558740,
+      "tag": "0013_drop_legacy_review_notes",
+      "breakpoints": true
     }
   ]
 }
