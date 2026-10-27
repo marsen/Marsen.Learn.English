@@ -11,7 +11,14 @@
     "setsUnit": "sets",
     "none": "(none)",
     "listSeparator": ", ",
-    "parenthesized": "({text})"
+    "parenthesized": "({text})",
+    "deletedSet": "[[TBD]]",
+    "save": "[[TBD]]",
+    "saved": "[[TBD]]",
+    "cancel": "[[TBD]]",
+    "delete": "[[TBD]]",
+    "copied": "[[TBD]]",
+    "problemSeparator": "[[TBD]]"
   },
   "roles": {
     "admin": "Admin",
@@ -74,6 +81,33 @@
       "editedAiNoteEmpty": "An edited AI comment can't be empty. Delete it instead",
       "badPayload": "Your review couldn't be sent. Please reload the page and try again",
       "verdictMissing": "{count, plural, one {# item hasn't} other {# items haven't}} been checked yet"
+    },
+    "manage": {
+      "notLoggedIn": "[[TBD]]",
+      "forbidden": "[[TBD]]",
+      "invalidEmail": "[[TBD]]",
+      "emailTaken": "[[TBD]]",
+      "accountNotFound": "[[TBD]]",
+      "unknownRoles": "[[TBD]]",
+      "cannotRemoveOwnAdmin": "[[TBD]]"
+    },
+    "upload": {
+      "notLoggedIn": "[[TBD]]",
+      "forbidden": "[[TBD]]",
+      "missingFiles": "[[TBD]]",
+      "invalidJson": "[[TBD]]",
+      "schemaField": "[[TBD]]",
+      "duplicate": "[[TBD]]",
+      "unsupportedSchema": "[[TBD]]",
+      "audioTooSmall": "[[TBD]]",
+      "audioMismatch": "[[TBD]]",
+      "generatorValidationFailed": "[[TBD]]",
+      "missingAiVerdict": "[[TBD]]",
+      "answerKeyField": "[[TBD]]",
+      "transcriptTimingMismatch": "[[TBD]]",
+      "evidenceUnknownQuestion": "[[TBD]]",
+      "evidenceUnknownTurn": "[[TBD]]",
+      "evidenceMissing": "[[TBD]]"
     }
   },
   "dashboard": {
@@ -255,5 +289,281 @@
     "pending": "{count} left to check",
     "resultPass": "→ Pass",
     "resultFail": "→ Fail"
+  },
+  "permissions": {
+    "uploadSets": "[[TBD]]",
+    "reviewSets": "[[TBD]]",
+    "setExamAccess": "[[TBD]]",
+    "takeExam": "[[TBD]]",
+    "viewResult": "[[TBD]]",
+    "viewAnswerKey": "[[TBD]]",
+    "keepRecords": "[[TBD]]",
+    "manageRoles": "[[TBD]]",
+    "viewReviewLog": "[[TBD]]"
+  },
+  "accountSummary": {
+    "email": "[[TBD]]",
+    "roles": "[[TBD]]",
+    "permissions": "[[TBD]]"
+  },
+  "accounts": {
+    "title": "[[TBD]]",
+    "description": "[[TBD]]",
+    "addHeading": "[[TBD]]",
+    "emailPlaceholder": "[[TBD]]",
+    "add": "[[TBD]]",
+    "you": "[[TBD]]"
+  },
+  "reviewLog": {
+    "title": "[[TBD]]",
+    "description": "[[TBD]]",
+    "monthNav": "[[TBD]]",
+    "prev": "[[TBD]]",
+    "next": "[[TBD]]",
+    "month": "[[TBD]]",
+    "teachersHeading": "[[TBD]]",
+    "teachersHint": "[[TBD]]",
+    "empty": "[[TBD]]",
+    "colTeacher": "[[TBD]]",
+    "colSets": "[[TBD]]",
+    "colApproved": "[[TBD]]",
+    "colRejected": "[[TBD]]",
+    "deletedAccount": "[[TBD]]",
+    "entriesHeading": "[[TBD]]",
+    "colTime": "[[TBD]]",
+    "colSet": "[[TBD]]",
+    "colDecision": "[[TBD]]"
+  },
+  "uploadSet": {
+    "title": "[[TBD]]",
+    "description": "[[TBD]]",
+    "pickFolder": "[[TBD]]",
+    "pickHint": "[[TBD]]",
+    "topFolder": "[[TBD]]",
+    "missingFile": "[[TBD]]",
+    "waiting": "[[TBD]]",
+    "uploading": "[[TBD]]",
+    "uploaded": "[[TBD]]",
+    "failed": "[[TBD]]",
+    "failedWith": "[[TBD]]",
+    "uploadN": "[[TBD]]",
+    "done": "[[TBD]]"
+  },
+  "adminDashboard": {
+    "kpiPending": "[[TBD]]",
+    "kpiReady": "[[TBD]]",
+    "kpiRejected": "[[TBD]]",
+    "kpiListed": "[[TBD]]",
+    "kpiPublic": "[[TBD]]",
+    "readyHeading": "[[TBD]]",
+    "readyHint": "[[TBD]]",
+    "readyEmpty": "[[TBD]]",
+    "teacherFallback": "[[TBD]]",
+    "approvedBy": "[[TBD]]",
+    "copyFeedback": "[[TBD]]",
+    "list": "[[TBD]]",
+    "makePublic": "[[TBD]]",
+    "rejectedHeading": "[[TBD]]",
+    "rejectedHint": "[[TBD]]",
+    "rejectedEmpty": "[[TBD]]",
+    "rejectedBy": "[[TBD]]",
+    "overallComment": "[[TBD]]",
+    "noteTargetWhole": "[[TBD]]",
+    "noteLine": "[[TBD]]",
+    "noComments": "[[TBD]]",
+    "mailSubject": "[[TBD]]",
+    "discuss": "[[TBD]]",
+    "copyFeedbackForAi": "[[TBD]]",
+    "uploadFix": "[[TBD]]",
+    "deleteConfirm": "[[TBD]]",
+    "deleteConfirmButton": "[[TBD]]",
+    "topicsHeading": "[[TBD]]",
+    "fakeData": "[[TBD]]",
+    "topics": {
+      "gym": "[[TBD]]",
+      "carRental": "[[TBD]]",
+      "library": "[[TBD]]",
+      "hotel": "[[TBD]]",
+      "doctor": "[[TBD]]"
+    }
+  },
+  "studentDashboard": {
+    "recommendNew": "[[TBD]]",
+    "recommendRetry": "[[TBD]]",
+    "questionCount": "[[TBD]]",
+    "bestScore": "[[TBD]]",
+    "start": "[[TBD]]",
+    "retry": "[[TBD]]",
+    "noExams": "[[TBD]]",
+    "notTaken": "[[TBD]]",
+    "papersUnit": "[[TBD]]",
+    "challenge": "[[TBD]]",
+    "viewAll": "[[TBD]]",
+    "scoresHeading": "[[TBD]]",
+    "scoresEmpty": "[[TBD]]",
+    "attempts": "[[TBD]]",
+    "timesUnit": "[[TBD]]",
+    "average": "[[TBD]]",
+    "latest": "[[TBD]]",
+    "recentN": "[[TBD]]",
+    "barTitle": "[[TBD]]",
+    "weakHeading": "[[TBD]]",
+    "weakHint": "[[TBD]]",
+    "weakStat": "[[TBD]]"
+  },
+  "examList": {
+    "metaTitle": "[[TBD]]",
+    "title": "[[TBD]]",
+    "guestHint": "[[TBD]]",
+    "empty": "[[TBD]]",
+    "questionCount": "[[TBD]]"
+  },
+  "exam": {
+    "metaTitle": "[[TBD]]",
+    "unavailableGuest": "[[TBD]]",
+    "intro": "[[TBD]]",
+    "start": "[[TBD]]",
+    "submitted": "[[TBD]]",
+    "statusStart": "[[TBD]]",
+    "statusListen": "[[TBD]]",
+    "statusCheck": "[[TBD]]",
+    "statusRead": "[[TBD]]",
+    "statusReadQuestions": "[[TBD]]",
+    "questions": {
+      "single": "[[TBD]]",
+      "pair": "[[TBD]]",
+      "range": "[[TBD]]"
+    },
+    "submit": "[[TBD]]",
+    "submitting": "[[TBD]]",
+    "errors": {
+      "unavailable": "[[TBD]]",
+      "submitFailed": "[[TBD]]",
+      "attemptNotFound": "[[TBD]]",
+      "audioFailed": "[[TBD]]",
+      "audioInterrupted": "[[TBD]]",
+      "autoplayBlocked": "[[TBD]]"
+    }
+  },
+  "history": {
+    "title": "[[TBD]]",
+    "empty": "[[TBD]]",
+    "colSubmitted": "[[TBD]]",
+    "colExam": "[[TBD]]",
+    "colScore": "[[TBD]]",
+    "view": "[[TBD]]"
+  },
+  "result": {
+    "title": "[[TBD]]",
+    "notFound": "[[TBD]]",
+    "signupTitle": "[[TBD]]",
+    "signupBody": "[[TBD]]",
+    "sendSignupCode": "[[TBD]]",
+    "colNumber": "[[TBD]]",
+    "colGiven": "[[TBD]]",
+    "colExpected": "[[TBD]]",
+    "blank": "[[TBD]]",
+    "accepted": "[[TBD]]"
+  },
+  "landing": {
+    "metaTitle": "[[TBD]]",
+    "nav": {
+      "features": "[[TBD]]",
+      "how": "[[TBD]]",
+      "demo": "[[TBD]]",
+      "faq": "[[TBD]]"
+    },
+    "navCta": "[[TBD]]",
+    "login": "[[TBD]]",
+    "dashboard": "[[TBD]]",
+    "navCtaMember": "[[TBD]]",
+    "hero": {
+      "badge": "[[TBD]]",
+      "titleLine1": "[[TBD]]",
+      "titleLine2": "[[TBD]]",
+      "lead": "[[TBD]]",
+      "cta": "[[TBD]]",
+      "secondary": "[[TBD]]",
+      "note": "[[TBD]]",
+      "illustration": "[[TBD]]",
+      "playingTag": "[[TBD]]"
+    },
+    "features": {
+      "title": "[[TBD]]",
+      "lead": "[[TBD]]",
+      "items": {
+        "unlimited": {
+          "title": "[[TBD]]",
+          "body": "[[TBD]]"
+        },
+        "realPace": {
+          "title": "[[TBD]]",
+          "body": "[[TBD]]"
+        },
+        "instantGrading": {
+          "title": "[[TBD]]",
+          "body": "[[TBD]]"
+        },
+        "weakTraps": {
+          "title": "[[TBD]]",
+          "body": "[[TBD]]"
+        }
+      }
+    },
+    "steps": {
+      "title": "[[TBD]]",
+      "items": {
+        "open": {
+          "title": "[[TBD]]",
+          "body": "[[TBD]]"
+        },
+        "listen": {
+          "title": "[[TBD]]",
+          "body": "[[TBD]]"
+        },
+        "review": {
+          "title": "[[TBD]]",
+          "body": "[[TBD]]"
+        }
+      }
+    },
+    "demo": {
+      "title": "[[TBD]]",
+      "lead": "[[TBD]]",
+      "idle": "[[TBD]]",
+      "playing": "[[TBD]]",
+      "ended": "[[TBD]]",
+      "submit": "[[TBD]]",
+      "playAria": "[[TBD]]",
+      "hints": {
+        "q1": "[[TBD]]",
+        "q2": "[[TBD]]"
+      }
+    },
+    "faq": {
+      "title": "[[TBD]]",
+      "items": {
+        "price": {
+          "q": "[[TBD]]",
+          "a": "[[TBD]]"
+        },
+        "author": {
+          "q": "[[TBD]]",
+          "a": "[[TBD]]"
+        },
+        "score": {
+          "q": "[[TBD]]",
+          "a": "[[TBD]]"
+        }
+      }
+    },
+    "finalCta": {
+      "title": "[[TBD]]",
+      "lead": "[[TBD]]",
+      "cta": "[[TBD]]"
+    },
+    "footer": {
+      "disclaimer": "[[TBD]]"
+    }
   }
 }

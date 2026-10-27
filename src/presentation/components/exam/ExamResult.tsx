@@ -1,8 +1,12 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import type { AttemptResultView } from "@/application/exam/examResult";
 import { Table, Td, Th, Tr } from "@/presentation/components/ui/Table";
 
 /** 批改結果：分數、每題你寫的與正解。 */
 export function ExamResult({ result }: { result: AttemptResultView }) {
+  const t = useTranslations();
   return (
     <div className="grid gap-6">
       <div>
@@ -14,9 +18,9 @@ export function ExamResult({ result }: { result: AttemptResultView }) {
       <Table
         head={
           <>
-            <Th>題號</Th>
-            <Th>你寫的</Th>
-            {result.answerKeyVisible && <Th>正解</Th>}
+            <Th>{t("result.colNumber")}</Th>
+            <Th>{t("result.colGiven")}</Th>
+            {result.answerKeyVisible && <Th>{t("result.colExpected")}</Th>}
           </>
         }
       >
@@ -26,14 +30,16 @@ export function ExamResult({ result }: { result: AttemptResultView }) {
               {r.number} {r.correct ? "✓" : "✗"}
             </Td>
             <Td className={r.given ? undefined : "text-muted-foreground"}>
-              {r.given || "（空白）"}
+              {r.given || t("result.blank")}
             </Td>
             {result.answerKeyVisible && (
               <Td>
                 {r.expected}
                 {r.accepted.length > 0 && (
                   <span className="ml-2 text-muted-foreground">
-                    （也算對：{r.accepted.join("、")}）
+                    {t("result.accepted", {
+                      list: r.accepted.join(t("common.listSeparator")),
+                    })}
                   </span>
                 )}
               </Td>

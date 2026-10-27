@@ -10,16 +10,16 @@ describe("roleProblems", () => {
   });
 
   it("應該不讓管理員拿掉自己的管理員角色", () => {
-    expect(
-      roleProblems({ actorId: "a", targetId: "a", roles: ["teacher"] }),
-    ).toHaveLength(1);
+    expect(roleProblems({ actorId: "a", targetId: "a", roles: ["teacher"] })).toEqual([
+      { code: "cannotRemoveOwnAdmin" },
+    ]);
     expect(roleProblems({ actorId: "a", targetId: "a", roles: ["admin"] })).toEqual([]);
   });
 
   it("應該擋下不認得的角色", () => {
-    expect(roleProblems({ actorId: "a", targetId: "b", roles: ["boss"] })).toHaveLength(
-      1,
-    );
+    expect(roleProblems({ actorId: "a", targetId: "b", roles: ["boss"] })).toEqual([
+      { code: "unknownRoles", roles: ["boss"] },
+    ]);
   });
 });
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { eventAt, formatClock, questionLabel, viewOf } from "./examTiming";
+import { eventAt, formatClock, questionRange, viewOf } from "./examTiming";
 
 const events = [
   { type: "announce", id: "intro", start: 0, end: 8 },
@@ -26,8 +26,8 @@ describe("examTiming", () => {
 
   it("應該把秒數與題號範圍寫成中文", () => {
     expect(formatClock(65.2)).toBe("1:06");
-    expect(questionLabel([1, 6])).toBe("第 1–6 題");
-    expect(questionLabel([3, 4])).toBe("第 3、4 題");
-    expect(questionLabel([5, 5])).toBe("第 5 題");
+    expect(questionRange([1, 6])).toEqual({ kind: "range", a: 1, b: 6 });
+    expect(questionRange([3, 4])).toEqual({ kind: "pair", a: 3, b: 4 });
+    expect(questionRange([5, 5])).toEqual({ kind: "single", a: 5, b: 5 });
   });
 });

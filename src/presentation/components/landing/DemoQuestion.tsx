@@ -1,30 +1,22 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { matchesAnswer } from "@/domain/exam/grading";
 import { LANDING } from "@/presentation/content/landing";
 import { Wave } from "./icons";
 
 const T = LANDING.demo;
 
-// 示意題的答案卡，用跟正式考試一樣的批改規則
+// 示意題的答案卡，用跟正式考試一樣的批改規則；答錯的提示在翻譯檔 landing.demo.hints.<題號>
 const KEY = {
-  q1: {
-    answer: "37",
-    accepted: [],
-    policy: "digits_only" as const,
-    hint: "第 1 題：說錯再更正，答案是 37。",
-  },
-  q2: {
-    answer: "mornings",
-    accepted: ["morning"],
-    policy: "exact_word" as const,
-    hint: "第 2 題：evening 是干擾，答案是 mornings。",
-  },
+  q1: { answer: "37", accepted: [], policy: "digits_only" as const },
+  q2: { answer: "mornings", accepted: ["morning"], policy: "exact_word" as const },
 };
 
 /** 首頁的「試做一題」：文字代替錄音（只播一次），交卷用正式的批改規則。 */
 export function DemoQuestion() {
+  const t = useTranslations("landing.demo");
   const [line, setLine] = useState(-1);
   const [ended, setEnded] = useState(false);
   const [answers, setAnswers] = useState({ q1: "", q2: "" });
@@ -47,7 +39,7 @@ export function DemoQuestion() {
     e.preventDefault();
     const checks = (Object.keys(KEY) as (keyof typeof KEY)[]).map((q) => ({
       ok: matchesAnswer(KEY[q], answers[q]),
-      hint: KEY[q].hint,
+      hint: t(`hints.${q}`),
     }));
     setResult({
       score: checks.filter((c) => c.ok).length,
@@ -56,7 +48,7 @@ export function DemoQuestion() {
   };
 
   const playing = line >= 0 && !ended;
-  const status = line < 0 ? T.idle : ended ? T.ended : T.playing;
+  const status = line < 0 ? t("idle") : ended ? t("ended") : t("playing");
   const input =
     "border-0 border-b border-foreground bg-transparent px-1 focus:outline-none focus:ring-2 focus:ring-primary-soft";
 
@@ -67,7 +59,7 @@ export function DemoQuestion() {
           type="button"
           onClick={play}
           disabled={line >= 0}
-          aria-label="播放示意錄音"
+          aria-label={t("playAria")}
           className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground transition hover:scale-105 hover:bg-accent-hover disabled:pointer-events-none disabled:opacity-50"
         >
           <svg
@@ -133,7 +125,7 @@ export function DemoQuestion() {
         </div>
         <div className="mt-6 flex flex-wrap items-center gap-4">
           <button className="rounded-full bg-primary px-6 py-2.5 font-medium text-primary-foreground transition hover:scale-105 hover:bg-primary-hover">
-            {T.submit}
+            {t("submit")}
           </button>
           {result && (
             <p

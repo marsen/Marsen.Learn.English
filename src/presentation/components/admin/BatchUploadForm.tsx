@@ -9,6 +9,7 @@ import {
   type BundlePair,
 } from "@/presentation/lib/bundlePairs";
 import { Button } from "@/presentation/components/ui/Button";
+import { uploadErrorText } from "@/presentation/lib/errorMessages";
 
 type Props = {
   action: (prev: UploadSetFormState, formData: FormData) => Promise<UploadSetFormState>;
@@ -25,7 +26,8 @@ type Row = {
  * 每套各自成功或失敗，互不影響；同一套已上傳過的會顯示原因、不會重複建立。
  */
 export function BatchUploadForm({ action }: Props) {
-  const t = useTranslations("examSet.aiVerdict");
+  const t = useTranslations();
+  const tu = useTranslations("uploadSet");
   const [rows, setRows] = useState<Row[]>([]);
   const [running, setRunning] = useState(false);
 
@@ -38,7 +40,7 @@ export function BatchUploadForm({ action }: Props) {
       pairBundles(files).map((pair) => ({
         pair,
         state: pair.ok ? "waiting" : "failed",
-        message: pair.ok ? "等待上傳" : pair.problem,
+        message: pair.ok ? tu("waiting") : tu("missingFile", { file: pair.missing }),
       })),
     );
   };
@@ -50,7 +52,7 @@ export function BatchUploadForm({ action }: Props) {
     setRunning(true);
     for (const [i, row] of rows.entries()) {
       if (row.state !== "waiting" || !row.pair.ok) continue;
-      update(i, { state: "uploading", message: "上傳中…" });
+      update(i, { state: "uploading", message: tu("uploading") });
       const fd = new FormData();
       fd.set("setJson", row.pair.setJson);
       fd.set("audio", row.pair.audio);
@@ -59,16 +61,26 @@ export function BatchUploadForm({ action }: Props) {
         if (r.uploaded) {
           update(i, {
             state: "done",
-            message: `已上傳：${r.uploaded.title}，${t(r.uploaded.aiVerdict)}`,
+            message: tu("uploaded", {
+              title: r.uploaded.title,
+              verdict: t(`examSet.aiVerdict.${r.uploaded.aiVerdict}`),
+            }),
           });
         } else {
           update(i, {
             state: "failed",
-            message: (r.problems ?? ["上傳失敗"]).join("；"),
+            message: r.problems?.length
+              ? r.problems
+                  .map((p) => uploadErrorText(t, p))
+                  .join(t("common.problemSeparator"))
+              : tu("failed"),
           });
         }
       } catch (err) {
-        update(i, { state: "failed", message: `上傳失敗：${(err as Error).message}` });
+        update(i, {
+          state: "failed",
+          message: tu("failedWith", { message: (err as Error).message }),
+        });
       }
     }
     setRunning(false);
@@ -87,10 +99,9 @@ export function BatchUploadForm({ action }: Props) {
   return (
     <div className="grid gap-5">
       <label className="block">
-        <span className="mb-1 block font-medium">選資料夾</span>
+        <span className="mb-1 block font-medium">{tu("pickFolder")}</span>
         <span className="mb-2 block text-sm text-muted-foreground">
-          選 Question.Generator 的 <code>results/out</code>
-          ，或其中一套題組的資料夾。每套要有 set.json 和 audio.mp3。
+          {tu.rich("pickHint", { code: (chunks) => <code>{chunks}</code> })}
         </span>
         {/* webkitdirectory：讓瀏覽器選整個資料夾 */}
         <input
@@ -112,7 +123,7 @@ export function BatchUploadForm({ action }: Props) {
               >
                 <span className={`w-4 ${badge[r.state]}`}>{mark[r.state]}</span>
                 <span className="w-40 shrink-0 font-mono">
-                  {folderLabel(r.pair.folder)}
+                  {folderLabel(r.pair.folder) ?? tu("topFolder")}
                 </span>
                 <span className={badge[r.state]}>{rows[i].message}</span>
               </li>
@@ -120,11 +131,11 @@ export function BatchUploadForm({ action }: Props) {
           </ul>
           <div className="flex items-center gap-4">
             <Button onClick={start} disabled={running || waiting === 0}>
-              {running ? "上傳中…" : `上傳 ${waiting} 套`}
+              {running ? tu("uploading") : tu("uploadN", { count: waiting })}
             </Button>
             {!running && done > 0 && (
               <a href="/admin/sets" className="text-sm text-primary underline">
-                完成 {done} 套，去題組清單 →
+                {tu("done", { count: done })}
               </a>
             )}
           </div>

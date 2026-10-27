@@ -24,8 +24,8 @@ describe("pairBundles", () => {
   it("應該標出缺檔的資料夾", () => {
     const pairs = pairBundles([f("out/a/set.json"), f("out/b/audio.mp3")]);
     expect(pairs).toEqual([
-      { folder: "out/a", ok: false, problem: "缺少 audio.mp3" },
-      { folder: "out/b", ok: false, problem: "缺少 set.json" },
+      { folder: "out/a", ok: false, missing: "audio.mp3" },
+      { folder: "out/b", ok: false, missing: "set.json" },
     ]);
   });
 

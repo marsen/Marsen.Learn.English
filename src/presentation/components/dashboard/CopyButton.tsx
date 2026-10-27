@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/presentation/components/ui/Button";
 
 /** 複製一段文字到剪貼簿（例如老師的回饋，貼給 AI） */
 export function CopyButton({ text, label }: { text: string; label: string }) {
   const [copied, setCopied] = useState(false);
+  const t = useTranslations("common");
 
   const copy = async () => {
     try {
@@ -19,7 +21,7 @@ export function CopyButton({ text, label }: { text: string; label: string }) {
 
   return (
     <Button variant="secondary" size="sm" onClick={copy}>
-      {copied ? "已複製 ✓" : label}
+      {copied ? t("copied") : label}
     </Button>
   );
 }
