@@ -1,4 +1,5 @@
 import type { ExamAccess, ExamSet, ExamSetPrivate } from "./examSet";
+import type { ExamSetFilter, ExamSetSummary } from "./examSetFilter";
 import type { ReviewRecord, TeacherReview } from "./review";
 
 /** 題組儲存的 port。 */
@@ -8,6 +9,8 @@ export interface ExamSetRepository {
   save(set: ExamSet, secret: ExamSetPrivate): Promise<void>;
   /** 新上傳的在前面 */
   list(): Promise<ExamSet[]>;
+  /** 後台清單用：只帶清單欄位、照條件過濾，新上傳的在前面 */
+  listSummaries(filter: ExamSetFilter): Promise<ExamSetSummary[]>;
   findById(setId: string): Promise<ExamSet | null>;
   findPrivate(setId: string): Promise<ExamSetPrivate | null>;
   findReview(setId: string): Promise<TeacherReview | null>;

@@ -173,7 +173,27 @@
     "colCount": "Questions",
     "colStatus": "Review status",
     "colAccess": "Availability",
-    "colUploaded": "Uploaded"
+    "colUploaded": "Uploaded",
+    "noMatch": "No sets match these filters.",
+    "filter": {
+      "teacher": "🍵 Teacher",
+      "ai": "🤖 AI",
+      "access": "Availability",
+      "all": "All",
+      "status": {
+        "pending_review": "Waiting",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "verdict": {
+        "pass": "Passed",
+        "needs_human": "Concerns"
+      },
+      "keywordPlaceholder": "Search ID, title, topic",
+      "search": "Search",
+      "clear": "Clear filters",
+      "count": "{count, plural, one {# set} other {# sets}}"
+    }
   },
   "review": {
     "metaTitle": "Review",

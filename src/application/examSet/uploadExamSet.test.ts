@@ -198,8 +198,8 @@ describe("ListExamSets", () => {
   it("應該讓管理員與老師看清單，學生看不到", async () => {
     await upload(admin, bundle());
     const list = new ListExamSets(sets);
-    expect(await list.execute({ actor: admin })).toHaveLength(1);
-    expect(await list.execute({ actor: account(["teacher"]) })).toHaveLength(1);
+    expect((await list.execute({ actor: admin }))?.sets).toHaveLength(1);
+    expect((await list.execute({ actor: account(["teacher"]) }))?.sets).toHaveLength(1);
     expect(await list.execute({ actor: account(["student"]) })).toBeNull();
   });
 });

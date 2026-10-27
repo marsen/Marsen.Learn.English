@@ -173,7 +173,27 @@
     "colCount": "題數",
     "colStatus": "審核狀態",
     "colAccess": "開放對象",
-    "colUploaded": "上傳時間"
+    "colUploaded": "上傳時間",
+    "noMatch": "沒有符合條件的題組。",
+    "filter": {
+      "teacher": "🍵 老師",
+      "ai": "🤖 AI",
+      "access": "開放對象",
+      "all": "全部",
+      "status": {
+        "pending_review": "待審",
+        "approved": "通過",
+        "rejected": "退回"
+      },
+      "verdict": {
+        "pass": "通過",
+        "needs_human": "有疑慮"
+      },
+      "keywordPlaceholder": "搜尋代號、標題、主題",
+      "search": "搜尋",
+      "clear": "清除條件",
+      "count": "共 {count} 套"
+    }
   },
   "review": {
     "metaTitle": "審稿",
