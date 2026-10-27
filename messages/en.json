@@ -12,13 +12,13 @@
     "none": "(none)",
     "listSeparator": ", ",
     "parenthesized": "({text})",
-    "deletedSet": "[[TBD]]",
-    "save": "[[TBD]]",
-    "saved": "[[TBD]]",
-    "cancel": "[[TBD]]",
-    "delete": "[[TBD]]",
-    "copied": "[[TBD]]",
-    "problemSeparator": "[[TBD]]"
+    "deletedSet": "(deleted set)",
+    "save": "Save",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "copied": "Copied ✓",
+    "problemSeparator": "; "
   },
   "roles": {
     "admin": "Admin",
@@ -83,31 +83,31 @@
       "verdictMissing": "{count, plural, one {# item hasn't} other {# items haven't}} been checked yet"
     },
     "manage": {
-      "notLoggedIn": "[[TBD]]",
-      "forbidden": "[[TBD]]",
-      "invalidEmail": "[[TBD]]",
-      "emailTaken": "[[TBD]]",
-      "accountNotFound": "[[TBD]]",
-      "unknownRoles": "[[TBD]]",
-      "cannotRemoveOwnAdmin": "[[TBD]]"
+      "notLoggedIn": "Please log in first",
+      "forbidden": "Your account doesn't have permission to manage accounts",
+      "invalidEmail": "That email address isn't valid",
+      "emailTaken": "This email already has an account",
+      "accountNotFound": "Account not found",
+      "unknownRoles": "Unknown role: {roles}",
+      "cannotRemoveOwnAdmin": "You can't remove your own admin role"
     },
     "upload": {
-      "notLoggedIn": "[[TBD]]",
-      "forbidden": "[[TBD]]",
-      "missingFiles": "[[TBD]]",
-      "invalidJson": "[[TBD]]",
-      "schemaField": "[[TBD]]",
-      "duplicate": "[[TBD]]",
-      "unsupportedSchema": "[[TBD]]",
-      "audioTooSmall": "[[TBD]]",
-      "audioMismatch": "[[TBD]]",
-      "generatorValidationFailed": "[[TBD]]",
-      "missingAiVerdict": "[[TBD]]",
-      "answerKeyField": "[[TBD]]",
-      "transcriptTimingMismatch": "[[TBD]]",
-      "evidenceUnknownQuestion": "[[TBD]]",
-      "evidenceUnknownTurn": "[[TBD]]",
-      "evidenceMissing": "[[TBD]]"
+      "notLoggedIn": "Please log in first",
+      "forbidden": "Your account doesn't have permission to upload sets",
+      "missingFiles": "Please choose both set.json and audio.mp3",
+      "invalidJson": "set.json isn't valid JSON",
+      "schemaField": "set.json field {path}: {message}",
+      "duplicate": "Set {setId} has already been uploaded",
+      "unsupportedSchema": "Unsupported schema_version: {version} (only {supported} is supported; please re-bundle it in Question.Generator)",
+      "audioTooSmall": "The audio file is too small and may be broken",
+      "audioMismatch": "The audio file doesn't match what set.json records (wrong file, or the file was changed)",
+      "generatorValidationFailed": "The question generator's validation didn't pass",
+      "missingAiVerdict": "Missing the AI review verdict (provenance.ai_review.verdict)",
+      "answerKeyField": "Answer key {path}: {message}",
+      "transcriptTimingMismatch": "The transcript doesn't line up with the timeline (different number or order of lines)",
+      "evidenceUnknownQuestion": "transcript.evidence has a question that isn't in the answer key: {questionId}",
+      "evidenceUnknownTurn": "transcript.evidence for {questionId} points to a line that doesn't exist: {turn}",
+      "evidenceMissing": "transcript.evidence is missing the source for {questionId}"
     }
   },
   "dashboard": {
@@ -291,280 +291,280 @@
     "resultFail": "→ Fail"
   },
   "permissions": {
-    "uploadSets": "[[TBD]]",
-    "reviewSets": "[[TBD]]",
-    "setExamAccess": "[[TBD]]",
-    "takeExam": "[[TBD]]",
-    "viewResult": "[[TBD]]",
-    "viewAnswerKey": "[[TBD]]",
-    "keepRecords": "[[TBD]]",
-    "manageRoles": "[[TBD]]",
-    "viewReviewLog": "[[TBD]]"
+    "uploadSets": "Upload sets",
+    "reviewSets": "Review sets (decide whether a test passes)",
+    "setExamAccess": "Set who can take a test",
+    "takeExam": "Take tests",
+    "viewResult": "See results",
+    "viewAnswerKey": "See the answers",
+    "keepRecords": "Test history",
+    "manageRoles": "Manage permissions",
+    "viewReviewLog": "See the review log"
   },
   "accountSummary": {
-    "email": "[[TBD]]",
-    "roles": "[[TBD]]",
-    "permissions": "[[TBD]]"
+    "email": "Logged in as",
+    "roles": "Roles",
+    "permissions": "What you can do"
   },
   "accounts": {
-    "title": "[[TBD]]",
-    "description": "[[TBD]]",
-    "addHeading": "[[TBD]]",
-    "emailPlaceholder": "[[TBD]]",
-    "add": "[[TBD]]",
-    "you": "[[TBD]]"
+    "title": "Permissions",
+    "description": "Assign roles to each account. An account can have several roles, and it can use everything those roles allow. You can't remove your own admin role.",
+    "addHeading": "Add an account",
+    "emailPlaceholder": "email",
+    "add": "Add",
+    "you": "(you)"
   },
   "reviewLog": {
-    "title": "[[TBD]]",
-    "description": "[[TBD]]",
-    "monthNav": "[[TBD]]",
-    "prev": "[[TBD]]",
-    "next": "[[TBD]]",
-    "month": "[[TBD]]",
-    "teachersHeading": "[[TBD]]",
-    "teachersHint": "[[TBD]]",
-    "empty": "[[TBD]]",
-    "colTeacher": "[[TBD]]",
-    "colSets": "[[TBD]]",
-    "colApproved": "[[TBD]]",
-    "colRejected": "[[TBD]]",
-    "deletedAccount": "[[TBD]]",
-    "entriesHeading": "[[TBD]]",
-    "colTime": "[[TBD]]",
-    "colSet": "[[TBD]]",
-    "colDecision": "[[TBD]]"
+    "title": "Review log",
+    "description": "Every submitted review is logged. Entries stay even if the decision is changed or the set is deleted. Months follow Taiwan time.",
+    "monthNav": "Change month",
+    "prev": "← Previous month",
+    "next": "Next month →",
+    "month": "{month}/{year}",
+    "teachersHeading": "By teacher",
+    "teachersHint": "A set reviewed more than once (decision changed) counts as one. Approved or rejected follows the latest decision.",
+    "empty": "No reviews this month yet.",
+    "colTeacher": "Teacher",
+    "colSets": "Sets reviewed",
+    "colApproved": "Approved",
+    "colRejected": "Rejected",
+    "deletedAccount": "(account no longer exists)",
+    "entriesHeading": "All reviews",
+    "colTime": "Time",
+    "colSet": "Set",
+    "colDecision": "Decision"
   },
   "uploadSet": {
-    "title": "[[TBD]]",
-    "description": "[[TBD]]",
-    "pickFolder": "[[TBD]]",
-    "pickHint": "[[TBD]]",
-    "topFolder": "[[TBD]]",
-    "missingFile": "[[TBD]]",
-    "waiting": "[[TBD]]",
-    "uploading": "[[TBD]]",
-    "uploaded": "[[TBD]]",
-    "failed": "[[TBD]]",
-    "failedWith": "[[TBD]]",
-    "uploadN": "[[TBD]]",
-    "done": "[[TBD]]"
+    "title": "Upload sets",
+    "description": "Sets the AI has concerns about can be uploaded too. A teacher will review them.",
+    "pickFolder": "Choose a folder",
+    "pickHint": "Choose Question.Generator's <code>results/out</code>, or the folder of a single set. Each set needs set.json and audio.mp3.",
+    "topFolder": "(top level)",
+    "missingFile": "Missing {file}",
+    "waiting": "Waiting to upload",
+    "uploading": "Uploading…",
+    "uploaded": "Uploaded: {title}, {verdict}",
+    "failed": "Upload failed",
+    "failedWith": "Upload failed: {message}",
+    "uploadN": "Upload {count, plural, one {# set} other {# sets}}",
+    "done": "{count, plural, one {# set} other {# sets}} done. Go to the set list →"
   },
   "adminDashboard": {
-    "kpiPending": "[[TBD]]",
-    "kpiReady": "[[TBD]]",
-    "kpiRejected": "[[TBD]]",
-    "kpiListed": "[[TBD]]",
-    "kpiPublic": "[[TBD]]",
-    "readyHeading": "[[TBD]]",
-    "readyHint": "[[TBD]]",
-    "readyEmpty": "[[TBD]]",
-    "teacherFallback": "[[TBD]]",
-    "approvedBy": "[[TBD]]",
-    "copyFeedback": "[[TBD]]",
-    "list": "[[TBD]]",
-    "makePublic": "[[TBD]]",
-    "rejectedHeading": "[[TBD]]",
-    "rejectedHint": "[[TBD]]",
-    "rejectedEmpty": "[[TBD]]",
-    "rejectedBy": "[[TBD]]",
-    "overallComment": "[[TBD]]",
-    "noteTargetWhole": "[[TBD]]",
-    "noteLine": "[[TBD]]",
-    "noComments": "[[TBD]]",
-    "mailSubject": "[[TBD]]",
-    "discuss": "[[TBD]]",
-    "copyFeedbackForAi": "[[TBD]]",
-    "uploadFix": "[[TBD]]",
-    "deleteConfirm": "[[TBD]]",
-    "deleteConfirmButton": "[[TBD]]",
-    "topicsHeading": "[[TBD]]",
-    "fakeData": "[[TBD]]",
+    "kpiPending": "Waiting for review",
+    "kpiReady": "Ready to list",
+    "kpiRejected": "Has problems",
+    "kpiListed": "Listed",
+    "kpiPublic": "Public trial",
+    "readyHeading": "Ready to list",
+    "readyHint": "Approved by a teacher, still unlisted.",
+    "readyEmpty": "No sets waiting to be listed.",
+    "teacherFallback": "A teacher",
+    "approvedBy": "Approved by {who} on {day}",
+    "copyFeedback": "📋 Copy feedback",
+    "list": "List",
+    "makePublic": "Make public",
+    "rejectedHeading": "Has problems",
+    "rejectedHint": "Sets rejected by a teacher. Upload a new version once fixed, or delete it if it can't be fixed.",
+    "rejectedEmpty": "No rejected sets.",
+    "rejectedBy": "Rejected by {who} on {day}",
+    "overallComment": "Overall comment: {text}",
+    "noteTargetWhole": "Whole set / audio",
+    "noteLine": "{target}: {text}",
+    "noComments": "(the teacher left no comments)",
+    "mailSubject": "Review of set {setId}",
+    "discuss": "💬 Discuss with the teacher",
+    "copyFeedbackForAi": "📋 Copy feedback (to paste into AI)",
+    "uploadFix": "⬆︎ Upload a fixed version",
+    "deleteConfirm": "Delete the whole set? This can't be undone.",
+    "deleteConfirmButton": "Yes, delete",
+    "topicsHeading": "Topics",
+    "fakeData": "Sample data",
     "topics": {
-      "gym": "[[TBD]]",
-      "carRental": "[[TBD]]",
-      "library": "[[TBD]]",
-      "hotel": "[[TBD]]",
-      "doctor": "[[TBD]]"
+      "gym": "Gym",
+      "carRental": "Car rental",
+      "library": "Library",
+      "hotel": "Hotel",
+      "doctor": "Doctor"
     }
   },
   "studentDashboard": {
-    "recommendNew": "[[TBD]]",
-    "recommendRetry": "[[TBD]]",
-    "questionCount": "[[TBD]]",
-    "bestScore": "[[TBD]]",
-    "start": "[[TBD]]",
-    "retry": "[[TBD]]",
-    "noExams": "[[TBD]]",
-    "notTaken": "[[TBD]]",
-    "papersUnit": "[[TBD]]",
-    "challenge": "[[TBD]]",
-    "viewAll": "[[TBD]]",
-    "scoresHeading": "[[TBD]]",
-    "scoresEmpty": "[[TBD]]",
-    "attempts": "[[TBD]]",
-    "timesUnit": "[[TBD]]",
-    "average": "[[TBD]]",
-    "latest": "[[TBD]]",
-    "recentN": "[[TBD]]",
-    "barTitle": "[[TBD]]",
-    "weakHeading": "[[TBD]]",
-    "weakHint": "[[TBD]]",
-    "weakStat": "[[TBD]]"
+    "recommendNew": "Recommended next",
+    "recommendRetry": "You've taken them all! Try your lowest score again",
+    "questionCount": "{count, plural, one {# question} other {# questions}}",
+    "bestScore": " · Best so far: {percent}",
+    "start": "Start practicing",
+    "retry": "Try again",
+    "noExams": "There are no tests to take yet. Check back later.",
+    "notTaken": "Tests you haven't taken",
+    "papersUnit": "{count, plural, one {test} other {tests}}",
+    "challenge": "Take one now →",
+    "viewAll": "See all tests →",
+    "scoresHeading": "My scores",
+    "scoresEmpty": "Finish your first test and your scores will show up here.",
+    "attempts": "Taken",
+    "timesUnit": "{count, plural, one {time} other {times}}",
+    "average": "Average correct",
+    "latest": "Latest",
+    "recentN": "Last {count, plural, one {# test} other {# tests}}",
+    "barTitle": "{title}: {score} / {total}",
+    "weakHeading": "Question types you miss most",
+    "weakHint": "Watch out for these traps when you practice.",
+    "weakStat": "Missed <b>{wrong}</b> of {seen}"
   },
   "examList": {
-    "metaTitle": "[[TBD]]",
-    "title": "[[TBD]]",
-    "guestHint": "[[TBD]]",
-    "empty": "[[TBD]]",
-    "questionCount": "[[TBD]]"
+    "metaTitle": "Tests",
+    "title": "IELTS Listening Section 1",
+    "guestHint": "You're seeing the public tests. <login>Log in</login> to take more.",
+    "empty": "There are no tests to take right now.",
+    "questionCount": "{count, plural, one {# question} other {# questions}}"
   },
   "exam": {
-    "metaTitle": "[[TBD]]",
-    "unavailableGuest": "[[TBD]]",
-    "intro": "[[TBD]]",
-    "start": "[[TBD]]",
-    "submitted": "[[TBD]]",
-    "statusStart": "[[TBD]]",
-    "statusListen": "[[TBD]]",
-    "statusCheck": "[[TBD]]",
-    "statusRead": "[[TBD]]",
-    "statusReadQuestions": "[[TBD]]",
+    "metaTitle": "Test",
+    "unavailableGuest": "This test can't be taken right now. <login>Log in</login> and you may be able to take it.",
+    "intro": "\"{title}\". When you press start, the recording plays right away. <b>It plays only once and can't be paused or rewound</b>, just like the real exam. The recording includes time to read the questions and time to check at the end. Your answers are submitted automatically when it ends.",
+    "start": "Start the test",
+    "submitted": "Submitted. Opening your results…",
+    "statusStart": "The recording is starting.",
+    "statusListen": "Recording playing. Fill in the answers as you listen.",
+    "statusCheck": "Check your answers. {clock}",
+    "statusRead": "Reading time  {clock}",
+    "statusReadQuestions": "Reading time: {questions}  {clock}",
     "questions": {
-      "single": "[[TBD]]",
-      "pair": "[[TBD]]",
-      "range": "[[TBD]]"
+      "single": "Question {a}",
+      "pair": "Questions {a} and {b}",
+      "range": "Questions {a}–{b}"
     },
-    "submit": "[[TBD]]",
-    "submitting": "[[TBD]]",
+    "submit": "Submit",
+    "submitting": "Submitting…",
     "errors": {
-      "unavailable": "[[TBD]]",
-      "submitFailed": "[[TBD]]",
-      "attemptNotFound": "[[TBD]]",
-      "audioFailed": "[[TBD]]",
-      "audioInterrupted": "[[TBD]]",
-      "autoplayBlocked": "[[TBD]]"
+      "unavailable": "This test can't be taken right now.",
+      "submitFailed": "Couldn't submit: {message}. Your answers are still here. Please press \"Submit\" again.",
+      "attemptNotFound": "This attempt wasn't found",
+      "audioFailed": "The recording failed to play. You can keep answering and submit yourself.",
+      "audioInterrupted": "The recording was interrupted. Please refresh the page and try again.",
+      "autoplayBlocked": "The recording couldn't start automatically. Please refresh the page and try again."
     }
   },
   "history": {
-    "title": "[[TBD]]",
-    "empty": "[[TBD]]",
-    "colSubmitted": "[[TBD]]",
-    "colExam": "[[TBD]]",
-    "colScore": "[[TBD]]",
-    "view": "[[TBD]]"
+    "title": "My test history",
+    "empty": "No history yet. <link>Take a test</link>",
+    "colSubmitted": "Submitted",
+    "colExam": "Test",
+    "colScore": "Score",
+    "view": "See results"
   },
   "result": {
-    "title": "[[TBD]]",
-    "notFound": "[[TBD]]",
-    "signupTitle": "[[TBD]]",
-    "signupBody": "[[TBD]]",
-    "sendSignupCode": "[[TBD]]",
-    "colNumber": "[[TBD]]",
-    "colGiven": "[[TBD]]",
-    "colExpected": "[[TBD]]",
-    "blank": "[[TBD]]",
-    "accepted": "[[TBD]]"
+    "title": "Results",
+    "notFound": "We couldn't find the results for this attempt.",
+    "signupTitle": "Want to see the answers? Sign up for free",
+    "signupBody": "Enter your email, then the login code we send you, and you're signed up. This attempt is saved to your account and you'll see the answer to every question.",
+    "sendSignupCode": "Send me a sign-up code",
+    "colNumber": "No.",
+    "colGiven": "Your answer",
+    "colExpected": "Answer",
+    "blank": "(blank)",
+    "accepted": "(also accepted: {list})"
   },
   "landing": {
-    "metaTitle": "[[TBD]]",
+    "metaTitle": "Practicing More: IELTS Listening practice tests",
     "nav": {
-      "features": "[[TBD]]",
-      "how": "[[TBD]]",
-      "demo": "[[TBD]]",
-      "faq": "[[TBD]]"
+      "features": "Features",
+      "how": "How it works",
+      "demo": "Try a question",
+      "faq": "FAQ"
     },
-    "navCta": "[[TBD]]",
-    "login": "[[TBD]]",
-    "dashboard": "[[TBD]]",
-    "navCtaMember": "[[TBD]]",
+    "navCta": "Try for free",
+    "login": "Log in",
+    "dashboard": "My dashboard",
+    "navCtaMember": "Start practicing",
     "hero": {
-      "badge": "[[TBD]]",
-      "titleLine1": "[[TBD]]",
-      "titleLine2": "[[TBD]]",
-      "lead": "[[TBD]]",
-      "cta": "[[TBD]]",
-      "secondary": "[[TBD]]",
-      "note": "[[TBD]]",
-      "illustration": "[[TBD]]",
-      "playingTag": "[[TBD]]"
+      "badge": "Section 1 · Form completion",
+      "titleLine1": "IELTS Listening practice tests",
+      "titleLine2": "Lots of sets. Keep practicing.",
+      "lead": "Modeled on the real exam: reading time and the same pacing. Instant feedback shows you the mistakes you make most.",
+      "cta": "Try a full test for free",
+      "secondary": "Try one question first →",
+      "note": "No sign-up needed",
+      "illustration": "[Illustration placeholder: cute headphones]",
+      "playingTag": "Recording playing"
     },
     "features": {
-      "title": "[[TBD]]",
-      "lead": "[[TBD]]",
+      "title": "Why practice here",
+      "lead": "There's no shortcut to listening. Listen more, write more, make more mistakes.",
       "items": {
         "unlimited": {
-          "title": "[[TBD]]",
-          "body": "[[TBD]]"
+          "title": "Always new questions",
+          "body": "New questions every day, new sets every week."
         },
         "realPace": {
-          "title": "[[TBD]]",
-          "body": "[[TBD]]"
+          "title": "Real exam pacing",
+          "body": "Reading pauses, recording pace and a final check, all following the exam timeline."
         },
         "instantGrading": {
-          "title": "[[TBD]]",
-          "body": "[[TBD]]"
+          "title": "Marked as soon as you submit",
+          "body": "Capital letters and date formats are checked by the rules. See right away which answers were right or wrong."
         },
         "weakTraps": {
-          "title": "[[TBD]]",
-          "body": "[[TBD]]"
+          "title": "See your common mistakes",
+          "body": "Self-corrections, similar numbers, spelling… see where you're weakest."
         }
       }
     },
     "steps": {
-      "title": "[[TBD]]",
+      "title": "Try it now",
       "items": {
         "open": {
-          "title": "[[TBD]]",
-          "body": "[[TBD]]"
+          "title": "Open a test",
+          "body": "No sign-up. Press start and the test begins."
         },
         "listen": {
-          "title": "[[TBD]]",
-          "body": "[[TBD]]"
+          "title": "Fill in the answer sheet as you listen",
+          "body": "The page tells you when it's reading time and highlights the blanks to look at."
         },
         "review": {
-          "title": "[[TBD]]",
-          "body": "[[TBD]]"
+          "title": "See your score and the answers",
+          "body": "Log in with your email to see every answer and keep your practice history."
         }
       }
     },
     "demo": {
-      "title": "[[TBD]]",
-      "lead": "[[TBD]]",
-      "idle": "[[TBD]]",
-      "playing": "[[TBD]]",
-      "ended": "[[TBD]]",
-      "submit": "[[TBD]]",
-      "playAria": "[[TBD]]",
-      "playFailed": "[[TBD]]",
-      "transcript": "[[TBD]]",
-      "fullTest": "[[TBD]]",
-      "correct": "[[TBD]]",
-      "wrong": "[[TBD]]"
+      "title": "Try a question first",
+      "lead": "Two questions cut from a real test set. The recording plays only once. Fill in the answers as you listen.",
+      "idle": "Press play to start (plays only once)",
+      "playing": "Playing. Fill in the answers as you listen.",
+      "ended": "The recording has ended. Check your answers.",
+      "submit": "Submit",
+      "playAria": "Play the sample recording",
+      "playFailed": "The recording couldn't play. Please refresh the page and try again.",
+      "transcript": "Transcript",
+      "fullTest": "Take a full test (10 questions) →",
+      "correct": "Correct!",
+      "wrong": "The answer is {answer}"
     },
     "faq": {
-      "title": "[[TBD]]",
+      "title": "FAQ",
       "items": {
         "price": {
-          "q": "[[TBD]]",
-          "a": "[[TBD]]"
+          "q": "Does it cost anything?",
+          "a": "Trying a test is free and needs no sign-up. Sign up to take more tests and see the answers."
         },
         "author": {
-          "q": "[[TBD]]",
-          "a": "[[TBD]]"
+          "q": "Who writes the questions?",
+          "a": "They're generated in the IELTS Section 1 format, and a teacher reviews each set before it's opened for practice."
         },
         "score": {
-          "q": "[[TBD]]",
-          "a": "[[TBD]]"
+          "q": "Does my score here reflect my IELTS score?",
+          "a": "No. This is practice, and it has nothing to do with how the real exam is scored."
         }
       }
     },
     "finalCta": {
-      "title": "[[TBD]]",
-      "lead": "[[TBD]]",
-      "cta": "[[TBD]]"
+      "title": "Try a test now",
+      "lead": "6 minutes, 10 questions, results right away.",
+      "cta": "Start a free test"
     },
     "footer": {
-      "disclaimer": "[[TBD]]"
+      "disclaimer": "This site isn't affiliated with IELTS. Practice scores don't represent official scores."
     }
   }
 }

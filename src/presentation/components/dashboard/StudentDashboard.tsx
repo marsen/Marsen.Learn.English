@@ -49,7 +49,9 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
           <p className="text-sm text-muted-foreground">{ts("notTaken")}</p>
           <p className="mt-1 text-5xl font-bold">
             {view.notTakenCount}{" "}
-            <span className="text-lg font-medium">{ts("papersUnit")}</span>
+            <span className="text-lg font-medium">
+              {ts("papersUnit", { count: view.notTakenCount })}
+            </span>
           </p>
           <p className="mt-2 text-sm text-primary">
             {view.notTakenCount > 0 ? ts("challenge") : ts("viewAll")}
@@ -68,7 +70,9 @@ export function StudentDashboard({ view }: { view: StudentDashboardView }) {
               <p className="text-sm text-muted-foreground">{ts("attempts")}</p>
               <p className="mt-1 text-3xl font-bold">
                 {view.attemptCount}{" "}
-                <span className="text-base font-medium">{ts("timesUnit")}</span>
+                <span className="text-base font-medium">
+                  {ts("timesUnit", { count: view.attemptCount })}
+                </span>
               </p>
             </div>
             <div className="rounded-2xl border border-border bg-surface p-5">
