@@ -535,10 +535,11 @@
       "ended": "[[TBD]]",
       "submit": "[[TBD]]",
       "playAria": "[[TBD]]",
-      "hints": {
-        "q1": "[[TBD]]",
-        "q2": "[[TBD]]"
-      }
+      "playFailed": "[[TBD]]",
+      "transcript": "[[TBD]]",
+      "fullTest": "[[TBD]]",
+      "correct": "[[TBD]]",
+      "wrong": "[[TBD]]"
     },
     "faq": {
       "title": "[[TBD]]",

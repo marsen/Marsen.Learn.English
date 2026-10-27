@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import type { LandingDemoView } from "@/application/exam/landingDemo";
 import { LANDING as L } from "@/presentation/content/landing";
 import { Reveal } from "@/presentation/components/Reveal";
 import { DemoQuestion } from "./DemoQuestion";
@@ -14,11 +15,14 @@ export function LandingPage({
   examHref,
   loginHref,
   dashboardHref,
+  demo,
 }: {
   examHref: string;
   loginHref: string;
   /** 已登入時給：導覽列改成「我的總覽」「開始練習」 */
   dashboardHref?: string;
+  /** 「先試做一題」的錄音與題目 */
+  demo: LandingDemoView;
 }) {
   const t = useTranslations("landing");
   const brand = useTranslations("common")("brand");
@@ -169,7 +173,7 @@ export function LandingPage({
               <p className="mt-4 text-muted-foreground">{t("demo.lead")}</p>
             </Reveal>
             <Reveal className="mt-12">
-              <DemoQuestion />
+              <DemoQuestion demo={demo} examHref={examHref} />
             </Reveal>
           </div>
         </section>
