@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { LANDING } from "@/presentation/content/landing";
+import { LanguageSwitcher } from "@/presentation/components/LanguageSwitcher";
 import { HeadphonesIcon } from "./icons";
 
-/** 首頁導覽列：桌機橫排，手機收成選單 */
+/** 首頁導覽列：桌機橫排，手機收成選單；語言切換在兩種版面都一直看得到 */
 export function LandingNav({
   examHref,
   loginHref,
@@ -37,6 +38,7 @@ export function LandingNav({
               {t(`landing.nav.${n.key}`)}
             </a>
           ))}
+          <LanguageSwitcher />
           <a href={account.href} className="hover:text-primary-hover">
             {account.label}
           </a>
@@ -47,24 +49,27 @@ export function LandingNav({
             {ctaLabel}
           </a>
         </div>
-        <button
-          type="button"
-          onClick={() => setOpen((o) => !o)}
-          className="rounded-lg p-2 md:hidden"
-          aria-label={t("nav.openMenu")}
-          aria-expanded={open}
-        >
-          <svg
-            viewBox="0 0 24 24"
-            className="h-6 w-6"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.8}
-            strokeLinecap="round"
+        <div className="flex items-center gap-1 md:hidden">
+          <LanguageSwitcher />
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            className="rounded-lg p-2"
+            aria-label={t("nav.openMenu")}
+            aria-expanded={open}
           >
-            <path d="M4 7h16M4 12h16M4 17h16" />
-          </svg>
-        </button>
+            <svg
+              viewBox="0 0 24 24"
+              className="h-6 w-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.8}
+              strokeLinecap="round"
+            >
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          </button>
+        </div>
       </nav>
       {open && (
         <div className="border-t border-border px-5 pb-5 md:hidden">
