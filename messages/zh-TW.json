@@ -350,8 +350,6 @@
     "failedWith": "上傳失敗：{message}",
     "uploadN": "上傳 {count} 套",
     "done": "完成 {count} 套，去題組清單 →",
-    "picked": "選了 {count} 套",
-    "noTranscript": "沒有逐字稿",
     "status": {
       "waiting": "待上傳",
       "uploading": "上傳中",
@@ -360,28 +358,18 @@
       "failed": "失敗"
     },
     "outcome": {
-      "created": "已上傳，等老師審稿。{verdict}",
-      "supplemented": "已補上逐字稿與製作紀錄，審核狀態和開放對象都沒變。",
-      "replaced": "已覆蓋，退回待審：老師重新通過後才會上架。",
-      "unchanged": "跟網站上的一樣，沒有變更。"
+      "created": "已上傳",
+      "supplemented": "已覆蓋，審核狀態不變",
+      "replaced": "已覆蓋，退回待審",
+      "unchanged": "沒有變更"
     },
     "existing": {
-      "supplement": "網站上已經有這套，題目、答案、錄音都一樣。覆蓋只會補上逐字稿與製作紀錄，審核狀態不變。",
-      "content": "網站上已經有這套，而且內容不同（{fields}）。覆蓋後會退回待審，老師重新通過才會上架；目前的審稿意見會清掉，審稿紀錄保留。",
-      "unchanged": "網站上已經有這套，內容完全一樣，不用上傳。"
+      "supplement": "內容相同，覆蓋後審核狀態不變",
+      "content": "內容不同，覆蓋後要重新審稿",
+      "unchanged": "內容相同，不用上傳"
     },
-    "overwriteSupplement": "補上逐字稿",
-    "overwriteContent": "覆蓋並退回待審",
-    "overwriteAllSupplement": "全部補上逐字稿（{count} 套）",
-    "fields": {
-      "title": "標題",
-      "paper": "題目卷",
-      "answers": "答案",
-      "audio": "錄音"
-    },
-    "fieldSeparator": "、",
     "retry": "重新上傳",
-    "retryFailed": "重新上傳失敗的 {count} 套"
+    "overwrite": "覆蓋"
   },
   "adminDashboard": {
     "kpiPending": "等老師審",
