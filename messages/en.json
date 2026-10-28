@@ -3,7 +3,7 @@
     "brand": "Practicing More",
     "language": "Language",
     "languageNames": {
-      "zh-TW": "繁體中文",
+      "zh-TW": "中文",
       "en": "English"
     },
     "saving": "Saving…",
@@ -518,7 +518,7 @@
       "lead": "Modeled on the real exam: reading time and the same pacing. Instant feedback shows you the mistakes you make most.",
       "cta": "Try a full test for free",
       "secondary": "Try one question first →",
-      "note": "No sign-up needed",
+      "note": "",
       "illustration": "[Illustration placeholder: cute headphones]",
       "playingTag": "Recording playing"
     },
@@ -562,7 +562,7 @@
       }
     },
     "demo": {
-      "title": "Try a question first",
+      "title": "TRY A QUESTIONS FIRST",
       "lead": "Two questions cut from a real test set. The recording plays only once. Fill in the answers as you listen.",
       "idle": "Press play to start (plays only once)",
       "playing": "Playing. Fill in the answers as you listen.",

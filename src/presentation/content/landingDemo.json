@@ -8,7 +8,7 @@
   "duration": 19.83,
   "paper": {
     "title": "Tour Booking Form",
-    "instruction": "Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
+    "instruction": "Write NO MORE THAN ONE WORDS AND/OR A NUMBER for each answer.",
     "rows": [
       {
         "label": "Transport",
