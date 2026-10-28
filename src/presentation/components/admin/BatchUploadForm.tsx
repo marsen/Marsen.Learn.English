@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { ExistingSet, UploadOutcome } from "@/application/examSet/examSetResult";
-import { SUPPORTED_SCHEMA_VERSION } from "@/domain/examSet/bundle";
 import type { UploadSetFormState } from "@/presentation/components/formStates";
 import {
   folderLabel,
@@ -19,19 +18,12 @@ type Props = {
 
 type RowState = "waiting" | "uploading" | "done" | "exists" | "failed";
 
-/** 從 set.json 先讀出來給畫面看的資訊（真正的檢查在伺服器） */
-type Preview = { setId: string | null; title: string | null; minor: number } | null;
-
 type Row = {
   pair: BundlePair;
-  preview: Preview;
   state: RowState;
-  /** 失敗原因（逐條） */
   problems: string[];
   existing?: ExistingSet;
   outcome?: UploadOutcome;
-  /** 上傳成功時的 AI 結論文字 */
-  verdict?: string;
 };
 
 /** 狀態標籤的顏色（只用主題 token） */
@@ -42,32 +34,10 @@ const BADGE: Record<RowState, string> = {
   exists: "bg-primary-soft text-primary-hover",
   failed: "bg-destructive/10 text-destructive",
 };
-const CARD: Record<RowState, string> = {
-  waiting: "border-border",
-  uploading: "border-primary/40",
-  done: "border-accent/40",
-  exists: "border-primary/40",
-  failed: "border-destructive/40",
-};
-const ORDER: RowState[] = ["waiting", "uploading", "exists", "done", "failed"];
-
-async function readPreview(pair: BundlePair): Promise<Preview> {
-  if (!pair.ok) return null;
-  try {
-    const b = JSON.parse(await pair.setJson.text());
-    return {
-      setId: typeof b.set_id === "string" ? b.set_id : null,
-      title: typeof b.title === "string" ? b.title : null,
-      minor: typeof b.schema_minor === "number" ? b.schema_minor : 0,
-    };
-  } catch {
-    return null;
-  }
-}
 
 /**
  * 批次上傳：選 Question.Generator 的 results/out 資料夾（或其中幾套），一套一套依序上傳。
- * 每套各自成功或失敗，互不影響。網站上已經有的題組不會直接蓋掉：先說明覆蓋會怎樣，按了才覆蓋。
+ * 網站上已經有的題組不直接蓋掉：說明覆蓋會怎樣，按「覆蓋」才寫入（判斷見 docs/set-overwrite.md）。
  */
 export function BatchUploadForm({ action }: Props) {
   const t = useTranslations();
@@ -75,19 +45,16 @@ export function BatchUploadForm({ action }: Props) {
   const [rows, setRows] = useState<Row[]>([]);
   const [busy, setBusy] = useState(false);
 
-  const pick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const pick = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = [...(e.target.files ?? [])].map((file) => ({
       path: file.webkitRelativePath || file.name,
       file,
     }));
-    // 清掉選取紀錄：檔案改過後再選同一個資料夾，瀏覽器才會再通知（重新讀檔）
+    // 清掉選取紀錄：檔案改過後再選同一個資料夾，瀏覽器才會再通知
     e.target.value = "";
-    const pairs = pairBundles(files);
-    const previews = await Promise.all(pairs.map(readPreview));
     setRows(
-      pairs.map((pair, i) => ({
+      pairBundles(files).map((pair) => ({
         pair,
-        preview: previews[i],
         state: pair.ok ? "waiting" : "failed",
         problems: pair.ok ? [] : [tu("missingFile", { file: pair.missing })],
       })),
@@ -106,23 +73,15 @@ export function BatchUploadForm({ action }: Props) {
     if (overwrite) fd.set("overwrite", "1");
     try {
       const r = await action({}, fd);
-      if (r.uploaded) {
-        update(i, {
-          state: "done",
-          outcome: r.uploaded.outcome,
-          verdict: t(`examSet.aiVerdict.${r.uploaded.aiVerdict}`),
-          existing: undefined,
-        });
-      } else if (r.existing) {
-        update(i, { state: "exists", existing: r.existing });
-      } else {
+      if (r.uploaded) update(i, { state: "done", outcome: r.uploaded.outcome });
+      else if (r.existing) update(i, { state: "exists", existing: r.existing });
+      else
         update(i, {
           state: "failed",
           problems: r.problems?.length
             ? r.problems.map((p) => uploadErrorText(t, p))
             : [tu("failed")],
         });
-      }
     } catch (err) {
       update(i, {
         state: "failed",
@@ -131,24 +90,18 @@ export function BatchUploadForm({ action }: Props) {
     }
   };
 
-  /** 依序處理選到的列（一次一套，避免同時塞大量錄音） */
+  /** 依序處理（一次一套，避免同時塞大量錄音） */
   const run = async (which: (r: Row) => boolean, overwrite: boolean) => {
     setBusy(true);
     for (const [i, row] of rows.entries()) if (which(row)) await send(row, i, overwrite);
     setBusy(false);
   };
 
-  const count = (s: RowState) => rows.filter((r) => r.state === s).length;
-  const isSupplement = (r: Row) =>
-    r.state === "exists" && r.existing?.kind === "supplement";
-  const supplementCount = rows.filter(isSupplement).length;
-  /** 上傳失敗、但兩個檔案都在的（缺檔的要先補檔再重選資料夾） */
-  const isRetryable = (r: Row) => r.state === "failed" && r.pair.ok;
-  const retryCount = rows.filter(isRetryable).length;
-  const doneCount = count("done");
+  const waiting = rows.filter((r) => r.state === "waiting").length;
+  const done = rows.filter((r) => r.state === "done").length;
 
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-5">
       <div className="grid gap-2">
         <label
           className={buttonClass({
@@ -156,7 +109,7 @@ export function BatchUploadForm({ action }: Props) {
             className: "justify-self-start",
           })}
         >
-          📁 {tu("pickFolder")}
+          {tu("pickFolder")}
           <input
             type="file"
             multiple
@@ -173,159 +126,83 @@ export function BatchUploadForm({ action }: Props) {
       </div>
 
       {rows.length > 0 && (
-        <>
-          <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
-            <span className="mr-2 text-sm font-medium">
-              {tu("picked", { count: rows.length })}
-            </span>
-            {ORDER.filter((s) => count(s) > 0).map((s) => (
-              <span
-                key={s}
-                className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${BADGE[s]}`}
-              >
-                {tu(`status.${s}`)} {count(s)}
-              </span>
-            ))}
-            <span className="ml-auto flex flex-wrap gap-2">
-              {retryCount > 0 && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled={busy}
-                  onClick={() => run(isRetryable, false)}
+        <ul className="grid gap-2">
+          {rows.map((r) => (
+            <li
+              key={r.pair.folder}
+              className="rounded-lg border border-border bg-surface px-4 py-2"
+            >
+              <div className="flex flex-wrap items-center gap-3">
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${BADGE[r.state]}`}
                 >
-                  {tu("retryFailed", { count: retryCount })}
-                </Button>
-              )}
-              {supplementCount > 0 && (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  disabled={busy}
-                  onClick={() => run(isSupplement, true)}
-                >
-                  {tu("overwriteAllSupplement", { count: supplementCount })}
-                </Button>
-              )}
-              {count("waiting") > 0 && (
-                <Button
-                  size="sm"
-                  disabled={busy}
-                  onClick={() => run((r) => r.state === "waiting", false)}
-                >
-                  {busy ? tu("uploading") : tu("uploadN", { count: count("waiting") })}
-                </Button>
-              )}
-            </span>
-          </div>
-
-          <ul className="grid gap-3">
-            {rows.map((r) => (
-              <li
-                key={r.pair.folder}
-                className={`rounded-xl border bg-surface px-4 py-3 ${CARD[r.state]}`}
-              >
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span
-                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${BADGE[r.state]}`}
-                  >
-                    {tu(`status.${r.state}`)}
+                  {tu(`status.${r.state}`)}
+                </span>
+                <span className="font-mono text-sm">
+                  {folderLabel(r.pair.folder) ?? tu("topFolder")}
+                </span>
+                {r.state === "done" && r.outcome && (
+                  <span className="text-sm text-muted-foreground">
+                    {tu(`outcome.${r.outcome}`)}
                   </span>
-                  <span className="font-mono text-sm">
-                    {r.preview?.setId ?? folderLabel(r.pair.folder) ?? tu("topFolder")}
-                  </span>
-                  {r.preview?.title && <span className="text-sm">{r.preview.title}</span>}
-                  {r.preview && (
-                    <span
-                      title={r.preview.minor > 0 ? undefined : tu("noTranscript")}
-                      className={`ml-auto rounded-full px-2 py-0.5 font-mono text-xs ${
-                        r.preview.minor > 0
-                          ? "bg-accent-soft text-accent-hover"
-                          : "bg-muted text-muted-foreground"
-                      }`}
+                )}
+                {r.state === "exists" && r.existing && (
+                  <span className="text-sm">{tu(`existing.${r.existing.kind}`)}</span>
+                )}
+                <span className="ml-auto">
+                  {r.state === "exists" &&
+                    r.existing &&
+                    r.existing.kind !== "unchanged" && (
+                      <Button
+                        size="sm"
+                        variant={r.existing.kind === "content" ? "danger" : "primary"}
+                        disabled={busy}
+                        onClick={() => run((x) => x === r, true)}
+                      >
+                        {tu("overwrite")}
+                      </Button>
+                    )}
+                  {r.state === "failed" && r.pair.ok && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      disabled={busy}
+                      onClick={() => run((x) => x === r, false)}
                     >
-                      {SUPPORTED_SCHEMA_VERSION}.{r.preview.minor}
-                    </span>
+                      {tu("retry")}
+                    </Button>
                   )}
-                </div>
+                </span>
+              </div>
+              {r.state === "failed" && (
+                <ul className="mt-1 list-disc pl-5 text-sm text-destructive">
+                  {r.problems.map((p, i) => (
+                    <li key={i}>{p}</li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
 
-                <RowDetail
-                  row={r}
-                  busy={busy}
-                  onOverwrite={() => run((x) => x === r, true)}
-                  onRetry={() => run((x) => x === r, false)}
-                />
-              </li>
-            ))}
-          </ul>
-
-          {!busy && doneCount > 0 && (
+      {(waiting > 0 || done > 0) && (
+        <div className="flex items-center gap-4">
+          {waiting > 0 && (
+            <Button
+              disabled={busy}
+              onClick={() => run((r) => r.state === "waiting", false)}
+            >
+              {busy ? tu("uploading") : tu("uploadN", { count: waiting })}
+            </Button>
+          )}
+          {!busy && done > 0 && (
             <a href="/admin/sets" className="text-sm text-primary underline">
-              {tu("done", { count: doneCount })}
+              {tu("done", { count: done })}
             </a>
           )}
-        </>
+        </div>
       )}
     </div>
   );
-}
-
-function RowDetail({
-  row,
-  busy,
-  onOverwrite,
-  onRetry,
-}: {
-  row: Row;
-  busy: boolean;
-  onOverwrite: () => void;
-  onRetry: () => void;
-}) {
-  const tu = useTranslations("uploadSet");
-  if (row.state === "failed") {
-    return (
-      <div className="mt-2 flex flex-wrap items-start gap-3">
-        <ul className="flex-1 list-disc pl-5 text-sm text-destructive">
-          {row.problems.map((p, i) => (
-            <li key={i}>{p}</li>
-          ))}
-        </ul>
-        {row.pair.ok && (
-          <Button variant="secondary" size="sm" disabled={busy} onClick={onRetry}>
-            {tu("retry")}
-          </Button>
-        )}
-      </div>
-    );
-  }
-  if (row.state === "done" && row.outcome) {
-    return (
-      <p className="mt-2 text-sm text-muted-foreground">
-        {tu(`outcome.${row.outcome}`, { verdict: row.verdict ?? "" })}
-      </p>
-    );
-  }
-  if (row.state === "exists" && row.existing) {
-    const { kind, fields } = row.existing;
-    return (
-      <div className="mt-3 flex flex-wrap items-center gap-3 rounded-lg bg-card px-3 py-2 text-sm">
-        <p className="flex-1">
-          {tu(`existing.${kind}`, {
-            fields: fields.map((f) => tu(`fields.${f}`)).join(tu("fieldSeparator")),
-          })}
-        </p>
-        {kind !== "unchanged" && (
-          <Button
-            size="sm"
-            variant={kind === "content" ? "danger" : "primary"}
-            disabled={busy}
-            onClick={onOverwrite}
-          >
-            {tu(kind === "content" ? "overwriteContent" : "overwriteSupplement")}
-          </Button>
-        )}
-      </div>
-    );
-  }
-  return null;
 }
