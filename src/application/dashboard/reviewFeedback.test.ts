@@ -21,6 +21,7 @@ const set: ExamSet = {
   timing: toPublicTiming(b.timing),
   audioKey: "k",
   aiVerdict: "needs_human",
+  schemaMinor: 0,
   status: "rejected",
   access: "unlisted",
   uploadedBy: "u",

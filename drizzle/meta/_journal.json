@@ -99,6 +99,13 @@
       "when": 1792814558740,
       "tag": "0013_drop_legacy_review_notes",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1793176167811,
+      "tag": "0014_exam_set_schema_minor",
+      "breakpoints": true
     }
   ]
 }

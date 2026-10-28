@@ -3,6 +3,7 @@
 import type { ExamSet } from "@/domain/examSet/examSet";
 import type { ExamSetSummary } from "@/domain/examSet/examSetFilter";
 import { statusTagsOf } from "@/domain/examSet/statusTags";
+import { SUPPORTED_SCHEMA_VERSION } from "@/domain/examSet/bundle";
 import { useLocale, useTranslations } from "next-intl";
 import { ACCESS_ORDER } from "@/presentation/lib/examSetLabels";
 import { StatusTags } from "./StatusTags";
@@ -38,6 +39,7 @@ export function ExamSetTable({ sets, filtered, setAccessAction }: Props) {
           <Th>{t("sets.colSet")}</Th>
           <Th>{t("sets.colTitle")}</Th>
           <Th>{t("sets.colCount")}</Th>
+          <Th>{t("sets.colVersion")}</Th>
           <Th>{t("sets.colStatus")}</Th>
           <Th>{t("sets.colAccess")}</Th>
           <Th>{t("sets.colUploaded")}</Th>
@@ -53,6 +55,22 @@ export function ExamSetTable({ sets, filtered, setAccessAction }: Props) {
           </Td>
           <Td>{s.title}</Td>
           <Td className="whitespace-nowrap">{s.questionCount}</Td>
+          <Td className="whitespace-nowrap">
+            <span
+              title={t(
+                s.schemaMinor > 0
+                  ? "sets.versionHint.transcript"
+                  : "sets.versionHint.noTranscript",
+              )}
+              className={`rounded-full px-2 py-0.5 font-mono text-xs ${
+                s.schemaMinor > 0
+                  ? "bg-accent-soft text-accent-hover"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {SUPPORTED_SCHEMA_VERSION}.{s.schemaMinor}
+            </span>
+          </Td>
           <Td>
             <StatusTags tags={statusTagsOf(s)} />
           </Td>
