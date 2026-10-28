@@ -25,6 +25,9 @@ type Row = {
   outcome?: UploadOutcome;
 };
 
+/** 同一套題組的識別：最後一層資料夾名稱（通常就是 set_id） */
+const keyOf = (pair: BundlePair) => folderLabel(pair.folder) ?? pair.folder;
+
 /** 狀態標籤的顏色（只用主題 token） */
 const BADGE: Record<RowState, string> = {
   waiting: "bg-muted text-muted-foreground",
@@ -51,13 +54,14 @@ export function BatchUploadForm({ action }: Props) {
     }));
     // 清掉選取紀錄：檔案改過後再選同一個資料夾，瀏覽器才會再通知
     e.target.value = "";
-    setRows(
-      pairBundles(files).map((pair) => ({
-        pair,
-        state: pair.ok ? "waiting" : "failed",
-        problems: pair.ok ? [] : [tu("missingFile", { file: pair.missing })],
-      })),
-    );
+    const picked: Row[] = pairBundles(files).map((pair) => ({
+      pair,
+      state: pair.ok ? "waiting" : "failed",
+      problems: pair.ok ? [] : [tu("missingFile", { file: pair.missing })],
+    }));
+    // 累加到清單：同一套（資料夾名稱相同）用新選的取代，其他的（包括已完成的）留著
+    const keys = new Set(picked.map((r) => keyOf(r.pair)));
+    setRows((rs) => [...rs.filter((r) => !keys.has(keyOf(r.pair))), ...picked]);
   };
 
   const update = (i: number, patch: Partial<Row>) =>
