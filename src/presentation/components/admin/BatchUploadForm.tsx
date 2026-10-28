@@ -110,7 +110,7 @@ export function BatchUploadForm({ action }: Props) {
   const waiting = rows.filter((r) => r.state === "waiting").length;
   const done = rows.filter((r) => r.state === "done").length;
   const existing = rows.filter((r) => r.state === "exists").length;
-  /** 從清單拿掉（不上傳、不覆蓋） */
+  /** 從清單拿掉（不上傳、不覆蓋）；已完成的拿掉後，再選到就會重新出現為待上傳 */
   const remove = (r: Row) => setRows((rs) => rs.filter((x) => x !== r));
 
   return (
@@ -179,7 +179,7 @@ export function BatchUploadForm({ action }: Props) {
                       {tu("retry")}
                     </Button>
                   )}
-                  {r.state !== "done" && r.state !== "uploading" && (
+                  {r.state !== "uploading" && (
                     <Button
                       size="sm"
                       variant="secondary"
