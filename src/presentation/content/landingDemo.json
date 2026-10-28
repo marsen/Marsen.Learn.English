@@ -1,0 +1,83 @@
+{
+  "source": {
+    "setId": "s1-tour-0001",
+    "from": "t21",
+    "to": "t22",
+    "paper": "scripts/landing-demo.paper.json"
+  },
+  "duration": 19.83,
+  "paper": {
+    "title": "Tour Booking Form",
+    "instruction": "Write NO MORE THAN ONE WORDS AND/OR A NUMBER for each answer.",
+    "rows": [
+      {
+        "label": "Transport",
+        "parts": [
+          {
+            "text": "Transport:"
+          },
+          {
+            "blank": "demo-transport"
+          }
+        ],
+        "inline": true,
+        "section": "Trip details"
+      },
+      {
+        "label": "Seat",
+        "parts": [
+          {
+            "text": "Seat: near the"
+          },
+          {
+            "blank": "q08"
+          }
+        ],
+        "inline": true,
+        "section": "Trip details"
+      }
+    ]
+  },
+  "answers": [
+    {
+      "questionId": "demo-transport",
+      "answer": "coach",
+      "accepted": [],
+      "policy": "exact_word",
+      "trap": "none"
+    },
+    {
+      "questionId": "q08",
+      "answer": "front",
+      "accepted": [],
+      "policy": "exact_word",
+      "trap": "none"
+    }
+  ],
+  "transcript": [
+    {
+      "id": "t21",
+      "speaker": "A",
+      "text": "Will do, I'll pop that on the booking now. And some people like to choose where they sit on the coach, especially on the longer drives. Do you have any preference at all?",
+      "start": 0.3
+    },
+    {
+      "id": "t22",
+      "speaker": "B",
+      "text": "Oh, yes, please. I'd like to sit right at the front. I get awfully travel sick if I'm stuck at the back, and I need to keep an eye on everyone anyway.",
+      "start": 11.4
+    }
+  ],
+  "evidence": [
+    {
+      "questionId": "q08",
+      "turn": "t22",
+      "quote": "I'd like to sit right at the front."
+    },
+    {
+      "questionId": "demo-transport",
+      "turn": "t21",
+      "quote": "where they sit on the coach"
+    }
+  ]
+}

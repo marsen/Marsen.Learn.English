@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Page, PageHeader } from "@/presentation/components/ui/Page";
+import { Msg } from "@/presentation/components/Msg";
+import { DocumentTitle } from "@/presentation/components/DocumentTitle";
 import { AttemptHistory } from "@/presentation/components/exam/AttemptHistory";
 import { requireAccount } from "@/infrastructure/auth/currentAccount";
 import { listMyAttempts } from "@/infrastructure/di/examSetContainer";
 
-export const metadata: Metadata = { title: "我的考試紀錄", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("history");
+  return { title: t("title"), robots: { index: false } };
+}
 
 export default async function HistoryPage() {
   const actor = await requireAccount("/exam/history");
@@ -14,7 +20,8 @@ export default async function HistoryPage() {
 
   return (
     <Page>
-      <PageHeader title="我的考試紀錄" />
+      <DocumentTitle id="history.title" />
+      <PageHeader title={<Msg id="history.title" />} />
       <AttemptHistory records={records} />
     </Page>
   );

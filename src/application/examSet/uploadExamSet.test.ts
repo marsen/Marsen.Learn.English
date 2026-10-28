@@ -35,8 +35,10 @@ const admin = account(["admin"]);
 
 let sets: InMemoryExamSetRepository;
 let storage: InMemoryAudioStorage;
-const upload = (actor: Account, input: ReturnType<typeof bundle>) =>
-  new UploadExamSet(sets, storage, sha256).execute({ actor, ...input });
+const upload = (
+  actor: Account,
+  input: ReturnType<typeof bundle> & { overwrite?: boolean },
+) => new UploadExamSet(sets, storage, sha256).execute({ actor, ...input });
 
 beforeEach(() => {
   sets = new InMemoryExamSetRepository();
@@ -51,6 +53,7 @@ describe("UploadExamSet", () => {
       setId: "s1-sample-0001",
       title: fixture.title,
       aiVerdict: "needs_human",
+      outcome: "created",
     });
     const [saved] = await sets.list();
     expect(saved.status).toBe("pending_review");
@@ -78,10 +81,15 @@ describe("UploadExamSet", () => {
     expect(await sets.list()).toHaveLength(0);
   });
 
-  it("應該擋下重複上傳同一套題", async () => {
+  it("應該在同一套題再上傳、沒說要覆蓋時回報已存在，而且不寫入", async () => {
     await upload(admin, bundle());
     const r = await upload(admin, bundle());
-    expect(r.ok).toBe(false);
+    expect(r).toMatchObject({
+      ok: false,
+      problems: [],
+      existing: { setId: "s1-sample-0001", kind: "unchanged" },
+    });
+    expect(await sets.list()).toHaveLength(1);
   });
 
   it("應該擋下錄音和 set.json 對不上的情況，而且不存任何東西", async () => {
@@ -99,7 +107,8 @@ describe("UploadExamSet", () => {
       bundle((b) => delete b.paper),
     );
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.problems.join()).toContain("paper");
+    if (!r.ok)
+      expect(r.problems).toContainEqual(expect.objectContaining({ path: "paper" }));
   });
 
   it("應該擋下沒有 AI 審稿結論的舊格式（只有 provenance.review）", async () => {
@@ -121,27 +130,30 @@ describe("UploadExamSet", () => {
       }),
     );
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.problems.join()).toContain("answer_policy");
+    if (!r.ok)
+      expect(r.problems).toContainEqual(
+        expect.objectContaining({ path: "answers.answers.0.answer_policy" }),
+      );
   });
 });
 
-describe("UploadExamSet 逐字稿（set.json 2.1）", () => {
-  /** 照時間軸產生逐字稿，每題的出處依序指到一句 */
-  const withTranscript = (b: typeof fixture) => {
-    const turnIds: string[] = b.timing.events
-      .filter((e: { type: string }) => e.type === "turn")
-      .map((e: { id: string }) => e.id);
-    b.schema_minor = 1;
-    b.transcript = {
-      turns: turnIds.map((id) => ({ id, speaker: "A", text: `secret line ${id}` })),
-      evidence: b.answers.answers.map((a: { question_id: string }, i: number) => ({
-        question_id: a.question_id,
-        turn: turnIds[i * 2],
-        quote: `secret line ${turnIds[i * 2]}`,
-      })),
-    };
+/** 照時間軸產生逐字稿，每題的出處依序指到一句 */
+const withTranscript = (b: typeof fixture) => {
+  const turnIds: string[] = b.timing.events
+    .filter((e: { type: string }) => e.type === "turn")
+    .map((e: { id: string }) => e.id);
+  b.schema_minor = 1;
+  b.transcript = {
+    turns: turnIds.map((id) => ({ id, speaker: "A", text: `secret line ${id}` })),
+    evidence: b.answers.answers.map((a: { question_id: string }, i: number) => ({
+      question_id: a.question_id,
+      turn: turnIds[i * 2],
+      quote: `secret line ${turnIds[i * 2]}`,
+    })),
   };
+};
 
+describe("UploadExamSet 逐字稿（set.json 2.1）", () => {
   it("應該把逐字稿存在私密部分，公開部分看不到", async () => {
     const r = await upload(admin, bundle(withTranscript));
     expect(r.ok).toBe(true);
@@ -170,7 +182,7 @@ describe("UploadExamSet 逐字稿（set.json 2.1）", () => {
       }),
     );
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.problems.join()).toContain("時間軸");
+    if (!r.ok) expect(r.problems).toContainEqual({ code: "transcriptTimingMismatch" });
     expect(await sets.list()).toHaveLength(0);
   });
 
@@ -198,8 +210,92 @@ describe("ListExamSets", () => {
   it("應該讓管理員與老師看清單，學生看不到", async () => {
     await upload(admin, bundle());
     const list = new ListExamSets(sets);
-    expect(await list.execute({ actor: admin })).toHaveLength(1);
-    expect(await list.execute({ actor: account(["teacher"]) })).toHaveLength(1);
+    expect((await list.execute({ actor: admin }))?.sets).toHaveLength(1);
+    expect((await list.execute({ actor: account(["teacher"]) }))?.sets).toHaveLength(1);
     expect(await list.execute({ actor: account(["student"]) })).toBeNull();
+  });
+});
+
+describe("UploadExamSet 覆蓋", () => {
+  const reviewer = account(["teacher"]);
+  /** 先上傳一套 2.0（沒有逐字稿），老師通過、管理員設成公開 */
+  async function approvedPublicSet() {
+    await upload(admin, bundle());
+    await sets.saveReview({
+      setId: "s1-sample-0001",
+      reviewerId: reviewer.id,
+      decision: "approved",
+      verdicts: [],
+      comment: "OK",
+      notes: [],
+      aiActions: [],
+      reviewedAt: new Date(),
+    });
+    await sets.setAccess("s1-sample-0001", "public");
+  }
+
+  it("應該在只補上逐字稿時，先告訴使用者審核狀態不會變", async () => {
+    await approvedPublicSet();
+    const r = await upload(admin, bundle(withTranscript));
+    expect(r).toMatchObject({ ok: false, existing: { kind: "supplement", fields: [] } });
+    expect(sets.privateOf("s1-sample-0001")?.transcript).toBeNull();
+  });
+
+  it("應該在確定覆蓋、只補逐字稿時，保留通過、公開與老師意見", async () => {
+    await approvedPublicSet();
+    const r = await upload(admin, { ...bundle(withTranscript), overwrite: true });
+    expect(r).toMatchObject({ ok: true, outcome: "supplemented" });
+    const [saved] = await sets.list();
+    expect(saved).toMatchObject({ status: "approved", access: "public", schemaMinor: 1 });
+    expect(sets.privateOf("s1-sample-0001")?.transcript?.turns.length).toBeGreaterThan(0);
+    expect(await sets.findReview("s1-sample-0001")).not.toBeNull();
+  });
+
+  it("應該在內容有變、確定覆蓋時，整套換掉並退回待審，清掉目前的審稿意見但保留紀錄", async () => {
+    await approvedPublicSet();
+    const changed = bundle((b) => {
+      b.answers.answers[0].answer = "something else";
+    });
+    const check = await upload(admin, changed);
+    expect(check).toMatchObject({
+      ok: false,
+      existing: { kind: "content", fields: ["answers"] },
+    });
+
+    const r = await upload(admin, { ...changed, overwrite: true });
+    expect(r).toMatchObject({ ok: true, outcome: "replaced" });
+    const [saved] = await sets.list();
+    expect(saved).toMatchObject({ status: "pending_review", access: "public" });
+    expect(sets.privateOf("s1-sample-0001")?.answers).toMatchObject({
+      answers: expect.arrayContaining([
+        expect.objectContaining({ answer: "something else" }),
+      ]),
+    });
+    expect(await sets.findReview("s1-sample-0001")).toBeNull();
+    expect(
+      await sets.listReviewRecords(new Date(0), new Date(Date.now() + 1000)),
+    ).toHaveLength(1);
+  });
+
+  it("應該在完全一樣、確定覆蓋時什麼都不動", async () => {
+    await approvedPublicSet();
+    const r = await upload(admin, { ...bundle(), overwrite: true });
+    expect(r).toMatchObject({ ok: true, outcome: "unchanged" });
+    expect((await sets.list())[0].status).toBe("approved");
+  });
+
+  it("應該在錄音換了時存新的錄音檔，舊的留著", async () => {
+    await upload(admin, bundle());
+    const before = storage.files.size;
+    const audio = new Uint8Array(20_000).map((_, i) => (i * 7) % 251);
+    const b = JSON.parse(bundle().setJsonText);
+    b.audio = { ...b.audio, bytes: audio.byteLength, sha256: sha256.hex(audio) };
+    const r = await upload(admin, {
+      setJsonText: JSON.stringify(b),
+      audio,
+      overwrite: true,
+    });
+    expect(r).toMatchObject({ ok: true, outcome: "replaced" });
+    expect(storage.files.size).toBe(before + 1);
   });
 });

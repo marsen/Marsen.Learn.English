@@ -19,8 +19,11 @@ const schema = z.object({
     .min(1),
 });
 
+/** 答案卡格式不對：哪個欄位、Zod 的說明（英文） */
+export type AnswerKeyProblem = { code: "answerKeyField"; path: string; message: string };
+
 export type ParseAnswerKeyResult =
-  { ok: true; entries: AnswerKeyEntry[] } | { ok: false; problems: string[] };
+  { ok: true; entries: AnswerKeyEntry[] } | { ok: false; problems: AnswerKeyProblem[] };
 
 /** 從 set.json 的答案卡（answers）取出批改要用的標準答案；格式不對（含不認得的答案規則）回傳原因 */
 export function parseAnswerKey(answers: JsonObject): ParseAnswerKeyResult {
@@ -28,9 +31,11 @@ export function parseAnswerKey(answers: JsonObject): ParseAnswerKeyResult {
   if (!r.success) {
     return {
       ok: false,
-      problems: r.error.issues.map(
-        (i) => `答案卡 answers.${i.path.join(".")}：${i.message}`,
-      ),
+      problems: r.error.issues.map((i) => ({
+        code: "answerKeyField" as const,
+        path: `answers.${i.path.join(".")}`,
+        message: i.message,
+      })),
     };
   }
   return {

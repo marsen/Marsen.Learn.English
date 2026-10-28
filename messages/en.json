@@ -1,9 +1,9 @@
 {
   "common": {
-    "brand": "Infinite Listening",
+    "brand": "Practicing More",
     "language": "Language",
     "languageNames": {
-      "zh-TW": "繁體中文",
+      "zh-TW": "中文",
       "en": "English"
     },
     "saving": "Saving…",
@@ -11,7 +11,14 @@
     "setsUnit": "sets",
     "none": "(none)",
     "listSeparator": ", ",
-    "parenthesized": "({text})"
+    "parenthesized": "({text})",
+    "deletedSet": "(deleted set)",
+    "save": "Save",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "copied": "Copied ✓",
+    "problemSeparator": "; "
   },
   "roles": {
     "admin": "Admin",
@@ -74,6 +81,32 @@
       "editedAiNoteEmpty": "An edited AI comment can't be empty. Delete it instead",
       "badPayload": "Your review couldn't be sent. Please reload the page and try again",
       "verdictMissing": "{count, plural, one {# item hasn't} other {# items haven't}} been checked yet"
+    },
+    "manage": {
+      "notLoggedIn": "Please log in first",
+      "forbidden": "Your account doesn't have permission to manage accounts",
+      "invalidEmail": "That email address isn't valid",
+      "emailTaken": "This email already has an account",
+      "accountNotFound": "Account not found",
+      "unknownRoles": "Unknown role: {roles}",
+      "cannotRemoveOwnAdmin": "You can't remove your own admin role"
+    },
+    "upload": {
+      "notLoggedIn": "Please log in first",
+      "forbidden": "Your account doesn't have permission to upload sets",
+      "missingFiles": "Please choose both set.json and audio.mp3",
+      "invalidJson": "set.json isn't valid JSON",
+      "schemaField": "set.json field {path}: {message}",
+      "unsupportedSchema": "Unsupported schema_version: {version} (only {supported} is supported; please re-bundle it in Question.Generator)",
+      "audioTooSmall": "The audio file is too small and may be broken",
+      "audioMismatch": "The audio file doesn't match what set.json records (wrong file, or the file was changed)",
+      "generatorValidationFailed": "The question generator's validation didn't pass",
+      "missingAiVerdict": "Missing the AI review verdict (provenance.ai_review.verdict)",
+      "answerKeyField": "Answer key {path}: {message}",
+      "transcriptTimingMismatch": "The transcript doesn't line up with the timeline (different number or order of lines)",
+      "evidenceUnknownQuestion": "transcript.evidence has a question that isn't in the answer key: {questionId}",
+      "evidenceUnknownTurn": "transcript.evidence for {questionId} points to a line that doesn't exist: {turn}",
+      "evidenceMissing": "transcript.evidence is missing the source for {questionId}"
     }
   },
   "dashboard": {
@@ -173,7 +206,32 @@
     "colCount": "Questions",
     "colStatus": "Review status",
     "colAccess": "Availability",
-    "colUploaded": "Uploaded"
+    "colUploaded": "Uploaded",
+    "noMatch": "No sets match these filters.",
+    "filter": {
+      "teacher": "🍵 Teacher",
+      "ai": "🤖 AI",
+      "access": "Availability",
+      "all": "All",
+      "status": {
+        "pending_review": "Waiting",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "verdict": {
+        "pass": "Passed",
+        "needs_human": "Concerns"
+      },
+      "keywordPlaceholder": "Search ID, title, topic",
+      "search": "Search",
+      "clear": "Clear filters",
+      "count": "{count, plural, one {# set} other {# sets}}"
+    },
+    "colVersion": "Version",
+    "versionHint": {
+      "transcript": "2.1: has a transcript",
+      "noTranscript": "2.0: no transcript. Re-bundle it as 2.1 and overwrite it on the upload page to add one"
+    }
   },
   "review": {
     "metaTitle": "Review",
@@ -235,5 +293,312 @@
     "pending": "{count} left to check",
     "resultPass": "→ Pass",
     "resultFail": "→ Fail"
+  },
+  "permissions": {
+    "uploadSets": "Upload sets",
+    "reviewSets": "Review sets (decide whether a test passes)",
+    "setExamAccess": "Set who can take a test",
+    "takeExam": "Take tests",
+    "viewResult": "See results",
+    "viewAnswerKey": "See the answers",
+    "keepRecords": "Test history",
+    "manageRoles": "Manage permissions",
+    "viewReviewLog": "See the review log"
+  },
+  "accountSummary": {
+    "email": "Logged in as",
+    "roles": "Roles",
+    "permissions": "What you can do"
+  },
+  "accounts": {
+    "title": "Permissions",
+    "description": "Assign roles to each account. An account can have several roles, and it can use everything those roles allow. You can't remove your own admin role.",
+    "addHeading": "Add an account",
+    "emailPlaceholder": "email",
+    "add": "Add",
+    "you": "(you)"
+  },
+  "reviewLog": {
+    "title": "Review log",
+    "description": "Every submitted review is logged. Entries stay even if the decision is changed or the set is deleted. Months follow Taiwan time.",
+    "monthNav": "Change month",
+    "prev": "← Previous month",
+    "next": "Next month →",
+    "month": "{month}/{year}",
+    "teachersHeading": "By teacher",
+    "teachersHint": "A set reviewed more than once (decision changed) counts as one. Approved or rejected follows the latest decision.",
+    "empty": "No reviews this month yet.",
+    "colTeacher": "Teacher",
+    "colSets": "Sets reviewed",
+    "colApproved": "Approved",
+    "colRejected": "Rejected",
+    "deletedAccount": "(account no longer exists)",
+    "entriesHeading": "All reviews",
+    "colTime": "Time",
+    "colSet": "Set",
+    "colDecision": "Decision"
+  },
+  "uploadSet": {
+    "title": "Upload sets",
+    "description": "Sets the AI has concerns about can be uploaded too. A teacher will review them.",
+    "pickFolder": "Choose a folder",
+    "pickHint": "Choose Question.Generator's <code>results/out</code>, or the folder of a single set. Each set needs set.json and audio.mp3.",
+    "topFolder": "(top level)",
+    "missingFile": "Missing {file}",
+    "uploading": "Uploading…",
+    "failed": "Upload failed",
+    "failedWith": "Upload failed: {message}",
+    "uploadN": "Upload {count, plural, one {# set} other {# sets}}",
+    "done": "{count, plural, one {# set} other {# sets}} done. Go to the set list →",
+    "picked": "{count, plural, one {# set} other {# sets}} selected",
+    "noTranscript": "No transcript",
+    "status": {
+      "waiting": "Ready",
+      "uploading": "Uploading",
+      "done": "Done",
+      "exists": "Already exists",
+      "failed": "Failed"
+    },
+    "outcome": {
+      "created": "Uploaded. Waiting for a teacher's review. {verdict}",
+      "supplemented": "Transcript and provenance added. Review status and availability unchanged.",
+      "replaced": "Overwritten and sent back for review. It will be listed again once a teacher approves it.",
+      "unchanged": "Same as the one on the site. Nothing changed."
+    },
+    "existing": {
+      "supplement": "This set is already on the site, with the same questions, answers and audio. Overwriting only adds the transcript and provenance; the review status stays the same.",
+      "content": "This set is already on the site, and the content is different ({fields}). Overwriting sends it back for review, and it will only be listed again once a teacher approves it. The current review comments are cleared; the review log is kept.",
+      "unchanged": "This set is already on the site and is exactly the same. No need to upload."
+    },
+    "overwriteSupplement": "Add transcript",
+    "overwriteContent": "Overwrite and send back for review",
+    "overwriteAllSupplement": "Add all transcripts ({count, plural, one {# set} other {# sets}})",
+    "fields": {
+      "title": "title",
+      "paper": "question paper",
+      "answers": "answers",
+      "audio": "audio"
+    },
+    "fieldSeparator": ", ",
+    "retry": "Upload again",
+    "retryFailed": "Upload {count, plural, one {the failed set} other {# failed sets}} again"
+  },
+  "adminDashboard": {
+    "kpiPending": "Waiting for review",
+    "kpiReady": "Ready to list",
+    "kpiRejected": "Has problems",
+    "kpiListed": "Listed",
+    "kpiPublic": "Public trial",
+    "readyHeading": "Ready to list",
+    "readyHint": "Approved by a teacher, still unlisted.",
+    "readyEmpty": "No sets waiting to be listed.",
+    "teacherFallback": "A teacher",
+    "approvedBy": "Approved by {who} on {day}",
+    "copyFeedback": "📋 Copy feedback",
+    "list": "List",
+    "makePublic": "Make public",
+    "rejectedHeading": "Has problems",
+    "rejectedHint": "Sets rejected by a teacher. Upload a new version once fixed, or delete it if it can't be fixed.",
+    "rejectedEmpty": "No rejected sets.",
+    "rejectedBy": "Rejected by {who} on {day}",
+    "overallComment": "Overall comment: {text}",
+    "noteTargetWhole": "Whole set / audio",
+    "noteLine": "{target}: {text}",
+    "noComments": "(the teacher left no comments)",
+    "mailSubject": "Review of set {setId}",
+    "discuss": "💬 Discuss with the teacher",
+    "copyFeedbackForAi": "📋 Copy feedback (to paste into AI)",
+    "uploadFix": "⬆︎ Upload a fixed version",
+    "deleteConfirm": "Delete the whole set? This can't be undone.",
+    "deleteConfirmButton": "Yes, delete",
+    "topicsHeading": "Topics",
+    "fakeData": "Sample data",
+    "topics": {
+      "gym": "Gym",
+      "carRental": "Car rental",
+      "library": "Library",
+      "hotel": "Hotel",
+      "doctor": "Doctor"
+    }
+  },
+  "studentDashboard": {
+    "recommendNew": "Recommended next",
+    "recommendRetry": "You've taken them all! Try your lowest score again",
+    "questionCount": "{count, plural, one {# question} other {# questions}}",
+    "bestScore": " · Best so far: {percent}",
+    "start": "Start practicing",
+    "retry": "Try again",
+    "noExams": "There are no tests to take yet. Check back later.",
+    "notTaken": "Tests you haven't taken",
+    "papersUnit": "{count, plural, one {test} other {tests}}",
+    "challenge": "Take one now →",
+    "viewAll": "See all tests →",
+    "scoresHeading": "My scores",
+    "scoresEmpty": "Finish your first test and your scores will show up here.",
+    "attempts": "Taken",
+    "timesUnit": "{count, plural, one {time} other {times}}",
+    "average": "Average correct",
+    "latest": "Latest",
+    "recentN": "Last {count, plural, one {# test} other {# tests}}",
+    "barTitle": "{title}: {score} / {total}",
+    "weakHeading": "Question types you miss most",
+    "weakHint": "Watch out for these traps when you practice.",
+    "weakStat": "Missed <b>{wrong}</b> of {seen}"
+  },
+  "examList": {
+    "metaTitle": "Tests",
+    "title": "IELTS Listening Section 1",
+    "guestHint": "You're seeing the public tests. <login>Log in</login> to take more.",
+    "empty": "There are no tests to take right now.",
+    "questionCount": "{count, plural, one {# question} other {# questions}}"
+  },
+  "exam": {
+    "metaTitle": "Test",
+    "unavailableGuest": "This test can't be taken right now. <login>Log in</login> and you may be able to take it.",
+    "intro": "\"{title}\". When you press start, the recording plays right away. <b>It plays only once and can't be paused or rewound</b>, just like the real exam. The recording includes time to read the questions and time to check at the end. Your answers are submitted automatically when it ends.",
+    "start": "Start the test",
+    "submitted": "Submitted. Opening your results…",
+    "statusStart": "The recording is starting.",
+    "statusListen": "Recording playing. Fill in the answers as you listen.",
+    "statusCheck": "Check your answers. {clock}",
+    "statusRead": "Reading time  {clock}",
+    "statusReadQuestions": "Reading time: {questions}  {clock}",
+    "questions": {
+      "single": "Question {a}",
+      "pair": "Questions {a} and {b}",
+      "range": "Questions {a}–{b}"
+    },
+    "submit": "Submit",
+    "submitting": "Submitting…",
+    "errors": {
+      "unavailable": "This test can't be taken right now.",
+      "submitFailed": "Couldn't submit: {message}. Your answers are still here. Please press \"Submit\" again.",
+      "attemptNotFound": "This attempt wasn't found",
+      "audioFailed": "The recording failed to play. You can keep answering and submit yourself.",
+      "audioInterrupted": "The recording was interrupted. Please refresh the page and try again.",
+      "autoplayBlocked": "The recording couldn't start automatically. Please refresh the page and try again."
+    }
+  },
+  "history": {
+    "title": "My test history",
+    "empty": "No history yet. <link>Take a test</link>",
+    "colSubmitted": "Submitted",
+    "colExam": "Test",
+    "colScore": "Score",
+    "view": "See results"
+  },
+  "result": {
+    "title": "Results",
+    "notFound": "We couldn't find the results for this attempt.",
+    "signupTitle": "Want to see the answers? Sign up for free",
+    "signupBody": "Enter your email, then the login code we send you, and you're signed up. This attempt is saved to your account and you'll see the answer to every question.",
+    "sendSignupCode": "Send me a sign-up code",
+    "colNumber": "No.",
+    "colGiven": "Your answer",
+    "colExpected": "Answer",
+    "blank": "(blank)",
+    "accepted": "(also accepted: {list})"
+  },
+  "landing": {
+    "metaTitle": "Practicing More: IELTS Listening practice tests",
+    "nav": {
+      "features": "Features",
+      "how": "How it works",
+      "demo": "Try a question",
+      "faq": "FAQ"
+    },
+    "navCta": "Try for free",
+    "login": "Log in",
+    "dashboard": "My dashboard",
+    "navCtaMember": "Start practicing",
+    "hero": {
+      "badge": "Section 1 · Form completion",
+      "titleLine1": "IELTS Listening practice tests",
+      "titleLine2": "Lots of sets. Keep practicing.",
+      "lead": "Modeled on the real exam: reading time and the same pacing. Instant feedback shows you the mistakes you make most.",
+      "cta": "Try a full test for free",
+      "secondary": "Try one question first →",
+      "note": "",
+      "illustration": "[Illustration placeholder: cute headphones]",
+      "playingTag": "Recording playing"
+    },
+    "features": {
+      "title": "Why practice here",
+      "lead": "There's no shortcut to listening. Listen more, write more, make more mistakes.",
+      "items": {
+        "unlimited": {
+          "title": "Always new questions",
+          "body": "New questions every day, new sets every week."
+        },
+        "realPace": {
+          "title": "Real exam pacing",
+          "body": "Reading pauses, recording pace and a final check, all following the exam timeline."
+        },
+        "instantGrading": {
+          "title": "Marked as soon as you submit",
+          "body": "Capital letters and date formats are checked by the rules. See right away which answers were right or wrong."
+        },
+        "weakTraps": {
+          "title": "See your common mistakes",
+          "body": "Self-corrections, similar numbers, spelling… see where you're weakest."
+        }
+      }
+    },
+    "steps": {
+      "title": "Try it now",
+      "items": {
+        "open": {
+          "title": "Open a test",
+          "body": "No sign-up. Press start and the test begins."
+        },
+        "listen": {
+          "title": "Fill in the answer sheet as you listen",
+          "body": "The page tells you when it's reading time and highlights the blanks to look at."
+        },
+        "review": {
+          "title": "See your score and the answers",
+          "body": "Log in with your email to see every answer and keep your practice history."
+        }
+      }
+    },
+    "demo": {
+      "title": "TRY A QUESTIONS FIRST",
+      "lead": "Two questions cut from a real test set. The recording plays only once. Fill in the answers as you listen.",
+      "idle": "Press play to start (plays only once)",
+      "playing": "Playing. Fill in the answers as you listen.",
+      "ended": "The recording has ended. Check your answers.",
+      "submit": "Submit",
+      "playAria": "Play the sample recording",
+      "playFailed": "The recording couldn't play. Please refresh the page and try again.",
+      "transcript": "Transcript",
+      "fullTest": "Take a full test (10 questions) →",
+      "correct": "Correct!",
+      "wrong": "The answer is {answer}"
+    },
+    "faq": {
+      "title": "FAQ",
+      "items": {
+        "price": {
+          "q": "Does it cost anything?",
+          "a": "Trying a test is free and needs no sign-up. Sign up to take more tests and see the answers."
+        },
+        "author": {
+          "q": "Who writes the questions?",
+          "a": "They're generated in the IELTS Section 1 format, and a teacher reviews each set before it's opened for practice."
+        },
+        "score": {
+          "q": "Does my score here reflect my IELTS score?",
+          "a": "No. This is practice, and it has nothing to do with how the real exam is scored."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Try a test now",
+      "lead": "6 minutes, 10 questions, results right away.",
+      "cta": "Start a free test"
+    },
+    "footer": {
+      "disclaimer": "This site isn't affiliated with IELTS. Practice scores don't represent official scores."
+    }
   }
 }

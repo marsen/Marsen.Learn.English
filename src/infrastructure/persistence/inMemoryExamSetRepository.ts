@@ -1,6 +1,11 @@
 import type { ExamAccess, ExamSet, ExamSetPrivate } from "@/domain/examSet/examSet";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import {
+  matchesFilter,
+  type ExamSetFilter,
+  type ExamSetSummary,
+} from "@/domain/examSet/examSetFilter";
+import {
   statusAfter,
   type ReviewRecord,
   type TeacherReview,
@@ -22,10 +27,60 @@ export class InMemoryExamSetRepository implements ExamSetRepository {
     this.privates.set(secret.setId, structuredClone(secret));
   }
 
+  async replace(set: ExamSet, secret: ExamSetPrivate): Promise<void> {
+    if (!this.sets.has(set.setId)) throw new Error(`沒有題組 ${set.setId}`);
+    this.sets.set(set.setId, structuredClone(set));
+    this.privates.set(secret.setId, structuredClone(secret));
+    this.reviews.delete(set.setId);
+  }
+
+  async supplement(
+    set: Pick<ExamSet, "setId" | "aiVerdict" | "schemaMinor">,
+    secret: Pick<ExamSetPrivate, "provenance" | "transcript">,
+  ): Promise<void> {
+    const s = this.sets.get(set.setId);
+    const p = this.privates.get(set.setId);
+    if (!s || !p) throw new Error(`沒有題組 ${set.setId}`);
+    this.sets.set(set.setId, {
+      ...s,
+      aiVerdict: set.aiVerdict,
+      schemaMinor: set.schemaMinor,
+    });
+    this.privates.set(set.setId, structuredClone({ ...p, ...secret }));
+  }
+
   async list(): Promise<ExamSet[]> {
     return [...this.sets.values()]
       .sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime())
       .map((s) => structuredClone(s));
+  }
+
+  async listSummaries(filter: ExamSetFilter): Promise<ExamSetSummary[]> {
+    return (await this.list())
+      .filter((s) => matchesFilter(s, filter))
+      .map(
+        ({
+          setId,
+          title,
+          topic,
+          questionCount,
+          aiVerdict,
+          schemaMinor,
+          status,
+          access,
+          uploadedAt,
+        }) => ({
+          setId,
+          title,
+          topic,
+          questionCount,
+          aiVerdict,
+          schemaMinor,
+          status,
+          access,
+          uploadedAt,
+        }),
+      );
   }
 
   async findById(setId: string): Promise<ExamSet | null> {

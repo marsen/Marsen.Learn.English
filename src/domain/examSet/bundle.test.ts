@@ -98,8 +98,12 @@ describe("transcriptProblems", () => {
       ],
     };
     const problems = transcriptProblems(bad, turns, ["q01", "q02"]);
-    expect(problems.join()).toContain("t9");
-    expect(problems.join()).toContain("q99");
-    expect(problems.join()).toContain("q02");
+    expect(problems).toEqual(
+      expect.arrayContaining([
+        { code: "evidenceUnknownTurn", questionId: "q01", turn: "t9" },
+        { code: "evidenceUnknownQuestion", questionId: "q99" },
+        { code: "evidenceMissing", questionId: "q02" },
+      ]),
+    );
   });
 });

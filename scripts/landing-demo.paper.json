@@ -1,0 +1,33 @@
+{
+  "$comment": "首頁示意題專用的題目卷（覆蓋題組原本的題目卷）。answers／evidence 是題組答案卡以外另外挖的空格。",
+  "rows": [
+    {
+      "label": "Transport",
+      "parts": [{ "text": "Transport:" }, { "blank": "demo-transport" }],
+      "inline": true,
+      "section": "Trip details"
+    },
+    {
+      "label": "Seat",
+      "parts": [{ "text": "Seat: near the" }, { "blank": "q08" }],
+      "inline": true,
+      "section": "Trip details"
+    }
+  ],
+  "answers": [
+    {
+      "questionId": "demo-transport",
+      "answer": "coach",
+      "accepted": [],
+      "policy": "exact_word",
+      "trap": "none"
+    }
+  ],
+  "evidence": [
+    {
+      "questionId": "demo-transport",
+      "turn": "t21",
+      "quote": "where they sit on the coach"
+    }
+  ]
+}

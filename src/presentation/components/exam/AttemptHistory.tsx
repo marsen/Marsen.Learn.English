@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import type { AttemptRecord } from "@/application/exam/examResult";
 import { EmptyState } from "@/presentation/components/ui/EmptyState";
 import { Table, Td, Th, Tr } from "@/presentation/components/ui/Table";
@@ -5,13 +8,17 @@ import { formatFullDateTime } from "@/presentation/lib/format";
 
 /** 我的考試紀錄：日期、考卷、分數，點進去看完整結果。 */
 export function AttemptHistory({ records }: { records: AttemptRecord[] }) {
+  const t = useTranslations("history");
   if (records.length === 0) {
     return (
       <EmptyState>
-        還沒有紀錄。
-        <a href="/exam" className="text-primary underline">
-          去寫一張考卷
-        </a>
+        {t.rich("empty", {
+          link: (chunks) => (
+            <a href="/exam" className="text-primary underline">
+              {chunks}
+            </a>
+          ),
+        })}
       </EmptyState>
     );
   }
@@ -19,9 +26,9 @@ export function AttemptHistory({ records }: { records: AttemptRecord[] }) {
     <Table
       head={
         <>
-          <Th>交卷時間</Th>
-          <Th>考卷</Th>
-          <Th>分數</Th>
+          <Th>{t("colSubmitted")}</Th>
+          <Th>{t("colExam")}</Th>
+          <Th>{t("colScore")}</Th>
           <Th />
         </>
       }
@@ -37,7 +44,7 @@ export function AttemptHistory({ records }: { records: AttemptRecord[] }) {
           </Td>
           <Td>
             <a href={`/exam/result/${r.attemptId}`} className="text-primary underline">
-              看結果
+              {t("view")}
             </a>
           </Td>
         </Tr>

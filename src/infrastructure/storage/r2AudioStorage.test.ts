@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { R2AudioStorage } from "./r2AudioStorage";
 
 const storage = new R2AudioStorage({
@@ -17,6 +17,22 @@ describe("R2AudioStorage", () => {
     expect(url.pathname).toBe("/audio/s1-gym-0001/audio-ab12cd34.mp3");
     expect(url.searchParams.get("X-Amz-Expires")).toBe("3600");
     expect(url.searchParams.get("X-Amz-Signature")).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it("上傳時應該用網址＋原始 bytes 呼叫 fetch（Next.js 重包 Request 會弄丟 Content-Length）", async () => {
+    const bytes = new Uint8Array([1, 2, 3]);
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    try {
+      await storage.put("s1-gym-0001/audio-ab12cd34.mp3", bytes, "audio/mpeg");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+    const [input, init] = fetchMock.mock.calls[0];
+    expect(typeof input).toBe("string");
+    expect(init.method).toBe("PUT");
+    expect(init.body).toBe(bytes);
+    expect(new Headers(init.headers).get("authorization")).toMatch(/^AWS4-HMAC-SHA256 /);
   });
 
   it("應該擋下會跳出資料夾的 key", async () => {

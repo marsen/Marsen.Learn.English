@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Page } from "@/presentation/components/ui/Page";
+import { DocumentTitle } from "@/presentation/components/DocumentTitle";
+import { RichMsg } from "@/presentation/components/RichMsg";
 import { ExamRunner } from "@/presentation/components/exam/ExamRunner";
 import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
 import { listAvailableExams } from "@/infrastructure/di/examSetContainer";
 import { startExamAction, submitExamAction } from "@/app/actions/exam";
 
-export const metadata: Metadata = { title: "考試", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("exam");
+  return { title: t("metaTitle"), robots: { index: false } };
+}
 
 export default async function ExamPage({
   params,
@@ -21,6 +27,7 @@ export default async function ExamPage({
 
   return (
     <Page>
+      <DocumentTitle id="exam.metaTitle" />
       {exam ? (
         <ExamRunner
           title={exam.title}
@@ -30,16 +37,7 @@ export default async function ExamPage({
         />
       ) : (
         <p>
-          這張考卷現在不能考。
-          {!actor && (
-            <>
-              {" "}
-              <a href="/login" className="text-primary underline">
-                登入
-              </a>
-              後可能可以寫。
-            </>
-          )}
+          <RichMsg id={actor ? "exam.errors.unavailable" : "exam.unavailableGuest"} />
         </p>
       )}
     </Page>

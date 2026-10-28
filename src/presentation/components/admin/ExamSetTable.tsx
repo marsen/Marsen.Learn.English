@@ -1,7 +1,9 @@
 "use client";
 
 import type { ExamSet } from "@/domain/examSet/examSet";
+import type { ExamSetSummary } from "@/domain/examSet/examSetFilter";
 import { statusTagsOf } from "@/domain/examSet/statusTags";
+import { SUPPORTED_SCHEMA_VERSION } from "@/domain/examSet/bundle";
 import { useLocale, useTranslations } from "next-intl";
 import { ACCESS_ORDER } from "@/presentation/lib/examSetLabels";
 import { StatusTags } from "./StatusTags";
@@ -10,7 +12,9 @@ import { Table, Td, Th, Tr } from "@/presentation/components/ui/Table";
 import { formatDateTime } from "@/presentation/lib/format";
 
 type Props = {
-  sets: ExamSet[];
+  sets: ExamSetSummary[];
+  /** 有套用過濾條件：沒資料時顯示「沒有符合條件」而不是「還沒有題組」 */
+  filtered?: boolean;
   /** 有「設定考卷開放對象」權限才給，沒給就只顯示不能改 */
   setAccessAction?: (formData: FormData) => Promise<void>;
 };
@@ -22,10 +26,11 @@ const ACCESS_ACTIVE: Record<ExamSet["access"], string> = {
   public: "bg-accent font-semibold text-accent-foreground",
 };
 
-export function ExamSetTable({ sets, setAccessAction }: Props) {
+export function ExamSetTable({ sets, filtered, setAccessAction }: Props) {
   const t = useTranslations();
   const locale = useLocale();
-  if (sets.length === 0) return <EmptyState>{t("sets.empty")}</EmptyState>;
+  if (sets.length === 0)
+    return <EmptyState>{t(filtered ? "sets.noMatch" : "sets.empty")}</EmptyState>;
 
   return (
     <Table
@@ -34,6 +39,7 @@ export function ExamSetTable({ sets, setAccessAction }: Props) {
           <Th>{t("sets.colSet")}</Th>
           <Th>{t("sets.colTitle")}</Th>
           <Th>{t("sets.colCount")}</Th>
+          <Th>{t("sets.colVersion")}</Th>
           <Th>{t("sets.colStatus")}</Th>
           <Th>{t("sets.colAccess")}</Th>
           <Th>{t("sets.colUploaded")}</Th>
@@ -49,6 +55,22 @@ export function ExamSetTable({ sets, setAccessAction }: Props) {
           </Td>
           <Td>{s.title}</Td>
           <Td className="whitespace-nowrap">{s.questionCount}</Td>
+          <Td className="whitespace-nowrap">
+            <span
+              title={t(
+                s.schemaMinor > 0
+                  ? "sets.versionHint.transcript"
+                  : "sets.versionHint.noTranscript",
+              )}
+              className={`rounded-full px-2 py-0.5 font-mono text-xs ${
+                s.schemaMinor > 0
+                  ? "bg-accent-soft text-accent-hover"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {SUPPORTED_SCHEMA_VERSION}.{s.schemaMinor}
+            </span>
+          </Td>
           <Td>
             <StatusTags tags={statusTagsOf(s)} />
           </Td>

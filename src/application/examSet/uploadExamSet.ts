@@ -7,19 +7,23 @@ import {
   toPublicTiming,
   transcriptProblems,
 } from "@/domain/examSet/bundle";
-import type { Transcript } from "@/domain/examSet/examSet";
+import type { ExamSet, ExamSetPrivate, Transcript } from "@/domain/examSet/examSet";
+import { checkOverwrite } from "@/domain/examSet/overwrite";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import type { Sha256 } from "@/application/shared/ports";
 import type { AudioStorage } from "./ports";
 import { setJsonSchema } from "./setJsonSchema";
 import { parseAnswerKey } from "./answerKey";
-import type { UploadExamSetResult } from "./examSetResult";
+import type { UploadExamSetResult, UploadProblem } from "./examSetResult";
 
 /**
  * 管理員上傳一套題組（set.json + 錄音）。
  * - 只有「上傳題目」權限的帳號能用
  * - AI 審稿有疑慮（needs_human）的照樣收下，狀態是「待老師審稿」
- * - 同一個 set_id 不能重複上傳
+ * - 同一個 set_id 已經有了：沒說要覆蓋就回報「已存在」與覆蓋會怎樣（不寫入）；說要覆蓋才換
+ *   - 只補資料（題目、答案、錄音都一樣，多了逐字稿等）：審核狀態、開放對象、老師意見都不動
+ *   - 內容有變：整套換掉、退回待審（開放對象不動，要老師重新通過才考得到），目前的審稿意見清掉
+ *   - 已經交卷的作答紀錄不受影響（交卷時就存好了分數與每題對錯）
  * - 逐字稿（2.1 起的 transcript）只存在私密部分，考生拿不到
  * 寫入順序：先存錄音、再存資料；資料存失敗時錄音只是多一個沒人用的檔案，不會出現「有題目沒錄音」。
  */
@@ -35,31 +39,35 @@ export class UploadExamSet {
     actor: Account;
     setJsonText: string;
     audio: Uint8Array;
+    /** 同一個 set_id 已經有了時，確定要覆蓋 */
+    overwrite?: boolean;
   }): Promise<UploadExamSetResult> {
     if (!can(input.actor.roles, "uploadSets")) {
-      return { ok: false, problems: ["你的帳號沒有上傳題目的權限"] };
+      return { ok: false, problems: [{ code: "forbidden" }] };
     }
 
     let raw: unknown;
     try {
       raw = JSON.parse(input.setJsonText);
     } catch {
-      return { ok: false, problems: ["set.json 不是有效的 JSON"] };
+      return { ok: false, problems: [{ code: "invalidJson" }] };
     }
     const parsed = setJsonSchema.safeParse(raw);
     if (!parsed.success) {
       return {
         ok: false,
-        problems: parsed.error.issues.map(
-          (i) => `set.json 欄位 ${i.path.join(".")}：${i.message}`,
-        ),
+        problems: parsed.error.issues.map((i) => ({
+          code: "schemaField" as const,
+          path: i.path.join("."),
+          message: i.message,
+        })),
       };
     }
     const b = parsed.data;
 
     const sha = this.sha256.hex(input.audio);
     const aiVerdict = b.provenance.ai_review?.verdict;
-    const problems = bundleProblems({
+    const problems: UploadProblem[] = bundleProblems({
       schemaVersion: b.schema_version,
       declaredAudio: { bytes: b.audio.bytes, sha256: b.audio.sha256 },
       actualAudio: { bytes: input.audio.byteLength, sha256: sha },
@@ -98,29 +106,59 @@ export class UploadExamSet {
     }
     if (problems.length > 0 || !isAiVerdict(aiVerdict)) return { ok: false, problems };
 
-    if (await this.sets.exists(b.set_id)) {
-      return { ok: false, problems: [`題組 ${b.set_id} 已經上傳過了`] };
+    const audioKey = audioKeyFor(b.set_id, sha);
+    const next: ExamSet = {
+      setId: b.set_id,
+      title: b.title,
+      topic: b.topic,
+      questionCount: b.question_count,
+      paper: b.paper,
+      timing: toPublicTiming(b.timing),
+      audioKey,
+      aiVerdict,
+      schemaMinor: b.schema_minor ?? 0,
+      status: "pending_review",
+      access: "unlisted", // 新上傳先下架，老師通過後由管理員上架
+      uploadedBy: input.actor.id,
+      uploadedAt: this.now(),
+    };
+    const nextSecret: ExamSetPrivate = {
+      setId: b.set_id,
+      answers: b.answers,
+      provenance: b.provenance,
+      transcript,
+    };
+    const done = { ok: true as const, setId: b.set_id, title: b.title, aiVerdict };
+
+    const current = await this.sets.findById(b.set_id);
+    const currentSecret = current && (await this.sets.findPrivate(b.set_id));
+    if (!current || !currentSecret) {
+      await this.storage.put(audioKey, input.audio, "audio/mpeg");
+      await this.sets.save(next, nextSecret);
+      return { ...done, outcome: "created" };
     }
 
-    const audioKey = audioKeyFor(b.set_id, sha);
-    await this.storage.put(audioKey, input.audio, "audio/mpeg");
-    await this.sets.save(
-      {
-        setId: b.set_id,
-        title: b.title,
-        topic: b.topic,
-        questionCount: b.question_count,
-        paper: b.paper,
-        timing: toPublicTiming(b.timing),
-        audioKey,
-        aiVerdict,
-        status: "pending_review",
-        access: "unlisted", // 新上傳先下架，老師通過後由管理員上架
-        uploadedBy: input.actor.id,
-        uploadedAt: this.now(),
-      },
-      { setId: b.set_id, answers: b.answers, provenance: b.provenance, transcript },
+    const check = checkOverwrite(
+      { set: current, secret: currentSecret },
+      { set: next, secret: nextSecret },
     );
-    return { ok: true, setId: b.set_id, title: b.title, aiVerdict };
+    if (!input.overwrite) {
+      return {
+        ok: false,
+        problems: [],
+        existing: { setId: b.set_id, title: current.title, ...check },
+      };
+    }
+    if (check.kind === "unchanged") return { ...done, outcome: "unchanged" };
+    if (check.kind === "supplement") {
+      await this.sets.supplement(next, nextSecret);
+      return { ...done, outcome: "supplemented" };
+    }
+    // 內容有變：新錄音另存（舊檔留著，正在考的人不會被抽掉），開放對象沿用，退回待審
+    if (check.fields.includes("audio")) {
+      await this.storage.put(audioKey, input.audio, "audio/mpeg");
+    }
+    await this.sets.replace({ ...next, access: current.access }, nextSecret);
+    return { ...done, outcome: "replaced" };
   }
 }

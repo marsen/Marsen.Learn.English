@@ -1,4 +1,5 @@
 import type { ExamAccess, ExamSet, ExamSetPrivate } from "./examSet";
+import type { ExamSetFilter, ExamSetSummary } from "./examSetFilter";
 import type { ReviewRecord, TeacherReview } from "./review";
 
 /** 題組儲存的 port。 */
@@ -6,8 +7,19 @@ export interface ExamSetRepository {
   exists(setId: string): Promise<boolean>;
   /** 公開部分與私密部分一起存 */
   save(set: ExamSet, secret: ExamSetPrivate): Promise<void>;
+  /**
+   * 覆蓋上傳、內容有變：整套換掉（公開與私密部分），並清掉目前的審稿意見（審稿紀錄保留）。同一個交易
+   */
+  replace(set: ExamSet, secret: ExamSetPrivate): Promise<void>;
+  /** 覆蓋上傳、只補資料：更新逐字稿、製作紀錄、AI 結論與版本，題目與審核狀態不動 */
+  supplement(
+    set: Pick<ExamSet, "setId" | "aiVerdict" | "schemaMinor">,
+    secret: Pick<ExamSetPrivate, "provenance" | "transcript">,
+  ): Promise<void>;
   /** 新上傳的在前面 */
   list(): Promise<ExamSet[]>;
+  /** 後台清單用：只帶清單欄位、照條件過濾，新上傳的在前面 */
+  listSummaries(filter: ExamSetFilter): Promise<ExamSetSummary[]>;
   findById(setId: string): Promise<ExamSet | null>;
   findPrivate(setId: string): Promise<ExamSetPrivate | null>;
   findReview(setId: string): Promise<TeacherReview | null>;

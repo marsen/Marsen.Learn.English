@@ -10,7 +10,9 @@ export const setJsonSchema = z.object({
   schema_version: z.unknown(),
   /** 小版號（2.1 起才有）；相容的改動才升，不影響能不能上傳 */
   schema_minor: z.number().int().nonnegative().optional(),
-  set_id: z.string().regex(/^[a-z0-9-]+$/, "set_id 只能有小寫英數與 -"),
+  set_id: z
+    .string()
+    .regex(/^[a-z0-9-]+$/, "set_id: lowercase letters, digits and - only"),
   title: z.string().min(1),
   topic: z.string().min(1),
   question_count: z.number().int().positive(),

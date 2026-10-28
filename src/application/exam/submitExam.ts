@@ -33,7 +33,9 @@ export class SubmitExam {
     if (!set || !secret) return { ok: false, reason: "not_found" };
     const key = parseAnswerKey(secret.answers);
     if (!key.ok)
-      throw new Error(`題組 ${set.setId} 的答案卡無法批改：${key.problems.join("；")}`);
+      throw new Error(
+        `題組 ${set.setId} 的答案卡無法批改：${key.problems.map((p) => `${p.path} ${p.message}`).join("；")}`,
+      );
 
     const answers = normalizeAnswers(input.answers, blanksOf(set.paper));
     const saved = await this.attempts.submit(

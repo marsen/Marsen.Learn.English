@@ -1,4 +1,4 @@
-import { and, countDistinct, desc, eq, gte, lt } from "drizzle-orm";
+import { and, countDistinct, desc, eq, gte, ilike, lt, or, type SQL } from "drizzle-orm";
 import {
   isExamAccess,
   isExamSetStatus,
@@ -7,6 +7,7 @@ import {
   type ExamSetPrivate,
 } from "@/domain/examSet/examSet";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
+import type { ExamSetFilter, ExamSetSummary } from "@/domain/examSet/examSetFilter";
 import { isAiVerdict } from "@/domain/examSet/bundle";
 import {
   isReviewDecision,
@@ -24,14 +25,20 @@ import {
 } from "@/infrastructure/db/schema";
 
 type Row = typeof examSets.$inferSelect;
+type Codes = Pick<Row, "aiVerdict" | "status" | "access">;
 
-function toDomain(row: Row): ExamSet {
+/** 資料庫裡的代碼字串 → domain 型別；不認得的值給保守的預設 */
+function withCodes<T extends Codes>(row: T) {
   return {
     ...row,
-    aiVerdict: isAiVerdict(row.aiVerdict) ? row.aiVerdict : "needs_human",
-    status: isExamSetStatus(row.status) ? row.status : "pending_review",
-    access: isExamAccess(row.access) ? row.access : "members",
+    aiVerdict: isAiVerdict(row.aiVerdict) ? row.aiVerdict : ("needs_human" as const),
+    status: isExamSetStatus(row.status) ? row.status : ("pending_review" as const),
+    access: isExamAccess(row.access) ? row.access : ("members" as const),
   };
+}
+
+function toDomain(row: Row): ExamSet {
+  return withCodes(row);
 }
 
 export class DrizzleExamSetRepository implements ExamSetRepository {
@@ -52,6 +59,74 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
   async list(): Promise<ExamSet[]> {
     const rows = await this.db.select().from(examSets).orderBy(desc(examSets.uploadedAt));
     return rows.map(toDomain);
+  }
+
+  async listSummaries(filter: ExamSetFilter): Promise<ExamSetSummary[]> {
+    const where: SQL[] = [];
+    if (filter.status) where.push(eq(examSets.status, filter.status));
+    if (filter.aiVerdict) where.push(eq(examSets.aiVerdict, filter.aiVerdict));
+    if (filter.access) where.push(eq(examSets.access, filter.access));
+    if (filter.keyword) {
+      // LIKE 的萬用字元當一般字元比對
+      const k = `%${filter.keyword.replace(/[\\%_]/g, "\\$&")}%`;
+      const match = or(
+        ilike(examSets.setId, k),
+        ilike(examSets.title, k),
+        ilike(examSets.topic, k),
+      );
+      if (match) where.push(match);
+    }
+    // 只選清單欄位，不撈題目卷、時間軸
+    const rows = await this.db
+      .select({
+        setId: examSets.setId,
+        title: examSets.title,
+        topic: examSets.topic,
+        questionCount: examSets.questionCount,
+        aiVerdict: examSets.aiVerdict,
+        schemaMinor: examSets.schemaMinor,
+        status: examSets.status,
+        access: examSets.access,
+        uploadedAt: examSets.uploadedAt,
+      })
+      .from(examSets)
+      .where(and(...where))
+      .orderBy(desc(examSets.uploadedAt));
+    return rows.map(withCodes);
+  }
+
+  async replace(set: ExamSet, secret: ExamSetPrivate): Promise<void> {
+    const { setId, ...rest } = set;
+    const secretRest = {
+      answers: secret.answers,
+      provenance: secret.provenance,
+      transcript: secret.transcript,
+    };
+    // batch 在 Neon 上是同一個交易：題組、私密部分一起換，目前的審稿意見清掉（審稿紀錄 exam_review_log 保留）
+    await this.db.batch([
+      this.db.update(examSets).set(rest).where(eq(examSets.setId, setId)),
+      this.db
+        .update(examSetPrivates)
+        .set(secretRest)
+        .where(eq(examSetPrivates.setId, setId)),
+      this.db.delete(examSetReviews).where(eq(examSetReviews.setId, setId)),
+    ]);
+  }
+
+  async supplement(
+    set: Pick<ExamSet, "setId" | "aiVerdict" | "schemaMinor">,
+    secret: Pick<ExamSetPrivate, "provenance" | "transcript">,
+  ): Promise<void> {
+    await this.db.batch([
+      this.db
+        .update(examSets)
+        .set({ aiVerdict: set.aiVerdict, schemaMinor: set.schemaMinor })
+        .where(eq(examSets.setId, set.setId)),
+      this.db
+        .update(examSetPrivates)
+        .set({ provenance: secret.provenance, transcript: secret.transcript })
+        .where(eq(examSetPrivates.setId, set.setId)),
+    ]);
   }
 
   async findById(setId: string): Promise<ExamSet | null> {

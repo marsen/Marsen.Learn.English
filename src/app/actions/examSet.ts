@@ -19,7 +19,7 @@ export async function uploadExamSetAction(
   formData: FormData,
 ): Promise<UploadSetFormState> {
   const actor = await getCurrentAccount();
-  if (!actor) return { problems: ["請先登入"] };
+  if (!actor) return { problems: [{ code: "notLoggedIn" }] };
 
   const setJson = formData.get("setJson");
   const audio = formData.get("audio");
@@ -29,19 +29,26 @@ export async function uploadExamSetAction(
     setJson.size === 0 ||
     audio.size === 0
   ) {
-    return { problems: ["請選 set.json 和 audio.mp3 兩個檔案"] };
+    return { problems: [{ code: "missingFiles" }] };
   }
 
   const result = await uploadExamSet().execute({
     actor,
     setJsonText: await setJson.text(),
     audio: new Uint8Array(await audio.arrayBuffer()),
+    overwrite: formData.get("overwrite") === "1",
   });
-  if (!result.ok) return { problems: result.problems };
+  if (!result.ok) return { problems: result.problems, existing: result.existing };
 
   revalidatePath("/admin/sets");
+  revalidatePath(`/admin/sets/${result.setId}`);
   return {
-    uploaded: { setId: result.setId, title: result.title, aiVerdict: result.aiVerdict },
+    uploaded: {
+      setId: result.setId,
+      title: result.title,
+      aiVerdict: result.aiVerdict,
+      outcome: result.outcome,
+    },
   };
 }
 

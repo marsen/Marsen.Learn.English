@@ -1,4 +1,6 @@
 import type { LoginError } from "@/application/auth/authResult";
+import type { ManageError } from "@/application/account/manageAccounts";
+import type { UploadProblem } from "@/application/examSet/examSetResult";
 import type { ReviewFormState } from "@/presentation/components/formStates";
 
 /**
@@ -9,16 +11,29 @@ type Translate = (key: string, values?: Record<string, string | number>) => stri
 
 type ReviewFormError = NonNullable<ReviewFormState["problems"]>[number];
 
-export function loginErrorText(t: Translate, { code, ...values }: LoginError): string {
-  return t(`errors.login.${code}`, values);
+type CodedError = { code: string } & Record<string, string | number | string[]>;
+
+/** 代碼帶的值：清單（例如不認得的角色）用翻譯檔的頓號接起來 */
+function errorText(t: Translate, group: string, { code, ...values }: CodedError): string {
+  const sep = t("common.listSeparator");
+  const flat = Object.fromEntries(
+    Object.entries(values).map(([k, v]) => [k, Array.isArray(v) ? v.join(sep) : v]),
+  );
+  return t(`errors.${group}.${code}`, flat);
 }
 
-export function reviewErrorText(
-  t: Translate,
-  { code, ...values }: ReviewFormError,
-): string {
-  return t(`errors.review.${code}`, values);
+export function loginErrorText(t: Translate, error: LoginError): string {
+  return errorText(t, "login", error);
 }
 
-/** 題組已刪除時顯示的名稱 */
-export const DELETED_SET_TITLE = "（已刪除的題組）";
+export function reviewErrorText(t: Translate, error: ReviewFormError): string {
+  return errorText(t, "review", error);
+}
+
+export function manageErrorText(t: Translate, error: ManageError): string {
+  return errorText(t, "manage", error);
+}
+
+export function uploadErrorText(t: Translate, error: UploadProblem): string {
+  return errorText(t, "upload", error);
+}

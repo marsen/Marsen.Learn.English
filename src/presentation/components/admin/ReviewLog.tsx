@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import type { ReviewLogView } from "@/application/dashboard/reviewLog";
 import { StatusTags } from "./StatusTags";
 import { ButtonLink, buttonClass } from "@/presentation/components/ui/Button";
@@ -5,25 +8,22 @@ import { EmptyState } from "@/presentation/components/ui/EmptyState";
 import { Table, Td, Th, Tr } from "@/presentation/components/ui/Table";
 import { formatDateTime } from "@/presentation/lib/format";
 
-const monthLabel = (m: string) => {
-  const [y, mm] = m.split("-");
-  return `${y} 年 ${Number(mm)} 月`;
-};
-
 /** 審稿紀錄：每位老師這個月審了幾套，以及每一筆審稿。 */
 export function ReviewLog({ view }: { view: ReviewLogView }) {
+  const t = useTranslations("reviewLog");
+  const [year, month] = view.month.split("-");
   return (
     <div className="grid gap-10">
-      <nav className="flex items-center gap-3" aria-label="切換月份">
+      <nav className="flex items-center gap-3" aria-label={t("monthNav")}>
         <ButtonLink
           href={`/admin/reviews?month=${view.prevMonth}`}
           variant="secondary"
           size="sm"
         >
-          ← 上個月
+          {t("prev")}
         </ButtonLink>
         <p className="min-w-32 text-center text-lg font-semibold text-heading">
-          {monthLabel(view.month)}
+          {t("month", { year, month: Number(month) })}
         </p>
         {view.nextMonth ? (
           <ButtonLink
@@ -31,7 +31,7 @@ export function ReviewLog({ view }: { view: ReviewLogView }) {
             variant="secondary"
             size="sm"
           >
-            下個月 →
+            {t("next")}
           </ButtonLink>
         ) : (
           <span
@@ -41,37 +41,35 @@ export function ReviewLog({ view }: { view: ReviewLogView }) {
               className: "opacity-40",
             })}
           >
-            下個月 →
+            {t("next")}
           </span>
         )}
       </nav>
 
       <section>
-        <h2 className="mb-1 text-lg font-semibold">每位老師</h2>
-        <p className="mb-3 text-sm text-muted-foreground">
-          同一套題審好幾次（改判）只算一套；通過、退回依最後一次的判定。
-        </p>
+        <h2 className="mb-1 text-lg font-semibold">{t("teachersHeading")}</h2>
+        <p className="mb-3 text-sm text-muted-foreground">{t("teachersHint")}</p>
         {view.teachers.length === 0 ? (
-          <EmptyState>這個月還沒有人審稿。</EmptyState>
+          <EmptyState>{t("empty")}</EmptyState>
         ) : (
           <Table
             head={
               <>
-                <Th>老師</Th>
-                <Th align="right">審了幾套</Th>
-                <Th align="right">通過</Th>
-                <Th align="right">退回</Th>
+                <Th>{t("colTeacher")}</Th>
+                <Th align="right">{t("colSets")}</Th>
+                <Th align="right">{t("colApproved")}</Th>
+                <Th align="right">{t("colRejected")}</Th>
               </>
             }
           >
-            {view.teachers.map((t) => (
-              <Tr key={t.reviewerId}>
-                <Td>{t.email ?? "（帳號已不存在）"}</Td>
+            {view.teachers.map((r) => (
+              <Tr key={r.reviewerId}>
+                <Td>{r.email ?? t("deletedAccount")}</Td>
                 <Td align="right" className="text-lg font-bold">
-                  {t.sets}
+                  {r.sets}
                 </Td>
-                <Td align="right">{t.approved}</Td>
-                <Td align="right">{t.rejected}</Td>
+                <Td align="right">{r.approved}</Td>
+                <Td align="right">{r.rejected}</Td>
               </Tr>
             ))}
           </Table>
@@ -80,14 +78,14 @@ export function ReviewLog({ view }: { view: ReviewLogView }) {
 
       {view.entries.length > 0 && (
         <section>
-          <h2 className="mb-3 text-lg font-semibold">每一筆審稿</h2>
+          <h2 className="mb-3 text-lg font-semibold">{t("entriesHeading")}</h2>
           <Table
             head={
               <>
-                <Th>時間</Th>
-                <Th>老師</Th>
-                <Th>題組</Th>
-                <Th>判定</Th>
+                <Th>{t("colTime")}</Th>
+                <Th>{t("colTeacher")}</Th>
+                <Th>{t("colSet")}</Th>
+                <Th>{t("colDecision")}</Th>
               </>
             }
           >
@@ -96,7 +94,7 @@ export function ReviewLog({ view }: { view: ReviewLogView }) {
                 <Td className="whitespace-nowrap text-muted-foreground">
                   {formatDateTime(e.reviewedAt)}
                 </Td>
-                <Td>{e.email ?? "（帳號已不存在）"}</Td>
+                <Td>{e.email ?? t("deletedAccount")}</Td>
                 <Td>
                   <span className="font-mono text-primary">{e.setId}</span>
                   <span className="ml-2">{e.setTitle}</span>
