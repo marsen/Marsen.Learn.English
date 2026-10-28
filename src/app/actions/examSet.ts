@@ -36,12 +36,19 @@ export async function uploadExamSetAction(
     actor,
     setJsonText: await setJson.text(),
     audio: new Uint8Array(await audio.arrayBuffer()),
+    overwrite: formData.get("overwrite") === "1",
   });
-  if (!result.ok) return { problems: result.problems };
+  if (!result.ok) return { problems: result.problems, existing: result.existing };
 
   revalidatePath("/admin/sets");
+  revalidatePath(`/admin/sets/${result.setId}`);
   return {
-    uploaded: { setId: result.setId, title: result.title, aiVerdict: result.aiVerdict },
+    uploaded: {
+      setId: result.setId,
+      title: result.title,
+      aiVerdict: result.aiVerdict,
+      outcome: result.outcome,
+    },
   };
 }
 

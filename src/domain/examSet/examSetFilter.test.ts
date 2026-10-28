@@ -7,6 +7,7 @@ const set: ExamSetSummary = {
   topic: "library membership",
   questionCount: 10,
   aiVerdict: "pass",
+  schemaMinor: 0,
   status: "pending_review",
   access: "unlisted",
   uploadedAt: new Date("2026-10-20T00:00:00Z"),

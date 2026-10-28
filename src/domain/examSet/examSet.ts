@@ -59,6 +59,8 @@ export type ExamSet = {
   timing: PublicTiming;
   audioKey: string;
   aiVerdict: AiVerdict;
+  /** set.json 的小版號（大版號一律是 SUPPORTED_SCHEMA_VERSION）：0＝2.0 沒有逐字稿、1＝2.1 有逐字稿 */
+  schemaMinor: number;
   status: ExamSetStatus;
   access: ExamAccess;
   uploadedBy: string;

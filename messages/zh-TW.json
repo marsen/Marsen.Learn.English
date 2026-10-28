@@ -97,7 +97,6 @@
       "missingFiles": "請選 set.json 和 audio.mp3 兩個檔案",
       "invalidJson": "set.json 不是有效的 JSON",
       "schemaField": "set.json 欄位 {path}：{message}",
-      "duplicate": "題組 {setId} 已經上傳過了",
       "unsupportedSchema": "不支援的 schema_version：{version}（只支援 {supported}，請在 Question.Generator 重新打包）",
       "audioTooSmall": "錄音檔太小，可能是壞的",
       "audioMismatch": "錄音檔和 set.json 記載的不一致（可能選錯檔，或檔案被改過）",
@@ -227,6 +226,11 @@
       "search": "搜尋",
       "clear": "清除條件",
       "count": "共 {count} 套"
+    },
+    "colVersion": "版本",
+    "versionHint": {
+      "transcript": "2.1：有逐字稿",
+      "noTranscript": "2.0：沒有逐字稿。重新打包成 2.1 後到上傳頁覆蓋，就能補上"
     }
   },
   "review": {
@@ -341,13 +345,43 @@
     "pickHint": "選 Question.Generator 的 <code>results/out</code>，或其中一套題組的資料夾。每套要有 set.json 和 audio.mp3。",
     "topFolder": "（最上層）",
     "missingFile": "缺少 {file}",
-    "waiting": "等待上傳",
     "uploading": "上傳中…",
-    "uploaded": "已上傳：{title}，{verdict}",
     "failed": "上傳失敗",
     "failedWith": "上傳失敗：{message}",
     "uploadN": "上傳 {count} 套",
-    "done": "完成 {count} 套，去題組清單 →"
+    "done": "完成 {count} 套，去題組清單 →",
+    "picked": "選了 {count} 套",
+    "noTranscript": "沒有逐字稿",
+    "status": {
+      "waiting": "待上傳",
+      "uploading": "上傳中",
+      "done": "完成",
+      "exists": "已存在",
+      "failed": "失敗"
+    },
+    "outcome": {
+      "created": "已上傳，等老師審稿。{verdict}",
+      "supplemented": "已補上逐字稿與製作紀錄，審核狀態和開放對象都沒變。",
+      "replaced": "已覆蓋，退回待審：老師重新通過後才會上架。",
+      "unchanged": "跟網站上的一樣，沒有變更。"
+    },
+    "existing": {
+      "supplement": "網站上已經有這套，題目、答案、錄音都一樣。覆蓋只會補上逐字稿與製作紀錄，審核狀態不變。",
+      "content": "網站上已經有這套，而且內容不同（{fields}）。覆蓋後會退回待審，老師重新通過才會上架；目前的審稿意見會清掉，審稿紀錄保留。",
+      "unchanged": "網站上已經有這套，內容完全一樣，不用上傳。"
+    },
+    "overwriteSupplement": "補上逐字稿",
+    "overwriteContent": "覆蓋並退回待審",
+    "overwriteAllSupplement": "全部補上逐字稿（{count} 套）",
+    "fields": {
+      "title": "標題",
+      "paper": "題目卷",
+      "answers": "答案",
+      "audio": "錄音"
+    },
+    "fieldSeparator": "、",
+    "retry": "重新上傳",
+    "retryFailed": "重新上傳失敗的 {count} 套"
   },
   "adminDashboard": {
     "kpiPending": "等老師審",

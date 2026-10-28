@@ -59,6 +59,8 @@ export const examSets = pgTable("exam_sets", {
   timing: jsonb("timing").$type<PublicTiming>().notNull(),
   audioKey: text("audio_key").notNull(),
   aiVerdict: text("ai_verdict").notNull(), // 'pass' | 'needs_human'
+  // set.json 小版號：0＝2.0（沒有逐字稿）、1＝2.1（有逐字稿）。既有資料由 migration 依逐字稿回填
+  schemaMinor: integer("schema_minor").notNull().default(0),
   status: text("status").notNull(), // 'pending_review' | 'approved' | 'rejected'
   access: text("access").notNull().default("members"), // 'public' | 'members' | 'unlisted'
   uploadedBy: uuid("uploaded_by")

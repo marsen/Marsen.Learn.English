@@ -23,6 +23,7 @@ function examSet(setId: string, over: Partial<ExamSet> = {}): ExamSet {
     timing: { totalSeconds: 0, events: [] },
     audioKey: `${setId}.mp3`,
     aiVerdict: "pass",
+    schemaMinor: 0,
     status: "pending_review",
     access: "unlisted",
     uploadedBy: admin.id,
