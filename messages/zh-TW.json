@@ -3,7 +3,7 @@
     "brand": "多練雅思聽力",
     "language": "語言",
     "languageNames": {
-      "zh-TW": "繁體中文",
+      "zh-TW": "中文",
       "en": "English"
     },
     "saving": "儲存中…",
@@ -342,7 +342,7 @@
     "title": "上傳題組",
     "description": "AI 有疑慮的題組也可以上傳，會交給老師審稿。",
     "pickFolder": "選資料夾",
-    "pickHint": "選 Question.Generator 的 <code>results/out</code>，或其中一套題組的資料夾。每套要有 set.json 和 audio.mp3。",
+    "pickHint": "選擇題組，每套要有 set.json 和 audio.mp3。",
     "topFolder": "（最上層）",
     "missingFile": "缺少 {file}",
     "uploading": "上傳中…",
@@ -518,7 +518,7 @@
       "lead": "仿照正式考試：看題時間、播放節奏。即時反饋，看見自己的常犯錯誤。",
       "cta": "免費試寫一回",
       "secondary": "先試做一題 →",
-      "note": "免註冊就能測驗",
+      "note": "",
       "illustration": "[在此處放入微日系Q 版耳機插圖]",
       "playingTag": "錄音播放中"
     },
