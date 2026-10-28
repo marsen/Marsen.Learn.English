@@ -359,14 +359,14 @@
     },
     "outcome": {
       "created": "Uploaded",
-      "supplemented": "Overwritten, review status unchanged",
-      "replaced": "Overwritten, sent back for review",
+      "supplemented": "Overwritten",
+      "replaced": "Overwritten; waiting for review",
       "unchanged": "No changes"
     },
     "existing": {
-      "supplement": "Same content; review status stays the same",
-      "content": "Different content; needs a new review",
-      "unchanged": "Same content; no need to upload"
+      "supplement": "Questions unchanged",
+      "content": "Questions changed; needs a new review",
+      "unchanged": "No changes"
     },
     "retry": "Upload again",
     "overwrite": "Overwrite"

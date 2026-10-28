@@ -359,14 +359,14 @@
     },
     "outcome": {
       "created": "已上傳",
-      "supplemented": "已覆蓋，審核狀態不變",
-      "replaced": "已覆蓋，退回待審",
+      "supplemented": "已覆蓋",
+      "replaced": "已覆蓋，待重審",
       "unchanged": "沒有變更"
     },
     "existing": {
-      "supplement": "內容相同，覆蓋後審核狀態不變",
-      "content": "內容不同，覆蓋後要重新審稿",
-      "unchanged": "內容相同，不用上傳"
+      "supplement": "題目沒變",
+      "content": "題目有變，要重審",
+      "unchanged": "沒有變更"
     },
     "retry": "重新上傳",
     "overwrite": "覆蓋"
