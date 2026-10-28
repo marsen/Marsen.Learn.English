@@ -99,7 +99,8 @@ describe("UploadExamSet", () => {
       bundle((b) => delete b.paper),
     );
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.problems.join()).toContain("paper");
+    if (!r.ok)
+      expect(r.problems).toContainEqual(expect.objectContaining({ path: "paper" }));
   });
 
   it("應該擋下沒有 AI 審稿結論的舊格式（只有 provenance.review）", async () => {
@@ -121,7 +122,10 @@ describe("UploadExamSet", () => {
       }),
     );
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.problems.join()).toContain("answer_policy");
+    if (!r.ok)
+      expect(r.problems).toContainEqual(
+        expect.objectContaining({ path: "answers.answers.0.answer_policy" }),
+      );
   });
 });
 
@@ -170,7 +174,7 @@ describe("UploadExamSet 逐字稿（set.json 2.1）", () => {
       }),
     );
     expect(r.ok).toBe(false);
-    if (!r.ok) expect(r.problems.join()).toContain("時間軸");
+    if (!r.ok) expect(r.problems).toContainEqual({ code: "transcriptTimingMismatch" });
     expect(await sets.list()).toHaveLength(0);
   });
 
@@ -198,8 +202,8 @@ describe("ListExamSets", () => {
   it("應該讓管理員與老師看清單，學生看不到", async () => {
     await upload(admin, bundle());
     const list = new ListExamSets(sets);
-    expect(await list.execute({ actor: admin })).toHaveLength(1);
-    expect(await list.execute({ actor: account(["teacher"]) })).toHaveLength(1);
+    expect((await list.execute({ actor: admin }))?.sets).toHaveLength(1);
+    expect((await list.execute({ actor: account(["teacher"]) }))?.sets).toHaveLength(1);
     expect(await list.execute({ actor: account(["student"]) })).toBeNull();
   });
 });

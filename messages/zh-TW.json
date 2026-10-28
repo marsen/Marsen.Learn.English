@@ -1,6 +1,6 @@
 {
   "common": {
-    "brand": "無限雅思聽力",
+    "brand": "多練雅思聽力",
     "language": "語言",
     "languageNames": {
       "zh-TW": "繁體中文",
@@ -11,7 +11,14 @@
     "setsUnit": "套",
     "none": "（沒有）",
     "listSeparator": "、",
-    "parenthesized": "（{text}）"
+    "parenthesized": "（{text}）",
+    "deletedSet": "（已刪除的題組）",
+    "save": "儲存",
+    "saved": "已儲存",
+    "cancel": "取消",
+    "delete": "刪除",
+    "copied": "已複製 ✓",
+    "problemSeparator": "；"
   },
   "roles": {
     "admin": "管理員",
@@ -74,6 +81,33 @@
       "editedAiNoteEmpty": "改寫的 AI 意見不能是空白，不需要的話請刪除",
       "badPayload": "審稿沒送出去，請重新整理頁面再試",
       "verdictMissing": "還有 {count} 項沒判"
+    },
+    "manage": {
+      "notLoggedIn": "請先登入",
+      "forbidden": "你的帳號沒有管理權限",
+      "invalidEmail": "email 格式不對",
+      "emailTaken": "這個 email 已經有帳號了",
+      "accountNotFound": "找不到這個帳號",
+      "unknownRoles": "不認得的角色：{roles}",
+      "cannotRemoveOwnAdmin": "不能拿掉自己的管理員角色"
+    },
+    "upload": {
+      "notLoggedIn": "請先登入",
+      "forbidden": "你的帳號沒有上傳題目的權限",
+      "missingFiles": "請選 set.json 和 audio.mp3 兩個檔案",
+      "invalidJson": "set.json 不是有效的 JSON",
+      "schemaField": "set.json 欄位 {path}：{message}",
+      "duplicate": "題組 {setId} 已經上傳過了",
+      "unsupportedSchema": "不支援的 schema_version：{version}（只支援 {supported}，請在 Question.Generator 重新打包）",
+      "audioTooSmall": "錄音檔太小，可能是壞的",
+      "audioMismatch": "錄音檔和 set.json 記載的不一致（可能選錯檔，或檔案被改過）",
+      "generatorValidationFailed": "出題工具的驗證不是通過",
+      "missingAiVerdict": "缺少 AI 審稿結論（provenance.ai_review.verdict）",
+      "answerKeyField": "答案卡 {path}：{message}",
+      "transcriptTimingMismatch": "transcript 的句子和時間軸對不上（句數或順序不同）",
+      "evidenceUnknownQuestion": "transcript.evidence 有答案卡沒有的題目：{questionId}",
+      "evidenceUnknownTurn": "transcript.evidence 的 {questionId} 指到不存在的句子：{turn}",
+      "evidenceMissing": "transcript.evidence 缺少 {questionId} 的出處"
     }
   },
   "dashboard": {
@@ -173,7 +207,27 @@
     "colCount": "題數",
     "colStatus": "審核狀態",
     "colAccess": "開放對象",
-    "colUploaded": "上傳時間"
+    "colUploaded": "上傳時間",
+    "noMatch": "沒有符合條件的題組。",
+    "filter": {
+      "teacher": "🍵 老師",
+      "ai": "🤖 AI",
+      "access": "開放對象",
+      "all": "全部",
+      "status": {
+        "pending_review": "待審",
+        "approved": "通過",
+        "rejected": "退回"
+      },
+      "verdict": {
+        "pass": "通過",
+        "needs_human": "有疑慮"
+      },
+      "keywordPlaceholder": "搜尋代號、標題、主題",
+      "search": "搜尋",
+      "clear": "清除條件",
+      "count": "共 {count} 套"
+    }
   },
   "review": {
     "metaTitle": "審稿",
@@ -235,5 +289,282 @@
     "pending": "{count} 項待處理",
     "resultPass": "→ 合格",
     "resultFail": "→ 不合格"
+  },
+  "permissions": {
+    "uploadSets": "上傳題目",
+    "reviewSets": "審稿（評估試卷是否合格）",
+    "setExamAccess": "設定考卷開放對象",
+    "takeExam": "寫考卷",
+    "viewResult": "看批改結果",
+    "viewAnswerKey": "看正解",
+    "keepRecords": "考試紀錄",
+    "manageRoles": "管理權限",
+    "viewReviewLog": "看審稿紀錄"
+  },
+  "accountSummary": {
+    "email": "登入帳號",
+    "roles": "角色",
+    "permissions": "能用的功能"
+  },
+  "accounts": {
+    "title": "管理權限",
+    "description": "指定每個帳號的角色。一個帳號可以有多個角色，能用的功能是各角色加起來。不能拿掉自己的管理員角色。",
+    "addHeading": "新增帳號",
+    "emailPlaceholder": "email",
+    "add": "新增",
+    "you": "（你）"
+  },
+  "reviewLog": {
+    "title": "審稿紀錄",
+    "description": "每送出一次審稿就記一筆，改判或刪掉題組都不會不見。月份照台灣時間算。",
+    "monthNav": "切換月份",
+    "prev": "← 上個月",
+    "next": "下個月 →",
+    "month": "{year} 年 {month} 月",
+    "teachersHeading": "每位老師",
+    "teachersHint": "同一套題審好幾次（改判）只算一套；通過、退回依最後一次的判定。",
+    "empty": "這個月還沒有人審稿。",
+    "colTeacher": "老師",
+    "colSets": "審了幾套",
+    "colApproved": "通過",
+    "colRejected": "退回",
+    "deletedAccount": "（帳號已不存在）",
+    "entriesHeading": "每一筆審稿",
+    "colTime": "時間",
+    "colSet": "題組",
+    "colDecision": "判定"
+  },
+  "uploadSet": {
+    "title": "上傳題組",
+    "description": "AI 有疑慮的題組也可以上傳，會交給老師審稿。",
+    "pickFolder": "選資料夾",
+    "pickHint": "選 Question.Generator 的 <code>results/out</code>，或其中一套題組的資料夾。每套要有 set.json 和 audio.mp3。",
+    "topFolder": "（最上層）",
+    "missingFile": "缺少 {file}",
+    "waiting": "等待上傳",
+    "uploading": "上傳中…",
+    "uploaded": "已上傳：{title}，{verdict}",
+    "failed": "上傳失敗",
+    "failedWith": "上傳失敗：{message}",
+    "uploadN": "上傳 {count} 套",
+    "done": "完成 {count} 套，去題組清單 →"
+  },
+  "adminDashboard": {
+    "kpiPending": "等老師審",
+    "kpiReady": "可以上架",
+    "kpiRejected": "有問題",
+    "kpiListed": "上架中",
+    "kpiPublic": "公開試考",
+    "readyHeading": "可以上架",
+    "readyHint": "老師已通過、目前還是下架。",
+    "readyEmpty": "沒有等著上架的題組。",
+    "teacherFallback": "老師",
+    "approvedBy": "{who} {day} 通過",
+    "copyFeedback": "📋 複製回饋",
+    "list": "上架",
+    "makePublic": "設為公開",
+    "rejectedHeading": "有問題",
+    "rejectedHint": "老師退回的題組。修好就上傳新版本，修不了就刪掉。",
+    "rejectedEmpty": "沒有被退回的題組。",
+    "rejectedBy": "{who} {day} 退回",
+    "overallComment": "整體意見：{text}",
+    "noteTargetWhole": "整套／錄音",
+    "noteLine": "{target}：{text}",
+    "noComments": "（老師沒有寫意見）",
+    "mailSubject": "題組 {setId} 審稿討論",
+    "discuss": "💬 找老師討論",
+    "copyFeedbackForAi": "📋 複製回饋（貼給 AI）",
+    "uploadFix": "⬆︎ 上傳修正版",
+    "deleteConfirm": "確定整套刪掉？刪了就救不回來",
+    "deleteConfirmButton": "確定刪除",
+    "topicsHeading": "情境主題統計",
+    "fakeData": "假資料",
+    "topics": {
+      "gym": "健身房",
+      "carRental": "租車",
+      "library": "圖書館",
+      "hotel": "飯店",
+      "doctor": "看醫生"
+    }
+  },
+  "studentDashboard": {
+    "recommendNew": "下一張推薦給你",
+    "recommendRetry": "全部考過了！挑分數最低的再挑戰一次",
+    "questionCount": "{count} 題",
+    "bestScore": " ・ 上次最好 {percent} 分",
+    "start": "開始練習",
+    "retry": "再挑戰",
+    "noExams": "目前還沒有可以考的考卷，晚點再來看看。",
+    "notTaken": "還沒考過的考卷",
+    "papersUnit": "張",
+    "challenge": "等你挑戰 →",
+    "viewAll": "看全部考卷 →",
+    "scoresHeading": "我的成績",
+    "scoresEmpty": "考完第一張，這裡就會出現你的成績。",
+    "attempts": "考了",
+    "timesUnit": "次",
+    "average": "平均答對",
+    "latest": "最近一次",
+    "recentN": "最近 {count} 次",
+    "barTitle": "{title}：{score} / {total}",
+    "weakHeading": "最常錯的題型",
+    "weakHint": "練習時特別留意這幾種陷阱。",
+    "weakStat": "錯 <b>{wrong}</b> / {seen} 題"
+  },
+  "examList": {
+    "metaTitle": "考卷",
+    "title": "雅思聽力 Section 1",
+    "guestHint": "你現在看到的是公開考卷。<login>登入</login>後可以寫更多。",
+    "empty": "目前沒有可以寫的考卷。",
+    "questionCount": "{count} 題"
+  },
+  "exam": {
+    "metaTitle": "考試",
+    "unavailableGuest": "這張考卷現在不能考。<login>登入</login>後可能可以寫。",
+    "intro": "《{title}》。按下開始後錄音會直接播放，<b>只播一次，不能暫停或倒轉</b>，跟正式考試一樣。錄音裡有看題時間和最後檢查時間，錄音結束會自動交卷。",
+    "start": "開始考試",
+    "submitted": "已交卷，正在打開批改結果…",
+    "statusStart": "錄音開始。",
+    "statusListen": "錄音播放中，邊聽邊填。",
+    "statusCheck": "檢查你的答案。{clock}",
+    "statusRead": "看題時間　{clock}",
+    "statusReadQuestions": "看題時間：{questions}　{clock}",
+    "questions": {
+      "single": "第 {a} 題",
+      "pair": "第 {a}、{b} 題",
+      "range": "第 {a}–{b} 題"
+    },
+    "submit": "交卷",
+    "submitting": "交卷中…",
+    "errors": {
+      "unavailable": "這張考卷現在不能考。",
+      "submitFailed": "交卷失敗：{message}。答案還在，請再按一次「交卷」。",
+      "attemptNotFound": "找不到這次作答",
+      "audioFailed": "錄音播放失敗，你可以繼續作答，再自己按交卷。",
+      "audioInterrupted": "錄音中斷了，請重新整理後再試一次。",
+      "autoplayBlocked": "錄音沒辦法自動播放，請重新整理後再試一次。"
+    }
+  },
+  "history": {
+    "title": "我的考試紀錄",
+    "empty": "還沒有紀錄。<link>去寫一張考卷</link>",
+    "colSubmitted": "交卷時間",
+    "colExam": "考卷",
+    "colScore": "分數",
+    "view": "看結果"
+  },
+  "result": {
+    "title": "批改結果",
+    "notFound": "找不到這次作答的結果。",
+    "signupTitle": "想看正解？免費註冊就能看",
+    "signupBody": "輸入 email，再輸入信裡的登入碼就完成註冊，這次的作答會保留在你的帳號裡，並看到每題正解。",
+    "sendSignupCode": "寄註冊碼給我",
+    "colNumber": "題號",
+    "colGiven": "你寫的",
+    "colExpected": "正解",
+    "blank": "（空白）",
+    "accepted": "（也算對：{list}）"
+  },
+  "landing": {
+    "metaTitle": "無限雅思聽力模擬測試",
+    "nav": {
+      "features": "特色",
+      "how": "怎麼練",
+      "demo": "試做一題",
+      "faq": "常見問題"
+    },
+    "navCta": "免費試寫",
+    "login": "登入",
+    "dashboard": "我的總覽",
+    "navCtaMember": "開始練習",
+    "hero": {
+      "badge": "Section 1・表格填空",
+      "titleLine1": "模擬雅思聽力測試",
+      "titleLine2": "大量題組，持續練習",
+      "lead": "仿照正式考試：看題時間、播放節奏。即時反饋，看見自己的常犯錯誤。",
+      "cta": "免費試寫一回",
+      "secondary": "先試做一題 →",
+      "note": "免註冊就能測驗",
+      "illustration": "[在此處放入微日系Q 版耳機插圖]",
+      "playingTag": "錄音播放中"
+    },
+    "features": {
+      "title": "為什麼在這裡練",
+      "lead": "聽力沒有捷徑，就是多聽、多寫、多錯幾次。",
+      "items": {
+        "unlimited": {
+          "title": "題庫持續翻新",
+          "body": "天天有題寫，周周有題練"
+        },
+        "realPace": {
+          "title": "擬真考試節奏",
+          "body": "看題停頓、播放節奏、最後檢查，全程跟著時間軸走。"
+        },
+        "instantGrading": {
+          "title": "交卷立刻批改",
+          "body": "大小寫、日期寫法都照規則比對，每題對錯一目了然。"
+        },
+        "weakTraps": {
+          "title": "數據分析常犯錯誤",
+          "body": "錯誤更正、相近數字、拼字……看見自己弱點。"
+        }
+      }
+    },
+    "steps": {
+      "title": "立即體驗",
+      "items": {
+        "open": {
+          "title": "打開一回試題",
+          "body": "免註冊，按下開始就進入考試。"
+        },
+        "listen": {
+          "title": "邊聽邊填答案卷",
+          "body": "畫面會提示看題時間，該看的空格自動標亮。"
+        },
+        "review": {
+          "title": "看分數與正解",
+          "body": "email 登入就能看每題正解，並保留練習紀錄。"
+        }
+      }
+    },
+    "demo": {
+      "title": "先試做一題",
+      "lead": "從正式題組剪下來的兩題，錄音只播一次，邊聽邊填。",
+      "idle": "按播放開始（只播一次）",
+      "playing": "播放中，邊聽邊填。",
+      "ended": "錄音結束，檢查你的答案。",
+      "submit": "交卷",
+      "playAria": "播放示意錄音",
+      "playFailed": "錄音沒辦法播放，請重新整理後再試一次。",
+      "transcript": "逐字稿",
+      "fullTest": "寫完整一回（10 題）→",
+      "correct": "答對了！",
+      "wrong": "正解是 {answer}"
+    },
+    "faq": {
+      "title": "常見問題",
+      "items": {
+        "price": {
+          "q": "要付費嗎？",
+          "a": "試寫免費、不用註冊。註冊後可以寫更多回並看正解。"
+        },
+        "author": {
+          "q": "題目是誰出的？",
+          "a": "依雅思 Section 1 的格式產生，並由老師審過才會開放練習。"
+        },
+        "score": {
+          "q": "分數代表我的雅思成績嗎？",
+          "a": "不代表。這是練習用的模擬，跟正式考試的評分無關。"
+        }
+      }
+    },
+    "finalCta": {
+      "title": "現在就寫一回看看",
+      "lead": "6 分鐘、10 題、立刻知道結果。",
+      "cta": "開始免費試寫"
+    },
+    "footer": {
+      "disclaimer": "本網站與 IELTS 官方無關，模擬成績不代表正式分數。"
+    }
   }
 }

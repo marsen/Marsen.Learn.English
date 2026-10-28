@@ -35,6 +35,9 @@ export function viewOf(event: TimingEvent | null, t: number): ExamPhaseView | nu
   return { kind: "read", remaining, questions };
 }
 
-export function questionLabel([a, b]: [number, number]): string {
-  return a === b ? `第 ${a} 題` : b - a === 1 ? `第 ${a}、${b} 題` : `第 ${a}–${b} 題`;
+/** 看題提示要怎麼寫題號：一題、相鄰兩題、一段範圍（文字在翻譯檔 exam.questions.*） */
+export type QuestionRange = { kind: "single" | "pair" | "range"; a: number; b: number };
+
+export function questionRange([a, b]: [number, number]): QuestionRange {
+  return { kind: a === b ? "single" : b - a === 1 ? "pair" : "range", a, b };
 }

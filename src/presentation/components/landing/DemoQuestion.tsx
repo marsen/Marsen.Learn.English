@@ -1,64 +1,74 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import type { LandingDemoView } from "@/application/exam/landingDemo";
 import { matchesAnswer } from "@/domain/exam/grading";
-import { LANDING } from "@/presentation/content/landing";
+import { ExamPaper } from "@/presentation/components/exam/ExamPaper";
 import { Wave } from "./icons";
 
-const T = LANDING.demo;
+type Stage = "idle" | "playing" | "ended";
 
-// 示意題的答案卡，用跟正式考試一樣的批改規則
-const KEY = {
-  q1: {
-    answer: "37",
-    accepted: [],
-    policy: "digits_only" as const,
-    hint: "第 1 題：說錯再更正，答案是 37。",
-  },
-  q2: {
-    answer: "mornings",
-    accepted: ["morning"],
-    policy: "exact_word" as const,
-    hint: "第 2 題：evening 是干擾，答案是 mornings。",
-  },
-};
+/**
+ * 首頁的「先試做一題」：從正式題組剪下來的一段錄音（只播一次、不能暫停），
+ * 邊聽邊填，交卷用正式的批改規則。播放時不顯示對話文字（不然變成考閱讀），交卷後才給逐字稿。
+ */
+export function DemoQuestion({
+  demo,
+  examHref,
+}: {
+  demo: LandingDemoView;
+  examHref: string;
+}) {
+  const td = useTranslations("landing.demo");
+  const [stage, setStage] = useState<Stage>("idle");
+  const [progress, setProgress] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-/** 首頁的「試做一題」：文字代替錄音（只播一次），交卷用正式的批改規則。 */
-export function DemoQuestion() {
-  const [line, setLine] = useState(-1);
-  const [ended, setEnded] = useState(false);
-  const [answers, setAnswers] = useState({ q1: "", q2: "" });
-  const [result, setResult] = useState<{ score: number; hints: string[] } | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => audioRef.current?.pause(), []);
 
   const play = () => {
-    if (line >= 0) return;
-    const step = (i: number) => {
-      setLine(i);
-      timer.current = setTimeout(
-        () => (i + 1 < T.lines.length ? step(i + 1) : setEnded(true)),
-        2200,
-      );
-    };
-    step(0);
+    if (stage !== "idle") return;
+    const audio = new Audio(demo.audioUrl);
+    audioRef.current = audio;
+    audio.addEventListener("timeupdate", () =>
+      setProgress(Math.min(1, audio.currentTime / demo.duration)),
+    );
+    audio.addEventListener("ended", () => {
+      setProgress(1);
+      setStage("ended");
+    });
+    setStage("playing");
+    audio.play().catch(() => {
+      setError(true);
+      setStage("idle");
+      audioRef.current = null;
+    });
   };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    const checks = (Object.keys(KEY) as (keyof typeof KEY)[]).map((q) => ({
-      ok: matchesAnswer(KEY[q], answers[q]),
-      hint: KEY[q].hint,
-    }));
-    setResult({
-      score: checks.filter((c) => c.ok).length,
-      hints: checks.filter((c) => !c.ok).map((c) => c.hint),
-    });
+    audioRef.current?.pause();
+    setStage("ended");
+    setSubmitted(true);
   };
 
-  const playing = line >= 0 && !ended;
-  const status = line < 0 ? T.idle : ended ? T.ended : T.playing;
-  const input =
-    "border-0 border-b border-foreground bg-transparent px-1 focus:outline-none focus:ring-2 focus:ring-primary-soft";
+  const results = demo.answers.map((a) => ({
+    ...a,
+    ok: matchesAnswer(a, answers[a.questionId] ?? ""),
+  }));
+  const quoteOf = (turnId: string) => demo.evidence.find((e) => e.turn === turnId)?.quote;
+
+  const status = error
+    ? td("playFailed")
+    : stage === "idle"
+      ? td("idle")
+      : stage === "playing"
+        ? td("playing")
+        : td("ended");
 
   return (
     <div className="rounded-3xl border border-primary-soft bg-card/60 p-6 md:p-8">
@@ -66,8 +76,8 @@ export function DemoQuestion() {
         <button
           type="button"
           onClick={play}
-          disabled={line >= 0}
-          aria-label="播放示意錄音"
+          disabled={stage !== "idle" || submitted}
+          aria-label={td("playAria")}
           className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground transition hover:scale-105 hover:bg-accent-hover disabled:pointer-events-none disabled:opacity-50"
         >
           <svg
@@ -83,68 +93,66 @@ export function DemoQuestion() {
           <div className="h-2 overflow-hidden rounded-full bg-border">
             <div
               className="h-full rounded-full bg-accent transition-[width] duration-200"
-              style={{ width: `${((line + 1) / T.lines.length) * 100}%` }}
+              style={{ width: `${progress * 100}%` }}
             />
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">{status}</p>
+          <p className="mt-2 text-sm text-muted-foreground" aria-live="polite">
+            {status}
+          </p>
         </div>
-        <Wave paused={!playing} className="text-accent" />
+        <Wave paused={stage !== "playing"} className="text-accent" />
       </div>
 
-      <p className="mt-6 min-h-14 rounded-2xl bg-surface px-5 py-4 italic">
-        {line >= 0 ? T.lines[line] : ""}
-      </p>
-
-      <form
-        onSubmit={submit}
-        className="mt-6 rounded-2xl bg-surface p-5 md:p-6"
-        autoComplete="off"
-      >
-        <p className="text-center font-semibold text-heading">{T.paperTitle}</p>
-        <p className="mt-1 text-center text-sm text-muted-foreground italic">
-          {T.instruction}
-        </p>
-        <div className="mt-5 space-y-4">
-          <label className="flex flex-wrap items-center gap-2">
-            <span>• Address:</span>
-            <span className="grid h-6 w-6 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-              1
-            </span>
-            <input
-              aria-label="Question 1"
-              value={answers.q1}
-              onChange={(e) => setAnswers((a) => ({ ...a, q1: e.target.value }))}
-              className={`w-24 ${input}`}
-            />
-            <span>Maple Court</span>
-          </label>
-          <label className="flex flex-wrap items-center gap-2">
-            <span>• Preferred time:</span>
-            <span className="grid h-6 w-6 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-              2
-            </span>
-            <input
-              aria-label="Question 2"
-              value={answers.q2}
-              onChange={(e) => setAnswers((a) => ({ ...a, q2: e.target.value }))}
-              className={`w-32 ${input}`}
-            />
-          </label>
-        </div>
-        <div className="mt-6 flex flex-wrap items-center gap-4">
-          <button className="rounded-full bg-primary px-6 py-2.5 font-medium text-primary-foreground transition hover:scale-105 hover:bg-primary-hover">
-            {T.submit}
+      <form onSubmit={submit} className="mt-6" autoComplete="off">
+        <ExamPaper
+          paper={demo.paper}
+          answers={answers}
+          onChange={(id, v) => setAnswers((a) => ({ ...a, [id]: v }))}
+          disabled={submitted}
+          highlight={null}
+        />
+        {!submitted && (
+          <button
+            disabled={stage === "idle"}
+            className="mt-6 rounded-full bg-primary px-6 py-2.5 font-medium text-primary-foreground transition hover:scale-105 hover:bg-primary-hover disabled:pointer-events-none disabled:opacity-50"
+          >
+            {td("submit")}
           </button>
-          {result && (
-            <p
-              className={`text-sm font-medium ${result.score === 2 ? "text-accent" : "text-primary-hover"}`}
-              aria-live="polite"
-            >
-              {result.score} / 2　{result.hints.join("")}
-            </p>
-          )}
-        </div>
+        )}
       </form>
+
+      {submitted && (
+        <div className="mt-6 grid gap-4" aria-live="polite">
+          {results.map((r) => (
+            <p
+              key={r.questionId}
+              className={`text-lg font-semibold ${r.ok ? "text-accent" : "text-primary-hover"}`}
+            >
+              {r.ok ? td("correct") : td("wrong", { answer: r.answer })}
+            </p>
+          ))}
+          <details className="rounded-2xl bg-surface px-5 py-4" open>
+            <summary className="cursor-pointer font-medium">{td("transcript")}</summary>
+            <ol className="mt-3 grid gap-2 text-sm">
+              {demo.transcript.map((line) => {
+                const quote = quoteOf(line.id);
+                return (
+                  <li
+                    key={line.id}
+                    className={quote ? "rounded-md bg-primary-soft/50 px-2" : "px-2"}
+                  >
+                    <b className="mr-1">{line.speaker}:</b>
+                    {line.text}
+                  </li>
+                );
+              })}
+            </ol>
+          </details>
+          <a href={examHref} className="font-medium text-primary underline">
+            {td("fullTest")}
+          </a>
+        </div>
+      )}
     </div>
   );
 }

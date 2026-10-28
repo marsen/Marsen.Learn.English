@@ -12,7 +12,7 @@ export async function setAccountRolesAction(
   formData: FormData,
 ): Promise<ManageFormState> {
   const actor = await getCurrentAccount();
-  if (!actor) return { problems: ["請先登入"] };
+  if (!actor) return { problems: [{ code: "notLoggedIn" }] };
   const r = await setAccountRoles().execute({
     actor,
     accountId: String(formData.get("accountId") ?? ""),
@@ -28,7 +28,7 @@ export async function addAccountAction(
   formData: FormData,
 ): Promise<ManageFormState> {
   const actor = await getCurrentAccount();
-  if (!actor) return { problems: ["請先登入"] };
+  if (!actor) return { problems: [{ code: "notLoggedIn" }] };
   const r = await addAccount().execute({
     actor,
     email: String(formData.get("email") ?? ""),

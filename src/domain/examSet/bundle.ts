@@ -26,24 +26,33 @@ export type BundleFacts = {
   aiVerdict: unknown;
 };
 
+/** 不能上傳的原因（代碼；文字在翻譯檔 errors.upload.*） */
+export type BundleProblem =
+  | { code: "unsupportedSchema"; version: string; supported: number }
+  | { code: "audioTooSmall" }
+  | { code: "audioMismatch" }
+  | { code: "generatorValidationFailed" }
+  | { code: "missingAiVerdict" };
+
 /** 回傳所有不能上傳的原因；空陣列代表可以上傳 */
-export function bundleProblems(f: BundleFacts): string[] {
-  const problems: string[] = [];
+export function bundleProblems(f: BundleFacts): BundleProblem[] {
+  const problems: BundleProblem[] = [];
   if (f.schemaVersion !== SUPPORTED_SCHEMA_VERSION) {
-    problems.push(
-      `不支援的 schema_version：${String(f.schemaVersion)}（只支援 ${SUPPORTED_SCHEMA_VERSION}，請在 Question.Generator 重新打包）`,
-    );
+    problems.push({
+      code: "unsupportedSchema",
+      version: String(f.schemaVersion),
+      supported: SUPPORTED_SCHEMA_VERSION,
+    });
   }
-  if (f.actualAudio.bytes < MIN_AUDIO_BYTES) problems.push("錄音檔太小，可能是壞的");
+  if (f.actualAudio.bytes < MIN_AUDIO_BYTES) problems.push({ code: "audioTooSmall" });
   if (
     f.actualAudio.bytes !== f.declaredAudio.bytes ||
     f.actualAudio.sha256 !== f.declaredAudio.sha256
   ) {
-    problems.push("錄音檔和 set.json 記載的不一致（可能選錯檔，或檔案被改過）");
+    problems.push({ code: "audioMismatch" });
   }
-  if (!f.validateOk) problems.push("出題工具的驗證不是通過");
-  if (!isAiVerdict(f.aiVerdict))
-    problems.push("缺少 AI 審稿結論（provenance.ai_review.verdict）");
+  if (!f.validateOk) problems.push({ code: "generatorValidationFailed" });
+  if (!isAiVerdict(f.aiVerdict)) problems.push({ code: "missingAiVerdict" });
   return problems;
 }
 
@@ -85,28 +94,38 @@ export function audioKeyFor(setId: string, sha256: string): string {
  * 逐字稿要跟時間軸、答案卡對得上，不然審稿頁的「從答案那句開始聽」會跳錯地方。
  * 回傳所有問題；空陣列代表沒問題。
  */
+export type TranscriptProblem =
+  | { code: "transcriptTimingMismatch" }
+  | { code: "evidenceUnknownQuestion"; questionId: string }
+  | { code: "evidenceUnknownTurn"; questionId: string; turn: string }
+  | { code: "evidenceMissing"; questionId: string };
+
 export function transcriptProblems(
   t: Transcript,
   timingTurnIds: readonly string[],
   questionIds: readonly string[],
-): string[] {
-  const problems: string[] = [];
+): TranscriptProblem[] {
+  const problems: TranscriptProblem[] = [];
   const turnIds = t.turns.map((x) => x.id);
   if (
     turnIds.length !== timingTurnIds.length ||
     turnIds.some((id, i) => id !== timingTurnIds[i])
   ) {
-    problems.push("transcript 的句子和時間軸對不上（句數或順序不同）");
+    problems.push({ code: "transcriptTimingMismatch" });
   }
   for (const e of t.evidence) {
     if (!questionIds.includes(e.questionId))
-      problems.push(`transcript.evidence 有答案卡沒有的題目：${e.questionId}`);
+      problems.push({ code: "evidenceUnknownQuestion", questionId: e.questionId });
     if (!turnIds.includes(e.turn))
-      problems.push(`transcript.evidence 的 ${e.questionId} 指到不存在的句子：${e.turn}`);
+      problems.push({
+        code: "evidenceUnknownTurn",
+        questionId: e.questionId,
+        turn: e.turn,
+      });
   }
   for (const q of questionIds) {
     if (!t.evidence.some((e) => e.questionId === q))
-      problems.push(`transcript.evidence 缺少 ${q} 的出處`);
+      problems.push({ code: "evidenceMissing", questionId: q });
   }
   return problems;
 }

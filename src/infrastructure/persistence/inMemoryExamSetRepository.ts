@@ -1,6 +1,11 @@
 import type { ExamAccess, ExamSet, ExamSetPrivate } from "@/domain/examSet/examSet";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import {
+  matchesFilter,
+  type ExamSetFilter,
+  type ExamSetSummary,
+} from "@/domain/examSet/examSetFilter";
+import {
   statusAfter,
   type ReviewRecord,
   type TeacherReview,
@@ -26,6 +31,32 @@ export class InMemoryExamSetRepository implements ExamSetRepository {
     return [...this.sets.values()]
       .sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime())
       .map((s) => structuredClone(s));
+  }
+
+  async listSummaries(filter: ExamSetFilter): Promise<ExamSetSummary[]> {
+    return (await this.list())
+      .filter((s) => matchesFilter(s, filter))
+      .map(
+        ({
+          setId,
+          title,
+          topic,
+          questionCount,
+          aiVerdict,
+          status,
+          access,
+          uploadedAt,
+        }) => ({
+          setId,
+          title,
+          topic,
+          questionCount,
+          aiVerdict,
+          status,
+          access,
+          uploadedAt,
+        }),
+      );
   }
 
   async findById(setId: string): Promise<ExamSet | null> {

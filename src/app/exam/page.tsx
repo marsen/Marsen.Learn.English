@@ -1,10 +1,17 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import { Page, PageHeader } from "@/presentation/components/ui/Page";
+import { Msg } from "@/presentation/components/Msg";
+import { DocumentTitle } from "@/presentation/components/DocumentTitle";
+import { RichMsg } from "@/presentation/components/RichMsg";
 import { ExamList } from "@/presentation/components/exam/ExamList";
 import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
 import { listAvailableExams } from "@/infrastructure/di/examSetContainer";
 
-export const metadata: Metadata = { title: "考卷", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("examList");
+  return { title: t("metaTitle"), robots: { index: false } };
+}
 
 export default async function ExamListPage() {
   const actor = await getCurrentAccount();
@@ -12,15 +19,12 @@ export default async function ExamListPage() {
 
   return (
     <Page width="sm">
-      <PageHeader title="雅思聽力 Section 1" />
+      <DocumentTitle id="examList.metaTitle" />
+      <PageHeader title={<Msg id="examList.title" />} />
       <ExamList exams={exams} />
       {!actor && (
         <p className="mt-6 text-sm text-muted-foreground">
-          你現在看到的是公開考卷。
-          <a href="/login" className="text-primary underline">
-            登入
-          </a>
-          後可以寫更多。
+          <RichMsg id="examList.guestHint" />
         </p>
       )}
     </Page>

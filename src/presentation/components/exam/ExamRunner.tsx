@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import type {
   ExamSheet,
   StartExamResult,
@@ -12,7 +13,7 @@ import { Button } from "@/presentation/components/ui/Button";
 import {
   eventAt,
   formatClock,
-  questionLabel,
+  questionRange,
   viewOf,
   type ExamPhaseView,
 } from "@/presentation/lib/examTiming";
@@ -29,6 +30,11 @@ type Props = {
 
 type Stage = "intro" | "running" | "submitting" | "submitted";
 
+/** 錯誤：翻譯檔 exam.errors.* 的代碼，交卷失敗時帶原因 */
+type RunnerError =
+  | { code: "unavailable" | "audioFailed" | "audioInterrupted" | "autoplayBlocked" }
+  | { code: "submitFailed"; message: string };
+
 /**
  * 考試流程：說明 → 開始（錄音只播一次，不能暫停、倒轉）→ 邊聽邊填 → 錄音結束自動交卷，或自己按交卷。
  * 看題停頓、最後檢查都照錄音時間軸。
@@ -41,7 +47,8 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
   const [sheet, setSheet] = useState<ExamSheet | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [phase, setPhase] = useState<ExamPhaseView | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<RunnerError | null>(null);
+  const t = useTranslations("exam");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // 給錄音事件（不在 React 流程內）讀最新的答案與是否已在交卷
   const answersRef = useRef<Record<string, string>>({});
@@ -62,9 +69,9 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
       } else if (r.reason === "already_submitted") {
         setStage("submitted");
         window.location.assign(`/exam/result/${attemptId}`);
-      } else throw new Error("找不到這次作答");
+      } else throw new Error(t("errors.attemptNotFound"));
     } catch (e) {
-      setError(`交卷失敗：${(e as Error).message}。答案還在，請再按一次「交卷」。`);
+      setError({ code: "submitFailed", message: (e as Error).message });
       handingInRef.current = false;
       setStage("running");
     }
@@ -79,7 +86,7 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
     setError(null);
     const r = await start();
     if (!r.ok) {
-      setError("這張考卷現在不能考。");
+      setError({ code: "unavailable" });
       return;
     }
     setSheet(r.sheet);
@@ -98,7 +105,7 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
     let retries = 0;
     audio.addEventListener("error", () => {
       if (retries >= MAX_AUDIO_RETRIES) {
-        setError("錄音播放失敗，你可以繼續作答，再自己按交卷。");
+        setError({ code: "audioFailed" });
         return;
       }
       retries += 1;
@@ -108,7 +115,7 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
         "loadedmetadata",
         () => {
           audio.currentTime = at;
-          audio.play().catch(() => setError("錄音中斷了，請重新整理後再試一次。"));
+          audio.play().catch(() => setError({ code: "audioInterrupted" }));
         },
         { once: true },
       );
@@ -120,20 +127,21 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
     // 只有瀏覽器擋自動播放才提示；載入失敗由上面的 error 自動重試處理
     audio.play().catch((e: unknown) => {
       if (e instanceof DOMException && e.name === "NotAllowedError")
-        setError("錄音沒辦法自動播放，請重新整理後再試一次。");
+        setError({ code: "autoplayBlocked" });
     });
   };
+
+  const errorText =
+    error &&
+    t(`errors.${error.code}`, "message" in error ? { message: error.message } : {});
 
   if (stage === "intro") {
     return (
       <div className="grid gap-4">
-        <p>
-          《{title}》。按下開始後錄音會直接播放，<b>只播一次，不能暫停或倒轉</b>
-          ，跟正式考試一樣。 錄音裡有看題時間和最後檢查時間，錄音結束會自動交卷。
-        </p>
-        {error && <Alert tone="error">{error}</Alert>}
+        <p>{t.rich("intro", { title, b: (chunks) => <b>{chunks}</b> })}</p>
+        {errorText && <Alert tone="error">{errorText}</Alert>}
         <Button onClick={begin} className="justify-self-start">
-          開始考試
+          {t("start")}
         </Button>
       </div>
     );
@@ -142,19 +150,28 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
   if (stage === "submitted") {
     return (
       <div className="grid gap-2">
-        <Alert>已交卷，正在打開批改結果…</Alert>
+        <Alert>{t("submitted")}</Alert>
       </div>
     );
   }
 
+  const questionsText = (q: [number, number]) => {
+    const r = questionRange(q);
+    return t(`questions.${r.kind}`, { a: r.a, b: r.b });
+  };
   const status =
     phase === null
-      ? "錄音開始。"
+      ? t("statusStart")
       : phase.kind === "listen"
-        ? "錄音播放中，邊聽邊填。"
+        ? t("statusListen")
         : phase.kind === "check"
-          ? `檢查你的答案。${formatClock(phase.remaining)}`
-          : `看題時間${phase.questions ? `：${questionLabel(phase.questions)}` : ""}　${formatClock(phase.remaining)}`;
+          ? t("statusCheck", { clock: formatClock(phase.remaining) })
+          : phase.questions
+            ? t("statusReadQuestions", {
+                questions: questionsText(phase.questions),
+                clock: formatClock(phase.remaining),
+              })
+            : t("statusRead", { clock: formatClock(phase.remaining) });
 
   return (
     <div className="grid gap-4">
@@ -164,7 +181,7 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
       >
         {status}
       </p>
-      {error && <Alert tone="error">{error}</Alert>}
+      {errorText && <Alert tone="error">{errorText}</Alert>}
       {sheet && (
         <ExamPaper
           paper={sheet.paper}
@@ -179,7 +196,7 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
         onClick={() => sheet && handIn(sheet.attemptId)}
         className="justify-self-start"
       >
-        {stage === "submitting" ? "交卷中…" : "交卷"}
+        {stage === "submitting" ? t("submitting") : t("submit")}
       </Button>
     </div>
   );

@@ -1,12 +1,21 @@
 import type { Account } from "@/domain/account/account";
 import type { AccountRepository } from "@/domain/account/accountRepository";
 import { can } from "@/domain/account/permission";
-import { cleanRoles, roleProblems } from "@/domain/account/roleRules";
+import { cleanRoles, roleProblems, type RoleProblem } from "@/domain/account/roleRules";
 import { isValidEmail, normalizeEmail } from "@/domain/auth/email";
 
-export type ManageResult = { ok: true } | { ok: false; problems: string[] };
+/** 管理帳號失敗的原因（代碼；文字在翻譯檔 errors.manage.*） */
+export type ManageError =
+  | RoleProblem
+  | { code: "notLoggedIn" }
+  | { code: "forbidden" }
+  | { code: "invalidEmail" }
+  | { code: "emailTaken" }
+  | { code: "accountNotFound" };
 
-const FORBIDDEN: ManageResult = { ok: false, problems: ["你的帳號沒有管理權限"] };
+export type ManageResult = { ok: true } | { ok: false; problems: ManageError[] };
+
+const FORBIDDEN: ManageResult = { ok: false, problems: [{ code: "forbidden" }] };
 
 /** 帳號清單（管理權限）。 */
 export class ListAccounts {
@@ -28,7 +37,7 @@ export class AddAccount {
   }): Promise<ManageResult> {
     if (!can(input.actor.roles, "manageRoles")) return FORBIDDEN;
     const email = normalizeEmail(input.email);
-    if (!isValidEmail(email)) return { ok: false, problems: ["email 格式不對"] };
+    if (!isValidEmail(email)) return { ok: false, problems: [{ code: "invalidEmail" }] };
     const problems = roleProblems({
       actorId: input.actor.id,
       targetId: "",
@@ -36,7 +45,7 @@ export class AddAccount {
     });
     if (problems.length > 0) return { ok: false, problems };
     if (await this.accounts.findByEmail(email))
-      return { ok: false, problems: ["這個 email 已經有帳號了"] };
+      return { ok: false, problems: [{ code: "emailTaken" }] };
     const account = await this.accounts.create(email);
     await this.accounts.setRoles(account.id, cleanRoles(input.roles));
     return { ok: true };
@@ -60,7 +69,7 @@ export class SetAccountRoles {
     });
     if (problems.length > 0) return { ok: false, problems };
     if (!(await this.accounts.findById(input.accountId))) {
-      return { ok: false, problems: ["找不到這個帳號"] };
+      return { ok: false, problems: [{ code: "accountNotFound" }] };
     }
     await this.accounts.setRoles(input.accountId, cleanRoles(input.roles));
     return { ok: true };

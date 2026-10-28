@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { Page, PageHeader } from "@/presentation/components/ui/Page";
+import { Msg } from "@/presentation/components/Msg";
+import { DocumentTitle } from "@/presentation/components/DocumentTitle";
 import { ReviewLog } from "@/presentation/components/admin/ReviewLog";
 import { requirePermission } from "@/infrastructure/auth/currentAccount";
 import { getReviewLog } from "@/infrastructure/di/examSetContainer";
 
-export const metadata: Metadata = { title: "審稿紀錄", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("reviewLog");
+  return { title: t("title"), robots: { index: false } };
+}
 
 export default async function ReviewLogPage({
   searchParams,
@@ -19,9 +25,10 @@ export default async function ReviewLogPage({
 
   return (
     <Page width="lg">
+      <DocumentTitle id="reviewLog.title" />
       <PageHeader
-        title="審稿紀錄"
-        description="每送出一次審稿就記一筆，改判或刪掉題組都不會不見。月份照台灣時間算。"
+        title={<Msg id="reviewLog.title" />}
+        description={<Msg id="reviewLog.description" />}
       />
       <ReviewLog view={view} />
     </Page>

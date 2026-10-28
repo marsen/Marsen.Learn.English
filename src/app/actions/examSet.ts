@@ -19,7 +19,7 @@ export async function uploadExamSetAction(
   formData: FormData,
 ): Promise<UploadSetFormState> {
   const actor = await getCurrentAccount();
-  if (!actor) return { problems: ["請先登入"] };
+  if (!actor) return { problems: [{ code: "notLoggedIn" }] };
 
   const setJson = formData.get("setJson");
   const audio = formData.get("audio");
@@ -29,7 +29,7 @@ export async function uploadExamSetAction(
     setJson.size === 0 ||
     audio.size === 0
   ) {
-    return { problems: ["請選 set.json 和 audio.mp3 兩個檔案"] };
+    return { problems: [{ code: "missingFiles" }] };
   }
 
   const result = await uploadExamSet().execute({

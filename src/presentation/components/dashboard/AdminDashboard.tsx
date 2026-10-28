@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import type {
   AdminDashboardView,
   RejectedSetView,
@@ -22,26 +25,41 @@ type Props = {
 
 const day = (d: Date | null) => (d ? formatDay(d) : "");
 
-const who = (r: ReviewedSetView) => r.reviewerEmail ?? "老師";
+type Translate = (key: string, values?: Record<string, string | number>) => string;
+
+const who = (t: Translate, r: ReviewedSetView) => r.reviewerEmail ?? t("teacherFallback");
 
 /** 卡片上只列老師寫的意見；AI 的意見、題目、逐字稿在複製的完整回饋裡 */
-const teacherComments = (r: RejectedSetView) =>
+const teacherComments = (t: Translate, r: RejectedSetView) =>
   [
-    r.comment && `整體意見：${r.comment}`,
-    ...r.notes.map((n) => `${n.target ?? "整套／錄音"}：${n.text}`),
+    r.comment && t("overallComment", { text: r.comment }),
+    ...r.notes.map((n) =>
+      t("noteLine", { target: n.target ?? t("noteTargetWhole"), text: n.text }),
+    ),
   ]
     .filter(Boolean)
     .join("\n");
 
 /** 管理員總覽：可以上架、有問題、題目分類統計。 */
 export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
+  const t = useTranslations("adminDashboard");
   const c = view.counts;
   const kpis = [
-    { label: "等老師審", n: c.pending, tone: "" },
-    { label: "可以上架", n: c.readyToList, tone: "border-accent/50 bg-accent-soft/40" },
-    { label: "有問題", n: c.rejected, tone: "border-destructive/40 bg-destructive/5" },
-    { label: "上架中", n: c.listed, tone: "" },
-    { label: "公開試考", n: c.public, tone: "" },
+    { key: "pending", label: t("kpiPending"), n: c.pending, tone: "" },
+    {
+      key: "ready",
+      label: t("kpiReady"),
+      n: c.readyToList,
+      tone: "border-accent/50 bg-accent-soft/40",
+    },
+    {
+      key: "rejected",
+      label: t("kpiRejected"),
+      n: c.rejected,
+      tone: "border-destructive/40 bg-destructive/5",
+    },
+    { key: "listed", label: t("kpiListed"), n: c.listed, tone: "" },
+    { key: "public", label: t("kpiPublic"), n: c.public, tone: "" },
   ];
 
   return (
@@ -49,7 +67,7 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {kpis.map((k) => (
           <div
-            key={k.label}
+            key={k.key}
             className={`rounded-2xl border border-border bg-surface p-4 ${k.tone}`}
           >
             <p className="text-sm text-muted-foreground">{k.label}</p>
@@ -58,10 +76,12 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
         ))}
       </div>
 
-      <h2 className="mt-10 mb-1 text-lg font-semibold text-heading">可以上架</h2>
-      <p className="mb-3 text-sm text-muted-foreground">老師已通過、目前還是下架。</p>
+      <h2 className="mt-10 mb-1 text-lg font-semibold text-heading">
+        {t("readyHeading")}
+      </h2>
+      <p className="mb-3 text-sm text-muted-foreground">{t("readyHint")}</p>
       {view.readyToList.length === 0 ? (
-        <EmptyState>沒有等著上架的題組。</EmptyState>
+        <EmptyState>{t("readyEmpty")}</EmptyState>
       ) : (
         <Table>
           {view.readyToList.map((r) => (
@@ -79,14 +99,14 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
                 <StatusTags tags={statusTagsOf(r.set)} />
               </Td>
               <Td className="text-xs whitespace-nowrap text-muted-foreground">
-                {who(r)} {day(r.reviewedAt)} 通過
+                {t("approvedBy", { who: who(t, r), day: day(r.reviewedAt) })}
               </Td>
               <Td align="right" className="whitespace-nowrap">
                 <form action={setAccessAction} className="inline-flex gap-2">
-                  <CopyButton text={r.feedback} label="📋 複製回饋" />
+                  <CopyButton text={r.feedback} label={t("copyFeedback")} />
                   <input type="hidden" name="setId" value={r.set.setId} />
                   <Button type="submit" name="access" value="members" size="sm">
-                    上架
+                    {t("list")}
                   </Button>
                   <Button
                     type="submit"
@@ -95,7 +115,7 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
                     variant="secondary"
                     size="sm"
                   >
-                    設為公開
+                    {t("makePublic")}
                   </Button>
                 </form>
               </Td>
@@ -104,12 +124,12 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
         </Table>
       )}
 
-      <h2 className="mt-10 mb-1 text-lg font-semibold text-heading">有問題</h2>
-      <p className="mb-3 text-sm text-muted-foreground">
-        老師退回的題組。修好就上傳新版本，修不了就刪掉。
-      </p>
+      <h2 className="mt-10 mb-1 text-lg font-semibold text-heading">
+        {t("rejectedHeading")}
+      </h2>
+      <p className="mb-3 text-sm text-muted-foreground">{t("rejectedHint")}</p>
       {view.rejected.length === 0 ? (
-        <EmptyState>沒有被退回的題組。</EmptyState>
+        <EmptyState>{t("rejectedEmpty")}</EmptyState>
       ) : (
         <div className="grid gap-3">
           {view.rejected.map((r) => (
@@ -127,24 +147,24 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
                 <span>{r.set.title}</span>
                 <StatusTags tags={statusTagsOf(r.set)} />
                 <span className="ml-auto text-xs text-muted-foreground">
-                  {who(r)} {day(r.reviewedAt)} 退回
+                  {t("rejectedBy", { who: who(t, r), day: day(r.reviewedAt) })}
                 </span>
               </div>
               <pre className="mt-3 rounded-lg bg-muted px-4 py-3 font-sans text-sm whitespace-pre-wrap">
-                {teacherComments(r) || "（老師沒有寫意見）"}
+                {teacherComments(t, r) || t("noComments")}
               </pre>
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 {r.reviewerEmail && (
                   <a
-                    href={`mailto:${r.reviewerEmail}?subject=${encodeURIComponent(`題組 ${r.set.setId} 審稿討論`)}`}
+                    href={`mailto:${r.reviewerEmail}?subject=${encodeURIComponent(t("mailSubject", { setId: r.set.setId }))}`}
                     className={buttonClass({ variant: "secondary", size: "sm" })}
                   >
-                    💬 找老師討論
+                    {t("discuss")}
                   </a>
                 )}
-                <CopyButton text={r.feedback} label="📋 複製回饋（貼給 AI）" />
+                <CopyButton text={r.feedback} label={t("copyFeedbackForAi")} />
                 <ButtonLink href="/admin/sets/upload" variant="secondary" size="sm">
-                  ⬆︎ 上傳修正版
+                  {t("uploadFix")}
                 </ButtonLink>
                 <DeleteSetButton setId={r.set.setId} action={deleteAction} />
               </div>
@@ -154,9 +174,9 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
       )}
 
       <h2 className="mt-10 mb-3 flex items-center gap-2 text-lg font-semibold text-heading">
-        情境主題統計
+        {t("topicsHeading")}
         <span className="rounded bg-muted px-1.5 py-0.5 text-xs font-normal text-muted-foreground">
-          假資料
+          {t("fakeData")}
         </span>
       </h2>
       <TopicChart />

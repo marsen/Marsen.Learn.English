@@ -13,7 +13,7 @@ import type { Sha256 } from "@/application/shared/ports";
 import type { AudioStorage } from "./ports";
 import { setJsonSchema } from "./setJsonSchema";
 import { parseAnswerKey } from "./answerKey";
-import type { UploadExamSetResult } from "./examSetResult";
+import type { UploadExamSetResult, UploadProblem } from "./examSetResult";
 
 /**
  * 管理員上傳一套題組（set.json + 錄音）。
@@ -37,29 +37,31 @@ export class UploadExamSet {
     audio: Uint8Array;
   }): Promise<UploadExamSetResult> {
     if (!can(input.actor.roles, "uploadSets")) {
-      return { ok: false, problems: ["你的帳號沒有上傳題目的權限"] };
+      return { ok: false, problems: [{ code: "forbidden" }] };
     }
 
     let raw: unknown;
     try {
       raw = JSON.parse(input.setJsonText);
     } catch {
-      return { ok: false, problems: ["set.json 不是有效的 JSON"] };
+      return { ok: false, problems: [{ code: "invalidJson" }] };
     }
     const parsed = setJsonSchema.safeParse(raw);
     if (!parsed.success) {
       return {
         ok: false,
-        problems: parsed.error.issues.map(
-          (i) => `set.json 欄位 ${i.path.join(".")}：${i.message}`,
-        ),
+        problems: parsed.error.issues.map((i) => ({
+          code: "schemaField" as const,
+          path: i.path.join("."),
+          message: i.message,
+        })),
       };
     }
     const b = parsed.data;
 
     const sha = this.sha256.hex(input.audio);
     const aiVerdict = b.provenance.ai_review?.verdict;
-    const problems = bundleProblems({
+    const problems: UploadProblem[] = bundleProblems({
       schemaVersion: b.schema_version,
       declaredAudio: { bytes: b.audio.bytes, sha256: b.audio.sha256 },
       actualAudio: { bytes: input.audio.byteLength, sha256: sha },
@@ -99,7 +101,7 @@ export class UploadExamSet {
     if (problems.length > 0 || !isAiVerdict(aiVerdict)) return { ok: false, problems };
 
     if (await this.sets.exists(b.set_id)) {
-      return { ok: false, problems: [`題組 ${b.set_id} 已經上傳過了`] };
+      return { ok: false, problems: [{ code: "duplicate", setId: b.set_id }] };
     }
 
     const audioKey = audioKeyFor(b.set_id, sha);

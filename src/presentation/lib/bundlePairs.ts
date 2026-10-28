@@ -6,7 +6,7 @@ export type PickedFile = { path: string; file: File };
 
 export type BundlePair =
   | { folder: string; ok: true; setJson: File; audio: File }
-  | { folder: string; ok: false; problem: string };
+  | { folder: string; ok: false; missing: string };
 
 const SET_JSON = "set.json";
 const AUDIO = "audio.mp3";
@@ -26,13 +26,13 @@ export function pairBundles(files: readonly PickedFile[]): BundlePair[] {
     .map(([folder, found]): BundlePair => {
       const setJson = found.get(SET_JSON);
       const audio = found.get(AUDIO);
-      if (!setJson) return { folder, ok: false, problem: `缺少 ${SET_JSON}` };
-      if (!audio) return { folder, ok: false, problem: `缺少 ${AUDIO}` };
+      if (!setJson) return { folder, ok: false, missing: SET_JSON };
+      if (!audio) return { folder, ok: false, missing: AUDIO };
       return { folder, ok: true, setJson, audio };
     });
 }
 
-/** 顯示用：只留最後一層資料夾名稱（通常就是題組編號） */
-export function folderLabel(folder: string): string {
-  return folder.split("/").pop() || folder || "（最上層）";
+/** 顯示用：只留最後一層資料夾名稱（通常就是題組編號）；最上層回傳 null（由畫面顯示「最上層」） */
+export function folderLabel(folder: string): string | null {
+  return folder.split("/").pop() || folder || null;
 }

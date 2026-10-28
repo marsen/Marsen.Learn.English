@@ -21,8 +21,8 @@ type VerifyAction = (
 type Props = {
   requestCode: RequestAction;
   verifyCode: VerifyAction;
-  /** 第一步按鈕的文字；沒給就用「寄登入碼給我」 */
-  submitLabel?: string;
+  /** 第一步按鈕文字的翻譯 key；沒給就用 login.sendCode（寄登入碼給我） */
+  submitLabelId?: string;
 };
 
 const field = "w-full rounded-lg border border-border bg-surface px-3 py-2 text-base";
@@ -32,7 +32,7 @@ const field = "w-full rounded-lg border border-border bg-surface px-3 py-2 text-
  * 1. 輸入 email → 寄一組 6 位數登入碼
  * 2. 在同一個畫面輸入登入碼 → 登入（第一次用的 email 會自動建立帳號）
  */
-export function LoginForm({ requestCode, verifyCode, submitLabel }: Props) {
+export function LoginForm({ requestCode, verifyCode, submitLabelId }: Props) {
   const t = useTranslations();
   const [sent, requestAction, requesting] = useActionState(requestCode, {});
   // 寄出後想換 email：回到第一步；寄出新的一組就回到第二步
@@ -99,7 +99,7 @@ export function LoginForm({ requestCode, verifyCode, submitLabel }: Props) {
         />
       </div>
       <Button type="submit" disabled={requesting}>
-        {requesting ? t("common.sending") : (submitLabel ?? t("login.sendCode"))}
+        {requesting ? t("common.sending") : t(submitLabelId ?? "login.sendCode")}
       </Button>
     </form>
   );
