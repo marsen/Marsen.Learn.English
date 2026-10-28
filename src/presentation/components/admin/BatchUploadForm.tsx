@@ -59,9 +59,15 @@ export function BatchUploadForm({ action }: Props) {
       state: pair.ok ? "waiting" : "failed",
       problems: pair.ok ? [] : [tu("missingFile", { file: pair.missing })],
     }));
-    // 累加到清單：同一套（資料夾名稱相同）用新選的取代，其他的（包括已完成的）留著
-    const keys = new Set(picked.map((r) => keyOf(r.pair)));
-    setRows((rs) => [...rs.filter((r) => !keys.has(keyOf(r.pair))), ...picked]);
+    // 累加到清單：已完成的留著（同一套再選到就略過，要重傳先「移除」）；其他同一套的用新選的取代
+    setRows((rs) => {
+      const done = new Set(
+        rs.filter((r) => r.state === "done").map((r) => keyOf(r.pair)),
+      );
+      const fresh = picked.filter((r) => !done.has(keyOf(r.pair)));
+      const keys = new Set(fresh.map((r) => keyOf(r.pair)));
+      return [...rs.filter((r) => !keys.has(keyOf(r.pair))), ...fresh];
+    });
   };
 
   const update = (i: number, patch: Partial<Row>) =>
