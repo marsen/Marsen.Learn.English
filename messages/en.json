@@ -97,7 +97,6 @@
       "missingFiles": "Please choose both set.json and audio.mp3",
       "invalidJson": "set.json isn't valid JSON",
       "schemaField": "set.json field {path}: {message}",
-      "duplicate": "Set {setId} has already been uploaded",
       "unsupportedSchema": "Unsupported schema_version: {version} (only {supported} is supported; please re-bundle it in Question.Generator)",
       "audioTooSmall": "The audio file is too small and may be broken",
       "audioMismatch": "The audio file doesn't match what set.json records (wrong file, or the file was changed)",
@@ -227,6 +226,11 @@
       "search": "Search",
       "clear": "Clear filters",
       "count": "{count, plural, one {# set} other {# sets}}"
+    },
+    "colVersion": "Version",
+    "versionHint": {
+      "transcript": "2.1: has a transcript",
+      "noTranscript": "2.0: no transcript. Re-bundle it as 2.1 and overwrite it on the upload page to add one"
     }
   },
   "review": {
@@ -341,13 +345,41 @@
     "pickHint": "Choose Question.Generator's <code>results/out</code>, or the folder of a single set. Each set needs set.json and audio.mp3.",
     "topFolder": "(top level)",
     "missingFile": "Missing {file}",
-    "waiting": "Waiting to upload",
     "uploading": "Uploading…",
-    "uploaded": "Uploaded: {title}, {verdict}",
     "failed": "Upload failed",
     "failedWith": "Upload failed: {message}",
     "uploadN": "Upload {count, plural, one {# set} other {# sets}}",
-    "done": "{count, plural, one {# set} other {# sets}} done. Go to the set list →"
+    "done": "{count, plural, one {# set} other {# sets}} done. Go to the set list →",
+    "picked": "{count, plural, one {# set} other {# sets}} selected",
+    "noTranscript": "No transcript",
+    "status": {
+      "waiting": "Ready",
+      "uploading": "Uploading",
+      "done": "Done",
+      "exists": "Already exists",
+      "failed": "Failed"
+    },
+    "outcome": {
+      "created": "Uploaded. Waiting for a teacher's review. {verdict}",
+      "supplemented": "Transcript and provenance added. Review status and availability unchanged.",
+      "replaced": "Overwritten and sent back for review. It will be listed again once a teacher approves it.",
+      "unchanged": "Same as the one on the site. Nothing changed."
+    },
+    "existing": {
+      "supplement": "This set is already on the site, with the same questions, answers and audio. Overwriting only adds the transcript and provenance; the review status stays the same.",
+      "content": "This set is already on the site, and the content is different ({fields}). Overwriting sends it back for review, and it will only be listed again once a teacher approves it. The current review comments are cleared; the review log is kept.",
+      "unchanged": "This set is already on the site and is exactly the same. No need to upload."
+    },
+    "overwriteSupplement": "Add transcript",
+    "overwriteContent": "Overwrite and send back for review",
+    "overwriteAllSupplement": "Add all transcripts ({count, plural, one {# set} other {# sets}})",
+    "fields": {
+      "title": "title",
+      "paper": "question paper",
+      "answers": "answers",
+      "audio": "audio"
+    },
+    "fieldSeparator": ", "
   },
   "adminDashboard": {
     "kpiPending": "Waiting for review",

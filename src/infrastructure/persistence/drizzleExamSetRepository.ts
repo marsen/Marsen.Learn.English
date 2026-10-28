@@ -84,6 +84,7 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
         topic: examSets.topic,
         questionCount: examSets.questionCount,
         aiVerdict: examSets.aiVerdict,
+        schemaMinor: examSets.schemaMinor,
         status: examSets.status,
         access: examSets.access,
         uploadedAt: examSets.uploadedAt,
@@ -92,6 +93,40 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
       .where(and(...where))
       .orderBy(desc(examSets.uploadedAt));
     return rows.map(withCodes);
+  }
+
+  async replace(set: ExamSet, secret: ExamSetPrivate): Promise<void> {
+    const { setId, ...rest } = set;
+    const secretRest = {
+      answers: secret.answers,
+      provenance: secret.provenance,
+      transcript: secret.transcript,
+    };
+    // batch 在 Neon 上是同一個交易：題組、私密部分一起換，目前的審稿意見清掉（審稿紀錄 exam_review_log 保留）
+    await this.db.batch([
+      this.db.update(examSets).set(rest).where(eq(examSets.setId, setId)),
+      this.db
+        .update(examSetPrivates)
+        .set(secretRest)
+        .where(eq(examSetPrivates.setId, setId)),
+      this.db.delete(examSetReviews).where(eq(examSetReviews.setId, setId)),
+    ]);
+  }
+
+  async supplement(
+    set: Pick<ExamSet, "setId" | "aiVerdict" | "schemaMinor">,
+    secret: Pick<ExamSetPrivate, "provenance" | "transcript">,
+  ): Promise<void> {
+    await this.db.batch([
+      this.db
+        .update(examSets)
+        .set({ aiVerdict: set.aiVerdict, schemaMinor: set.schemaMinor })
+        .where(eq(examSets.setId, set.setId)),
+      this.db
+        .update(examSetPrivates)
+        .set({ provenance: secret.provenance, transcript: secret.transcript })
+        .where(eq(examSetPrivates.setId, set.setId)),
+    ]);
   }
 
   async findById(setId: string): Promise<ExamSet | null> {

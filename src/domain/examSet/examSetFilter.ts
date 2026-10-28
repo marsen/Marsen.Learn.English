@@ -8,6 +8,7 @@ export type ExamSetSummary = Pick<
   | "topic"
   | "questionCount"
   | "aiVerdict"
+  | "schemaMinor"
   | "status"
   | "access"
   | "uploadedAt"
