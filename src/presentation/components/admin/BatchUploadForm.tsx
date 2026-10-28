@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import type { ExistingSet, UploadOutcome } from "@/application/examSet/examSetResult";
+import type { UploadOutcome } from "@/application/examSet/examSetResult";
 import type { UploadSetFormState } from "@/presentation/components/formStates";
 import {
   folderLabel,
@@ -22,7 +22,6 @@ type Row = {
   pair: BundlePair;
   state: RowState;
   problems: string[];
-  existing?: ExistingSet;
   outcome?: UploadOutcome;
 };
 
@@ -37,7 +36,7 @@ const BADGE: Record<RowState, string> = {
 
 /**
  * 批次上傳：選 Question.Generator 的 results/out 資料夾（或其中幾套），一套一套依序上傳。
- * 網站上已經有的題組不直接蓋掉：說明覆蓋會怎樣，按「覆蓋」才寫入（判斷見 docs/set-overwrite.md）。
+ * 網站上已經有的題組不直接蓋掉：按「覆蓋」才寫入，當成新上傳（見 docs/set-overwrite.md）。
  */
 export function BatchUploadForm({ action }: Props) {
   const t = useTranslations();
@@ -74,7 +73,7 @@ export function BatchUploadForm({ action }: Props) {
     try {
       const r = await action({}, fd);
       if (r.uploaded) update(i, { state: "done", outcome: r.uploaded.outcome });
-      else if (r.existing) update(i, { state: "exists", existing: r.existing });
+      else if (r.existing) update(i, { state: "exists" });
       else
         update(i, {
           state: "failed",
@@ -146,22 +145,16 @@ export function BatchUploadForm({ action }: Props) {
                     {tu(`outcome.${r.outcome}`)}
                   </span>
                 )}
-                {r.state === "exists" && r.existing && (
-                  <span className="text-sm">{tu(`existing.${r.existing.kind}`)}</span>
-                )}
                 <span className="ml-auto">
-                  {r.state === "exists" &&
-                    r.existing &&
-                    r.existing.kind !== "unchanged" && (
-                      <Button
-                        size="sm"
-                        variant={r.existing.kind === "content" ? "danger" : "primary"}
-                        disabled={busy}
-                        onClick={() => run((x) => x === r, true)}
-                      >
-                        {tu("overwrite")}
-                      </Button>
-                    )}
+                  {r.state === "exists" && (
+                    <Button
+                      size="sm"
+                      disabled={busy}
+                      onClick={() => run((x) => x === r, true)}
+                    >
+                      {tu("overwrite")}
+                    </Button>
+                  )}
                   {r.state === "failed" && r.pair.ok && (
                     <Button
                       size="sm"

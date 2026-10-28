@@ -359,14 +359,7 @@
     },
     "outcome": {
       "created": "Uploaded",
-      "supplemented": "Overwritten",
-      "replaced": "Overwritten; waiting for review",
-      "unchanged": "No changes"
-    },
-    "existing": {
-      "supplement": "Questions unchanged",
-      "content": "Questions changed; needs a new review",
-      "unchanged": "No changes"
+      "replaced": "Overwritten"
     },
     "retry": "Upload again",
     "overwrite": "Overwrite"

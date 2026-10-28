@@ -8,7 +8,6 @@ import {
   transcriptProblems,
 } from "@/domain/examSet/bundle";
 import type { ExamSet, ExamSetPrivate, Transcript } from "@/domain/examSet/examSet";
-import { checkOverwrite } from "@/domain/examSet/overwrite";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import type { Sha256 } from "@/application/shared/ports";
 import type { AudioStorage } from "./ports";
@@ -20,10 +19,8 @@ import type { UploadExamSetResult, UploadProblem } from "./examSetResult";
  * 管理員上傳一套題組（set.json + 錄音）。
  * - 只有「上傳題目」權限的帳號能用
  * - AI 審稿有疑慮（needs_human）的照樣收下，狀態是「待老師審稿」
- * - 同一個 set_id 已經有了：沒說要覆蓋就回報「已存在」與覆蓋會怎樣（不寫入）；說要覆蓋才換
- *   - 只補資料（題目、答案、錄音都一樣，多了逐字稿等）：審核狀態、開放對象、老師意見都不動
- *   - 內容有變：整套換掉、退回待審（開放對象不動，要老師重新通過才考得到），目前的審稿意見清掉
- *   - 已經交卷的作答紀錄不受影響（交卷時就存好了分數與每題對錯）
+ * - 同一個 set_id 已經有了：沒說要覆蓋就回報「已存在」（不寫入）；說要覆蓋就當成新上傳
+ *   整套換掉、待審、下架，目前的審稿意見清掉（審稿紀錄保留）；已交卷的作答紀錄不受影響
  * - 逐字稿（2.1 起的 transcript）只存在私密部分，考生拿不到
  * 寫入順序：先存錄音、再存資料；資料存失敗時錄音只是多一個沒人用的檔案，不會出現「有題目沒錄音」。
  */
@@ -131,34 +128,19 @@ export class UploadExamSet {
     const done = { ok: true as const, setId: b.set_id, title: b.title, aiVerdict };
 
     const current = await this.sets.findById(b.set_id);
-    const currentSecret = current && (await this.sets.findPrivate(b.set_id));
-    if (!current || !currentSecret) {
+    if (!current) {
       await this.storage.put(audioKey, input.audio, "audio/mpeg");
       await this.sets.save(next, nextSecret);
       return { ...done, outcome: "created" };
     }
-
-    const check = checkOverwrite(
-      { set: current, secret: currentSecret },
-      { set: next, secret: nextSecret },
-    );
     if (!input.overwrite) {
-      return {
-        ok: false,
-        problems: [],
-        existing: { setId: b.set_id, title: current.title, ...check },
-      };
+      return { ok: false, problems: [], existing: { setId: b.set_id, title: current.title } };
     }
-    if (check.kind === "unchanged") return { ...done, outcome: "unchanged" };
-    if (check.kind === "supplement") {
-      await this.sets.supplement(next, nextSecret);
-      return { ...done, outcome: "supplemented" };
-    }
-    // 內容有變：新錄音另存（舊檔留著，正在考的人不會被抽掉），開放對象沿用，退回待審
-    if (check.fields.includes("audio")) {
+    // 覆蓋＝當成新上傳：待審、下架。錄音換了就另存新檔（舊檔留著，正在考的人不會被抽掉）
+    if (audioKey !== current.audioKey) {
       await this.storage.put(audioKey, input.audio, "audio/mpeg");
     }
-    await this.sets.replace({ ...next, access: current.access }, nextSecret);
+    await this.sets.replace(next, nextSecret);
     return { ...done, outcome: "replaced" };
   }
 }

@@ -113,21 +113,6 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
     ]);
   }
 
-  async supplement(
-    set: Pick<ExamSet, "setId" | "aiVerdict" | "schemaMinor">,
-    secret: Pick<ExamSetPrivate, "provenance" | "transcript">,
-  ): Promise<void> {
-    await this.db.batch([
-      this.db
-        .update(examSets)
-        .set({ aiVerdict: set.aiVerdict, schemaMinor: set.schemaMinor })
-        .where(eq(examSets.setId, set.setId)),
-      this.db
-        .update(examSetPrivates)
-        .set({ provenance: secret.provenance, transcript: secret.transcript })
-        .where(eq(examSetPrivates.setId, set.setId)),
-    ]);
-  }
 
   async findById(setId: string): Promise<ExamSet | null> {
     const [row] = await this.db

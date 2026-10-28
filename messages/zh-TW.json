@@ -359,14 +359,7 @@
     },
     "outcome": {
       "created": "已上傳",
-      "supplemented": "已覆蓋",
-      "replaced": "已覆蓋，待重審",
-      "unchanged": "沒有變更"
-    },
-    "existing": {
-      "supplement": "題目沒變",
-      "content": "題目有變，要重審",
-      "unchanged": "沒有變更"
+      "replaced": "已覆蓋"
     },
     "retry": "重新上傳",
     "overwrite": "覆蓋"
