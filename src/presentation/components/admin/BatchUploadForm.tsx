@@ -59,12 +59,12 @@ export function BatchUploadForm({ action }: Props) {
       state: pair.ok ? "waiting" : "failed",
       problems: pair.ok ? [] : [tu("missingFile", { file: pair.missing })],
     }));
-    // 累加到清單，每一行位置不變：已有的留在原位（已完成的不動，其他的換成新選的）；新的加在最後
+    // 累加到清單，每一行位置不變：已經送出過的（完成、已存在、上傳中）不動；待上傳、失敗的換成新選的；新的加在最後
     setRows((rs) => {
       const byKey = new Map(picked.map((r) => [keyOf(r.pair), r]));
       const kept = rs.map((r) => {
         const next = byKey.get(keyOf(r.pair));
-        return next && r.state !== "done" ? next : r;
+        return next && (r.state === "waiting" || r.state === "failed") ? next : r;
       });
       const known = new Set(rs.map((r) => keyOf(r.pair)));
       return [...kept, ...picked.filter((r) => !known.has(keyOf(r.pair)))];
@@ -110,7 +110,7 @@ export function BatchUploadForm({ action }: Props) {
   const waiting = rows.filter((r) => r.state === "waiting").length;
   const done = rows.filter((r) => r.state === "done").length;
   const existing = rows.filter((r) => r.state === "exists").length;
-  /** 從清單拿掉（不上傳、不覆蓋）；已完成的拿掉後，再選到就會重新出現為待上傳 */
+  /** 從清單拿掉（不上傳、不覆蓋）；拿掉後再選到，會重新出現為待上傳 */
   const remove = (r: Row) => setRows((rs) => rs.filter((x) => x !== r));
 
   return (
