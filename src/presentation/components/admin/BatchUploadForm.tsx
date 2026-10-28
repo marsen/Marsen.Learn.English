@@ -98,6 +98,9 @@ export function BatchUploadForm({ action }: Props) {
 
   const waiting = rows.filter((r) => r.state === "waiting").length;
   const done = rows.filter((r) => r.state === "done").length;
+  const existing = rows.filter((r) => r.state === "exists").length;
+  /** 從清單拿掉（不上傳、不覆蓋） */
+  const remove = (r: Row) => setRows((rs) => rs.filter((x) => x !== r));
 
   return (
     <div className="grid gap-5">
@@ -145,7 +148,7 @@ export function BatchUploadForm({ action }: Props) {
                     {tu(`outcome.${r.outcome}`)}
                   </span>
                 )}
-                <span className="ml-auto">
+                <span className="ml-auto flex gap-2">
                   {r.state === "exists" && (
                     <Button
                       size="sm"
@@ -165,6 +168,16 @@ export function BatchUploadForm({ action }: Props) {
                       {tu("retry")}
                     </Button>
                   )}
+                  {r.state !== "done" && r.state !== "uploading" && (
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      disabled={busy}
+                      onClick={() => remove(r)}
+                    >
+                      {tu("remove")}
+                    </Button>
+                  )}
                 </span>
               </div>
               {r.state === "failed" && (
@@ -179,7 +192,7 @@ export function BatchUploadForm({ action }: Props) {
         </ul>
       )}
 
-      {(waiting > 0 || done > 0) && (
+      {(waiting > 0 || existing > 0 || done > 0) && (
         <div className="flex items-center gap-4">
           {waiting > 0 && (
             <Button
@@ -187,6 +200,14 @@ export function BatchUploadForm({ action }: Props) {
               onClick={() => run((r) => r.state === "waiting", false)}
             >
               {busy ? tu("uploading") : tu("uploadN", { count: waiting })}
+            </Button>
+          )}
+          {existing > 0 && (
+            <Button
+              disabled={busy}
+              onClick={() => run((r) => r.state === "exists", true)}
+            >
+              {tu("overwriteAll", { count: existing })}
             </Button>
           )}
           {!busy && done > 0 && (

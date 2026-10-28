@@ -362,7 +362,9 @@
       "replaced": "已覆蓋"
     },
     "retry": "重新上傳",
-    "overwrite": "覆蓋"
+    "overwrite": "覆蓋",
+    "overwriteAll": "全部覆蓋（{count} 套）",
+    "remove": "移除"
   },
   "adminDashboard": {
     "kpiPending": "等老師審",

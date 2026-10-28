@@ -362,7 +362,9 @@
       "replaced": "Overwritten"
     },
     "retry": "Upload again",
-    "overwrite": "Overwrite"
+    "overwrite": "Overwrite",
+    "overwriteAll": "Overwrite all ({count, plural, one {# set} other {# sets}})",
+    "remove": "Remove"
   },
   "adminDashboard": {
     "kpiPending": "Waiting for review",
