@@ -80,6 +80,8 @@ export function BatchUploadForm({ action }: Props) {
       path: file.webkitRelativePath || file.name,
       file,
     }));
+    // 清掉選取紀錄：檔案改過後再選同一個資料夾，瀏覽器才會再通知（重新讀檔）
+    e.target.value = "";
     const pairs = pairBundles(files);
     const previews = await Promise.all(pairs.map(readPreview));
     setRows(
@@ -140,6 +142,9 @@ export function BatchUploadForm({ action }: Props) {
   const isSupplement = (r: Row) =>
     r.state === "exists" && r.existing?.kind === "supplement";
   const supplementCount = rows.filter(isSupplement).length;
+  /** 上傳失敗、但兩個檔案都在的（缺檔的要先補檔再重選資料夾） */
+  const isRetryable = (r: Row) => r.state === "failed" && r.pair.ok;
+  const retryCount = rows.filter(isRetryable).length;
   const doneCount = count("done");
 
   return (
@@ -182,6 +187,16 @@ export function BatchUploadForm({ action }: Props) {
               </span>
             ))}
             <span className="ml-auto flex flex-wrap gap-2">
+              {retryCount > 0 && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={busy}
+                  onClick={() => run(isRetryable, false)}
+                >
+                  {tu("retryFailed", { count: retryCount })}
+                </Button>
+              )}
               {supplementCount > 0 && (
                 <Button
                   variant="secondary"
@@ -238,6 +253,7 @@ export function BatchUploadForm({ action }: Props) {
                   row={r}
                   busy={busy}
                   onOverwrite={() => run((x) => x === r, true)}
+                  onRetry={() => run((x) => x === r, false)}
                 />
               </li>
             ))}
@@ -258,19 +274,28 @@ function RowDetail({
   row,
   busy,
   onOverwrite,
+  onRetry,
 }: {
   row: Row;
   busy: boolean;
   onOverwrite: () => void;
+  onRetry: () => void;
 }) {
   const tu = useTranslations("uploadSet");
   if (row.state === "failed") {
     return (
-      <ul className="mt-2 list-disc pl-5 text-sm text-destructive">
-        {row.problems.map((p, i) => (
-          <li key={i}>{p}</li>
-        ))}
-      </ul>
+      <div className="mt-2 flex flex-wrap items-start gap-3">
+        <ul className="flex-1 list-disc pl-5 text-sm text-destructive">
+          {row.problems.map((p, i) => (
+            <li key={i}>{p}</li>
+          ))}
+        </ul>
+        {row.pair.ok && (
+          <Button variant="secondary" size="sm" disabled={busy} onClick={onRetry}>
+            {tu("retry")}
+          </Button>
+        )}
+      </div>
     );
   }
   if (row.state === "done" && row.outcome) {

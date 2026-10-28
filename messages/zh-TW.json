@@ -379,7 +379,9 @@
       "answers": "答案",
       "audio": "錄音"
     },
-    "fieldSeparator": "、"
+    "fieldSeparator": "、",
+    "retry": "重新上傳",
+    "retryFailed": "重新上傳失敗的 {count} 套"
   },
   "adminDashboard": {
     "kpiPending": "等老師審",

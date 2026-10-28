@@ -379,7 +379,9 @@
       "answers": "answers",
       "audio": "audio"
     },
-    "fieldSeparator": ", "
+    "fieldSeparator": ", ",
+    "retry": "Upload again",
+    "retryFailed": "Upload {count, plural, one {the failed set} other {# failed sets}} again"
   },
   "adminDashboard": {
     "kpiPending": "Waiting for review",
