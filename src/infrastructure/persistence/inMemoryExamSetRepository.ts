@@ -34,20 +34,6 @@ export class InMemoryExamSetRepository implements ExamSetRepository {
     this.reviews.delete(set.setId);
   }
 
-  async supplement(
-    set: Pick<ExamSet, "setId" | "aiVerdict" | "schemaMinor">,
-    secret: Pick<ExamSetPrivate, "provenance" | "transcript">,
-  ): Promise<void> {
-    const s = this.sets.get(set.setId);
-    const p = this.privates.get(set.setId);
-    if (!s || !p) throw new Error(`沒有題組 ${set.setId}`);
-    this.sets.set(set.setId, {
-      ...s,
-      aiVerdict: set.aiVerdict,
-      schemaMinor: set.schemaMinor,
-    });
-    this.privates.set(set.setId, structuredClone({ ...p, ...secret }));
-  }
 
   async list(): Promise<ExamSet[]> {
     return [...this.sets.values()]

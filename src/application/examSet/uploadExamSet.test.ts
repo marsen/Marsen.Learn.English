@@ -87,7 +87,7 @@ describe("UploadExamSet", () => {
     expect(r).toMatchObject({
       ok: false,
       problems: [],
-      existing: { setId: "s1-sample-0001", kind: "unchanged" },
+      existing: { setId: "s1-sample-0001" },
     });
     expect(await sets.list()).toHaveLength(1);
   });
@@ -216,7 +216,7 @@ describe("ListExamSets", () => {
   });
 });
 
-describe("UploadExamSet 覆蓋", () => {
+describe("UploadExamSet 覆蓋（當成新上傳）", () => {
   const reviewer = account(["teacher"]);
   /** 先上傳一套 2.0（沒有逐字稿），老師通過、管理員設成公開 */
   async function approvedPublicSet() {
@@ -234,67 +234,49 @@ describe("UploadExamSet 覆蓋", () => {
     await sets.setAccess("s1-sample-0001", "public");
   }
 
-  it("應該在只補上逐字稿時，先告訴使用者審核狀態不會變", async () => {
-    await approvedPublicSet();
-    const r = await upload(admin, bundle(withTranscript));
-    expect(r).toMatchObject({ ok: false, existing: { kind: "supplement", fields: [] } });
-    expect(sets.privateOf("s1-sample-0001")?.transcript).toBeNull();
-  });
-
-  it("應該在確定覆蓋、只補逐字稿時，保留通過、公開與老師意見", async () => {
+  it("應該在只補上逐字稿、確定覆蓋時，也當成新上傳：待審、下架、清掉審稿意見、保留紀錄", async () => {
     await approvedPublicSet();
     const r = await upload(admin, { ...bundle(withTranscript), overwrite: true });
-    expect(r).toMatchObject({ ok: true, outcome: "supplemented" });
-    const [saved] = await sets.list();
-    expect(saved).toMatchObject({ status: "approved", access: "public", schemaMinor: 1 });
-    expect(sets.privateOf("s1-sample-0001")?.transcript?.turns.length).toBeGreaterThan(0);
-    expect(await sets.findReview("s1-sample-0001")).not.toBeNull();
-  });
-
-  it("應該在內容有變、確定覆蓋時，整套換掉並退回待審，清掉目前的審稿意見但保留紀錄", async () => {
-    await approvedPublicSet();
-    const changed = bundle((b) => {
-      b.answers.answers[0].answer = "something else";
-    });
-    const check = await upload(admin, changed);
-    expect(check).toMatchObject({
-      ok: false,
-      existing: { kind: "content", fields: ["answers"] },
-    });
-
-    const r = await upload(admin, { ...changed, overwrite: true });
     expect(r).toMatchObject({ ok: true, outcome: "replaced" });
     const [saved] = await sets.list();
-    expect(saved).toMatchObject({ status: "pending_review", access: "public" });
-    expect(sets.privateOf("s1-sample-0001")?.answers).toMatchObject({
-      answers: expect.arrayContaining([
-        expect.objectContaining({ answer: "something else" }),
-      ]),
+    expect(saved).toMatchObject({
+      status: "pending_review",
+      access: "unlisted",
+      schemaMinor: 1,
     });
+    expect(sets.privateOf("s1-sample-0001")?.transcript?.turns.length).toBeGreaterThan(0);
     expect(await sets.findReview("s1-sample-0001")).toBeNull();
     expect(
       await sets.listReviewRecords(new Date(0), new Date(Date.now() + 1000)),
     ).toHaveLength(1);
   });
 
-  it("應該在完全一樣、確定覆蓋時什麼都不動", async () => {
+  it("應該在答案改了、確定覆蓋時換成新的答案", async () => {
     await approvedPublicSet();
-    const r = await upload(admin, { ...bundle(), overwrite: true });
-    expect(r).toMatchObject({ ok: true, outcome: "unchanged" });
-    expect((await sets.list())[0].status).toBe("approved");
+    const changed = bundle((b) => {
+      b.answers.answers[0].answer = "something else";
+    });
+    expect(await upload(admin, { ...changed, overwrite: true })).toMatchObject({
+      ok: true,
+      outcome: "replaced",
+    });
+    expect(sets.privateOf("s1-sample-0001")?.answers).toMatchObject({
+      answers: expect.arrayContaining([
+        expect.objectContaining({ answer: "something else" }),
+      ]),
+    });
   });
 
-  it("應該在錄音換了時存新的錄音檔，舊的留著", async () => {
+  it("應該在錄音換了時存新的錄音檔，舊的留著；錄音沒換就不重存", async () => {
     await upload(admin, bundle());
     const before = storage.files.size;
+    await upload(admin, { ...bundle(withTranscript), overwrite: true });
+    expect(storage.files.size).toBe(before);
+
     const audio = new Uint8Array(20_000).map((_, i) => (i * 7) % 251);
     const b = JSON.parse(bundle().setJsonText);
     b.audio = { ...b.audio, bytes: audio.byteLength, sha256: sha256.hex(audio) };
-    const r = await upload(admin, {
-      setJsonText: JSON.stringify(b),
-      audio,
-      overwrite: true,
-    });
+    const r = await upload(admin, { setJsonText: JSON.stringify(b), audio, overwrite: true });
     expect(r).toMatchObject({ ok: true, outcome: "replaced" });
     expect(storage.files.size).toBe(before + 1);
   });
