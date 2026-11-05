@@ -113,7 +113,6 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
     ]);
   }
 
-
   async findById(setId: string): Promise<ExamSet | null> {
     const [row] = await this.db
       .select()

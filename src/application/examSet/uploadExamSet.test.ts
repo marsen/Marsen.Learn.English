@@ -276,7 +276,11 @@ describe("UploadExamSet 覆蓋（當成新上傳）", () => {
     const audio = new Uint8Array(20_000).map((_, i) => (i * 7) % 251);
     const b = JSON.parse(bundle().setJsonText);
     b.audio = { ...b.audio, bytes: audio.byteLength, sha256: sha256.hex(audio) };
-    const r = await upload(admin, { setJsonText: JSON.stringify(b), audio, overwrite: true });
+    const r = await upload(admin, {
+      setJsonText: JSON.stringify(b),
+      audio,
+      overwrite: true,
+    });
     expect(r).toMatchObject({ ok: true, outcome: "replaced" });
     expect(storage.files.size).toBe(before + 1);
   });

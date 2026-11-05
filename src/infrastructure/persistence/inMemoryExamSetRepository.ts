@@ -34,7 +34,6 @@ export class InMemoryExamSetRepository implements ExamSetRepository {
     this.reviews.delete(set.setId);
   }
 
-
   async list(): Promise<ExamSet[]> {
     return [...this.sets.values()]
       .sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime())
