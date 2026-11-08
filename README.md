@@ -30,7 +30,7 @@ pnpm build
 1. Neon 建專案，把連線網址填進 `.env.local` 的 `DATABASE_URL`
 2. `pnpm db:migrate` 建表，`pnpm db:seed` 建立 admin@marsen.me（管理員＋老師）
 3. Resend 驗證 `marsen.me` 網域，填 `RESEND_API_KEY` 與 `MAIL_FROM`
-4. Vercel 環境變數設同樣幾個（加上正式的 `SITE_URL`）
+4. 正式環境部署到 Cloud Run（main 的 CI 通過後自動部署），設定見 `docs/deploy-cloud-run.md`
 
 ## 舊版
 
