@@ -82,6 +82,7 @@
 - [ ] UI 整體改版
 - [ ] R2 裡換資料庫前的舊錄音檔，想清再清
 - [ ] 確認新加坡的資料庫都正常後，刪掉美國的舊 Neon 專案
+- [ ] 正式資料庫跟本機分開：本機改連 Neon dev branch（目前本機還是連正式資料庫）
 - [ ] 驗證 IP 修正：帶不同的假 IP 連續申請登入碼，第 21 次要被擋（Marsen 來驗）
 - [ ] Claude 怎麼驗畫面：給一個專用的 Neon branch，或由 Marsen 在本機驗 <<待決定>>
 - [ ] 清理 GitHub 上已合併或不用的分支（進行中，2026-10-29：本機已清，遠端待 Marsen 刪）
@@ -95,7 +96,6 @@
 - [x] 一定要有資料庫，拿掉記憶體模式 #914097d
 - [x] 自動部署先跑 migration；`DATABASE_URL` 由 GitHub Secret 同步，刪掉手動部署腳本 #71db22d
 - [x] IP 改取 `x-forwarded-for` 最後一個（防止繞過寄信次數限制） #d2313e7
-- [x] 正式資料庫跟本機分開：本機連 Neon dev branch（Marsen 手動設定，沒有 commit）
 - [x] Neon 搬到新加坡（Marsen 手動完成，沒有 commit）
 - [x] 部署到 Cloud Run、main 合併後自動部署 #ac61205
 - [x] 錄音經 Cloudflare R2＋audio-gate 送出 #4c5b914
