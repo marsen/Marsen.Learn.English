@@ -5,7 +5,9 @@ import { GetAdminDashboard } from "./adminDashboard";
 import { UploadExamSet } from "@/application/examSet/uploadExamSet";
 import { ReviewExamSet } from "@/application/examSet/reviewExamSet";
 import { SetExamAccess } from "@/application/examSet/setExamAccess";
-import { DeleteExamSet } from "@/application/examSet/deleteExamSet";
+import { DeleteExamSets } from "@/application/examSet/deleteExamSets";
+import { CountSetAttempts } from "@/application/examSet/countSetAttempts";
+import { GetTrialExam } from "@/application/exam/getTrialExam";
 import type { Account } from "@/domain/account/account";
 import type { Role } from "@/domain/account/role";
 import { InMemoryAccountRepository } from "@/infrastructure/persistence/inMemoryAccountRepository";
@@ -113,32 +115,77 @@ describe("GetAdminDashboard", () => {
   });
 });
 
-describe("DeleteExamSet", () => {
-  const del = (actor: Account, setId: string) =>
-    new DeleteExamSet(sets, attempts, storage).execute({ actor, setId });
+describe("DeleteExamSets", () => {
+  const del = (actor: Account, ...setIds: string[]) =>
+    new DeleteExamSets(sets, storage).execute({ actor, setIds });
 
-  it("應該刪掉退回的題組與音檔", async () => {
-    const audioKey = (await sets.findById("s1-c"))!.audioKey;
-    expect((await del(admin, "s1-c")).ok).toBe(true);
-    expect(await sets.findById("s1-c")).toBeNull();
-    expect(await storage.get(audioKey)).toBeNull();
+  it("應該刪掉任何狀態的題組與音檔", async () => {
+    const keys = await Promise.all(
+      ["s1-a", "s1-c", "s1-d"].map(async (id) => (await sets.findById(id))!.audioKey),
+    );
+    expect(await del(admin, "s1-a", "s1-c", "s1-d")).toEqual({ ok: true, deleted: 3 });
+    for (const id of ["s1-a", "s1-c", "s1-d"]) expect(await sets.findById(id)).toBeNull();
+    for (const key of keys) expect(await storage.get(key)).toBeNull();
+    expect(await sets.findById("s1-b")).not.toBeNull();
   });
 
-  it("應該不刪合格的題組", async () => {
-    expect((await del(admin, "s1-a")).ok).toBe(false);
-  });
-
-  it("應該不刪有人寫過的題組", async () => {
-    await attempts.create({
-      setId: "s1-c",
+  it("應該刪掉有人寫過的題組，作答紀錄留著", async () => {
+    const attempt = await attempts.create({
+      setId: "s1-a",
       accountId: null,
       guestId: "g",
       startedAt: new Date(),
     });
-    expect((await del(admin, "s1-c")).ok).toBe(false);
+    expect((await del(admin, "s1-a")).ok).toBe(true);
+    expect(await sets.findById("s1-a")).toBeNull();
+    expect(await attempts.findById(attempt.id)).not.toBeNull();
+  });
+
+  it("應該略過不存在的題組", async () => {
+    expect(await del(admin, "nope", "s1-c")).toEqual({ ok: true, deleted: 1 });
+  });
+
+  it("應該在刪掉公開題組後，沒有免費試卷", async () => {
+    await new SetExamAccess(sets).execute({
+      actor: admin,
+      setId: "s1-a",
+      access: "public",
+    });
+    await del(admin, "s1-a");
+    expect(await new GetTrialExam(sets).execute()).toBeNull();
   });
 
   it("應該只讓管理員刪", async () => {
     expect((await del(teacher, "s1-c")).ok).toBe(false);
+    expect(await sets.findById("s1-c")).not.toBeNull();
+  });
+});
+
+describe("CountSetAttempts", () => {
+  it("應該給管理員每套被寫過幾次，沒人寫過是 0", async () => {
+    await attempts.create({
+      setId: "s1-a",
+      accountId: null,
+      guestId: "g",
+      startedAt: new Date(),
+    });
+    await attempts.create({
+      setId: "s1-a",
+      accountId: null,
+      guestId: "h",
+      startedAt: new Date(),
+    });
+    expect(
+      await new CountSetAttempts(attempts).execute({
+        actor: admin,
+        setIds: ["s1-a", "s1-b"],
+      }),
+    ).toEqual({ "s1-a": 2, "s1-b": 0 });
+  });
+
+  it("應該不給老師", async () => {
+    expect(
+      await new CountSetAttempts(attempts).execute({ actor: teacher, setIds: ["s1-a"] }),
+    ).toBeNull();
   });
 });

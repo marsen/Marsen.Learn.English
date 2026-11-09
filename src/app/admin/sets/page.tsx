@@ -11,8 +11,12 @@ import { ExamSetFilterBar } from "@/presentation/components/admin/ExamSetFilterB
 import { can } from "@/domain/account/permission";
 import { isFilterEmpty } from "@/domain/examSet/examSetFilter";
 import { requireAccount } from "@/infrastructure/auth/currentAccount";
-import { getTrialExam, listExamSets } from "@/infrastructure/di/examSetContainer";
-import { setExamAccessAction } from "@/app/actions/examSet";
+import {
+  countSetAttempts,
+  getTrialExam,
+  listExamSets,
+} from "@/infrastructure/di/examSetContainer";
+import { deleteExamSetsAction, setExamAccessAction } from "@/app/actions/examSet";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("sets");
@@ -43,7 +47,14 @@ export default async function ExamSetsPage({
   if (!view) redirect("/admin?denied=1");
   // 公開題組（免費試卷）只有管理員能設，提示也只給管理員看
   const canSetAccess = can(account.roles, "setExamAccess");
-  const trial = canSetAccess ? await getTrialExam().execute() : null;
+  const [trial, attemptCounts] = await Promise.all([
+    canSetAccess ? getTrialExam().execute() : null,
+    // 只有管理員拿得到（老師是 null），拿得到才能勾選刪除
+    countSetAttempts().execute({
+      actor: account,
+      setIds: view.sets.map((s) => s.setId),
+    }),
+  ]);
   return (
     <Page width="lg">
       <DocumentTitle id="sets.title" />
@@ -79,6 +90,8 @@ export default async function ExamSetsPage({
         filtered={!isFilterEmpty(view.filter)}
         setAccessAction={canSetAccess ? setExamAccessAction : undefined}
         publicSetId={trial?.setId}
+        deleteAction={attemptCounts ? deleteExamSetsAction : undefined}
+        attemptCounts={attemptCounts ?? undefined}
       />
     </Page>
   );

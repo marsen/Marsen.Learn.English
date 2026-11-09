@@ -235,7 +235,11 @@
     },
     "trialLabel": "Free test:",
     "noTrialWarning": "No public set yet: the homepage free test links to the exam list. Pick one below and click “Public”.",
-    "confirmReplacePublic": "Only one set can be public: this replaces the current public set {setId} (it becomes Listed). Continue?"
+    "confirmReplacePublic": "Only one set can be public: this replaces the current public set {setId} (it becomes Listed). Continue?",
+    "selectAll": "Select all",
+    "select": "Select {setId}",
+    "deleteSelected": "Delete {count} selected",
+    "deleteSelectedConfirm": "Delete {count} sets? {taken} of them have been taken (scores are kept). This can't be undone."
   },
   "review": {
     "metaTitle": "Review",
@@ -397,6 +401,7 @@
     "copyFeedbackForAi": "📋 Copy feedback (to paste into AI)",
     "uploadFix": "⬆︎ Upload a fixed version",
     "deleteConfirm": "Delete the whole set? This can't be undone.",
+    "deleteConfirmTaken": "Delete the whole set? It has been taken {count} times (scores are kept). This can't be undone.",
     "deleteConfirmButton": "Yes, delete",
     "topicsHeading": "Topics",
     "fakeData": "Sample data",

@@ -5,6 +5,7 @@ import { UploadExamSet } from "@/application/examSet/uploadExamSet";
 import { ReviewExamSet } from "@/application/examSet/reviewExamSet";
 import { SetExamAccess } from "@/application/examSet/setExamAccess";
 import { GetExamSetAudio } from "@/application/examSet/getExamSetAudio";
+import { DeleteExamSets } from "@/application/examSet/deleteExamSets";
 import { ListAvailableExams } from "./listAvailableExams";
 import { StartExam } from "./startExam";
 import { SubmitExam } from "./submitExam";
@@ -238,6 +239,21 @@ describe("批改與結果", () => {
       guestId: gid(actor, guestId),
       attemptId,
     });
+
+  it("應該在題組刪掉後，成績頁照樣看得到分數與每題對錯，標題改用題組代號", async () => {
+    const r = await start(student, "s1-members");
+    if (!r.ok) throw new Error(r.reason);
+    const id = r.sheet.attemptId;
+    await submit(student, id, { q01: "37" });
+    await new DeleteExamSets(sets, storage).execute({
+      actor: admin,
+      setIds: ["s1-members"],
+    });
+    const v = await result(student, id);
+    expect(v?.title).toBe("s1-members");
+    expect(v?.score).toBe(1);
+    expect(v?.results).toHaveLength(10);
+  });
 
   it("應該在交卷時批改，結果頁看得到分數、每題對錯與正解", async () => {
     const r = await start(student, "s1-members");

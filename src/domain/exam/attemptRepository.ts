@@ -19,6 +19,8 @@ export interface AttemptRepository {
   ): Promise<boolean>;
   /** 這套題被寫過幾次（含還沒交卷的） */
   countBySet(setId: string): Promise<number>;
+  /** 每套題被寫過幾次（含還沒交卷的）；沒人寫過的 setId 也會有，值是 0 */
+  countBySets(setIds: string[]): Promise<Record<string, number>>;
   /** 某個帳號交過卷的作答（新的在前） */
   listSubmittedByAccount(accountId: string): Promise<Attempt[]>;
   /** 把這個瀏覽器（guestId）的路人作答移到帳號名下；回傳移過去的作答 id（新的在前） */

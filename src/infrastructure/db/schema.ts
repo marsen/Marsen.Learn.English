@@ -118,12 +118,13 @@ export const examReviewLog = pgTable(
   (t) => [index("exam_review_log_reviewed_at_idx").on(t.reviewedAt)],
 );
 
-/** 作答。路人的作答 account_id 為空。 */
+/**
+ * 作答。路人的作答 account_id 為空。
+ * set_id 不設外鍵：題組刪掉後作答還在（分數、每題對錯都存在 results，不靠題組）。
+ */
 export const examAttempts = pgTable("exam_attempts", {
   id: uuid("id").defaultRandom().primaryKey(),
-  setId: text("set_id")
-    .notNull()
-    .references(() => examSets.setId),
+  setId: text("set_id").notNull(),
   accountId: uuid("account_id").references(() => accounts.id, { onDelete: "set null" }),
   // 路人作答的瀏覽器識別（雜湊）；登入後清掉、改填 account_id
   guestId: text("guest_id"),

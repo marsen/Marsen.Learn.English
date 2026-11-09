@@ -5,12 +5,11 @@ import { GetReviewLog } from "./reviewLog";
 import { GetTeacherDashboard } from "./teacherDashboard";
 import { UploadExamSet } from "@/application/examSet/uploadExamSet";
 import { ReviewExamSet } from "@/application/examSet/reviewExamSet";
-import { DeleteExamSet } from "@/application/examSet/deleteExamSet";
+import { DeleteExamSets } from "@/application/examSet/deleteExamSets";
 import { monthOf, shiftMonth } from "@/application/shared/taipeiMonth";
 import type { Account } from "@/domain/account/account";
 import type { Role } from "@/domain/account/role";
 import { InMemoryAccountRepository } from "@/infrastructure/persistence/inMemoryAccountRepository";
-import { InMemoryAttemptRepository } from "@/infrastructure/persistence/inMemoryAttemptRepository";
 import { InMemoryExamSetRepository } from "@/infrastructure/persistence/inMemoryExamSetRepository";
 import { InMemoryAudioStorage } from "@/infrastructure/storage/inMemoryAudioStorage";
 import { NodeSha256 } from "@/infrastructure/crypto/nodeSha256";
@@ -81,10 +80,7 @@ describe("GetReviewLog", () => {
   });
 
   it("應該在題組刪掉後還留著紀錄", async () => {
-    await new DeleteExamSet(sets, new InMemoryAttemptRepository(), storage).execute({
-      actor: admin,
-      setId: "s1-c",
-    });
+    await new DeleteExamSets(sets, storage).execute({ actor: admin, setIds: ["s1-c"] });
     const view = await log(admin);
     expect(view?.teachers.find((t) => t.email === "lee@marsen.me")?.sets).toBe(1);
     expect(view?.entries.find((e) => e.setId === "s1-c")?.setTitle).toBe(fixture.title);

@@ -64,4 +64,10 @@ export class InMemoryAttemptRepository implements AttemptRepository {
   async countBySet(setId: string): Promise<number> {
     return [...this.attempts.values()].filter((a) => a.setId === setId).length;
   }
+
+  async countBySets(setIds: string[]): Promise<Record<string, number>> {
+    const counts: Record<string, number> = {};
+    for (const id of setIds) counts[id] = await this.countBySet(id);
+    return counts;
+  }
 }
