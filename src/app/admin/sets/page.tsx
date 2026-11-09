@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Page, PageHeader } from "@/presentation/components/ui/Page";
 import { ButtonLink } from "@/presentation/components/ui/Button";
+import { Alert } from "@/presentation/components/ui/Alert";
 import { Msg } from "@/presentation/components/Msg";
 import { DocumentTitle } from "@/presentation/components/DocumentTitle";
 import { ExamSetTable } from "@/presentation/components/admin/ExamSetTable";
@@ -40,7 +41,9 @@ export default async function ExamSetsPage({
     },
   });
   if (!view) redirect("/admin?denied=1");
-  const trial = await getTrialExam().execute();
+  // 公開題組（免費試卷）只有管理員能設，提示也只給管理員看；管理員頁面只用中文
+  const canSetAccess = can(account.roles, "setExamAccess");
+  const trial = canSetAccess ? await getTrialExam().execute() : null;
   return (
     <Page width="lg">
       <DocumentTitle id="sets.title" />
@@ -54,28 +57,27 @@ export default async function ExamSetsPage({
           )
         }
       />
-      <p className="mb-4 text-sm text-muted-foreground">
-        {trial ? (
-          <>
-            <Msg id="sets.trialLabel" />{" "}
+      {canSetAccess &&
+        (trial ? (
+          <p className="mb-4 text-sm text-muted-foreground">
+            免費試卷：
             <a
               href={`/admin/sets/${trial.setId}`}
               className="font-mono text-primary underline"
             >
               {trial.setId}
             </a>
-          </>
+          </p>
         ) : (
-          <Msg id="sets.noTrial" />
-        )}
-      </p>
+          <Alert tone="error" className="mb-4">
+            還沒有公開題組：首頁的免費試卷會導到考卷清單。在下面挑一張按「公開」。
+          </Alert>
+        ))}
       <ExamSetFilterBar filter={view.filter} count={view.sets.length} />
       <ExamSetTable
         sets={view.sets}
         filtered={!isFilterEmpty(view.filter)}
-        setAccessAction={
-          can(account.roles, "setExamAccess") ? setExamAccessAction : undefined
-        }
+        setAccessAction={canSetAccess ? setExamAccessAction : undefined}
         publicSetId={trial?.setId}
       />
     </Page>

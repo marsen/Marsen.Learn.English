@@ -231,10 +231,7 @@
     "versionHint": {
       "transcript": "2.1：有逐字稿",
       "noTranscript": "2.0：沒有逐字稿。重新打包成 2.1 後到上傳頁覆蓋，就能補上"
-    },
-    "trialLabel": "免費試卷：",
-    "noTrial": "目前沒有公開題組，首頁的試考連結會導到考卷清單。",
-    "confirmReplacePublic": "公開只能有一張：會取代目前公開的 {setId}（改成上架）。確定嗎？"
+    }
   },
   "review": {
     "metaTitle": "審稿",

@@ -231,10 +231,7 @@
     "versionHint": {
       "transcript": "2.1: has a transcript",
       "noTranscript": "2.0: no transcript. Re-bundle it as 2.1 and overwrite it on the upload page to add one"
-    },
-    "trialLabel": "Free test:",
-    "noTrial": "No public set yet — the homepage's full test links to the exam list.",
-    "confirmReplacePublic": "Only one set can be public: this replaces the current public set {setId} (it becomes Listed). Continue?"
+    }
   },
   "review": {
     "metaTitle": "Review",

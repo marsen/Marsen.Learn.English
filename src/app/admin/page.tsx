@@ -13,6 +13,7 @@ import {
   getAdminDashboard,
   getStudentDashboard,
   getTeacherDashboard,
+  getTrialExam,
 } from "@/infrastructure/di/examSetContainer";
 import { deleteExamSetAction, setExamAccessAction } from "@/app/actions/examSet";
 
@@ -43,6 +44,8 @@ export default async function DashboardPage({
       ? null
       : await getStudentDashboard().execute({ actor: account });
   const both = teacherView && adminView;
+  // 管理員頁面只用中文（使用者只有 Marsen）
+  const noTrial = adminView && !(await getTrialExam().execute());
   return (
     <Page width="lg">
       <DocumentTitle id="dashboard.title" />
@@ -50,6 +53,15 @@ export default async function DashboardPage({
       {denied && (
         <Alert tone="error" className="mb-6">
           <Msg id="dashboard.denied" />
+        </Alert>
+      )}
+      {noTrial && (
+        <Alert tone="error" className="mb-6">
+          還沒有公開題組：首頁的免費試卷會導到考卷清單。到{" "}
+          <a href="/admin/sets" className="underline">
+            題組清單
+          </a>{" "}
+          挑一張按「公開」。
         </Alert>
       )}
       {teacherView && (
