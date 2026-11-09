@@ -1,6 +1,6 @@
 {
   "common": {
-    "brand": "Practicing More",
+    "brand": "ListenMore",
     "language": "Language",
     "languageNames": {
       "zh-TW": "中文",
@@ -469,7 +469,8 @@
       "audioFailed": "The recording failed to play. You can keep answering and submit yourself.",
       "audioInterrupted": "The recording was interrupted. Please refresh the page and try again.",
       "autoplayBlocked": "The recording couldn't start automatically. Please refresh the page and try again."
-    }
+    },
+    "progressAria": "Recording progress"
   },
   "history": {
     "title": "My test history",
@@ -480,76 +481,76 @@
     "view": "See results"
   },
   "result": {
-    "title": "Results",
+    "title": "Your results",
     "notFound": "We couldn't find the results for this attempt.",
-    "signupTitle": "Want to see the answers? Sign up for free",
-    "signupBody": "Enter your email, then the login code we send you, and you're signed up. This attempt is saved to your account and you'll see the answer to every question.",
-    "sendSignupCode": "Send me a sign-up code",
+    "signupTitle": "See the correct answers — free",
+    "signupBody": "Just enter your email. We'll send you a 6-digit code — no password needed. This test will be saved to your account, with the correct answer to every question.",
+    "sendSignupCode": "Email me a code",
     "colNumber": "No.",
     "colGiven": "Your answer",
-    "colExpected": "Answer",
+    "colExpected": "Correct answer",
     "blank": "(blank)",
     "accepted": "(also accepted: {list})"
   },
   "landing": {
-    "metaTitle": "Practicing More: IELTS Listening practice tests",
+    "metaTitle": "ListenMore — Free IELTS Listening Practice Tests",
     "nav": {
       "features": "Features",
       "how": "How it works",
-      "demo": "Try a test",
+      "demo": "Try A Question",
       "faq": "FAQ"
     },
-    "navCta": "Try for free",
+    "navCta": "Free practice test",
     "login": "Log in",
     "dashboard": "My dashboard",
     "navCtaMember": "Start practicing",
     "hero": {
-      "badge": "Section 1 · Form completion",
-      "titleLine1": "IELTS Listening practice tests",
-      "titleLine2": "Lots of sets. Keep practicing.",
-      "lead": "Modeled on the real exam: reading time and the same pacing. Instant feedback shows you the mistakes you make most.",
-      "cta": "Try a full test for free",
-      "secondary": "Try one question first →",
+      "badge": "IELTS Listening · Section 1",
+      "titleLine1": "Practice IELTS Listening like it's test day.",
+      "titleLine2": "The more you listen, the better you score.",
+      "lead": "Real exam timing: reading time, audio played once, time to check. Get your score the moment you submit, and see which traps catch you out.",
+      "cta": "Take a free practice test",
+      "secondary": "Try A Question first →",
       "note": "",
       "illustration": "[Illustration placeholder: cute headphones]",
       "playingTag": "Recording playing"
     },
     "features": {
-      "title": "Why practice here",
-      "lead": "There's no shortcut to listening. Listen more, write more, make more mistakes.",
+      "title": "Why ListenMore",
+      "lead": "There's no shortcut. Every test you take, every mistake you make, gets you closer to your band score.",
       "items": {
         "unlimited": {
-          "title": "Always new questions",
-          "body": "New questions every day, new sets every week."
+          "title": "Fresh tests, all the time",
+          "body": "New practice tests are added regularly, so you'll never run out."
         },
         "realPace": {
-          "title": "Real exam pacing",
-          "body": "Reading pauses, recording pace and a final check, all following the exam timeline."
+          "title": "Real exam timing",
+          "body": "Reading time before each part, audio played only once, and time to check at the end, just like the real test."
         },
         "instantGrading": {
-          "title": "Marked as soon as you submit",
-          "body": "Capital letters and date formats are checked by the rules. See right away which answers were right or wrong."
+          "title": "Instant marking",
+          "body": "Submit and see your score right away, with every answer marked right or wrong."
         },
         "weakTraps": {
-          "title": "See your common mistakes",
-          "body": "Self-corrections, similar numbers, spelling… see where you're weakest."
+          "title": "Know your weak spots",
+          "body": "Similar numbers, spelling, speakers who change their minds — see which traps catch you most often."
         }
       }
     },
     "steps": {
-      "title": "Try it now",
+      "title": "How it works",
       "items": {
         "open": {
-          "title": "Open a test",
-          "body": "No sign-up. Press start and the test begins."
+          "title": "Start a test",
+          "body": "No sign-up needed. Press start and the test begins."
         },
         "listen": {
-          "title": "Fill in the answer sheet as you listen",
-          "body": "The page tells you when it's reading time and highlights the blanks to look at."
+          "title": "Listen and fill in the answers",
+          "body": "We'll tell you when it's reading time and highlight the questions to look at."
         },
         "review": {
-          "title": "See your score and the answers",
-          "body": "Log in with your email to see every answer and keep your practice history."
+          "title": "Check your score and the answers",
+          "body": "See your score and which answers you got right as soon as you submit. Sign in with just your email to see the correct answers and track your progress."
         }
       }
     },

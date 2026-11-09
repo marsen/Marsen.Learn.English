@@ -469,7 +469,8 @@
       "audioFailed": "錄音播放失敗，你可以繼續作答，再自己按交卷。",
       "audioInterrupted": "錄音中斷了，請重新整理後再試一次。",
       "autoplayBlocked": "錄音沒辦法自動播放，請重新整理後再試一次。"
-    }
+    },
+    "progressAria": "錄音進度"
   },
   "history": {
     "title": "我的考試紀錄",
@@ -483,8 +484,8 @@
     "title": "批改結果",
     "notFound": "找不到這次作答的結果。",
     "signupTitle": "想看正解？免費註冊就能看",
-    "signupBody": "輸入 email，再輸入信裡的登入碼就完成註冊，這次的作答會保留在你的帳號裡，並看到每題正解。",
-    "sendSignupCode": "寄註冊碼給我",
+    "signupBody": "只要 email，我們寄 6 位數登入碼給你，不用密碼。這次的成績會存進帳號，每題正解都看得到。",
+    "sendSignupCode": "寄登入碼給我",
     "colNumber": "題號",
     "colGiven": "你寫的",
     "colExpected": "正解",
@@ -520,7 +521,7 @@
       "items": {
         "unlimited": {
           "title": "題庫持續翻新",
-          "body": "天天有題寫，周周有題練"
+          "body": "題庫持續增加，練習不中斷。"
         },
         "realPace": {
           "title": "擬真考試節奏",
@@ -528,7 +529,7 @@
         },
         "instantGrading": {
           "title": "交卷立刻批改",
-          "body": "大小寫、日期寫法都照規則比對，每題對錯一目了然。"
+          "body": "交卷立刻知道分數，每題對錯一目了然。"
         },
         "weakTraps": {
           "title": "數據分析常犯錯誤",
