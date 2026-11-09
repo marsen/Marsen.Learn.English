@@ -235,7 +235,11 @@
     },
     "trialLabel": "免費試卷：",
     "noTrialWarning": "還沒有公開題組：首頁的免費試卷會導到考卷清單。在下面挑一張按「公開」。",
-    "confirmReplacePublic": "公開只能有一張：會取代目前公開的 {setId}（改成上架）。確定嗎？"
+    "confirmReplacePublic": "公開只能有一張：會取代目前公開的 {setId}（改成上架）。確定嗎？",
+    "selectAll": "全選",
+    "select": "選取 {setId}",
+    "deleteSelected": "刪除選取的 {count} 套",
+    "deleteSelectedConfirm": "刪除 {count} 套題組，其中 {taken} 套有人寫過（成績會保留）。刪了就救不回來，確定嗎？"
   },
   "review": {
     "metaTitle": "審稿",
@@ -397,6 +401,7 @@
     "copyFeedbackForAi": "📋 複製回饋（貼給 AI）",
     "uploadFix": "⬆︎ 上傳修正版",
     "deleteConfirm": "確定整套刪掉？刪了就救不回來",
+    "deleteConfirmTaken": "確定整套刪掉？已經被寫過 {count} 次（成績會保留）。刪了就救不回來",
     "deleteConfirmButton": "確定刪除",
     "topicsHeading": "情境主題統計",
     "fakeData": "假資料",

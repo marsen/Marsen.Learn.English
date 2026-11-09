@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import type {
   ReviewFormState,
   UploadSetFormState,
@@ -10,7 +11,7 @@ import { parseReviewPayload } from "@/application/examSet/reviewExamSet";
 import {
   reviewExamSet,
   setExamAccess,
-  deleteExamSet,
+  deleteExamSets,
   uploadExamSet,
 } from "@/infrastructure/di/examSetContainer";
 
@@ -93,10 +94,24 @@ export async function setExamAccessAction(formData: FormData): Promise<void> {
   revalidatePath("/admin");
 }
 
-export async function deleteExamSetAction(formData: FormData): Promise<void> {
+async function deleteSets(formData: FormData): Promise<void> {
   const actor = await getCurrentAccount();
   if (!actor) return;
-  await deleteExamSet().execute({ actor, setId: String(formData.get("setId") ?? "") });
+  await deleteExamSets().execute({
+    actor,
+    setIds: formData.getAll("setId").map(String),
+  });
   revalidatePath("/admin");
   revalidatePath("/admin/sets");
+}
+
+/** 在總覽刪：留在原頁 */
+export async function deleteExamSetAction(formData: FormData): Promise<void> {
+  await deleteSets(formData);
+}
+
+/** 在題組頁、題組清單刪（一套或多套）：刪完回題組清單 */
+export async function deleteExamSetsAction(formData: FormData): Promise<void> {
+  await deleteSets(formData);
+  redirect("/admin/sets");
 }

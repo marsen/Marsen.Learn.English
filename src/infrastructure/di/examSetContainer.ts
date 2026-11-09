@@ -4,7 +4,8 @@ import type { AudioStorage, RateLimiter } from "@/application/examSet/ports";
 import { InMemoryRateLimiter } from "@/infrastructure/limits/inMemoryRateLimiter";
 import { GetTeacherDashboard } from "@/application/dashboard/teacherDashboard";
 import { GetAdminDashboard } from "@/application/dashboard/adminDashboard";
-import { DeleteExamSet } from "@/application/examSet/deleteExamSet";
+import { DeleteExamSets } from "@/application/examSet/deleteExamSets";
+import { CountSetAttempts } from "@/application/examSet/countSetAttempts";
 import { getAccountRepository } from "@/infrastructure/di/authContainer";
 import { GetReviewLog } from "@/application/dashboard/reviewLog";
 import { GetStudentDashboard } from "@/application/dashboard/studentDashboard";
@@ -132,9 +133,13 @@ export function getAdminDashboard(): GetAdminDashboard {
   return new GetAdminDashboard(container().sets, getAccountRepository());
 }
 
-export function deleteExamSet(): DeleteExamSet {
+export function deleteExamSets(): DeleteExamSets {
   const c = container();
-  return new DeleteExamSet(c.sets, c.attempts, c.storage);
+  return new DeleteExamSets(c.sets, c.storage);
+}
+
+export function countSetAttempts(): CountSetAttempts {
+  return new CountSetAttempts(container().attempts);
 }
 
 export function getReviewLog(): GetReviewLog {
