@@ -99,11 +99,6 @@ beforeEach(async () => {
     setId: "s1-public",
     access: "public",
   });
-  await new SetExamAccess(sets).execute({
-    actor: admin,
-    setId: "s1-pending",
-    access: "public",
-  });
 });
 
 describe("SetExamAccess", () => {
@@ -128,7 +123,7 @@ describe("SetExamAccess", () => {
 });
 
 describe("ListAvailableExams", () => {
-  it("應該讓路人只看到公開且合格的考卷", async () => {
+  it("應該讓路人只看到公開的考卷", async () => {
     expect(await list(guest)).toEqual(["s1-public"]);
   });
 
@@ -139,6 +134,16 @@ describe("ListAvailableExams", () => {
 
   it("應該讓只有管理員角色的帳號一張都看不到", async () => {
     expect(await list(admin)).toEqual([]);
+  });
+  it("應該讓待審的題組設成公開後，路人也能寫，原本公開的改成上架", async () => {
+    await new SetExamAccess(sets).execute({
+      actor: admin,
+      setId: "s1-pending",
+      access: "public",
+    });
+    expect(await list(guest)).toEqual(["s1-pending"]);
+    expect((await sets.findById("s1-public"))?.access).toBe("members");
+    expect((await start(guest, "s1-pending")).ok).toBe(true);
   });
 });
 
@@ -151,7 +156,7 @@ describe("StartExam", () => {
     expect((await attempts.findById(r.sheet.attemptId))?.accountId).toBe("student");
   });
 
-  it("應該擋下路人考會員考卷、任何人考未合格的考卷", async () => {
+  it("應該擋下路人考會員考卷、任何人考未合格的會員考卷", async () => {
     expect((await start(guest, "s1-members")).ok).toBe(false);
     expect((await start(guest, "s1-pending")).ok).toBe(false);
     expect((await start(student, "s1-rejected")).ok).toBe(false);

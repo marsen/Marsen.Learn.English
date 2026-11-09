@@ -30,10 +30,23 @@ describe("canTake", () => {
     }
   });
 
-  it("應該不讓任何人寫待審稿或不合格的考卷", () => {
+  it("應該不讓任何人寫待審稿或不合格的會員考卷", () => {
     for (const status of ["pending_review", "rejected"] as const) {
-      expect(canTake(["student"], { status, access: "public" })).toBe(false);
-      expect(canTake([], { status, access: "public" })).toBe(false);
+      expect(canTake(["student"], { status, access: "members" })).toBe(false);
+      expect(canTake([], { status, access: "members" })).toBe(false);
     }
+  });
+
+  it("應該讓路人和會員寫公開考卷，不論審稿狀態", () => {
+    for (const status of ["pending_review", "rejected", "approved"] as const) {
+      expect(canTake([], { status, access: "public" })).toBe(true);
+      expect(canTake(["student"], { status, access: "public" })).toBe(true);
+    }
+  });
+
+  it("應該不讓只有管理員角色的帳號寫待審的公開考卷", () => {
+    expect(canTake(["admin"], { status: "pending_review", access: "public" })).toBe(
+      false,
+    );
   });
 });

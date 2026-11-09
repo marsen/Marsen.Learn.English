@@ -1,4 +1,15 @@
-import { and, countDistinct, desc, eq, gte, ilike, lt, or, type SQL } from "drizzle-orm";
+import {
+  and,
+  countDistinct,
+  desc,
+  eq,
+  gte,
+  ilike,
+  lt,
+  ne,
+  or,
+  type SQL,
+} from "drizzle-orm";
 import {
   isExamAccess,
   isExamSetStatus,
@@ -179,7 +190,32 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
   }
 
   async setAccess(setId: string, access: ExamAccess): Promise<void> {
-    await this.db.update(examSets).set({ access }).where(eq(examSets.setId, setId));
+    const update = this.db
+      .update(examSets)
+      .set({ access })
+      .where(eq(examSets.setId, setId));
+    if (access !== "public") {
+      await update;
+      return;
+    }
+    // batch 在 Neon 上是同一個交易：其他公開的改成上架，這張設成公開
+    await this.db.batch([
+      this.db
+        .update(examSets)
+        .set({ access: "members" })
+        .where(and(eq(examSets.access, "public"), ne(examSets.setId, setId))),
+      update,
+    ]);
+  }
+
+  async findPublic(): Promise<ExamSet | null> {
+    const [row] = await this.db
+      .select()
+      .from(examSets)
+      .where(eq(examSets.access, "public"))
+      .orderBy(desc(examSets.uploadedAt))
+      .limit(1);
+    return row ? toDomain(row) : null;
   }
 
   async countReviewsBy(reviewerId: string, since: Date): Promise<number> {

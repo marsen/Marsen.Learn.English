@@ -10,7 +10,7 @@ import { ExamSetFilterBar } from "@/presentation/components/admin/ExamSetFilterB
 import { can } from "@/domain/account/permission";
 import { isFilterEmpty } from "@/domain/examSet/examSetFilter";
 import { requireAccount } from "@/infrastructure/auth/currentAccount";
-import { listExamSets } from "@/infrastructure/di/examSetContainer";
+import { getTrialExam, listExamSets } from "@/infrastructure/di/examSetContainer";
 import { setExamAccessAction } from "@/app/actions/examSet";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -40,6 +40,7 @@ export default async function ExamSetsPage({
     },
   });
   if (!view) redirect("/admin?denied=1");
+  const trial = await getTrialExam().execute();
   return (
     <Page width="lg">
       <DocumentTitle id="sets.title" />
@@ -53,6 +54,21 @@ export default async function ExamSetsPage({
           )
         }
       />
+      <p className="mb-4 text-sm text-muted-foreground">
+        {trial ? (
+          <>
+            <Msg id="sets.trialLabel" />{" "}
+            <a
+              href={`/admin/sets/${trial.setId}`}
+              className="font-mono text-primary underline"
+            >
+              {trial.setId}
+            </a>
+          </>
+        ) : (
+          <Msg id="sets.noTrial" />
+        )}
+      </p>
       <ExamSetFilterBar filter={view.filter} count={view.sets.length} />
       <ExamSetTable
         sets={view.sets}
@@ -60,6 +76,7 @@ export default async function ExamSetsPage({
         setAccessAction={
           can(account.roles, "setExamAccess") ? setExamAccessAction : undefined
         }
+        publicSetId={trial?.setId}
       />
     </Page>
   );

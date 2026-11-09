@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { LandingPage } from "@/presentation/components/landing/LandingPage";
 import { DocumentTitle } from "@/presentation/components/DocumentTitle";
 import { getCurrentAccount } from "@/infrastructure/auth/currentAccount";
+import { getTrialExam } from "@/infrastructure/di/examSetContainer";
 import { toLandingDemoView } from "@/application/exam/landingDemo";
 import landingDemo from "@/presentation/content/landingDemo.json";
 
@@ -15,12 +16,15 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const account = await getCurrentAccount();
+  const [account, trial] = await Promise.all([
+    getCurrentAccount(),
+    getTrialExam().execute(),
+  ]);
   return (
     <>
       <DocumentTitle id="landing.metaTitle" />
       <LandingPage
-        examHref="/exam"
+        examHref={trial ? `/exam/${trial.setId}` : "/exam"}
         loginHref="/login"
         dashboardHref={account ? "/admin" : undefined}
         demo={DEMO}
