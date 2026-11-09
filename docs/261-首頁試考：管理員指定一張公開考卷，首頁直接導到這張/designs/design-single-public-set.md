@@ -57,7 +57,7 @@ findPublic(): Promise<ExamSet | null>;
 - 新增 `application/exam/getTrialExam.ts`：
 
   ```ts
-  /** 首頁試考的考卷：目前公開的那張，沒有就是 null */
+  /** 免費試卷的考卷：目前公開的那張，沒有就是 null */
   class GetTrialExam { execute(): Promise<{ setId: string } | null> }
   ```
 
@@ -79,13 +79,13 @@ const trial = await getTrialExam().execute();
 
 ### 5. 後台 `/admin/sets`
 
-- 頁首加一行「首頁試考：`s1-xxx`」（連到該題組），沒有時顯示「目前沒有公開題組，首頁會導到考卷清單」
+- 頁首加一行「免費試卷：`s1-xxx`」（連到該題組），沒有時顯示「目前沒有公開題組，首頁會導到考卷清單」
 - `ExamSetTable` 多收一個 `publicSetId?: string`：按其他題組的「公開」時，用 `window.confirm` 提示「會取代目前公開的 s1-xxx（改成上架）」，取消就不送出。沒有公開題組時不提示
-- 翻譯檔 `examSet.accessHint.public` 改成「公開：首頁試考用，全站只有一張，誰都能寫，不用等審稿」；新增的文字放 `sets.*`，`en.json`、`zh-TW.json` 兩份都要補
+- 翻譯檔 `examSet.accessHint.public` 改成「公開：免費試卷用，全站只有一張，誰都能寫，不用等審稿」；新增的文字放 `sets.*`，`en.json`、`zh-TW.json` 兩份都要補
 
 ### 不做的事
 
-- 不加新的開放對象種類，也不加「首頁試考」欄位：「公開」本身就是首頁試考
+- 不加新的開放對象種類，也不加「免費試卷」欄位：「公開」本身就是免費試卷
 - 會員考卷的審稿規則不動
 - 不做 migration
 

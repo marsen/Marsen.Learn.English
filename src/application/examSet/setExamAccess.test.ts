@@ -44,11 +44,11 @@ beforeEach(async () => {
 });
 
 describe("公開考卷全站只有一張", () => {
-  it("應該在沒有公開考卷時，首頁試考是 null", async () => {
+  it("應該在沒有公開考卷時，免費試卷是 null", async () => {
     expect(await trial()).toBeNull();
   });
 
-  it("應該讓待審的題組也能設成公開，並成為首頁試考", async () => {
+  it("應該讓待審的題組也能設成公開，並成為免費試卷", async () => {
     expect(await setAccess("A", "public")).toEqual({ ok: true });
     expect(await trial()).toEqual({ setId: "A" });
   });
@@ -62,7 +62,7 @@ describe("公開考卷全站只有一張", () => {
     expect(await trial()).toEqual({ setId: "B" });
   });
 
-  it("應該在公開的改成下架後，沒有首頁試考", async () => {
+  it("應該在公開的改成下架後，沒有免費試卷", async () => {
     await setAccess("A", "public");
     await setAccess("A", "unlisted");
     expect(await trial()).toBeNull();
