@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Page, PageHeader } from "@/presentation/components/ui/Page";
 import { Alert } from "@/presentation/components/ui/Alert";
 import { Msg } from "@/presentation/components/Msg";
+import { RichMsg } from "@/presentation/components/RichMsg";
 import { DocumentTitle } from "@/presentation/components/DocumentTitle";
 import { AccountSummary } from "@/presentation/components/AccountSummary";
 import { AdminDashboard } from "@/presentation/components/dashboard/AdminDashboard";
@@ -13,6 +14,7 @@ import {
   getAdminDashboard,
   getStudentDashboard,
   getTeacherDashboard,
+  getTrialExam,
 } from "@/infrastructure/di/examSetContainer";
 import { deleteExamSetAction, setExamAccessAction } from "@/app/actions/examSet";
 
@@ -43,6 +45,7 @@ export default async function DashboardPage({
       ? null
       : await getStudentDashboard().execute({ actor: account });
   const both = teacherView && adminView;
+  const noTrial = adminView && !(await getTrialExam().execute());
   return (
     <Page width="lg">
       <DocumentTitle id="dashboard.title" />
@@ -50,6 +53,11 @@ export default async function DashboardPage({
       {denied && (
         <Alert tone="error" className="mb-6">
           <Msg id="dashboard.denied" />
+        </Alert>
+      )}
+      {noTrial && (
+        <Alert tone="error" className="mb-6">
+          <RichMsg id="dashboard.noTrialWarning" />
         </Alert>
       )}
       {teacherView && (

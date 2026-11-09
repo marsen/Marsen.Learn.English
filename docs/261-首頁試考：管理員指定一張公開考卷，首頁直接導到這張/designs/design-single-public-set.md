@@ -83,6 +83,12 @@ const trial = await getTrialExam().execute();
 - `ExamSetTable` 多收一個 `publicSetId?: string`：按其他題組的「公開」時，用 `window.confirm` 提示「會取代目前公開的 s1-xxx（改成上架）」，取消就不送出。沒有公開題組時不提示
 - 翻譯檔 `examSet.accessHint.public` 改成「公開：免費試卷用，全站只有一張，誰都能寫，不用等審稿」；新增的文字放 `sets.*`，`en.json`、`zh-TW.json` 兩份都要補
 
+### 6. 追加（2026-11-09，上線後）
+
+- 沒有公開題組時，管理員總覽 `/admin` 和題組清單 `/admin/sets` 最上面顯示警告（`Alert tone="error"`），提醒去設一張
+- 「免費試卷：s1-xxx」、警告只給有「設定開放對象」權限的人看；老師看題組清單時不顯示
+- 文字照樣放翻譯檔（`sets.trialLabel`、`sets.noTrialWarning`、`sets.confirmReplacePublic`、`dashboard.noTrialWarning`）
+
 ### 不做的事
 
 - 不加新的開放對象種類，也不加「免費試卷」欄位：「公開」本身就是免費試卷

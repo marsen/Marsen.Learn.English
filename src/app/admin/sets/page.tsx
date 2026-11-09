@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { Page, PageHeader } from "@/presentation/components/ui/Page";
 import { ButtonLink } from "@/presentation/components/ui/Button";
+import { Alert } from "@/presentation/components/ui/Alert";
 import { Msg } from "@/presentation/components/Msg";
 import { DocumentTitle } from "@/presentation/components/DocumentTitle";
 import { ExamSetTable } from "@/presentation/components/admin/ExamSetTable";
@@ -40,7 +41,9 @@ export default async function ExamSetsPage({
     },
   });
   if (!view) redirect("/admin?denied=1");
-  const trial = await getTrialExam().execute();
+  // 公開題組（免費試卷）只有管理員能設，提示也只給管理員看
+  const canSetAccess = can(account.roles, "setExamAccess");
+  const trial = canSetAccess ? await getTrialExam().execute() : null;
   return (
     <Page width="lg">
       <DocumentTitle id="sets.title" />
@@ -54,9 +57,9 @@ export default async function ExamSetsPage({
           )
         }
       />
-      <p className="mb-4 text-sm text-muted-foreground">
-        {trial ? (
-          <>
+      {canSetAccess &&
+        (trial ? (
+          <p className="mb-4 text-sm text-muted-foreground">
             <Msg id="sets.trialLabel" />{" "}
             <a
               href={`/admin/sets/${trial.setId}`}
@@ -64,18 +67,17 @@ export default async function ExamSetsPage({
             >
               {trial.setId}
             </a>
-          </>
+          </p>
         ) : (
-          <Msg id="sets.noTrial" />
-        )}
-      </p>
+          <Alert tone="error" className="mb-4">
+            <Msg id="sets.noTrialWarning" />
+          </Alert>
+        ))}
       <ExamSetFilterBar filter={view.filter} count={view.sets.length} />
       <ExamSetTable
         sets={view.sets}
         filtered={!isFilterEmpty(view.filter)}
-        setAccessAction={
-          can(account.roles, "setExamAccess") ? setExamAccessAction : undefined
-        }
+        setAccessAction={canSetAccess ? setExamAccessAction : undefined}
         publicSetId={trial?.setId}
       />
     </Page>

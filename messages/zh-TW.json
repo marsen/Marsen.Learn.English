@@ -113,7 +113,8 @@
     "title": "總覽",
     "denied": "你的帳號沒有剛才那個功能的權限。",
     "reviewHeading": "審稿",
-    "manageHeading": "管理"
+    "manageHeading": "管理",
+    "noTrialWarning": "還沒有公開題組：首頁的免費試卷會導到考卷清單。到<sets>題組清單</sets>挑一張按「公開」。"
   },
   "teacherDashboard": {
     "intro": "別的老師審完的題組會自動從清單消失，不會重複審。",
@@ -233,7 +234,7 @@
       "noTranscript": "2.0：沒有逐字稿。重新打包成 2.1 後到上傳頁覆蓋，就能補上"
     },
     "trialLabel": "免費試卷：",
-    "noTrial": "目前沒有公開題組，首頁的試考連結會導到考卷清單。",
+    "noTrialWarning": "還沒有公開題組：首頁的免費試卷會導到考卷清單。在下面挑一張按「公開」。",
     "confirmReplacePublic": "公開只能有一張：會取代目前公開的 {setId}（改成上架）。確定嗎？"
   },
   "review": {

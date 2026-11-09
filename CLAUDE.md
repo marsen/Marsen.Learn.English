@@ -53,7 +53,7 @@ app（路由／Server Action，薄）→ presentation → application → domain
 - **有翻譯文字的元件一律是瀏覽器端元件（`"use client"`）**，資料由頁面（伺服器端）查好用 props 傳進去；頁面裡要放一句翻譯就用 `<Msg id="…" />`。伺服器端只有 `generateMetadata` 可以用 `getTranslations`，其他地方用了測試會擋（`presentation/lib/i18nRules.test.ts`）
 - 頁籤標題：`generateMetadata` 給第一次載入，頁面再放 `<DocumentTitle id="…" />` 讓切換時跟著變
 - 翻譯檔 `messages/<語言>.json`，每種語言的 key 要一樣（有測試檢查）
-- 老師、學生、路人會看到的文字一律放翻譯檔；只有管理員看的頁面暫時維持中文
+- 所有文字一律放翻譯檔，管理員才看得到的也一樣（Marsen 自己切換語言使用）
 - 後端只回錯誤代碼，文字在翻譯檔 `errors.*`
 - 共用的詞（按鈕、角色、題組狀態、陷阱類型…）放 `common`、`roles`、`examSet`，不要每頁各寫一份
 
