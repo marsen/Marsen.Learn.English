@@ -17,6 +17,8 @@ type Props = {
   filtered?: boolean;
   /** 有「設定考卷開放對象」權限才給，沒給就只顯示不能改 */
   setAccessAction?: (formData: FormData) => Promise<void>;
+  /** 目前公開的題組（全站只有一張）；設別張為公開前會提示要取代它 */
+  publicSetId?: string;
 };
 
 /** 目前選中的那一格的顏色 */
@@ -26,7 +28,7 @@ const ACCESS_ACTIVE: Record<ExamSet["access"], string> = {
   public: "bg-accent font-semibold text-accent-foreground",
 };
 
-export function ExamSetTable({ sets, filtered, setAccessAction }: Props) {
+export function ExamSetTable({ sets, filtered, setAccessAction, publicSetId }: Props) {
   const t = useTranslations();
   const locale = useLocale();
   if (sets.length === 0)
@@ -91,6 +93,17 @@ export function ExamSetTable({ sets, filtered, setAccessAction }: Props) {
                       value={a}
                       disabled={current}
                       aria-pressed={current}
+                      onClick={(e) => {
+                        if (
+                          a === "public" &&
+                          publicSetId &&
+                          publicSetId !== s.setId &&
+                          !window.confirm(
+                            t("sets.confirmReplacePublic", { setId: publicSetId }),
+                          )
+                        )
+                          e.preventDefault();
+                      }}
                       title={t(`examSet.accessHint.${a}`)}
                       className={`px-3 py-1 text-xs whitespace-nowrap transition-colors ${
                         current

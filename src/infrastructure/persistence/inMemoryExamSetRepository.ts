@@ -99,7 +99,15 @@ export class InMemoryExamSetRepository implements ExamSetRepository {
 
   async setAccess(setId: string, access: ExamAccess): Promise<void> {
     const set = this.sets.get(setId);
-    if (set) set.access = access;
+    if (!set) return;
+    if (access === "public")
+      for (const other of this.sets.values())
+        if (other.access === "public") other.access = "members";
+    set.access = access;
+  }
+
+  async findPublic(): Promise<ExamSet | null> {
+    return (await this.list()).find((s) => s.access === "public") ?? null;
   }
 
   /** 測試用：取私密部分 */

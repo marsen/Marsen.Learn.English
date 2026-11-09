@@ -5,7 +5,10 @@ import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 
 export type SetExamAccessResult = { ok: true } | { ok: false; problem: string };
 
-/** 管理員設定考卷開放對象（公開／會員）。只有合格的考卷才會真的被考到，但任何狀態都可以先設。 */
+/**
+ * 管理員設定考卷開放對象（公開／上架／下架）。
+ * 公開全站只有一張（設新的一張時，原本的改成上架），不用等審稿；上架的要合格才考得到。
+ */
 export class SetExamAccess {
   constructor(private readonly sets: ExamSetRepository) {}
 

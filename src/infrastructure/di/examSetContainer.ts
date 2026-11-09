@@ -10,6 +10,7 @@ import { GetReviewLog } from "@/application/dashboard/reviewLog";
 import { GetStudentDashboard } from "@/application/dashboard/studentDashboard";
 import { ClaimGuestAttempts } from "@/application/exam/claimGuestAttempts";
 import { GetAttemptResult } from "@/application/exam/getAttemptResult";
+import { GetTrialExam } from "@/application/exam/getTrialExam";
 import { ListAvailableExams } from "@/application/exam/listAvailableExams";
 import { ListMyAttempts } from "@/application/exam/listMyAttempts";
 import { StartExam } from "@/application/exam/startExam";
@@ -93,6 +94,10 @@ export function setExamAccess(): SetExamAccess {
 
 export function listAvailableExams(): ListAvailableExams {
   return new ListAvailableExams(container().sets);
+}
+
+export function getTrialExam(): GetTrialExam {
+  return new GetTrialExam(container().sets);
 }
 
 export function startExam(): StartExam {

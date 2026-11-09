@@ -18,7 +18,10 @@ export interface ExamSetRepository {
   findReview(setId: string): Promise<TeacherReview | null>;
   /** 存審稿、記一筆審稿紀錄，並同步更新題組狀態（同一個交易） */
   saveReview(review: TeacherReview): Promise<void>;
+  /** 設定開放對象；設成 public 時，原本 public 的全部改成 members（同一個交易），全站只留一張公開 */
   setAccess(setId: string, access: ExamAccess): Promise<void>;
+  /** 目前公開的那張（首頁試考）；資料裡若有多張，取最新上傳的 */
+  findPublic(): Promise<ExamSet | null>;
   /** 某位老師從 since 之後審了幾套（依審稿紀錄；同一套審好幾次只算一套） */
   /** 刪掉題組（連同私密部分與審稿） */
   delete(setId: string): Promise<void>;
