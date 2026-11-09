@@ -87,7 +87,7 @@ const trial = await getTrialExam().execute();
 
 - 沒有公開題組時，管理員總覽 `/admin` 和題組清單 `/admin/sets` 最上面顯示警告（`Alert tone="error"`），提醒去設一張
 - 「免費試卷：s1-xxx」、警告只給有「設定開放對象」權限的人看；老師看題組清單時不顯示
-- 管理員才看得到的文字（上面兩項、取代公開題組的確認）直接寫中文，不放翻譯檔：管理員只有 Marsen
+- 文字照樣放翻譯檔（`sets.trialLabel`、`sets.noTrialWarning`、`sets.confirmReplacePublic`、`dashboard.noTrialWarning`）
 
 ### 不做的事
 

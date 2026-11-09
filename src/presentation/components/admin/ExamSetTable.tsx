@@ -99,7 +99,7 @@ export function ExamSetTable({ sets, filtered, setAccessAction, publicSetId }: P
                           publicSetId &&
                           publicSetId !== s.setId &&
                           !window.confirm(
-                            `公開只能有一張：會取代目前公開的 ${publicSetId}（改成上架）。確定嗎？`,
+                            t("sets.confirmReplacePublic", { setId: publicSetId }),
                           )
                         )
                           e.preventDefault();

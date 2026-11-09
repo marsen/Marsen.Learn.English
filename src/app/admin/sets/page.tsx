@@ -41,7 +41,7 @@ export default async function ExamSetsPage({
     },
   });
   if (!view) redirect("/admin?denied=1");
-  // 公開題組（免費試卷）只有管理員能設，提示也只給管理員看；管理員頁面只用中文
+  // 公開題組（免費試卷）只有管理員能設，提示也只給管理員看
   const canSetAccess = can(account.roles, "setExamAccess");
   const trial = canSetAccess ? await getTrialExam().execute() : null;
   return (
@@ -60,7 +60,7 @@ export default async function ExamSetsPage({
       {canSetAccess &&
         (trial ? (
           <p className="mb-4 text-sm text-muted-foreground">
-            免費試卷：
+            <Msg id="sets.trialLabel" />{" "}
             <a
               href={`/admin/sets/${trial.setId}`}
               className="font-mono text-primary underline"
@@ -70,7 +70,7 @@ export default async function ExamSetsPage({
           </p>
         ) : (
           <Alert tone="error" className="mb-4">
-            還沒有公開題組：首頁的免費試卷會導到考卷清單。在下面挑一張按「公開」。
+            <Msg id="sets.noTrialWarning" />
           </Alert>
         ))}
       <ExamSetFilterBar filter={view.filter} count={view.sets.length} />

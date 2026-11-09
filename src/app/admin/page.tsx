@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Page, PageHeader } from "@/presentation/components/ui/Page";
 import { Alert } from "@/presentation/components/ui/Alert";
 import { Msg } from "@/presentation/components/Msg";
+import { RichMsg } from "@/presentation/components/RichMsg";
 import { DocumentTitle } from "@/presentation/components/DocumentTitle";
 import { AccountSummary } from "@/presentation/components/AccountSummary";
 import { AdminDashboard } from "@/presentation/components/dashboard/AdminDashboard";
@@ -44,7 +45,6 @@ export default async function DashboardPage({
       ? null
       : await getStudentDashboard().execute({ actor: account });
   const both = teacherView && adminView;
-  // 管理員頁面只用中文（使用者只有 Marsen）
   const noTrial = adminView && !(await getTrialExam().execute());
   return (
     <Page width="lg">
@@ -57,11 +57,7 @@ export default async function DashboardPage({
       )}
       {noTrial && (
         <Alert tone="error" className="mb-6">
-          還沒有公開題組：首頁的免費試卷會導到考卷清單。到{" "}
-          <a href="/admin/sets" className="underline">
-            題組清單
-          </a>{" "}
-          挑一張按「公開」。
+          <RichMsg id="dashboard.noTrialWarning" />
         </Alert>
       )}
       {teacherView && (
