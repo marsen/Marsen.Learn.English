@@ -85,6 +85,17 @@ const NUMBER_WORDS: Record<string, number> = {
   twenty: 20,
 };
 
+const TENS: Record<string, number> = {
+  twenty: 20,
+  thirty: 30,
+  forty: 40,
+  fifty: 50,
+  sixty: 60,
+  seventy: 70,
+  eighty: 80,
+  ninety: 90,
+};
+
 const MONTH_RE = Object.keys(MONTHS).join("|");
 const DATE_DM = new RegExp(
   `\\b(\\d{1,2})(?:st|nd|rd|th)?\\s+(?:of\\s+)?(${MONTH_RE})\\b(?:\\s+(\\d{4}))?`,
@@ -136,17 +147,62 @@ export function parseDate(str: string): DateHit | null {
   return h.end - h.index >= str.trim().length - 1 ? h : null;
 }
 
-const sameDate = (a: DateHit, b: DateHit) =>
+type DateValue = Pick<DateHit, "day" | "month" | "year">;
+
+const sameDate = (a: DateValue, b: DateValue) =>
   a.day === b.day &&
   a.month === b.month &&
   (a.year === null || b.year === null || a.year === b.year);
 
-/** "3"、"three" → "3"；只處理 0 到 20 的英文數字 */
+const isUnit = (w: string) => NUMBER_WORDS[w] >= 1 && NUMBER_WORDS[w] <= 9;
+
+/** "one hundred and sixteen" → 116、"thirty-seven" → 37；只處理到 999，其他回傳 null */
+function spelledNumber(t: string): number | null {
+  let words = t
+    .replace(/-/g, " ")
+    .split(" ")
+    .filter((w) => w !== "and");
+  let hundreds = 0;
+  if (words.length >= 2 && words[1] === "hundred") {
+    if (words[0] !== "a" && !isUnit(words[0])) return null;
+    hundreds = words[0] === "a" ? 1 : NUMBER_WORDS[words[0]];
+    words = words.slice(2);
+    if (words.length === 0) return hundreds * 100;
+  }
+  const [first, second] = words;
+  if (words.length === 1 && first in NUMBER_WORDS)
+    return hundreds * 100 + NUMBER_WORDS[first];
+  if (words.length === 1 && first in TENS) return hundreds * 100 + TENS[first];
+  if (words.length === 2 && first in TENS && isUnit(second)) {
+    return hundreds * 100 + TENS[first] + NUMBER_WORDS[second];
+  }
+  return null;
+}
+
+/** "3"、"three"、"thirty-seven" → 數字字串；英文數字只處理 0 到 999 */
 export function numberWordToDigits(token: string): string | null {
   const t = normalize(token);
   if (/^\d+$/.test(t)) return String(+t);
-  return t in NUMBER_WORDS ? String(NUMBER_WORDS[t]) : null;
+  const n = spelledNumber(t);
+  return n === null ? null : String(n);
 }
+
+/** "28/5" 這種寫法的所有合理讀法（日／月、月／日）；不是這種寫法就回傳空陣列 */
+function slashDates(s: string): { day: number; month: number; year: null }[] {
+  const m = /^(\d{1,2})\/(\d{1,2})$/.exec(s);
+  if (!m) return [];
+  const a = +m[1];
+  const b = +m[2];
+  return [
+    [a, b],
+    [b, a],
+  ]
+    .filter(([day, month]) => day >= 1 && day <= 31 && month >= 1 && month <= 12)
+    .map(([day, month]) => ({ day, month, year: null }));
+}
+
+/** 價錢的寫法：開頭的 £、結尾的 pound(s) */
+const MONEY = /^£\s*|\s*pounds?$/g;
 
 const dashToSpace = (s: string) => normalize(s).replace(/-/g, " ").replace(/\s+/g, " ");
 
@@ -163,18 +219,22 @@ export function matchesAnswer(
       // 連字號等同空白（King-Street = King Street），拼錯就是錯
       return candidates.some((c) => dashToSpace(c) === dashToSpace(given));
     case "date_equivalence": {
-      const gd = parseDate(given);
-      if (!gd) return false;
+      // 斜線寫法（28/5）日月兩種讀法有一種對上就算對
+      const slash = slashDates(g);
+      const parsed = parseDate(given);
+      const readings: DateValue[] = slash.length > 0 ? slash : parsed ? [parsed] : [];
       return candidates.some((c) => {
         const cd = parseDate(c);
-        return cd !== null && sameDate(cd, gd);
+        return cd !== null && readings.some((gd) => sameDate(cd, gd));
       });
     }
     case "digits_only": {
-      // 去掉空白與連字號；有字母就錯
-      if (/[a-z]/i.test(g)) return false;
-      const gd = g.replace(/[\s-]/g, "");
-      return candidates.some((c) => c.replace(/[\s-]/g, "") === gd);
+      // 去掉 £、pounds；剩下有字母就當英文數字，認不得就錯；否則去掉空白與連字號
+      const amount = g.replace(MONEY, "").trim();
+      const gd = /[a-z]/.test(amount)
+        ? numberWordToDigits(amount)
+        : amount.replace(/[\s-]/g, "");
+      return gd !== null && candidates.some((c) => c.replace(/[\s-]/g, "") === gd);
     }
     case "number_word": {
       const gn = numberWordToDigits(given);
