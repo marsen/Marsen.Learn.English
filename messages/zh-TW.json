@@ -512,7 +512,7 @@
       "cta": "免費試寫一回",
       "secondary": "先試做一題 →",
       "note": "",
-      "illustration": "[在此處放入微日系Q 版耳機插圖]",
+      "illustration": "[ TBD:在此處放入微日系Q 版耳機插圖]",
       "playingTag": "錄音播放中"
     },
     "features": {
@@ -565,8 +565,8 @@
       "playFailed": "錄音沒辦法播放，請重新整理後再試一次。",
       "transcript": "逐字稿",
       "fullTest": "寫完整一回（10 題）→",
-      "correct": "答對了！",
-      "wrong": "正解是 {answer}"
+      "correct": "第 {number} 題：答對了！",
+      "wrong": "第 {number} 題：正解是 {answer}"
     },
     "faq": {
       "title": "常見問題",
