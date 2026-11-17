@@ -21,6 +21,7 @@ import {
 import {
   browserStorage,
   clearDraft,
+  clearOtherDrafts,
   questionIdsOf,
   saveDraft,
   unansweredCount,
@@ -81,8 +82,14 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
 
   useEffect(() => {
     if (stage !== "running" || releaseGuardRef.current) return;
-    releaseGuardRef.current = installLeaveGuard(() => leaveConfirmRef.current);
-  }, [stage]);
+    const attemptId = sheet?.attemptId;
+    releaseGuardRef.current = installLeaveGuard(
+      () => leaveConfirmRef.current,
+      () => {
+        if (attemptId) clearDraft(browserStorage(), attemptId);
+      },
+    );
+  }, [stage, sheet]);
 
   /** 交卷完成要跳成績頁：先拿掉離開提醒、刪掉瀏覽器裡的暫存答案 */
   const leaveTo = (attemptId: string, url: string) => {
@@ -141,6 +148,8 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
       setError({ code: "unavailable" });
       return;
     }
+    // 開始新考試：之前沒交卷留下的暫存清掉，只留這次的
+    clearOtherDrafts(browserStorage(), r.sheet.attemptId);
     setSheet(r.sheet);
     setStage("running");
     const audio = new Audio(audioUrl);

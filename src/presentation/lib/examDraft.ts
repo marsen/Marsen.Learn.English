@@ -23,7 +23,7 @@ export function draftKey(attemptId: string): string {
 }
 
 /** 拿瀏覽器的 localStorage；有些瀏覽器連讀 window.localStorage 都會丟錯 */
-export function browserStorage(): DraftStorage | null {
+export function browserStorage(): Storage | null {
   try {
     return typeof window === "undefined" ? null : window.localStorage;
   } catch {
@@ -81,6 +81,24 @@ export function clearDraft(storage: DraftStorage | null, attemptId: string): voi
     storage.removeItem(draftKey(attemptId));
   } catch {
     // 刪不掉也不影響交卷
+  }
+}
+
+/** 開始新考試時用：清掉其他次作答留下的暫存，只留 keepAttemptId 這一次 */
+export function clearOtherDrafts(
+  storage: (DraftStorage & Pick<Storage, "length" | "key">) | null,
+  keepAttemptId: string,
+): void {
+  if (!storage) return;
+  try {
+    const stale: string[] = [];
+    for (let i = 0; i < storage.length; i++) {
+      const k = storage.key(i);
+      if (k && k.startsWith(PREFIX) && k !== draftKey(keepAttemptId)) stale.push(k);
+    }
+    for (const k of stale) storage.removeItem(k);
+  } catch {
+    // 清不掉也不影響考試
   }
 }
 

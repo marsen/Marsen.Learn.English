@@ -9,8 +9,10 @@
 - 存在**學生的瀏覽器** `localStorage`，一次作答一個鍵 `exam-draft:<attemptId>`，值是 `{attemptId, setId, answers, savedAt}`。
 - 每改一題就存（`ExamRunner.changeAnswer`）。
 - 交卷成功、網站回 `already_submitted`、`not_found` 時刪掉。
+- **開始新考試**時，清掉所有其他次的 `exam-draft:*`，只留這次的（`clearOtherDrafts`）。沒交卷就離開留下的暫存不會一直累積。
+- **考試中按登出**、在離開提醒按「確定離開」時，清掉這次的暫存（共用電腦換人時，不留答案）。登出表單加 `data-logout`，離開提醒認得出來（`isLogoutForm`）。點選單、上一頁、重新整理離開**不清**，留給之後的 AC-3 用。其他頁面的登出不管（那時沒有進行中的考試）。
 - 讀寫都包 `try/catch`，連拿 `window.localStorage` 都包：私密瀏覽、空間滿寫不進去，考試照常。
-- 純函式在 `src/presentation/lib/examDraft.ts`（`saveDraft`／`loadDraft`／`clearDraft`、`questionIdsOf`、`unansweredCount`），附單元測試；`ExamRunner` 只接上去。
+- 純函式在 `src/presentation/lib/examDraft.ts`（`saveDraft`／`loadDraft`／`clearDraft`／`clearOtherDrafts`、`questionIdsOf`、`unansweredCount`），附單元測試；`ExamRunner` 只接上去。
 - 網站、資料庫不動，沒有 migration。
 
 ### 離開提醒（D4，AC-1）
@@ -28,7 +30,7 @@
 - 確定離開後設 `leaving`，後面的 `beforeunload` 不再問第二次。
 - 交卷跳成績頁（`window.location.assign`）前先 `release()`，自動交卷、確認交卷後不會又跳提醒。元件卸載時也會 `release()`。
 
-**已知限制**：iPhone Safari 不支援 `beforeunload` 提醒，所以 iPhone 上重新整理、關分頁不會問（點選單、上一頁照樣會問）。答案已存在瀏覽器，但這次沒做 AC-3 的「回來自動交卷」，所以重新整理後暫存答案目前不會被用上。
+**已知限制**：iPhone Safari 不支援 `beforeunload` 提醒，所以 iPhone 上重新整理、關分頁不會問（點選單、上一頁照樣會問）。答案已存在瀏覽器，但這次沒做 AC-3 的「回來自動交卷」，所以重新整理後暫存答案目前不會被用上（下次開始新考試時清掉）。
 
 ### 交卷確認（D5，AC-2）
 

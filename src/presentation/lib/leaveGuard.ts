@@ -6,7 +6,11 @@
  * message 每次問的時候才讀（考試中切換介面語言也跟著換）。
  * 回傳 release()：交卷前一定要先呼叫，不然交卷後跳成績頁會又跳出提醒。
  */
-export function installLeaveGuard(message: () => string): () => void {
+export function installLeaveGuard(
+  message: () => string,
+  /** 考試中按登出、又按「確定離開」時呼叫（清掉這次的暫存答案；其他離開方式不清，留給之後的 AC-3） */
+  onLogoutConfirmed?: () => void,
+): () => void {
   // 已經按「確定離開」：後面的 beforeunload 不要再問一次
   let leaving = false;
   let released = false;
@@ -18,14 +22,16 @@ export function installLeaveGuard(message: () => string): () => void {
     e.returnValue = "";
   };
 
-  const ask = (e: Event) => {
-    if (leaving) return;
+  /** 問學生；回傳是不是確定離開 */
+  const ask = (e: Event): boolean => {
+    if (leaving) return true;
     if (window.confirm(message())) {
       leaving = true;
-      return;
+      return true;
     }
     e.preventDefault();
     e.stopPropagation();
+    return false;
   };
 
   const onClick = (e: MouseEvent) => {
@@ -36,7 +42,9 @@ export function installLeaveGuard(message: () => string): () => void {
     ask(e);
   };
 
-  const onSubmit = (e: SubmitEvent) => ask(e);
+  const onSubmit = (e: SubmitEvent) => {
+    if (ask(e) && isLogoutForm(e.target)) onLogoutConfirmed?.();
+  };
 
   const onPopState = () => {
     if (released) return;
@@ -75,4 +83,13 @@ export function leavesPage(
   if (a.hasAttribute("download")) return false;
   const href = a.getAttribute("href") ?? "";
   return !href.startsWith("#");
+}
+
+/** 登出的表單（AppSidebar 的 <form data-logout>） */
+export function isLogoutForm(target: EventTarget | null): boolean {
+  return (
+    typeof HTMLFormElement !== "undefined" &&
+    target instanceof HTMLFormElement &&
+    target.hasAttribute("data-logout")
+  );
 }

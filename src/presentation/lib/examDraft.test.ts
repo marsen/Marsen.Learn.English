@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import type { FullPaperView, PaperView } from "@/application/exam/paperView";
 import {
   clearDraft,
+  clearOtherDrafts,
   draftKey,
   loadDraft,
   questionIdsOf,
@@ -10,13 +11,17 @@ import {
   type DraftStorage,
 } from "./examDraft";
 
-function memory(): DraftStorage & { data: Map<string, string> } {
+function memory() {
   const data = new Map<string, string>();
   return {
     data,
-    getItem: (k) => data.get(k) ?? null,
-    setItem: (k, v) => void data.set(k, v),
-    removeItem: (k) => void data.delete(k),
+    get length() {
+      return data.size;
+    },
+    key: (i: number) => [...data.keys()][i] ?? null,
+    getItem: (k: string) => data.get(k) ?? null,
+    setItem: (k: string, v: string) => void data.set(k, v),
+    removeItem: (k: string) => void data.delete(k),
   };
 }
 
@@ -82,6 +87,20 @@ describe("examDraft", () => {
     saveDraft(s, { attemptId: "a1", setId: "s1", answers: { q1: "c" } });
     clearDraft(s, "a1");
     expect(loadDraft(s, "a1")).toBeNull();
+  });
+
+  it("開始新考試時清掉其他次的暫存，只留這次的，別的資料不動", () => {
+    const s = memory();
+    saveDraft(s, { attemptId: "old1", setId: "s1", answers: { q1: "a" } });
+    saveDraft(s, { attemptId: "old2", setId: "s2", answers: {} });
+    saveDraft(s, { attemptId: "now", setId: "s1", answers: {} });
+    s.data.set("NEXT_LOCALE", "en");
+    clearOtherDrafts(s, "now");
+    expect([...s.data.keys()].sort()).toEqual(["NEXT_LOCALE", draftKey("now")].sort());
+    expect(() =>
+      clearOtherDrafts({ ...broken, length: 1, key: () => draftKey("x") }, "now"),
+    ).not.toThrow();
+    expect(() => clearOtherDrafts(null, "now")).not.toThrow();
   });
 
   it("瀏覽器不給存（私密瀏覽、空間滿）時不丟錯", () => {
