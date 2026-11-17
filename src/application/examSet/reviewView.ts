@@ -1,7 +1,12 @@
 import { z } from "zod";
 import type { ExamSet, ExamSetPrivate, JsonObject } from "@/domain/examSet/examSet";
 import { aiNoteRef, type TeacherReview } from "@/domain/examSet/review";
-import { toPaperView, type PaperView } from "@/application/exam/paperView";
+import {
+  toSheetPapers,
+  type ChoiceOption,
+  type FullPaperView,
+  type PaperView,
+} from "@/application/exam/paperView";
 
 /** 一題答案在錄音裡的出處（set.json 2.1 起才有） */
 export type ReviewEvidence = {
@@ -29,6 +34,10 @@ export type ReviewQuestion = {
   wrongValue: string | null;
   note: string | null;
   evidence: ReviewEvidence | null;
+  /** 完整考卷：這題在 Section 幾；2.x 是 null */
+  ieltsSection: number | null;
+  /** 單選、配對的選項；填空是 null */
+  options: ChoiceOption[] | null;
 };
 
 /**
@@ -61,6 +70,8 @@ export type ReviewTurn = {
 export type ReviewView = {
   set: ExamSet;
   paper: PaperView;
+  /** 完整考卷（四個 section）才有；有的話題目卷照這個畫，paper 是空的 */
+  fullPaper: FullPaperView | null;
   questions: ReviewQuestion[];
   aiNotes: AiNote[];
   /** 逐字稿；2.1 以前打包的題組沒有，是 null */
@@ -149,21 +160,63 @@ export function buildReviewView(
   secret: ExamSetPrivate,
   review: TeacherReview | null,
 ): ReviewView {
-  const paperRows = paperSchema.parse(set.paper);
-  const paper = toPaperView(set.paper);
+  const { paper, fullPaper } = toSheetPapers(set.paper);
   const card = answerCardSchema.parse(secret.answers);
-  const where = new Map<string, { label: string | null; section: string | null }>();
-  for (const row of paperRows.rows) {
-    for (const part of row.parts ?? []) {
-      if (part.blank)
-        where.set(part.blank, { label: row.label ?? null, section: row.section ?? null });
-    }
-  }
+  type Where = {
+    label: string | null;
+    section: string | null;
+    ieltsSection: number | null;
+    options: ChoiceOption[] | null;
+  };
+  const where = new Map<string, Where>();
   const numberOf = new Map<string, number>();
-  for (const section of paper.sections)
-    for (const row of section.rows)
-      for (const part of row.parts)
-        if (part.kind === "blank") numberOf.set(part.questionId, part.number);
+  const addForm = (form: unknown, view: PaperView, ieltsSection: number | null) => {
+    for (const row of paperSchema.parse(form).rows) {
+      for (const part of row.parts ?? []) {
+        if (part.blank)
+          where.set(part.blank, {
+            label: row.label ?? null,
+            section: row.section ?? null,
+            ieltsSection,
+            options: null,
+          });
+      }
+    }
+    for (const section of view.sections)
+      for (const row of section.rows)
+        for (const part of row.parts)
+          if (part.kind === "blank") numberOf.set(part.questionId, part.number);
+  };
+  if (!fullPaper) addForm(set.paper, paper, null);
+  // 完整考卷：逐段、逐區塊找題目在哪裡；單選、配對多帶選項
+  const rawSections = Array.isArray(set.paper.sections) ? set.paper.sections : [];
+  fullPaper?.sections.forEach((sec, si) => {
+    const rawBlocks =
+      (rawSections[si] as { blocks?: { form?: unknown }[] })?.blocks ?? [];
+    sec.blocks.forEach((b, bi) => {
+      if (b.kind === "form") addForm(rawBlocks[bi]?.form ?? {}, b.paper, sec.ielts);
+      if (b.kind === "choice")
+        for (const q of b.questions) {
+          numberOf.set(q.questionId, q.number);
+          where.set(q.questionId, {
+            label: q.stem,
+            section: null,
+            ieltsSection: sec.ielts,
+            options: q.options,
+          });
+        }
+      if (b.kind === "matching")
+        for (const it of b.items) {
+          numberOf.set(it.questionId, it.number);
+          where.set(it.questionId, {
+            label: it.text,
+            section: null,
+            ieltsSection: sec.ielts,
+            options: b.options,
+          });
+        }
+    });
+  });
 
   // 每一句在錄音的開始時間（時間軸 type=turn 的事件，順序就是逐字稿的順序）
   const turnEvents = set.timing.events.filter((e) => e.type === "turn");
@@ -195,6 +248,7 @@ export function buildReviewView(
   return {
     set,
     paper,
+    fullPaper,
     questions: card.answers.map((a, i) => ({
       questionId: a.question_id,
       number: numberOf.get(a.question_id) ?? i + 1,
@@ -208,6 +262,8 @@ export function buildReviewView(
       wrongValue: a.wrong_value ?? null,
       note: a.note ?? null,
       evidence: evidenceOf(a.question_id),
+      ieltsSection: where.get(a.question_id)?.ieltsSection ?? null,
+      options: where.get(a.question_id)?.options ?? null,
     })),
     aiNotes: [
       ...warnings.map((w): AiNote => ({

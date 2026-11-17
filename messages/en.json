@@ -494,7 +494,9 @@
     "colGiven": "Your answer",
     "colExpected": "Answer",
     "blank": "(blank)",
-    "accepted": "(also accepted: {list})"
+    "accepted": "(also accepted: {list})",
+    "band": "IELTS Listening band (estimate): {band}",
+    "sectionScore": "Section {n}: {correct} / {total} correct"
   },
   "landing": {
     "metaTitle": "Practicing More: IELTS Listening practice tests",

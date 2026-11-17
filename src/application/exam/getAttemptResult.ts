@@ -4,6 +4,7 @@ import type { AttemptRepository } from "@/domain/exam/attemptRepository";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import { ownerOf, rolesOf, type ExamTaker } from "@/application/shared/actor";
 import type { AttemptResultView } from "./examResult";
+import { estimatedBand, sectionRangesOf, sectionScores } from "@/domain/examSet/fullExam";
 
 /**
  * 看批改結果：要有「看批改結果」權限，而且是自己的作答（路人只能看自己這個瀏覽器的）。
@@ -26,6 +27,9 @@ export class GetAttemptResult {
     if (!attempt.result || !attempt.submittedAt) return null;
     const set = await this.sets.findById(attempt.setId);
     const answerKeyVisible = can(roles, "viewAnswerKey");
+    // 完整考卷：各段答對幾題、級分都在讀取時算（作答紀錄的形狀和 2.x 一樣）
+    const ranges = set ? sectionRangesOf(set.paper) : [];
+    const isFull = ranges.length > 0;
     return {
       attemptId: attempt.id,
       setId: attempt.setId,
@@ -37,6 +41,8 @@ export class GetAttemptResult {
       results: attempt.result.results.map((r) =>
         answerKeyVisible ? r : { ...r, expected: null, accepted: [] },
       ),
+      sections: sectionScores(ranges, attempt.result.results),
+      band: isFull ? estimatedBand(attempt.result.score, attempt.result.total) : null,
     };
   }
 }

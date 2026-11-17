@@ -494,7 +494,9 @@
     "colGiven": "你寫的",
     "colExpected": "正解",
     "blank": "（空白）",
-    "accepted": "（也算對：{list}）"
+    "accepted": "（也算對：{list}）",
+    "band": "雅思聽力級分（估算）：{band}",
+    "sectionScore": "Section {n}：答對 {correct} / {total} 題"
   },
   "landing": {
     "metaTitle": "無限雅思聽力模擬測試",

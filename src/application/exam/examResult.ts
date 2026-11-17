@@ -1,5 +1,6 @@
 import type { ExamAccess, PublicTiming } from "@/domain/examSet/examSet";
 import type { GradeResult } from "@/domain/exam/grading";
+import type { SectionScore } from "@/domain/examSet/fullExam";
 import type { FullPaperView, PaperView } from "./paperView";
 
 /** 考卷清單上的一張 */
@@ -43,6 +44,10 @@ export type AttemptResultView = {
   total: number;
   answerKeyVisible: boolean;
   results: QuestionResultView[];
+  /** 完整考卷才有：每個 section 對幾題；2.x 是空陣列 */
+  sections: SectionScore[];
+  /** 滿分 40 題的完整考卷才有：換算的雅思級分（估算）；其他是 null */
+  band: number | null;
 };
 
 /** 考試紀錄的一筆 */
