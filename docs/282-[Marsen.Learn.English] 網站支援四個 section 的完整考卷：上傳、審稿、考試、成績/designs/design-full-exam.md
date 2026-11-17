@@ -20,6 +20,7 @@
 - 各段答對幾題、雅思級分都在**讀取時算**（題號 → 段落用 `paper.sections[].first_question/last_question`），作答紀錄的形狀不變，舊紀錄、舊成績不受影響。
 - 上傳檢查：3.0 另有一份外型檢查（`fullExamJsonSchema`）；轉好之後走原本的檢查（錄音雜湊大小、`validate.ok`、AI 結論、答案卡、逐字稿和時間軸一一對應）。另檢查：choice 每題 3 個選項、matching 選項比項目多 ≥2、答案是選項裡的字母、題號全卷唯一。
 - 大版號：網站改成收 2 和 3。
+- 同一個 `set_id` 已經有 2.x 題組（`s1-tour-0002` 就是）：照現有規則要勾「覆蓋」，整套換成完整考卷、待審、下架。舊作答的分數照舊；成績頁發現作答沒涵蓋每一段時，不分段、不換算級分。
 
 ### 批改
 
@@ -56,9 +57,9 @@
 
 ## 任務
 
-- [ ] T1：這份 design
-- [ ] T2：上傳 3.0（外型檢查、轉換、收大版號 3、上限 20MB）；驗證：`uploadExamSet.test.ts` 用真的 `s1-tour-0002` 結構的樣本；2.x 測試不改照過
-- [ ] T3：老師審稿四段、單選配對的選項／答案／依據、複製回饋；驗證：`reviewView` 測試
-- [ ] T4：學生考試：分段題目卷、三種題型作答、檢查時間；驗證：`paperView`、`examTiming` 測試，`pnpm build`
-- [ ] T5：批改 `letter`、成績頁（總分、級分、各段）；驗證：`grading.test.ts`、`fullExam.test.ts`、`examFlow` 測試
-- [ ] T6：中英文翻譯（兩邊 key 一致，`messages.test.ts`）
+- [x] T1：這份 design
+- [x] T2：上傳 3.0（外型檢查、轉換、收大版號 3、上限 20MB）；驗證：`uploadExamSet.test.ts` 用真的 `s1-tour-0002` 結構的樣本；2.x 測試不改照過
+- [x] T3：老師審稿四段、單選配對的選項／答案／依據、複製回饋；驗證：`reviewView` 測試
+- [x] T4：學生考試：分段題目卷、三種題型作答、檢查時間；驗證：`paperView`、`examTiming` 測試，`pnpm build`
+- [x] T5：批改 `letter`、成績頁（總分、級分、各段）；驗證：`grading.test.ts`、`fullExam.test.ts`、`examFlow` 測試
+- [x] T6：中英文翻譯（兩邊 key 一致，`messages.test.ts`）
