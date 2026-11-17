@@ -22,6 +22,7 @@ import {
   type Editing,
 } from "./review/NoteCard";
 import { ReviewPaper } from "./review/ReviewPaper";
+import { FullReviewPaper } from "./review/FullReviewPaper";
 import { Transcript } from "./review/Transcript";
 
 type Props = {
@@ -389,19 +390,35 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
         ref={boardRef}
         className="relative grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start xl:gap-12"
       >
-        <ReviewPaper
-          paper={view.paper}
-          questions={questions}
-          active={active}
-          verdicts={verdicts}
-          listening={listening}
-          counts={counts}
-          onSelect={selectFromPaper}
-          onPlay={(id) => {
-            const start = questions.get(id)?.evidence?.start;
-            if (start != null) seek(start, true);
-          }}
-        />
+        {view.fullPaper ? (
+          <FullReviewPaper
+            paper={view.fullPaper}
+            questions={questions}
+            active={active}
+            verdicts={verdicts}
+            listening={listening}
+            counts={counts}
+            onSelect={selectFromPaper}
+            onPlay={(id) => {
+              const start = questions.get(id)?.evidence?.start;
+              if (start != null) seek(start, true);
+            }}
+          />
+        ) : (
+          <ReviewPaper
+            paper={view.paper}
+            questions={questions}
+            active={active}
+            verdicts={verdicts}
+            listening={listening}
+            counts={counts}
+            onSelect={selectFromPaper}
+            onPlay={(id) => {
+              const start = questions.get(id)?.evidence?.start;
+              if (start != null) seek(start, true);
+            }}
+          />
+        )}
         <div ref={marginRef} className="relative grid min-w-0 gap-3 xl:block">
           {cards.map((target) => (
             <div key={target} data-card={target} className="xl:absolute xl:inset-x-0">

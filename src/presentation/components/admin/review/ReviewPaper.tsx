@@ -19,6 +19,8 @@ type Props = {
   counts: ReadonlyMap<string, number>;
   onSelect: (questionId: string) => void;
   onPlay: (questionId: string) => void;
+  /** 標題當作「整套」的批註錨點；完整考卷裡的填空區塊不用（錨點在整份考卷的標題） */
+  withSetAnchor?: boolean;
 };
 
 function nextIsPunctuation(
@@ -54,11 +56,15 @@ export function ReviewPaper({
   counts,
   onSelect,
   onPlay,
+  withSetAnchor = true,
 }: Props) {
   const t = useTranslations("review");
   return (
     <div className="min-w-0 rounded-xl border border-border bg-surface px-5 py-4 leading-loose">
-      <h2 data-anchor="set" className="my-3 text-center font-semibold">
+      <h2
+        data-anchor={withSetAnchor ? "set" : undefined}
+        className="my-3 text-center font-semibold"
+      >
         {paper.title}
       </h2>
       {paper.instruction && <Instruction text={paper.instruction} />}

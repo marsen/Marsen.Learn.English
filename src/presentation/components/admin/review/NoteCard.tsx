@@ -188,6 +188,28 @@ export function NoteCard(p: Props) {
               {r("answerDetails")}
             </summary>
             <dl className="mt-1 grid grid-cols-[6.5rem_1fr] gap-x-2 gap-y-0.5">
+              {q.ieltsSection !== null && (
+                <>
+                  <dt className="text-muted-foreground">{r("full.section")}</dt>
+                  <dd>{r("full.sectionN", { n: q.ieltsSection })}</dd>
+                </>
+              )}
+              {q.options && (
+                <>
+                  <dt className="text-muted-foreground">{r("full.options")}</dt>
+                  <dd>
+                    {q.options.map((o) => (
+                      <div
+                        key={o.key}
+                        className={o.key === q.answer ? "font-semibold" : undefined}
+                      >
+                        {o.key}. {o.text}
+                        {o.key === q.answer && " ✓"}
+                      </div>
+                    ))}
+                  </dd>
+                </>
+              )}
               <dt className="text-muted-foreground">{r("accepted")}</dt>
               <dd>
                 {q.accepted.length > 0

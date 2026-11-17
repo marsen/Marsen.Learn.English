@@ -170,14 +170,17 @@
       "exact_word": "Same word as the recording",
       "digits_only": "Digits only",
       "number_word": "Digits or number words both accepted",
-      "date_equivalence": "Any date format accepted"
+      "date_equivalence": "Any date format accepted",
+      "letter": "Letter only (any case)"
     },
     "answerType": {
       "word": "Word",
       "name_spelled": "Spelled name",
       "phone": "Phone number",
       "number": "Number",
-      "place": "Place"
+      "place": "Place",
+      "choice": "Multiple choice",
+      "matching": "Matching"
     },
     "aiRuling": {
       "problem": "AI verdict: problem",
@@ -300,7 +303,14 @@
     "summaryJoin": " · ",
     "pending": "{count} left to check",
     "resultPass": "→ Pass",
-    "resultFail": "→ Fail"
+    "resultFail": "→ Fail",
+    "full": {
+      "heading": "Full test ({count} sections)",
+      "answer": "Answer: {answer}",
+      "section": "Section",
+      "options": "Options",
+      "sectionN": "Section {n}"
+    }
   },
   "permissions": {
     "uploadSets": "Upload sets",

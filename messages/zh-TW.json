@@ -170,14 +170,17 @@
       "exact_word": "照錄音裡的字",
       "digits_only": "只寫數字",
       "number_word": "數字或英文數字都算對",
-      "date_equivalence": "日期寫法不拘"
+      "date_equivalence": "日期寫法不拘",
+      "letter": "只比字母（大小寫不拘）"
     },
     "answerType": {
       "word": "單字",
       "name_spelled": "拼出的名字",
       "phone": "電話號碼",
       "number": "數字",
-      "place": "地點"
+      "place": "地點",
+      "choice": "單選",
+      "matching": "配對"
     },
     "aiRuling": {
       "problem": "AI 判定：有問題",
@@ -300,7 +303,14 @@
     "summaryJoin": "、",
     "pending": "{count} 項待處理",
     "resultPass": "→ 合格",
-    "resultFail": "→ 不合格"
+    "resultFail": "→ 不合格",
+    "full": {
+      "heading": "完整考卷（{count} 個 section）",
+      "answer": "答案：{answer}",
+      "section": "段落",
+      "options": "選項",
+      "sectionN": "Section {n}"
+    }
   },
   "permissions": {
     "uploadSets": "上傳題目",
