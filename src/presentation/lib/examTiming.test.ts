@@ -24,6 +24,19 @@ describe("examTiming", () => {
     expect(viewOf(eventAt(events, 310), 310)).toEqual({ kind: "check", remaining: 20 });
   });
 
+  it("完整考卷每段的 s<n>-check 也是檢查時間；s4-pause1 是看題", () => {
+    const full = [
+      { type: "pause", id: "s4-pause1", start: 0, end: 30, questions: [31, 40] },
+      { type: "pause", id: "s4-check", start: 30, end: 60, questions: [31, 40] },
+    ];
+    expect(viewOf(eventAt(full, 10), 10)).toEqual({
+      kind: "read",
+      remaining: 20,
+      questions: [31, 40],
+    });
+    expect(viewOf(eventAt(full, 40), 40)).toEqual({ kind: "check", remaining: 20 });
+  });
+
   it("應該把秒數與題號範圍寫成中文", () => {
     expect(formatClock(65.2)).toBe("1:06");
     expect(questionRange([1, 6])).toEqual({ kind: "range", a: 1, b: 6 });

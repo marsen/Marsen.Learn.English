@@ -8,6 +8,7 @@ import type {
   SubmitExamResult,
 } from "@/application/exam/examResult";
 import { ExamPaper } from "./ExamPaper";
+import { FullExamPaper } from "./FullExamPaper";
 import { Alert } from "@/presentation/components/ui/Alert";
 import { Button } from "@/presentation/components/ui/Button";
 import {
@@ -182,7 +183,16 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
         {status}
       </p>
       {errorText && <Alert tone="error">{errorText}</Alert>}
-      {sheet && (
+      {sheet?.fullPaper && (
+        <FullExamPaper
+          paper={sheet.fullPaper}
+          answers={answers}
+          onChange={changeAnswer}
+          disabled={stage !== "running"}
+          highlight={phase?.kind === "read" ? phase.questions : null}
+        />
+      )}
+      {sheet && !sheet.fullPaper && (
         <ExamPaper
           paper={sheet.paper}
           answers={answers}

@@ -469,6 +469,11 @@
       "audioFailed": "The recording failed to play. You can keep answering and submit yourself.",
       "audioInterrupted": "The recording was interrupted. Please refresh the page and try again.",
       "autoplayBlocked": "The recording couldn't start automatically. Please refresh the page and try again."
+    },
+    "full": {
+      "sectionHeading": "Section {n} (Questions {a}–{b})",
+      "matchingLabel": "Question {n}",
+      "choose": "Choose"
     }
   },
   "history": {

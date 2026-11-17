@@ -1,6 +1,6 @@
 import type { ExamAccess, PublicTiming } from "@/domain/examSet/examSet";
 import type { GradeResult } from "@/domain/exam/grading";
-import type { PaperView } from "./paperView";
+import type { FullPaperView, PaperView } from "./paperView";
 
 /** 考卷清單上的一張 */
 export type AvailableExam = {
@@ -16,6 +16,8 @@ export type ExamSheet = {
   setId: string;
   title: string;
   paper: PaperView;
+  /** 完整考卷（四個 section）才有；有的話畫面照這個畫，paper 是空的 */
+  fullPaper: FullPaperView | null;
   timing: PublicTiming;
 };
 

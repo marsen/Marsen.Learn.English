@@ -469,6 +469,11 @@
       "audioFailed": "錄音播放失敗，你可以繼續作答，再自己按交卷。",
       "audioInterrupted": "錄音中斷了，請重新整理後再試一次。",
       "autoplayBlocked": "錄音沒辦法自動播放，請重新整理後再試一次。"
+    },
+    "full": {
+      "sectionHeading": "Section {n}（第 {a}–{b} 題）",
+      "matchingLabel": "第 {n} 題",
+      "choose": "選擇"
     }
   },
   "history": {

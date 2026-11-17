@@ -26,7 +26,9 @@ export function viewOf(event: TimingEvent | null, t: number): ExamPhaseView | nu
   if (!event) return null;
   if (event.type !== "pause") return { kind: "listen" };
   const remaining = Math.max(0, (event.end ?? t) - t);
-  if (event.id === "check") return { kind: "check", remaining };
+  // 2.x 是 check；完整考卷每段一個（s1-check…s4-check）
+  if (event.id === "check" || /^s\d+-check$/.test(event.id ?? ""))
+    return { kind: "check", remaining };
   const q = event.questions;
   const questions =
     Array.isArray(q) && q.length === 2 && q.every((x) => typeof x === "number")
