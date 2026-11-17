@@ -3,9 +3,10 @@
  * ① beforeunload：重新整理、關分頁、整頁跳轉（瀏覽器自己的提示，文字不能改；iPhone Safari 不支援）
  * ② 在 document 用 capture 攔連結的 click 和表單 submit（左側選單、登出）
  * ③ 進來時多推一筆歷史紀錄，按上一頁先回到這筆，問過再真的離開
+ * message 每次問的時候才讀（考試中切換介面語言也跟著換）。
  * 回傳 release()：交卷前一定要先呼叫，不然交卷後跳成績頁會又跳出提醒。
  */
-export function installLeaveGuard(message: string): () => void {
+export function installLeaveGuard(message: () => string): () => void {
   // 已經按「確定離開」：後面的 beforeunload 不要再問一次
   let leaving = false;
   let released = false;
@@ -19,7 +20,7 @@ export function installLeaveGuard(message: string): () => void {
 
   const ask = (e: Event) => {
     if (leaving) return;
-    if (window.confirm(message)) {
+    if (window.confirm(message())) {
       leaving = true;
       return;
     }
@@ -39,7 +40,7 @@ export function installLeaveGuard(message: string): () => void {
 
   const onPopState = () => {
     if (released) return;
-    if (!leaving && window.confirm(message)) {
+    if (!leaving && window.confirm(message())) {
       leaving = true;
       window.history.back();
       return;

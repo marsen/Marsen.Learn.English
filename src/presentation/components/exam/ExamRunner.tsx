@@ -65,6 +65,10 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
   // 離開提醒（考試進行中才有）；交卷跳頁前要先拿掉
   const releaseGuardRef = useRef<(() => void) | null>(null);
   const leaveConfirm = t("leaveConfirm");
+  const leaveConfirmRef = useRef(leaveConfirm);
+  useEffect(() => {
+    leaveConfirmRef.current = leaveConfirm;
+  }, [leaveConfirm]);
 
   useEffect(
     () => () => {
@@ -77,8 +81,8 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
 
   useEffect(() => {
     if (stage !== "running" || releaseGuardRef.current) return;
-    releaseGuardRef.current = installLeaveGuard(leaveConfirm);
-  }, [stage, leaveConfirm]);
+    releaseGuardRef.current = installLeaveGuard(() => leaveConfirmRef.current);
+  }, [stage]);
 
   /** 交卷完成要跳成績頁：先拿掉離開提醒、刪掉瀏覽器裡的暫存答案 */
   const leaveTo = (attemptId: string, url: string) => {
