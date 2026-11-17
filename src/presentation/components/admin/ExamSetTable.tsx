@@ -3,7 +3,6 @@
 import type { ExamSet } from "@/domain/examSet/examSet";
 import type { ExamSetSummary } from "@/domain/examSet/examSetFilter";
 import { statusTagsOf } from "@/domain/examSet/statusTags";
-import { SUPPORTED_SCHEMA_VERSION } from "@/domain/examSet/bundle";
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/presentation/components/ui/Button";
@@ -12,6 +11,7 @@ import { StatusTags } from "./StatusTags";
 import { EmptyState } from "@/presentation/components/ui/EmptyState";
 import { Table, Td, Th, Tr } from "@/presentation/components/ui/Table";
 import { formatDateTime } from "@/presentation/lib/format";
+import { versionHintOf, versionLabel } from "@/presentation/lib/examSetVersion";
 
 type Props = {
   sets: ExamSetSummary[];
@@ -137,18 +137,14 @@ export function ExamSetTable({
             <Td className="whitespace-nowrap">{s.questionCount}</Td>
             <Td className="whitespace-nowrap">
               <span
-                title={t(
-                  s.schemaMinor > 0
-                    ? "sets.versionHint.transcript"
-                    : "sets.versionHint.noTranscript",
-                )}
+                title={t(`sets.versionHint.${versionHintOf(s)}`)}
                 className={`rounded-full px-2 py-0.5 font-mono text-xs ${
-                  s.schemaMinor > 0
+                  versionHintOf(s) !== "noTranscript"
                     ? "bg-accent-soft text-accent-hover"
                     : "bg-muted text-muted-foreground"
                 }`}
               >
-                {SUPPORTED_SCHEMA_VERSION}.{s.schemaMinor}
+                {versionLabel(s)}
               </span>
             </Td>
             <Td>

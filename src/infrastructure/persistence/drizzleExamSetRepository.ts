@@ -8,6 +8,7 @@ import {
   lt,
   ne,
   or,
+  sql,
   type SQL,
 } from "drizzle-orm";
 import {
@@ -19,7 +20,7 @@ import {
 } from "@/domain/examSet/examSet";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import type { ExamSetFilter, ExamSetSummary } from "@/domain/examSet/examSetFilter";
-import { isAiVerdict } from "@/domain/examSet/bundle";
+import { isAiVerdict, schemaVersionOf } from "@/domain/examSet/bundle";
 import {
   isReviewDecision,
   statusAfter,
@@ -99,11 +100,16 @@ export class DrizzleExamSetRepository implements ExamSetRepository {
         status: examSets.status,
         access: examSets.access,
         uploadedAt: examSets.uploadedAt,
+        // 完整考卷（3.0）的題目卷有 sections；只取判斷結果，不撈整份題目卷
+        isFullExam: sql<boolean>`jsonb_typeof(${examSets.paper} -> 'sections') = 'array'`,
       })
       .from(examSets)
       .where(and(...where))
       .orderBy(desc(examSets.uploadedAt));
-    return rows.map(withCodes);
+    return rows.map(({ isFullExam, ...row }) => ({
+      ...withCodes(row),
+      schemaVersion: schemaVersionOf(isFullExam === true),
+    }));
   }
 
   async replace(set: ExamSet, secret: ExamSetPrivate): Promise<void> {

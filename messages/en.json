@@ -234,7 +234,8 @@
     "colVersion": "Version",
     "versionHint": {
       "transcript": "2.1: has a transcript",
-      "noTranscript": "2.0: no transcript. Re-bundle it as 2.1 and overwrite it on the upload page to add one"
+      "noTranscript": "2.0: no transcript. Re-bundle it as 2.1 and overwrite it on the upload page to add one",
+      "fullExam": "3.0: full test (four sections) with a transcript"
     },
     "trialLabel": "Free test:",
     "noTrialWarning": "No public set yet: the homepage free test links to the exam list. Pick one below and click “Public”.",

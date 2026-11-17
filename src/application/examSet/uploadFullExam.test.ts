@@ -78,6 +78,16 @@ describe("上傳完整考卷（set.json 3.0）", () => {
     expect(prov.sections).toHaveLength(4);
   });
 
+  it("題組列表的摘要：完整考卷是 3.0（大版號由內容判斷）", async () => {
+    await upload(exam());
+    const [summary] = await sets.listSummaries({});
+    expect(summary).toMatchObject({
+      setId: "s1-tour-0002",
+      schemaVersion: 3,
+      schemaMinor: 0,
+    });
+  });
+
   it("單選的答案不是選項裡的字母就擋下", async () => {
     const r = await upload(
       exam((b) => {
