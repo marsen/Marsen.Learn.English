@@ -15,7 +15,8 @@ export type DraftNote = { key: string; target: string | null; text: string };
 /** 老師對 AI 意見的處理；沒有就是保留 */
 export type DraftAiAction = { action: "edited" | "deleted"; text: string };
 
-/** 正在編輯什麼：老師的意見、新增意見、改寫 AI 意見、刪除 AI 意見（填原因） */
+/** 正在編輯什麼：老師的意見、新增意見、改寫 AI 意見、把 AI 意見標為已處理（填說明）。
+ * 「已處理」存的值沿用 "deleted"（不搬資料），畫面上不叫刪除，AI 原文照樣顯示。 */
 export type Editing =
   | { kind: "note"; key: string }
   | { kind: "new"; target: string }
@@ -113,7 +114,7 @@ export function NoteCard(p: Props) {
     const parts = [
       sum.ai > 0 && r("chipAi", { count: sum.ai }),
       sum.teacher > 0 && r("chipTeacher", { count: sum.teacher }),
-      sum.deleted > 0 && r("chipDeleted", { count: sum.deleted }),
+      sum.deleted > 0 && r("chipHandled", { count: sum.deleted }),
     ].filter(Boolean);
     // 滑鼠移上去先瞄第一則
     const firstAi = p.aiNotes.find((n) => !isDeleted(n));
@@ -270,7 +271,7 @@ export function NoteCard(p: Props) {
         return (
           <div
             key={n.ref}
-            className={`grid gap-1 rounded-lg border-l-3 px-3 py-2 ${BAR[severity]} ${deleted ? "bg-muted text-muted-foreground" : "bg-card"}`}
+            className={`grid gap-1 rounded-lg border-l-3 px-3 py-2 ${BAR[severity]} ${deleted ? "bg-muted" : "bg-card"}`}
           >
             <div className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
               <span className="font-bold text-primary-hover">
@@ -280,12 +281,10 @@ export function NoteCard(p: Props) {
                 <span className="rounded bg-muted px-1.5">{r("editedTag")}</span>
               )}
               {deleted && (
-                <span className="rounded bg-surface px-1.5">{r("deletedTag")}</span>
+                <span className="rounded bg-surface px-1.5">{r("handledTag")}</span>
               )}
             </div>
-            <p className={deleted ? "line-through" : ""}>
-              {time(edited ? a.text : n.message)}
-            </p>
+            <p>{time(edited ? a.text : n.message)}</p>
             {n.suggestion && !edited && (
               <p className="text-xs text-muted-foreground">
                 {r("suggestion", { text: "" })}
@@ -309,7 +308,7 @@ export function NoteCard(p: Props) {
             )}
             {deleted && a.text && (
               <p className="border-t border-dashed border-border pt-1 text-xs">
-                {r("deleteReason", { text: a.text })}
+                {r("handledReason", { text: a.text })}
               </p>
             )}
             {p.editing?.kind === "aiDelete" && p.editing.ref === n.ref ? (
@@ -317,8 +316,7 @@ export function NoteCard(p: Props) {
                 warn={p.warnUnsaved}
                 initial=""
                 placeholder={r("deleteReasonPlaceholder")}
-                saveLabel={r("delete")}
-                danger
+                saveLabel={r("markHandled")}
                 allowEmpty
                 currentTime={p.currentTime}
                 onCancel={() => p.setEditing(null)}
@@ -353,11 +351,11 @@ export function NoteCard(p: Props) {
                       </Button>
                     )}
                     <Button
-                      variant="dangerSecondary"
+                      variant="secondary"
                       size="xs"
                       onClick={() => p.setEditing({ kind: "aiDelete", ref: n.ref })}
                     >
-                      {r("delete")}
+                      {r("markHandled")}
                     </Button>
                   </>
                 )}
@@ -444,7 +442,6 @@ function Editor({
   currentTime,
   withTime = false,
   saveLabel,
-  danger = false,
   allowEmpty = false,
   warn = false,
 }: {
@@ -455,7 +452,6 @@ function Editor({
   currentTime: () => number;
   withTime?: boolean;
   saveLabel?: string;
-  danger?: boolean;
   allowEmpty?: boolean;
   warn?: boolean;
 }) {
@@ -496,7 +492,7 @@ function Editor({
             {t("insertTime")}
           </Button>
         )}
-        <Button variant={danger ? "danger" : "primary"} size="xs" onClick={save}>
+        <Button variant="primary" size="xs" onClick={save}>
           {saveLabel ?? t("ok")}
         </Button>
         <Button variant="secondary" size="xs" onClick={onCancel}>

@@ -18,6 +18,14 @@ import {
   viewOf,
   type ExamPhaseView,
 } from "@/presentation/lib/examTiming";
+import {
+  browserStorage,
+  clearDraft,
+  questionIdsOf,
+  saveDraft,
+  unansweredCount,
+} from "@/presentation/lib/examDraft";
+import { installLeaveGuard } from "@/presentation/lib/leaveGuard";
 
 type Props = {
   title: string;
@@ -54,8 +62,32 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
   // 給錄音事件（不在 React 流程內）讀最新的答案與是否已在交卷
   const answersRef = useRef<Record<string, string>>({});
   const handingInRef = useRef(false);
+  // 離開提醒（考試進行中才有）；交卷跳頁前要先拿掉
+  const releaseGuardRef = useRef<(() => void) | null>(null);
+  const leaveConfirm = t("leaveConfirm");
 
-  useEffect(() => () => audioRef.current?.pause(), []);
+  useEffect(
+    () => () => {
+      audioRef.current?.pause();
+      releaseGuardRef.current?.();
+      releaseGuardRef.current = null;
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (stage !== "running" || releaseGuardRef.current) return;
+    releaseGuardRef.current = installLeaveGuard(leaveConfirm);
+  }, [stage, leaveConfirm]);
+
+  /** 交卷完成要跳成績頁：先拿掉離開提醒、刪掉瀏覽器裡的暫存答案 */
+  const leaveTo = (attemptId: string, url: string) => {
+    clearDraft(browserStorage(), attemptId);
+    releaseGuardRef.current?.();
+    releaseGuardRef.current = null;
+    setStage("submitted");
+    window.location.assign(url);
+  };
 
   const handIn = async (attemptId: string) => {
     if (handingInRef.current) return;
@@ -64,13 +96,14 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
     audioRef.current?.pause();
     try {
       const r = await submit(attemptId, answersRef.current);
-      if (r.ok) {
-        setStage("submitted");
-        window.location.assign(`/exam/result/${r.attemptId}`);
-      } else if (r.reason === "already_submitted") {
-        setStage("submitted");
-        window.location.assign(`/exam/result/${attemptId}`);
-      } else throw new Error(t("errors.attemptNotFound"));
+      if (r.ok) leaveTo(attemptId, `/exam/result/${r.attemptId}`);
+      else if (r.reason === "already_submitted")
+        leaveTo(attemptId, `/exam/result/${attemptId}`);
+      else {
+        // 網站找不到這次作答：暫存的答案也用不到了
+        clearDraft(browserStorage(), attemptId);
+        throw new Error(t("errors.attemptNotFound"));
+      }
     } catch (e) {
       setError({ code: "submitFailed", message: (e as Error).message });
       handingInRef.current = false;
@@ -81,6 +114,20 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
   const changeAnswer = (questionId: string, value: string) => {
     answersRef.current = { ...answersRef.current, [questionId]: value };
     setAnswers(answersRef.current);
+    if (sheet)
+      saveDraft(browserStorage(), {
+        attemptId: sheet.attemptId,
+        setId: sheet.setId,
+        answers: answersRef.current,
+      });
+  };
+
+  /** 學生自己按「交卷」：先問，寫出還有幾題沒填（錄音播完自動交卷不問） */
+  const confirmHandIn = (s: ExamSheet) => {
+    const left = unansweredCount(questionIdsOf(s.paper, s.fullPaper), answersRef.current);
+    const message =
+      left > 0 ? t("confirmSubmitUnanswered", { count: left }) : t("confirmSubmit");
+    if (window.confirm(message)) void handIn(s.attemptId);
   };
 
   const begin = async () => {
@@ -203,7 +250,7 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
       )}
       <Button
         disabled={stage !== "running" || !sheet}
-        onClick={() => sheet && handIn(sheet.attemptId)}
+        onClick={() => sheet && confirmHandIn(sheet)}
         className="justify-self-start"
       >
         {stage === "submitting" ? t("submitting") : t("submit")}
