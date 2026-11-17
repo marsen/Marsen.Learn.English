@@ -13,6 +13,26 @@ describe("blanksOf", () => {
     expect(blanksOf(paper)).toEqual(["q01", "q02", "q03"]);
   });
 
+  it("完整考卷：逐段收填空、單選、配對的題號", () => {
+    const paper = {
+      sections: [
+        {
+          blocks: [{ type: "form", form: { rows: [{ parts: [{ blank: "q01" }] }] } }],
+        },
+        {
+          blocks: [
+            {
+              type: "choice",
+              questions: [{ question_id: "q11" }, { question_id: "q12" }],
+            },
+            { type: "matching", items: [{ question_id: "q16" }] },
+          ],
+        },
+      ],
+    };
+    expect(blanksOf(paper)).toEqual(["q01", "q11", "q12", "q16"]);
+  });
+
   it("應該容忍格式不完整的題目卷", () => {
     expect(blanksOf({})).toEqual([]);
     expect(blanksOf({ rows: [{}, { parts: "x" }] })).toEqual([]);

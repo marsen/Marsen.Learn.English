@@ -7,6 +7,7 @@ export const ANSWER_POLICIES = [
   "date_equivalence",
   "digits_only",
   "number_word",
+  "letter",
 ] as const;
 
 export type AnswerPolicy = (typeof ANSWER_POLICIES)[number];
@@ -235,6 +236,11 @@ export function matchesAnswer(
         ? numberWordToDigits(amount)
         : amount.replace(/[\s-]/g, "");
       return gd !== null && candidates.some((c) => c.replace(/[\s-]/g, "") === gd);
+    }
+    case "letter": {
+      // 單選、配對：只比字母，大小寫和前後空白不算
+      const gl = given.trim().toLowerCase();
+      return candidates.some((c) => c.trim().toLowerCase() === gl);
     }
     case "number_word": {
       const gn = numberWordToDigits(given);

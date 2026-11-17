@@ -11,7 +11,14 @@ import type { ExamSet, ExamSetPrivate, Transcript } from "@/domain/examSet/examS
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import type { Sha256 } from "@/application/shared/ports";
 import type { AudioStorage } from "./ports";
-import { setJsonSchema } from "./setJsonSchema";
+import { setJsonSchema, type SetJson } from "./setJsonSchema";
+import { parseFullExam } from "./fullExamJson";
+import { FULL_EXAM_SCHEMA_VERSION } from "@/domain/examSet/bundle";
+
+const isFullExamJson = (raw: unknown) =>
+  typeof raw === "object" &&
+  raw !== null &&
+  (raw as { schema_version?: unknown }).schema_version === FULL_EXAM_SCHEMA_VERSION;
 import { parseAnswerKey } from "./answerKey";
 import type { UploadExamSetResult, UploadProblem } from "./examSetResult";
 
@@ -49,18 +56,26 @@ export class UploadExamSet {
     } catch {
       return { ok: false, problems: [{ code: "invalidJson" }] };
     }
-    const parsed = setJsonSchema.safeParse(raw);
-    if (!parsed.success) {
-      return {
-        ok: false,
-        problems: parsed.error.issues.map((i) => ({
-          code: "schemaField" as const,
-          path: i.path.join("."),
-          message: i.message,
-        })),
-      };
+    // 完整考卷（3.0）先轉成和 2.x 一樣的形狀，之後的檢查、存法都一樣
+    let b: SetJson;
+    if (isFullExamJson(raw)) {
+      const full = parseFullExam(raw);
+      if (!full.ok) return { ok: false, problems: full.problems };
+      b = full.bundle;
+    } else {
+      const parsed = setJsonSchema.safeParse(raw);
+      if (!parsed.success) {
+        return {
+          ok: false,
+          problems: parsed.error.issues.map((i) => ({
+            code: "schemaField" as const,
+            path: i.path.join("."),
+            message: i.message,
+          })),
+        };
+      }
+      b = parsed.data;
     }
-    const b = parsed.data;
 
     const sha = this.sha256.hex(input.audio);
     const aiVerdict = b.provenance.ai_review?.verdict;

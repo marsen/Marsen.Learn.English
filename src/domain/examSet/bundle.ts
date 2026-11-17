@@ -13,6 +13,9 @@ import type { AiVerdict, PublicTiming, TimingEvent, Transcript } from "./examSet
  */
 export const SUPPORTED_SCHEMA_VERSION = 2;
 
+/** 完整考卷（四個 section 合成一份）的大版號：set.json 3.0，上傳時轉成和 2.x 一樣的存法 */
+export const FULL_EXAM_SCHEMA_VERSION = 3;
+
 /** 小於這個大小的錄音檔視為壞檔 */
 export const MIN_AUDIO_BYTES = 10_000;
 
@@ -37,7 +40,10 @@ export type BundleProblem =
 /** 回傳所有不能上傳的原因；空陣列代表可以上傳 */
 export function bundleProblems(f: BundleFacts): BundleProblem[] {
   const problems: BundleProblem[] = [];
-  if (f.schemaVersion !== SUPPORTED_SCHEMA_VERSION) {
+  if (
+    f.schemaVersion !== SUPPORTED_SCHEMA_VERSION &&
+    f.schemaVersion !== FULL_EXAM_SCHEMA_VERSION
+  ) {
     problems.push({
       code: "unsupportedSchema",
       version: String(f.schemaVersion),
