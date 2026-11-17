@@ -39,7 +39,8 @@
 
 ### 頁面
 
-- **管理員上傳**：`next.config.ts` 的 `serverActions.bodySizeLimit` 改成 `"20mb"`（錄音 12.8MB）。上傳頁不變。
+- **管理員上傳**：`next.config.ts` 的 `serverActions.bodySizeLimit` 和 `experimental.proxyClientMaxBodySize` 都改成 `"20mb"`（錄音 12.8MB）。上傳頁不變。
+  - 缺陷紀錄：一開始只改了 `bodySizeLimit`，Marsen 本機上傳 13MB 失敗（「Unexpected end of form」）。原因是請求會先經過 `src/proxy.ts`，Next 16 的 proxy 有自己的上限（預設 10MB，超過的部分被截掉），所以兩層上限要一起改。
 - **老師審稿**（`/admin/sets/<id>`）：完整考卷時，題目卷照段落顯示四個 section（填空用原本的畫法；單選列題幹和 A/B/C 選項；配對列選項框和項目），每題的審稿卡多顯示 Section 幾、選項（單選和配對）、正確答案、依據（`note`、逐字稿出處）；每題照舊能判 OK／需修改。「一鍵複製回饋」對單選、配對題附上題幹和選項。
 - **學生考試**：同一個考試頁，錄音照現有做法連續播放（`new Audio()`、不給控制鈕、不能暫停），題目卷依段落顯示；單選用 radio、配對用下拉選單（選項字母）、填空沿用輸入框。看題停頓的題號是全卷題號；`s<n>-check` 也算檢查時間。
 - **成績頁**：答對題數（滿分 40）、雅思級分（估算）、每個 section 對幾題；每題對錯清單照舊。
