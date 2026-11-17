@@ -28,8 +28,10 @@ export class GetAttemptResult {
     const set = await this.sets.findById(attempt.setId);
     const answerKeyVisible = can(roles, "viewAnswerKey");
     // 完整考卷：各段答對幾題、級分都在讀取時算（作答紀錄的形狀和 2.x 一樣）
+    // 同一個 set_id 從 2.x 覆蓋成完整考卷時，舊的作答只有部分段落：有段落一題都沒有就不分段、不換算
     const ranges = set ? sectionRangesOf(set.paper) : [];
-    const isFull = ranges.length > 0;
+    const scores = sectionScores(ranges, attempt.result.results);
+    const isFull = scores.length > 0 && scores.every((s) => s.total > 0);
     return {
       attemptId: attempt.id,
       setId: attempt.setId,
@@ -41,7 +43,7 @@ export class GetAttemptResult {
       results: attempt.result.results.map((r) =>
         answerKeyVisible ? r : { ...r, expected: null, accepted: [] },
       ),
-      sections: sectionScores(ranges, attempt.result.results),
+      sections: isFull ? scores : [],
       band: isFull ? estimatedBand(attempt.result.score, attempt.result.total) : null,
     };
   }

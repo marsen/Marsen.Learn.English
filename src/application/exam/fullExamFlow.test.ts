@@ -151,4 +151,29 @@ describe("完整考卷：考試與成績", () => {
     ]);
     expect(v?.results.find((x) => x.questionId === "q31")?.number).toBe(31);
   });
+
+  it("同一個 set_id 從 2.x 覆蓋成完整考卷：舊作答的分數不變，不分段、不換算級分", async () => {
+    // 舊作答：只有 Section 1 的 10 題（2.x 時交的卷）
+    const old = await attempts.create({
+      setId: SET_ID,
+      accountId: student.id,
+      guestId: null,
+      startedAt: new Date(),
+    });
+    const results = ids.slice(0, 10).map((q, i) => ({
+      questionId: q,
+      number: i + 1,
+      given: "x",
+      expected: key[q],
+      accepted: [],
+      correct: i < 7,
+    }));
+    await attempts.submit(old.id, {}, { score: 7, total: 10, results }, new Date());
+    const v = await new GetAttemptResult(sets, attempts).execute({
+      actor: student,
+      guestId: null,
+      attemptId: old.id,
+    });
+    expect(v).toMatchObject({ score: 7, total: 10, sections: [], band: null });
+  });
 });
