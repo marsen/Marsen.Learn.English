@@ -235,15 +235,28 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
   const pending = allTargets.filter((k) => !verdicts.has(k));
   const okCount = allTargets.filter((k) => verdicts.get(k) === true).length;
   const badCount = allTargets.filter((k) => verdicts.get(k) === false).length;
-  /** 依序跳到下一個還沒判的項目（從目前展開的那題往後找，繞回開頭），展開並捲過去 */
+  // 下一個還沒判的項目（從目前展開的那題往後找，繞回開頭）；按鈕上寫明是哪一項
+  const from = active ? allTargets.indexOf(active) : -1;
+  const order = [...allTargets.slice(from + 1), ...allTargets.slice(0, from + 1)];
+  const nextTarget: string | null =
+    order.find((x) => !verdicts.has(x) && x !== active) ?? pending[0] ?? null;
+  const targetName = (k: string) =>
+    k === SET ? r("wholeSet") : r("questionN", { n: questions.get(k)?.number ?? k });
+  // 跳過去的那張卡框起來一下，看得出到了哪裡
+  const [flash, setFlash] = useState<string | null>(null);
+  useEffect(() => {
+    if (flash === null) return;
+    const id = window.setTimeout(() => setFlash(null), 1600);
+    return () => window.clearTimeout(id);
+  }, [flash]);
+  /** 跳到下一個還沒判的項目：展開、捲過去、框起來 */
   const nextPending = () => {
-    if (pending.length === 0) return;
-    const from = active ? allTargets.indexOf(active) : -1;
-    const order = [...allTargets.slice(from + 1), ...allTargets.slice(0, from + 1)];
-    const k = order.find((x) => !verdicts.has(x) && x !== active) ?? pending[0];
+    const k = nextTarget;
+    if (k === null) return;
     if (active !== k) select(k);
     // 寬螢幕捲到考卷上的空格（卡就在旁邊），窄的捲到卡
     scrollTo.current = k;
+    setFlash(k);
   };
 
   // Esc 收起
@@ -390,6 +403,53 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
         {!view.turns && (
           <p className="mt-1 text-xs text-muted-foreground">{r("noTranscript")}</p>
         )}
+        {/* 進度、下一個待處理、送出：捲到哪都看得到 */}
+        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
+          <span data-review-progress>
+            {[
+              r("summaryOk", { count: okCount }),
+              r("summaryBad", { count: badCount }),
+              r("pending", { count: pending.length }),
+            ].join(r("summaryJoin"))}
+          </span>
+          {nextTarget !== null ? (
+            <button
+              type="button"
+              onClick={nextPending}
+              className="font-semibold text-primary-hover underline"
+            >
+              {r("nextPending", { target: targetName(nextTarget) })}
+            </button>
+          ) : (
+            <span className="text-muted-foreground">
+              {r("noPending")}
+              <b className={`ml-2 ${badCount > 0 ? "text-destructive" : "text-accent"}`}>
+                {badCount > 0 ? r("resultFail") : r("resultPass")}
+              </b>
+            </span>
+          )}
+          <Button
+            type="submit"
+            size="sm"
+            className="ml-auto"
+            disabled={isPending || pending.length > 0}
+          >
+            {isPending ? t("common.saving") : prev ? r("update") : r("submit")}
+          </Button>
+        </div>
+        {state.problems && state.problems.length > 0 && (
+          <div className="mt-2 max-h-40 overflow-auto">
+            <Alert
+              tone="error"
+              items={state.problems.map((p) => reviewErrorText(t, p))}
+            />
+          </div>
+        )}
+        {state.saved && (
+          <div className="mt-2">
+            <Alert>{r("saved")}</Alert>
+          </div>
+        )}
       </div>
 
       <div
@@ -427,7 +487,11 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
         )}
         <div ref={marginRef} className="relative grid min-w-0 gap-3 xl:block">
           {cards.map((target) => (
-            <div key={target} data-card={target} className="xl:absolute xl:inset-x-0">
+            <div
+              key={target}
+              data-card={target}
+              className={`rounded-2xl transition-shadow xl:absolute xl:inset-x-0 ${flash === target ? "ring-2 ring-primary ring-offset-2" : ""}`}
+            >
               <NoteCard
                 target={target}
                 question={target === SET ? null : (questions.get(target) ?? null)}
@@ -478,23 +542,6 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
 
       <section className="grid gap-3 rounded-xl border border-border bg-surface p-4">
         <h2 className="text-lg font-semibold">{r("decision")}</h2>
-        {/* 全部 OK 才合格；有一項有問題就不合格；還有沒判的就不能送出 */}
-        <p>
-          {[
-            r("summaryOk", { count: okCount }),
-            r("summaryBad", { count: badCount }),
-          ].join(r("summaryJoin"))}
-          {pending.length > 0 ? (
-            <>
-              {r("summaryJoin")}
-              <PendingLink count={pending.length} onClick={nextPending} label={r} />
-            </>
-          ) : (
-            <b className={`ml-2 ${badCount > 0 ? "text-destructive" : "text-accent"}`}>
-              {badCount > 0 ? r("resultFail") : r("resultPass")}
-            </b>
-          )}
-        </p>
         <label className="text-sm">
           <span className="mb-1 block font-medium">{r("comment")}</span>
           <textarea
@@ -504,40 +551,8 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
             className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
           />
         </label>
-        {state.problems && state.problems.length > 0 && (
-          <Alert tone="error" items={state.problems.map((p) => reviewErrorText(t, p))} />
-        )}
-        {state.saved && <Alert>{r("saved")}</Alert>}
-        <div className="flex flex-wrap items-center gap-3">
-          <Button type="submit" disabled={isPending || pending.length > 0}>
-            {isPending ? t("common.saving") : prev ? r("update") : r("submit")}
-          </Button>
-          {pending.length > 0 && (
-            <PendingLink count={pending.length} onClick={nextPending} label={r} />
-          )}
-        </div>
+        <p className="text-sm text-muted-foreground">{r("submitAtTop")}</p>
       </section>
     </form>
-  );
-}
-
-/** 「3 項待處理」：點了跳到下一個還沒判的項目 */
-function PendingLink({
-  count,
-  onClick,
-  label,
-}: {
-  count: number;
-  onClick: () => void;
-  label: (key: string, values?: Record<string, string | number>) => string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="font-semibold text-primary-hover underline"
-    >
-      {label("pending", { count })}
-    </button>
   );
 }

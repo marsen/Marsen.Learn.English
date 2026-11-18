@@ -309,6 +309,9 @@
     "summaryBad": "{count, plural, one {# problem} other {# problems}}",
     "summaryJoin": " · ",
     "pending": "{count} left to check",
+    "nextPending": "Next to check: {target}",
+    "noPending": "Nothing left to check",
+    "submitAtTop": "When the comment is done, submit with the button in the audio bar at the top.",
     "resultPass": "→ Pass",
     "resultFail": "→ Fail",
     "full": {

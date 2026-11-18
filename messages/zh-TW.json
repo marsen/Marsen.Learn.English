@@ -309,6 +309,9 @@
     "summaryBad": "{count} 項有問題",
     "summaryJoin": "、",
     "pending": "{count} 項待處理",
+    "nextPending": "下一個待處理：{target}",
+    "noPending": "沒有待處理了",
+    "submitAtTop": "寫完總評，按上方錄音列的「送出」。",
     "resultPass": "→ 合格",
     "resultFail": "→ 不合格",
     "full": {
