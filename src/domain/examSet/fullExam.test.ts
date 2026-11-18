@@ -4,6 +4,7 @@ import {
   isFullExamPaper,
   questionNumberOf,
   sectionRangesOf,
+  sectionTitlesOf,
   sectionScores,
 } from "./fullExam";
 
@@ -66,5 +67,26 @@ describe("estimatedBand", () => {
   it("不是 40 題的考卷不換算", () => {
     expect(estimatedBand(10, 10)).toBeNull();
     expect(estimatedBand(18, 20)).toBeNull();
+  });
+});
+
+describe("sectionTitlesOf", () => {
+  it("應該照段的順序讀出各段標題", () => {
+    expect(
+      sectionTitlesOf({
+        sections: [
+          { ielts_section: 2, title: "Museum tour" },
+          { ielts_section: 1, title: "Hotel booking" },
+        ],
+      }),
+    ).toEqual([
+      { section: 1, title: "Hotel booking" },
+      { section: 2, title: "Museum tour" },
+    ]);
+  });
+
+  it("應該在單段考卷回傳空陣列、跳過缺標題的段", () => {
+    expect(sectionTitlesOf({ type: "form_table", rows: [] })).toEqual([]);
+    expect(sectionTitlesOf({ sections: [{ ielts_section: 1 }] })).toEqual([]);
   });
 });

@@ -1,6 +1,6 @@
 import type { ExamAccess, PublicTiming } from "@/domain/examSet/examSet";
 import type { GradeResult } from "@/domain/exam/grading";
-import type { SectionScore } from "@/domain/examSet/fullExam";
+import type { SectionScore, SectionTitle } from "@/domain/examSet/fullExam";
 import type { FullPaperView, PaperView } from "./paperView";
 
 /** 考卷清單上的一張 */
@@ -9,6 +9,8 @@ export type AvailableExam = {
   title: string;
   questionCount: number;
   access: ExamAccess;
+  /** 完整考卷各段的標題（分辨不同套用）；單段考卷是空陣列 */
+  sections: SectionTitle[];
 };
 
 /** 開始考試後給考生的內容：題目卷、時間軸。不含答案、不含逐字稿 */

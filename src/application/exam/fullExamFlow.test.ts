@@ -5,6 +5,7 @@ import { ReviewExamSet } from "@/application/examSet/reviewExamSet";
 import { SetExamAccess } from "@/application/examSet/setExamAccess";
 import { GetExamSetForReview } from "@/application/examSet/getExamSetForReview";
 import { StartExam } from "./startExam";
+import { ListAvailableExams } from "./listAvailableExams";
 import { SubmitExam } from "./submitExam";
 import { GetAttemptResult } from "./getAttemptResult";
 import type { Account } from "@/domain/account/account";
@@ -111,6 +112,16 @@ describe("完整考卷：考試與成績", () => {
       setId: SET_ID,
       access: "members",
     });
+  });
+
+  it("考卷列表附上四段的標題，不同套分得出來", async () => {
+    const [exam] = await new ListAvailableExams(sets).execute({ actor: student });
+    expect(exam.sections).toEqual([
+      { section: 1, title: "Tour Booking Form" },
+      { section: 2, title: "Community Centre Volunteer Programme" },
+      { section: 3, title: "Research Project: Study Spaces on Campus" },
+      { section: 4, title: "Roman Concrete" },
+    ]);
   });
 
   it("交卷批改：單選配對只比字母；成績有總分、級分、各段", async () => {

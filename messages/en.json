@@ -455,10 +455,12 @@
   },
   "examList": {
     "metaTitle": "Tests",
-    "title": "IELTS Listening Section 1",
+    "title": "IELTS Listening tests",
     "guestHint": "You're seeing the public tests. <login>Log in</login> to take more.",
     "empty": "There are no tests to take right now.",
-    "questionCount": "{count, plural, one {# question} other {# questions}}"
+    "fullExam": "Full test ({sections} sections · {count} questions)",
+    "singleSection": "Section 1 · {count, plural, one {# question} other {# questions}}",
+    "sectionTitle": "S{n} {title}"
   },
   "exam": {
     "metaTitle": "Test",

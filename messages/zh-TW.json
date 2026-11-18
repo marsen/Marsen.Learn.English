@@ -455,10 +455,12 @@
   },
   "examList": {
     "metaTitle": "考卷",
-    "title": "雅思聽力 Section 1",
+    "title": "雅思聽力考卷",
     "guestHint": "你現在看到的是公開考卷。<login>登入</login>後可以寫更多。",
     "empty": "目前沒有可以寫的考卷。",
-    "questionCount": "{count} 題"
+    "fullExam": "完整考卷（{sections} 段・{count} 題）",
+    "singleSection": "Section 1・{count} 題",
+    "sectionTitle": "S{n} {title}"
   },
   "exam": {
     "metaTitle": "考試",

@@ -29,6 +29,22 @@ export function sectionRangesOf(paper: JsonObject): SectionRange[] {
   });
 }
 
+/** 一段的標題（考卷列表用來分辨不同的完整考卷） */
+export type SectionTitle = { section: number; title: string };
+
+/** 題目卷各段的標題（照段的順序）；不是完整考卷就是空陣列 */
+export function sectionTitlesOf(paper: JsonObject): SectionTitle[] {
+  if (!Array.isArray(paper.sections)) return [];
+  return paper.sections
+    .flatMap((s) => {
+      const o = s as Record<string, unknown>;
+      return typeof o.ielts_section === "number" && typeof o.title === "string"
+        ? [{ section: o.ielts_section, title: o.title }]
+        : [];
+    })
+    .sort((a, b) => a.section - b.section);
+}
+
 /** 題號 q31 → 31；認不得是 null */
 export function questionNumberOf(questionId: string): number | null {
   const m = /^q(\d+)$/.exec(questionId);
