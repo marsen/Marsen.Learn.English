@@ -474,6 +474,7 @@
     "start": "開始考試",
     "submitted": "已交卷，正在打開批改結果…",
     "statusStart": "錄音開始。",
+    "statusSection": "Section {n}・",
     "statusListen": "錄音播放中，邊聽邊填。",
     "statusCheck": "檢查你的答案。{clock}",
     "statusRead": "看題時間　{clock}",

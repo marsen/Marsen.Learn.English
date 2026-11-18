@@ -22,6 +22,15 @@ export function eventAt(events: TimingEvent[], t: number): TimingEvent | null {
   );
 }
 
+/**
+ * 這個事件屬於完整考卷的第幾段：事件 id 是 s1-t3、s2-pause1 這種寫法。
+ * 單段考卷、事件之間的空檔是 null（畫面沿用上一段）。
+ */
+export function sectionOf(event: TimingEvent | null): number | null {
+  const m = /^s(\d+)-/.exec(event?.id ?? "");
+  return m ? Number(m[1]) : null;
+}
+
 export function viewOf(event: TimingEvent | null, t: number): ExamPhaseView | null {
   if (!event) return null;
   if (event.type !== "pause") return { kind: "listen" };

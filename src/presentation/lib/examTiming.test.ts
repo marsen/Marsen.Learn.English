@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { eventAt, formatClock, questionRange, viewOf } from "./examTiming";
+import { eventAt, formatClock, questionRange, sectionOf, viewOf } from "./examTiming";
 
 const events = [
   { type: "announce", id: "intro", start: 0, end: 8 },
@@ -42,5 +42,20 @@ describe("examTiming", () => {
     expect(questionRange([1, 6])).toEqual({ kind: "range", a: 1, b: 6 });
     expect(questionRange([3, 4])).toEqual({ kind: "pair", a: 3, b: 4 });
     expect(questionRange([5, 5])).toEqual({ kind: "single", a: 5, b: 5 });
+  });
+});
+
+describe("sectionOf", () => {
+  const full = [
+    { type: "turn", id: "s1-t20", start: 0, end: 10 },
+    { type: "pause", id: "s2-pause1", start: 12, end: 40 },
+  ];
+  it("應該從事件 id 認出完整考卷的第幾段", () => {
+    expect(sectionOf(eventAt(full, 5))).toBe(1);
+    expect(sectionOf(eventAt(full, 20))).toBe(2);
+  });
+  it("應該在空檔、單段考卷回 null（畫面沿用上一段）", () => {
+    expect(sectionOf(eventAt(full, 11))).toBeNull();
+    expect(sectionOf(eventAt(events, 10))).toBeNull();
   });
 });

@@ -15,6 +15,7 @@ import {
   eventAt,
   formatClock,
   questionRange,
+  sectionOf,
   viewOf,
   type ExamPhaseView,
 } from "@/presentation/lib/examTiming";
@@ -57,6 +58,8 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
   const [sheet, setSheet] = useState<ExamSheet | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [phase, setPhase] = useState<ExamPhaseView | null>(null);
+  // 完整考卷：錄音現在播到第幾段（空檔沿用上一段）
+  const [section, setSection] = useState<number | null>(null);
   const [error, setError] = useState<RunnerError | null>(null);
   const t = useTranslations("exam");
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -155,11 +158,11 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
     const audio = new Audio(audioUrl);
     audioRef.current = audio;
     audio.addEventListener("timeupdate", () => {
-      const v = viewOf(
-        eventAt(r.sheet.timing.events, audio.currentTime),
-        audio.currentTime,
-      );
+      const event = eventAt(r.sheet.timing.events, audio.currentTime);
+      const v = viewOf(event, audio.currentTime);
       if (v) setPhase(v);
+      const n = sectionOf(event);
+      if (n !== null) setSection(n);
     });
     audio.addEventListener("ended", () => handIn(r.sheet.attemptId));
     // 播放出錯（例如 R2 短效網址過期、網路斷一下）：回網站拿新的網址，從原本的秒數接著播
@@ -240,6 +243,7 @@ export function ExamRunner({ title, audioUrl, start, submit }: Props) {
         className="sticky top-0 z-10 rounded-lg bg-background/95 py-2 font-medium"
         aria-live="polite"
       >
+        {section !== null && t("statusSection", { n: section })}
         {status}
       </p>
       {errorText && <Alert tone="error">{errorText}</Alert>}

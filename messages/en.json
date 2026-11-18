@@ -474,6 +474,7 @@
     "start": "Start the test",
     "submitted": "Submitted. Opening your results…",
     "statusStart": "The recording is starting.",
+    "statusSection": "Section {n} · ",
     "statusListen": "Recording playing. Fill in the answers as you listen.",
     "statusCheck": "Check your answers. {clock}",
     "statusRead": "Reading time  {clock}",
