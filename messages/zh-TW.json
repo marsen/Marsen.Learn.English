@@ -550,14 +550,21 @@
       "prev": "← 上一段：Section {n}",
       "next": "下一段：Section {n} →",
       "toSubmit": "下一頁：交卷 →",
-      "submitPage": "交卷頁",
       "submitTitle": "交卷",
       "sectionLeft": "Section {n}・剩 {count} 題沒填",
       "sectionDone": "Section {n} ✓ 都填了",
       "backTo": "回到 Section {n}",
       "confirmHint": "交了就不能再改。錄音播完會自動交卷。",
       "recheck": "再檢查",
-      "confirmSubmit": "確定交卷"
+      "confirmSubmit": "確定交卷",
+      "steps": "考卷分段",
+      "sectionN": "Section {n}",
+      "left": "剩 {count} 題沒填",
+      "viewing": "正在看 Section {n}",
+      "viewingSubmit": "正在看 交卷頁",
+      "audioAt": "♪ 錄音在 Section {n}",
+      "audioHere": "錄音在這段",
+      "onlyForward": "錄音開始後只往前播，不能倒退或跳段；題目可以自己前後翻頁，最後一頁交卷。"
     }
   },
   "history": {

@@ -10,6 +10,7 @@ import type {
 import { ExamPaper } from "./ExamPaper";
 import { FullExamPaper } from "./FullExamPaper";
 import { ExamSubmitPage } from "./ExamSubmitPage";
+import { ExamSteps, type ExamPage } from "./ExamSteps";
 import { Alert } from "@/presentation/components/ui/Alert";
 import { Button } from "@/presentation/components/ui/Button";
 import {
@@ -44,9 +45,6 @@ type Props = {
 };
 
 type Stage = "intro" | "running" | "submitting" | "submitted";
-
-/** 完整考卷的分頁：段號，或最後的交卷頁 */
-type ExamPage = number | "submit";
 
 /** 錯誤：翻譯檔 exam.errors.* 的代碼，交卷失敗時帶原因 */
 type RunnerError =
@@ -229,6 +227,7 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
       <div key="intro" className="grid gap-4">
         <p>{t.rich("intro", { title, b: (chunks) => <b>{chunks}</b> })}</p>
         <p className="font-medium">{t("overview", overview)}</p>
+        {overview.sections > 1 && <p>{t("paging.onlyForward")}</p>}
         <section className="grid gap-2 rounded-xl border border-border bg-surface p-4">
           <h2 className="font-semibold">{t("volumeTest")}</h2>
           <p className="text-sm text-muted-foreground">{t("volumeTestHint")}</p>
@@ -283,7 +282,8 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
     ? [...sheet.fullPaper.sections.map((s) => s.ielts), "submit"]
     : [];
   const pageIndex = page === null ? -1 : pages.indexOf(page);
-  const prevPage = pageIndex > 0 ? pages[pageIndex - 1] : null;
+  // 交卷頁是最後一頁，所以上一頁一定是段號
+  const prevPage = pageIndex > 0 ? (pages[pageIndex - 1] as number) : null;
   const nextPage =
     pageIndex >= 0 && pageIndex < pages.length - 1 ? pages[pageIndex + 1] : null;
   const submitButton = (
@@ -299,14 +299,33 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
   // key 不同：開始後整塊換掉，說明文字不會被當成狀態列沿用（瀏覽器翻譯外掛改過 DOM 時會殘留）
   return (
     <div key="running" className="grid gap-4">
-      <p
-        className="sticky top-0 z-10 rounded-lg bg-background/95 py-2 font-medium"
-        aria-live="polite"
-      >
-        {section !== null && t("statusSection", { n: section })}
-        {status}
-      </p>
-      {errorText && <Alert tone="error">{errorText}</Alert>}
+      {sheet?.fullPaper && page !== null ? (
+        // 完整考卷：狀態列、錯誤、步驟條一起黏在頂端，翻到哪頁都看得到錄音播到哪
+        <div className="sticky top-0 z-10 grid gap-2 rounded-lg bg-background/95 py-2">
+          <p className="font-medium" aria-live="polite">
+            {section !== null && t("statusSection", { n: section })}
+            {status}
+          </p>
+          {errorText && <Alert tone="error">{errorText}</Alert>}
+          <ExamSteps
+            left={unansweredBySection(sheet.fullPaper, answers)}
+            page={page}
+            playing={section}
+            onPage={goTo}
+          />
+        </div>
+      ) : (
+        <>
+          <p
+            className="sticky top-0 z-10 rounded-lg bg-background/95 py-2 font-medium"
+            aria-live="polite"
+          >
+            {section !== null && t("statusSection", { n: section })}
+            {status}
+          </p>
+          {errorText && <Alert tone="error">{errorText}</Alert>}
+        </>
+      )}
       {sheet?.fullPaper && typeof page === "number" && (
         <FullExamPaper
           paper={sheet.fullPaper}
@@ -330,9 +349,7 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
         <nav aria-label={t("paging.nav")} className="flex flex-wrap gap-2">
           {prevPage !== null && (
             <Button variant="secondary" onClick={() => goTo(prevPage)}>
-              {prevPage === "submit"
-                ? t("paging.submitPage")
-                : t("paging.prev", { n: prevPage })}
+              {t("paging.prev", { n: prevPage })}
             </Button>
           )}
           {nextPage !== null && (

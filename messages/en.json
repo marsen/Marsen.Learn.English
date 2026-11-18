@@ -550,14 +550,21 @@
       "prev": "← Previous: Section {n}",
       "next": "Next: Section {n} →",
       "toSubmit": "Next: Submit →",
-      "submitPage": "Submit page",
       "submitTitle": "Submit",
       "sectionLeft": "Section {n} · {count, plural, one {# question} other {# questions}} left blank",
       "sectionDone": "Section {n} ✓ all answered",
       "backTo": "Back to Section {n}",
       "confirmHint": "You can't change your answers after submitting. Your answers are submitted automatically when the recording ends.",
       "recheck": "Keep checking",
-      "confirmSubmit": "Yes, submit"
+      "confirmSubmit": "Yes, submit",
+      "steps": "Test sections",
+      "sectionN": "Section {n}",
+      "left": "{count} left blank",
+      "viewing": "Viewing Section {n}",
+      "viewingSubmit": "Viewing the submit page",
+      "audioAt": "♪ Recording in Section {n}",
+      "audioHere": "The recording is in this section",
+      "onlyForward": "Once the recording starts it only moves forward; you can't rewind or skip. You can page back and forth through the questions yourself and submit on the last page."
     }
   },
   "history": {
