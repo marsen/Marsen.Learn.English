@@ -7,7 +7,7 @@ import { Button } from "@/presentation/components/ui/Button";
 import { examSetLabel } from "@/presentation/lib/examSetLabels";
 import { clock } from "@/presentation/lib/reviewTime";
 import { aiSeverity, chipSummary, type Severity } from "@/presentation/lib/reviewNotes";
-import { TimeButton, TimeText } from "./TimeText";
+import { TimeButton, TimeText, type Seek } from "./TimeText";
 
 /** 老師的意見（畫面上的草稿；key 只給 React 用） */
 export type DraftNote = { key: string; target: string | null; text: string };
@@ -51,7 +51,7 @@ type Props = {
   onCollapse: () => void;
   currentTime: () => number;
   turnStarts: ReadonlyMap<string, number>;
-  onSeek: (seconds: number) => void;
+  onSeek: Seek;
 };
 
 /** 嚴重程度的顏色：提醒灰、注意橘、嚴重紅（小標籤的圓點、意見左邊的色條） */
@@ -100,7 +100,12 @@ export function NoteCard(p: Props) {
   const q = p.question;
   const isNew = p.editing?.kind === "new" && p.editing.target === p.target;
   const time = (text: string) => (
-    <TimeText text={text} turnStarts={p.turnStarts} onSeek={p.onSeek} />
+    <TimeText
+      text={text}
+      turnStarts={p.turnStarts}
+      section={p.question?.ieltsSection ?? null}
+      onSeek={p.onSeek}
+    />
   );
   const name = q ? r("questionN", { n: q.number }) : r("wholeSet");
   const severityOf = (n: AiNote) => aiSeverity(n);
@@ -237,7 +242,11 @@ export function NoteCard(p: Props) {
                   <dt className="text-muted-foreground">{r("evidence")}</dt>
                   <dd>
                     {q.evidence.start !== null && (
-                      <TimeButton seconds={q.evidence.start} onSeek={p.onSeek}>
+                      <TimeButton
+                        seconds={q.evidence.start}
+                        turn={q.evidence.turn}
+                        onSeek={p.onSeek}
+                      >
                         {q.evidence.turn} {clock(q.evidence.start)}
                       </TimeButton>
                     )}{" "}

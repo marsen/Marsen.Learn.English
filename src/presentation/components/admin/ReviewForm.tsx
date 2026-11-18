@@ -23,7 +23,7 @@ import {
 } from "./review/NoteCard";
 import { ReviewPaper } from "./review/ReviewPaper";
 import { FullReviewPaper } from "./review/FullReviewPaper";
-import { Transcript } from "./review/Transcript";
+import { Transcript, type TranscriptFocus } from "./review/Transcript";
 
 type Props = {
   view: ReviewView;
@@ -123,6 +123,12 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
     if (play) el.play().catch(() => {});
   };
   const currentTime = () => audioRef.current?.currentTime ?? 0;
+  // 從意見點句子編號：錄音跳過去，逐字稿那句捲進畫面、框起來
+  const [focusTurn, setFocusTurn] = useState<TranscriptFocus | null>(null);
+  const seekFromNote = (seconds: number, turn?: string) => {
+    seek(seconds);
+    if (turn) setFocusTurn((f) => ({ turn, n: (f?.n ?? 0) + 1 }));
+  };
 
   const questions = useMemo(
     () => new Map(view.questions.map((q) => [q.questionId, q])),
@@ -449,7 +455,7 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
                 onCollapse={collapse}
                 currentTime={currentTime}
                 turnStarts={turnStarts}
-                onSeek={(s) => seek(s)}
+                onSeek={seekFromNote}
               />
             </div>
           ))}
@@ -462,7 +468,12 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
       </div>
 
       {view.turns && (
-        <Transcript turns={view.turns} current={currentTurn} onSeek={(s) => seek(s)} />
+        <Transcript
+          turns={view.turns}
+          current={currentTurn}
+          focus={focusTurn}
+          onSeek={(s) => seek(s)}
+        />
       )}
 
       <section className="grid gap-3 rounded-xl border border-border bg-surface p-4">
