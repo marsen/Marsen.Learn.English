@@ -72,7 +72,7 @@ const SIDE_BY_SIDE = "(min-width: 1280px)";
  * 完整考卷一段一段審（#288）。分頁版全部寫好、驗過才打開；
  * 打開時錄音列的送出一起換成總結頁的送出（同一個開關）。
  */
-const PAGED_REVIEW = false;
+const PAGED_REVIEW = true;
 
 let nextKey = 0;
 const newKey = () => `n${(nextKey += 1)}`;
