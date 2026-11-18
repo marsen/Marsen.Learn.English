@@ -57,6 +57,8 @@ export type AiNote = {
   /** 發現：分類、嚴重度 */
   category: string | null;
   severity: string | null;
+  /** 完整考卷：這則意見屬於 Section 幾（ielts_section；沒寫就看題目所在段、示警編號的 s{n}- 前綴）；2.x 是 null */
+  ieltsSection: number | null;
 };
 
 /** 逐字稿的一句，附開始的秒數 */
@@ -112,6 +114,7 @@ const findingsSchema = z
                 severity: str,
                 message: str,
                 suggestion: optStr,
+                ielts_section: z.number().int().nullish().catch(null),
               })
               .loose(),
           )
@@ -132,6 +135,7 @@ const warningsSchema = z
         question_id: optStr,
         message: str,
         ai_ruling: optStr,
+        ielts_section: z.number().int().nullish().catch(null),
       })
       .loose(),
   )
@@ -242,6 +246,20 @@ export function buildReviewView(
     };
   };
 
+  // AI 意見屬於哪一段（完整考卷才有）：明寫的 ielts_section → 題目所在段 → 示警編號 s{n}- 前綴
+  const sectionOfNote = (
+    explicit: number | null | undefined,
+    questionId: string | null | undefined,
+    id: string | null,
+  ): number | null => {
+    if (!fullPaper) return null;
+    if (typeof explicit === "number") return explicit;
+    const fromQuestion = questionId ? where.get(questionId)?.ieltsSection : undefined;
+    if (typeof fromQuestion === "number") return fromQuestion;
+    const m = id ? /^s(\d+)-/.exec(id) : null;
+    return m ? Number(m[1]) : null;
+  };
+
   const warnings = warningsSchema.parse((secret.provenance as JsonObject).warnings ?? []);
   const findings = findingsSchema.parse(secret.provenance).ai_review?.findings ?? [];
 
@@ -277,6 +295,7 @@ export function buildReviewView(
         aiRuling: w.ai_ruling ?? null,
         category: null,
         severity: null,
+        ieltsSection: sectionOfNote(w.ielts_section, w.question_id, w.id),
       })),
       ...findings.map((f, i): AiNote => ({
         ref: aiNoteRef("finding", i),
@@ -289,6 +308,7 @@ export function buildReviewView(
         aiRuling: null,
         category: f.category ?? null,
         severity: f.severity,
+        ieltsSection: sectionOfNote(f.ielts_section, f.question_id, null),
       })),
     ],
     turns:

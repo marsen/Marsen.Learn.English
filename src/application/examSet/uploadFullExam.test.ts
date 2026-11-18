@@ -5,6 +5,7 @@ import type { Account } from "@/domain/account/account";
 import { blanksOf } from "@/domain/exam/paper";
 import { sectionRangesOf } from "@/domain/examSet/fullExam";
 import { parseAnswerKey } from "./answerKey";
+import { buildReviewView } from "./reviewView";
 import { InMemoryExamSetRepository } from "@/infrastructure/persistence/inMemoryExamSetRepository";
 import { InMemoryAudioStorage } from "@/infrastructure/storage/inMemoryAudioStorage";
 import { NodeSha256 } from "@/infrastructure/crypto/nodeSha256";
@@ -76,6 +77,22 @@ describe("上傳完整考卷（set.json 3.0）", () => {
     expect(prov.warnings.map((w) => w.id)).toEqual(["s4-w01"]);
     expect(prov.ai_review.findings.some((f) => f.ielts_section === 3)).toBe(true);
     expect(prov.sections).toHaveLength(4);
+  });
+
+  it("審稿頁：AI 意見帶所屬段落（明寫的、題目所在段、示警編號前綴）", async () => {
+    await upload(exam());
+    const set = (await sets.findById("s1-tour-0002"))!;
+    const view = buildReviewView(set, sets.privateOf("s1-tour-0002")!, null);
+    expect(view.aiNotes.length).toBeGreaterThan(0);
+    expect(view.aiNotes.every((n) => n.ieltsSection !== null)).toBe(true);
+    expect(view.aiNotes.find((n) => n.warningId === "s4-w01")?.ieltsSection).toBe(4);
+    expect(view.aiNotes.some((n) => n.kind === "finding" && n.ieltsSection === 3)).toBe(
+      true,
+    );
+    for (const n of view.aiNotes.filter((x) => x.questionId))
+      expect(n.ieltsSection).toBe(
+        view.questions.find((q) => q.questionId === n.questionId)?.ieltsSection,
+      );
   });
 
   it("題組列表的摘要：完整考卷是 3.0（大版號由內容判斷）", async () => {
