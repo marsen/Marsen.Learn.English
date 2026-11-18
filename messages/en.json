@@ -550,7 +550,14 @@
       "prev": "← Previous: Section {n}",
       "next": "Next: Section {n} →",
       "toSubmit": "Next: Submit →",
-      "submitPage": "Submit page"
+      "submitPage": "Submit page",
+      "submitTitle": "Submit",
+      "sectionLeft": "Section {n} · {count, plural, one {# question} other {# questions}} left blank",
+      "sectionDone": "Section {n} ✓ all answered",
+      "backTo": "Back to Section {n}",
+      "confirmHint": "You can't change your answers after submitting. Your answers are submitted automatically when the recording ends.",
+      "recheck": "Keep checking",
+      "confirmSubmit": "Yes, submit"
     }
   },
   "history": {

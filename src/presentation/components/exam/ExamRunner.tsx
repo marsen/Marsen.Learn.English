@@ -9,6 +9,7 @@ import type {
 } from "@/application/exam/examResult";
 import { ExamPaper } from "./ExamPaper";
 import { FullExamPaper } from "./FullExamPaper";
+import { ExamSubmitPage } from "./ExamSubmitPage";
 import { Alert } from "@/presentation/components/ui/Alert";
 import { Button } from "@/presentation/components/ui/Button";
 import {
@@ -25,6 +26,7 @@ import {
   clearOtherDrafts,
   questionIdsOf,
   saveDraft,
+  unansweredBySection,
   unansweredCount,
 } from "@/presentation/lib/examDraft";
 import { installLeaveGuard } from "@/presentation/lib/leaveGuard";
@@ -114,7 +116,11 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
     window.location.assign(url);
   };
 
-  const handIn = async (attemptId: string) => {
+  /**
+   * 交卷。resumeAudio：交卷失敗回到作答時，錄音從原本的秒數接著播（完整考卷學生自己按交卷時用；
+   * 錄音已播完觸發的自動交卷、單段考卷照舊不播）
+   */
+  const handIn = async (attemptId: string, resumeAudio = false) => {
     if (handingInRef.current) return;
     handingInRef.current = true;
     setStage("submitting");
@@ -133,6 +139,10 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
       setError({ code: "submitFailed", message: (e as Error).message });
       handingInRef.current = false;
       setStage("running");
+      const audio = audioRef.current;
+      // 暫停時位置還在，play() 從原秒數接著播；播完了就不播（不然會從頭開始）。
+      // 播不起來（載入失敗）由錄音的 error 事件處理，這裡不蓋掉「交卷失敗」的訊息
+      if (resumeAudio && audio && !audio.ended) audio.play().catch(() => undefined);
     }
   };
 
@@ -192,6 +202,8 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
         "loadedmetadata",
         () => {
           audio.currentTime = at;
+          // 交卷中：只換好網址、停在原秒數，不播（交卷失敗時才從這裡接著播）
+          if (handingInRef.current) return;
           audio.play().catch(() => setError({ code: "audioInterrupted" }));
         },
         { once: true },
@@ -305,7 +317,15 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
           highlight={phase?.kind === "read" ? phase.questions : null}
         />
       )}
-      {sheet?.fullPaper && page === "submit" && submitButton}
+      {sheet?.fullPaper && page === "submit" && (
+        <ExamSubmitPage
+          left={unansweredBySection(sheet.fullPaper, answers)}
+          disabled={stage !== "running"}
+          submitting={stage === "submitting"}
+          onGo={goTo}
+          onHandIn={() => void handIn(sheet.attemptId, true)}
+        />
+      )}
       {sheet?.fullPaper && (
         <nav aria-label={t("paging.nav")} className="flex flex-wrap gap-2">
           {prevPage !== null && (
