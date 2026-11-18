@@ -9,6 +9,8 @@ export type AvailableExam = {
   title: string;
   questionCount: number;
   access: ExamAccess;
+  /** 錄音長度（秒），開始前告訴考生大約要考多久 */
+  totalSeconds: number;
   /** 完整考卷各段的標題（分辨不同套用）；單段考卷是空陣列 */
   sections: SectionTitle[];
 };

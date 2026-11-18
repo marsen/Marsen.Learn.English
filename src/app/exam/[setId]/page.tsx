@@ -31,6 +31,11 @@ export default async function ExamPage({
       {exam ? (
         <ExamRunner
           title={exam.title}
+          overview={{
+            minutes: Math.max(1, Math.round(exam.totalSeconds / 60)),
+            questions: exam.questionCount,
+            sections: Math.max(1, exam.sections.length),
+          }}
           audioUrl={`/exam/${setId}/audio`}
           start={startExamAction.bind(null, setId)}
           submit={submitExamAction}

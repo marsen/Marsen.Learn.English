@@ -17,6 +17,7 @@ export class ListAvailableExams {
         title: s.title,
         questionCount: s.questionCount,
         access: s.access,
+        totalSeconds: s.timing.totalSeconds,
         sections: sectionTitlesOf(s.paper),
       }));
   }
