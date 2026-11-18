@@ -300,8 +300,9 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
   return (
     <div key="running" className="grid gap-4">
       {sheet?.fullPaper && page !== null ? (
-        // 完整考卷：狀態列、錯誤、步驟條一起黏在頂端，翻到哪頁都看得到錄音播到哪
-        <div className="sticky top-0 z-10 grid gap-2 rounded-lg bg-background/95 py-2">
+        // 完整考卷：狀態列、錯誤、步驟條一起黏在頂端，翻到哪頁都看得到錄音播到哪。
+        // 頂端讓出網站的頂列（手機 61px、電腦 h-14），和審稿頁 ReviewForm 的錄音列同一個位置
+        <div className="sticky top-[61px] z-10 grid gap-2 rounded-lg bg-background/95 py-2 md:top-14">
           <p className="font-medium" aria-live="polite">
             {section !== null && t("statusSection", { n: section })}
             {status}
