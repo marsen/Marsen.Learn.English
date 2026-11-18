@@ -21,6 +21,17 @@ import {
   type DraftNote,
   type Editing,
 } from "./review/NoteCard";
+import { browserStorage } from "@/presentation/lib/examDraft";
+import {
+  checkReviewDraft,
+  clearReviewDraft,
+  contentKey,
+  isoOf,
+  loadReviewDraft,
+  saveReviewDraft,
+  type ReviewContent,
+} from "@/presentation/lib/reviewDraft";
+import { installLeaveGuard } from "@/presentation/lib/leaveGuard";
 import { ReviewPaper } from "./review/ReviewPaper";
 import { FullReviewPaper } from "./review/FullReviewPaper";
 import { Transcript, type TranscriptFocus } from "./review/Transcript";
@@ -28,6 +39,8 @@ import { Transcript, type TranscriptFocus } from "./review/Transcript";
 type Props = {
   view: ReviewView;
   audioUrl: string;
+  /** 暫存的鍵帶老師的帳號：同一台電腦換人登入不會拿到別人的暫存 */
+  accountId: string;
   action: (prev: ReviewFormState, formData: FormData) => Promise<ReviewFormState>;
 };
 
@@ -40,11 +53,45 @@ let nextKey = 0;
 const newKey = () => `n${(nextKey += 1)}`;
 
 /**
+ * 網站上的審稿算出來的畫面內容（沒有暫存時的樣子）。
+ * 判定預設：上次審過就沿用；舊審稿沒有逐題判定時，合格的全部當 OK；
+ * 其他情況 AI 沒提意見的題目預設 OK，整套和 AI 有提意見的題目要老師點
+ */
+function baseContentOf(view: ReviewView): ReviewContent {
+  const prev = view.review;
+  const all = [SET, ...view.questions.map((q) => q.questionId)];
+  const verdicts: Record<string, boolean> =
+    prev && prev.verdicts.length > 0
+      ? Object.fromEntries(prev.verdicts.map((v) => [v.target ?? SET, v.ok]))
+      : prev?.decision === "approved"
+        ? Object.fromEntries(all.map((k) => [k, true]))
+        : Object.fromEntries(
+            view.questions
+              .filter((q) => !view.aiNotes.some((n) => n.questionId === q.questionId))
+              .map((q) => [q.questionId, true]),
+          );
+  return {
+    verdicts,
+    aiActions: Object.fromEntries(
+      (prev?.aiActions ?? []).map((a) => [
+        a.ref,
+        { action: a.action, text: a.text ?? "" },
+      ]),
+    ),
+    notes: (prev?.notes ?? []).map((n) => ({ target: n.target, text: n.text })),
+    comment: prev?.comment ?? "",
+    confirmed: {},
+    seen: [],
+  };
+}
+
+/**
  * 老師審稿：像批改考卷一樣，考卷填好標準答案，每題旁邊是 AI 的意見和老師的意見。
  * 老師可以保留、改寫、刪除 AI 的意見，替任何一題或整套加意見；每一題和整套都要判 OK 或有問題，
  * 全部 OK 才合格，全部判完才能送出。
+ * 審到一半的內容暫存在老師的瀏覽器（reviewDraft），有暫存時要離開會先問。
  */
-export function ReviewForm({ view, audioUrl, action }: Props) {
+export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
   const t = useTranslations();
   const r = (key: string, values?: Record<string, string | number>) =>
     t(`review.${key}`, values);
@@ -52,32 +99,22 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
   const prev = view.review;
 
   // ---------- 草稿 ----------
+  // 基準每次 render 從網站資料算（送出成功 revalidate 後跟著更新，不會誤判成有改）
+  const base = baseContentOf(view);
   const [notes, setNotes] = useState<DraftNote[]>(() =>
-    (prev?.notes ?? []).map((n) => ({ key: newKey(), target: n.target, text: n.text })),
+    base.notes.map((n) => ({ key: newKey(), target: n.target, text: n.text })),
   );
   const [aiActions, setAiActions] = useState<Map<string, DraftAiAction>>(
-    () =>
-      new Map(
-        (prev?.aiActions ?? []).map((a) => [
-          a.ref,
-          { action: a.action, text: a.text ?? "" },
-        ]),
-      ),
+    () => new Map(Object.entries(base.aiActions)),
   );
-  // 每一題、整套的判定（key：題號或 SET）：true＝OK，false＝有問題，沒有＝還沒判。
-  // 預設：上次審過就沿用；舊審稿沒有逐題判定時，合格的全部當 OK；
-  // 其他情況 AI 沒提意見的題目預設 OK，整套和 AI 有提意見的題目要老師點
-  const [verdicts, setVerdicts] = useState<Map<string, boolean>>(() => {
-    if (prev && prev.verdicts.length > 0)
-      return new Map(prev.verdicts.map((v) => [v.target ?? SET, v.ok]));
-    const all = [SET, ...view.questions.map((q) => q.questionId)];
-    if (prev?.decision === "approved") return new Map(all.map((k) => [k, true]));
-    return new Map(
-      view.questions
-        .filter((q) => !view.aiNotes.some((n) => n.questionId === q.questionId))
-        .map((q) => [q.questionId, true]),
-    );
-  });
+  // 每一題、整套的判定（key：題號或 SET）：true＝OK，false＝有問題，沒有＝還沒判
+  const [verdicts, setVerdicts] = useState<Map<string, boolean>>(
+    () => new Map(Object.entries(base.verdicts)),
+  );
+  // 總評用受控元件：React 每次 form action 前會 reset 表單，非受控的在送出失敗時會被清掉
+  const [comment, setComment] = useState(base.comment);
+  const [confirmed, setConfirmed] = useState<Record<string, string>>(base.confirmed);
+  const [seen, setSeen] = useState<ReadonlySet<string>>(() => new Set(base.seen));
   const judge = (target: string, ok: boolean) =>
     setVerdicts((m) => new Map(m).set(target, ok));
   const [editing, setEditing] = useState<Editing | null>(null);
@@ -111,6 +148,112 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
       text: a.text || null,
     })),
   });
+
+  // ---------- 暫存（瀏覽器）、離開提醒 ----------
+  const setId = view.set.setId;
+  const content: ReviewContent = {
+    verdicts: Object.fromEntries(verdicts),
+    aiActions: Object.fromEntries(aiActions),
+    notes: notes.map((n) => ({ target: n.target, text: n.text })),
+    comment,
+    confirmed,
+    seen: [...seen],
+  };
+  const key = contentKey(content);
+  const baseReviewedAt = isoOf(prev?.reviewedAt);
+  const uploadedAt = isoOf(view.set.uploadedAt) ?? "";
+  // 掛載後才讀暫存（在 useState 初始值讀會和伺服器畫的不一樣）；讀完才開始存
+  const [loaded, setLoaded] = useState(false);
+  const [draftStale, setDraftStale] = useState(false);
+  // 送出時的內容：送出成功後，網站存的寫法可能和畫面略有不同（例如去掉前後空白），和這個一樣也算沒改
+  const [submittedKey, setSubmittedKey] = useState<string | null>(null);
+  const dirty =
+    loaded && key !== contentKey(base) && !(state.saved && key === submittedKey);
+
+  // 讀瀏覽器暫存只能在掛載後做（伺服器沒有 localStorage），所以在 effect 裡 setState
+  /* eslint-disable react-hooks/set-state-in-effect */
+  useEffect(() => {
+    const storage = browserStorage();
+    const draft = loadReviewDraft(storage, accountId, setId);
+    if (draft) {
+      const checked = checkReviewDraft(draft, {
+        baseReviewedAt,
+        uploadedAt,
+        targets: new Set([SET, ...view.questions.map((q) => q.questionId)]),
+        refs: new Set(view.aiNotes.map((n) => n.ref)),
+      });
+      if (!checked.ok) {
+        clearReviewDraft(storage, accountId, setId);
+        setDraftStale(true);
+      } else {
+        const c = checked.content;
+        setVerdicts(new Map(Object.entries(c.verdicts)));
+        setAiActions(new Map(Object.entries(c.aiActions)));
+        setNotes(c.notes.map((n) => ({ key: newKey(), target: n.target, text: n.text })));
+        setComment(c.comment);
+        setConfirmed(c.confirmed);
+        setSeen(new Set(c.seen));
+      }
+    }
+    setLoaded(true);
+    // 只在進來時讀一次
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  // 內容一改就存；和網站上的一樣就刪
+  useEffect(() => {
+    if (!loaded) return;
+    const storage = browserStorage();
+    if (!dirty) clearReviewDraft(storage, accountId, setId);
+    else
+      saveReviewDraft(storage, {
+        setId,
+        accountId,
+        baseReviewedAt,
+        uploadedAt,
+        ...content,
+      });
+    // key 代表 content 的內容
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded, dirty, key, accountId, setId, baseReviewedAt, uploadedAt]);
+
+  // 第一次有暫存才裝離開提醒，裝了就不拆（到送出成功或離開這頁）；只在有暫存時才問
+  const dirtyRef = useRef(false);
+  const guardRef = useRef<(() => void) | null>(null);
+  const leaveConfirm = r("leaveConfirm");
+  const leaveConfirmRef = useRef(leaveConfirm);
+  useEffect(() => {
+    leaveConfirmRef.current = leaveConfirm;
+    dirtyRef.current = dirty;
+    if (dirty && !guardRef.current)
+      guardRef.current = installLeaveGuard(() => leaveConfirmRef.current, undefined, {
+        shouldAsk: () => dirtyRef.current,
+        ignoreForm: (f) => f.hasAttribute("data-review-form"),
+      });
+  }, [dirty, leaveConfirm]);
+  // 送出成功：拆掉提醒（之後若要換頁，也要先拆，不然會再問一次）
+  useEffect(() => {
+    if (!state.saved) return;
+    guardRef.current?.();
+    guardRef.current = null;
+  }, [state]);
+  useEffect(
+    () => () => {
+      guardRef.current?.();
+      guardRef.current = null;
+    },
+    [],
+  );
+  // 刪除題組（確定離開後才會送出）：這份暫存也用不到了
+  useEffect(() => {
+    const onSubmit = (e: Event) => {
+      if (e.target instanceof HTMLFormElement && e.target.hasAttribute("data-delete-set"))
+        clearReviewDraft(browserStorage(), accountId, setId);
+    };
+    document.addEventListener("submit", onSubmit);
+    return () => document.removeEventListener("submit", onSubmit);
+  }, [accountId, setId]);
 
   // ---------- 錄音 ----------
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -372,13 +515,17 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
 
   return (
     <form
+      data-review-form
       action={formAction}
       onSubmit={(e) => {
         // 有沒按「好」的意見就先不送，提醒老師；意見框是空的或沒改過就直接關掉
         if (hasUnsaved()) {
           e.preventDefault();
           showUnsaved();
-        } else if (editing !== null) setEditing(null);
+        } else {
+          if (editing !== null) setEditing(null);
+          setSubmittedKey(key);
+        }
       }}
       className="grid gap-6"
     >
@@ -432,6 +579,10 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
             {isPending ? t("common.saving") : prev ? r("update") : r("submit")}
           </Button>
         </div>
+        <p className="mt-1 text-xs text-muted-foreground" data-review-draft-hint>
+          {r("draftHint")}
+          {draftStale && <b className="ml-2 text-destructive">{r("draftStale")}</b>}
+        </p>
         {state.problems && state.problems.length > 0 && (
           <div className="mt-2 max-h-40 overflow-auto">
             <Alert
@@ -542,7 +693,8 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
           <textarea
             name="comment"
             rows={3}
-            defaultValue={prev?.comment ?? ""}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
             className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
           />
         </label>

@@ -321,7 +321,10 @@
       "section": "Section",
       "options": "Options",
       "sectionN": "Section {n}"
-    }
+    },
+    "draftHint": "Your verdicts are kept in this browser; they count only after you submit.",
+    "draftStale": "Your saved draft was out of date (the review was submitted elsewhere or the set was re-uploaded), so it was cleared.",
+    "leaveConfirm": "Your review isn't submitted yet (a draft is kept in this browser). Leave this page?"
   },
   "permissions": {
     "uploadSets": "Upload sets",

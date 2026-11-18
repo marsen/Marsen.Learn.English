@@ -321,7 +321,10 @@
       "section": "段落",
       "options": "選項",
       "sectionN": "Section {n}"
-    }
+    },
+    "draftHint": "判定暫存在這台瀏覽器，送出後才算正式。",
+    "draftStale": "暫存已過期（這份審稿在別處送出過或題組重新上傳），已清除。",
+    "leaveConfirm": "審到一半的判定還沒送出（已暫存在這台瀏覽器）。確定要離開嗎？"
   },
   "permissions": {
     "uploadSets": "上傳題目",

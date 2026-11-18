@@ -1,3 +1,10 @@
+export type LeaveGuardOptions = {
+  /** 每次要離開時才問：回 false 就不問、直接放行（審稿頁：沒有暫存就不問）。沒給＝一律問 */
+  shouldAsk?: () => boolean;
+  /** 這個表單送出不算離開（審稿頁自己的送出） */
+  ignoreForm?: (form: HTMLFormElement) => boolean;
+};
+
 /**
  * 考試進行中，學生要離開這頁先問一聲（AC-1）：
  * ① beforeunload：重新整理、關分頁、整頁跳轉（瀏覽器自己的提示，文字不能改；iPhone Safari 不支援）
@@ -10,13 +17,15 @@ export function installLeaveGuard(
   message: () => string,
   /** 考試中按登出、又按「確定離開」時呼叫（清掉這次的暫存答案；其他離開方式不清，留給之後的 AC-3） */
   onLogoutConfirmed?: () => void,
+  options: LeaveGuardOptions = {},
 ): () => void {
+  const shouldAsk = () => options.shouldAsk?.() ?? true;
   // 已經按「確定離開」：後面的 beforeunload 不要再問一次
   let leaving = false;
   let released = false;
 
   const onBeforeUnload = (e: BeforeUnloadEvent) => {
-    if (leaving) return;
+    if (leaving || !shouldAsk()) return;
     e.preventDefault();
     // 舊版 Chrome、Edge 要設 returnValue 才會問
     e.returnValue = "";
@@ -24,7 +33,7 @@ export function installLeaveGuard(
 
   /** 問學生；回傳是不是確定離開 */
   const ask = (e: Event): boolean => {
-    if (leaving) return true;
+    if (leaving || !shouldAsk()) return true;
     if (window.confirm(message())) {
       leaving = true;
       return true;
@@ -43,11 +52,19 @@ export function installLeaveGuard(
   };
 
   const onSubmit = (e: SubmitEvent) => {
+    const form = e.target as HTMLFormElement | null;
+    if (form && options.ignoreForm?.(form)) return;
     if (ask(e) && isLogoutForm(e.target)) onLogoutConfirmed?.();
   };
 
   const onPopState = () => {
     if (released) return;
+    // 不用問：照常回上一頁（進來時多推的那筆也要跳過）
+    if (!leaving && !shouldAsk()) {
+      leaving = true;
+      window.history.back();
+      return;
+    }
     if (!leaving && window.confirm(message())) {
       leaving = true;
       window.history.back();

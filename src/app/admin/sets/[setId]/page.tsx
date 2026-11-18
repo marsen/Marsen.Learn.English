@@ -72,6 +72,7 @@ export default async function ReviewPage({
       <ReviewForm
         view={view}
         audioUrl={`/admin/sets/${setId}/audio`}
+        accountId={account.id}
         action={reviewExamSetAction.bind(null, setId)}
       />
     </Page>
