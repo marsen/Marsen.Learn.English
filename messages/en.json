@@ -147,16 +147,20 @@
     },
     "accessHint": {
       "unlisted": "Unlisted: nobody can take it",
-      "members": "Listed: logged-in students and teachers can take it",
+      "members": "Listed: logged-in students and teachers can take it once a teacher approves it",
       "public": "Public: the free test, only one site-wide; anyone can take it, no review needed"
+    },
+    "takeable": {
+      "yes": "Students can take it",
+      "no": "Students can't take it"
     },
     "statusTag": {
       "FULL_PASS": "All passed: AI and teacher both approved",
       "AIP": "Passed AI review",
       "AI_WARN": "AI has concerns, please take a closer look",
-      "TP": "Approved by a teacher (can be taken)",
-      "TR": "Rejected by a teacher (can't be taken)",
-      "WAIT": "Waiting: no teacher has reviewed it yet (can't be taken)"
+      "TP": "Approved by a teacher",
+      "TR": "Rejected by a teacher",
+      "WAIT": "Waiting: no teacher has reviewed it yet"
     },
     "trap": {
       "none": "None",

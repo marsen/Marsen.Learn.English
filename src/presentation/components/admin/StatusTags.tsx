@@ -91,3 +91,15 @@ function Tag({ tag }: { tag: StatusTag }) {
     </span>
   );
 }
+
+/** 學生考不考得到（由 canTake 推出來，和審稿狀態分開講；公開的不看審稿） */
+export function TakeableHint({ takeable }: { takeable: boolean }) {
+  const t = useTranslations("examSet.takeable");
+  return (
+    <span
+      className={`text-xs whitespace-nowrap ${takeable ? "text-accent-hover" : "text-muted-foreground"}`}
+    >
+      {takeable ? t("yes") : t("no")}
+    </span>
+  );
+}
