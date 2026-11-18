@@ -317,7 +317,6 @@
     "resultPass": "→ 合格",
     "resultFail": "→ 不合格",
     "full": {
-      "heading": "完整考卷（{count} 個 section）",
       "answer": "答案：{answer}",
       "section": "段落",
       "options": "選項",

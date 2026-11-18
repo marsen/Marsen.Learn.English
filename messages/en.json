@@ -317,7 +317,6 @@
     "resultPass": "→ Pass",
     "resultFail": "→ Fail",
     "full": {
-      "heading": "Full test ({count} sections)",
       "answer": "Answer: {answer}",
       "section": "Section",
       "options": "Options",

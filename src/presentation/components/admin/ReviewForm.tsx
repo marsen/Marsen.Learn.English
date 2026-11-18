@@ -72,12 +72,6 @@ const SET = "set";
 /** 寬螢幕才把批註排在考卷旁邊、拉線；窄的排在考卷下面 */
 const SIDE_BY_SIDE = "(min-width: 1280px)";
 
-/**
- * 完整考卷一段一段審（#288）。分頁版全部寫好、驗過才打開；
- * 打開時錄音列的送出一起換成總結頁的送出（同一個開關）。
- */
-const PAGED_REVIEW = true;
-
 let nextKey = 0;
 const newKey = () => `n${(nextKey += 1)}`;
 
@@ -176,7 +170,8 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
   const [active, setActive] = useState<string | null>(null);
 
   // ---------- 一段一段審（完整考卷） ----------
-  const paged = PAGED_REVIEW && view.fullPaper !== null;
+  // 完整考卷一段一段審（#288）：送出在總結頁；2.x 單段考卷照舊（送出在錄音列）
+  const paged = view.fullPaper !== null;
   const sections = paged ? sectionsOf(view.questions) : [];
   const [tab, setTab] = useState<ReviewTab>(
     () => sectionsOf(view.questions)[0] ?? "summary",
@@ -794,29 +789,27 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
               else goTab(n.section);
             }}
           />
-        ) : view.fullPaper ? (
+        ) : view.fullPaper && sectionTab !== null ? (
           <div className="grid min-w-0 gap-4">
-            {sectionTab !== null && (
-              <SectionSummary
-                key={sectionTab}
-                progress={progress.find((p) => p.section === sectionTab)!}
-                aiNotes={view.aiNotes.filter(
-                  (n) => n.questionId === null && n.ieltsSection === sectionTab,
-                )}
-                aiActions={aiActions}
-                onHandle={(ref) => setAi(ref, { action: "deleted", text: "" })}
-                onRestore={(ref) => setAi(ref, null)}
-                start={sectionStart(events, sectionTab)}
-                onPlayStart={() => {
-                  const start = sectionStart(events, sectionTab);
-                  if (start !== null) seek(start, true);
-                }}
-                turnStarts={turnStarts}
-                onSeek={seekFromNote}
-              />
-            )}
+            <SectionSummary
+              key={sectionTab}
+              progress={progress.find((p) => p.section === sectionTab)!}
+              aiNotes={view.aiNotes.filter(
+                (n) => n.questionId === null && n.ieltsSection === sectionTab,
+              )}
+              aiActions={aiActions}
+              onHandle={(ref) => setAi(ref, { action: "deleted", text: "" })}
+              onRestore={(ref) => setAi(ref, null)}
+              start={sectionStart(events, sectionTab)}
+              onPlayStart={() => {
+                const start = sectionStart(events, sectionTab);
+                if (start !== null) seek(start, true);
+              }}
+              turnStarts={turnStarts}
+              onSeek={seekFromNote}
+            />
             <FullReviewPaper
-              section={sectionTab ?? undefined}
+              section={sectionTab}
               paper={view.fullPaper}
               questions={questions}
               active={active}

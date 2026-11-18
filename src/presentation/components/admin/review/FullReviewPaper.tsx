@@ -15,8 +15,8 @@ type Props = {
   counts: ReadonlyMap<string, number>;
   onSelect: (questionId: string) => void;
   onPlay: (questionId: string) => void;
-  /** 一段一段審：只畫這一段；沒給就畫全部 */
-  section?: number;
+  /** 一段一段審：只畫這一段 */
+  section: number;
 };
 
 /**
@@ -26,10 +26,7 @@ type Props = {
 export function FullReviewPaper(props: Props) {
   const { paper, questions, active, verdicts, listening, counts, onSelect, onPlay } =
     props;
-  const sections =
-    props.section === undefined
-      ? paper.sections
-      : paper.sections.filter((s) => s.ielts === props.section);
+  const sections = paper.sections.filter((s) => s.ielts === props.section);
   const t = useTranslations();
 
   /** 單選、配對的一題：題號、題目、答案字母、判定、意見數；data-anchor 給批註欄拉線用 */
@@ -107,11 +104,6 @@ export function FullReviewPaper(props: Props) {
 
   return (
     <div className="grid min-w-0 gap-4">
-      {props.section === undefined && (
-        <h2 data-anchor="set" className="font-semibold">
-          {t("review.full.heading", { count: paper.sections.length })}
-        </h2>
-      )}
       {sections.map((section) => (
         <section key={section.ielts} className="grid gap-3">
           <h3 className="font-semibold">
