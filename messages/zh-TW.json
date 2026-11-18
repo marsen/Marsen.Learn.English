@@ -544,6 +544,13 @@
       "matchingLabel": "第 {n} 題",
       "matchingOption": "{key} — {text}",
       "choose": "選擇"
+    },
+    "paging": {
+      "nav": "翻頁",
+      "prev": "← 上一段：Section {n}",
+      "next": "下一段：Section {n} →",
+      "toSubmit": "下一頁：交卷 →",
+      "submitPage": "交卷頁"
     }
   },
   "history": {

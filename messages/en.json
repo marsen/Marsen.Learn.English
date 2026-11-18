@@ -544,6 +544,13 @@
       "matchingLabel": "Question {n}",
       "matchingOption": "{key} — {text}",
       "choose": "Choose"
+    },
+    "paging": {
+      "nav": "Pages",
+      "prev": "← Previous: Section {n}",
+      "next": "Next: Section {n} →",
+      "toSubmit": "Next: Submit →",
+      "submitPage": "Submit page"
     }
   },
   "history": {

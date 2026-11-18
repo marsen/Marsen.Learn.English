@@ -11,6 +11,8 @@ type Props = {
   disabled: boolean;
   /** 看題時間要看的題號範圍（全卷題號），這些題目會標黃 */
   highlight: [number, number] | null;
+  /** 分頁時只畫這一段（段號）；不給就整份畫出來 */
+  section?: number;
 };
 
 /** 題號圓圈（和填空題同一個樣子） */
@@ -27,13 +29,22 @@ function Num({ n }: { n: number }) {
  * 填空沿用 2.x 的答題卷、單選用 A/B/C 單選鈕、配對用下拉選單（放在題號後面，選項寫「A — 內容」，
  * 值仍是字母，草稿、批改不受影響）。
  */
-export function FullExamPaper({ paper, answers, onChange, disabled, highlight }: Props) {
+export function FullExamPaper({
+  paper,
+  answers,
+  onChange,
+  disabled,
+  highlight,
+  section: only,
+}: Props) {
   const t = useTranslations("exam.full");
   const lit = (n: number) => highlight !== null && n >= highlight[0] && n <= highlight[1];
+  const sections =
+    only === undefined ? paper.sections : paper.sections.filter((s) => s.ielts === only);
 
   return (
     <div className="grid gap-6">
-      {paper.sections.map((section) => (
+      {sections.map((section) => (
         <section key={section.ielts} className="grid gap-3">
           <h2 className="font-semibold">
             {t("sectionHeading", {

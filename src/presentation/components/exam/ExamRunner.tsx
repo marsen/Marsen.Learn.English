@@ -43,6 +43,9 @@ type Props = {
 
 type Stage = "intro" | "running" | "submitting" | "submitted";
 
+/** 完整考卷的分頁：段號，或最後的交卷頁 */
+type ExamPage = number | "submit";
+
 /** 錯誤：翻譯檔 exam.errors.* 的代碼，交卷失敗時帶原因 */
 type RunnerError =
   | { code: "unavailable" | "audioFailed" | "audioInterrupted" | "autoplayBlocked" }
@@ -66,6 +69,8 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
   const [phase, setPhase] = useState<ExamPhaseView | null>(null);
   // 完整考卷：錄音現在播到第幾段（空檔沿用上一段）
   const [section, setSection] = useState<number | null>(null);
+  // 完整考卷：學生正在看哪一頁（自己翻，錄音換段時不跟著換）
+  const [page, setPage] = useState<ExamPage | null>(null);
   const [error, setError] = useState<RunnerError | null>(null);
   const t = useTranslations("exam");
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -161,6 +166,7 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
     // 開始新考試：之前沒交卷留下的暫存清掉，只留這次的
     clearOtherDrafts(browserStorage(), r.sheet.attemptId);
     setSheet(r.sheet);
+    if (r.sheet.fullPaper) setPage(r.sheet.fullPaper.sections[0]?.ielts ?? "submit");
     setStage("running");
     const audio = new Audio(audioUrl);
     audioRef.current = audio;
@@ -256,6 +262,28 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
               })
             : t("statusRead", { clock: formatClock(phase.remaining) });
 
+  /** 翻頁只換畫哪一段：錄音在 audioRef、答案在 answersRef，都不跟著動 */
+  const goTo = (p: ExamPage) => {
+    setPage(p);
+    window.scrollTo({ top: 0 });
+  };
+  const pages: ExamPage[] = sheet?.fullPaper
+    ? [...sheet.fullPaper.sections.map((s) => s.ielts), "submit"]
+    : [];
+  const pageIndex = page === null ? -1 : pages.indexOf(page);
+  const prevPage = pageIndex > 0 ? pages[pageIndex - 1] : null;
+  const nextPage =
+    pageIndex >= 0 && pageIndex < pages.length - 1 ? pages[pageIndex + 1] : null;
+  const submitButton = (
+    <Button
+      disabled={stage !== "running" || !sheet}
+      onClick={() => sheet && confirmHandIn(sheet)}
+      className="justify-self-start"
+    >
+      {stage === "submitting" ? t("submitting") : t("submit")}
+    </Button>
+  );
+
   // key 不同：開始後整塊換掉，說明文字不會被當成狀態列沿用（瀏覽器翻譯外掛改過 DOM 時會殘留）
   return (
     <div key="running" className="grid gap-4">
@@ -267,14 +295,38 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
         {status}
       </p>
       {errorText && <Alert tone="error">{errorText}</Alert>}
-      {sheet?.fullPaper && (
+      {sheet?.fullPaper && typeof page === "number" && (
         <FullExamPaper
           paper={sheet.fullPaper}
+          section={page}
           answers={answers}
           onChange={changeAnswer}
           disabled={stage !== "running"}
           highlight={phase?.kind === "read" ? phase.questions : null}
         />
+      )}
+      {sheet?.fullPaper && page === "submit" && submitButton}
+      {sheet?.fullPaper && (
+        <nav aria-label={t("paging.nav")} className="flex flex-wrap gap-2">
+          {prevPage !== null && (
+            <Button variant="secondary" onClick={() => goTo(prevPage)}>
+              {prevPage === "submit"
+                ? t("paging.submitPage")
+                : t("paging.prev", { n: prevPage })}
+            </Button>
+          )}
+          {nextPage !== null && (
+            <Button
+              variant="secondary"
+              onClick={() => goTo(nextPage)}
+              className="ml-auto"
+            >
+              {nextPage === "submit"
+                ? t("paging.toSubmit")
+                : t("paging.next", { n: nextPage })}
+            </Button>
+          )}
+        </nav>
       )}
       {sheet && !sheet.fullPaper && (
         <ExamPaper
@@ -285,13 +337,7 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
           highlight={phase?.kind === "read" ? phase.questions : null}
         />
       )}
-      <Button
-        disabled={stage !== "running" || !sheet}
-        onClick={() => sheet && confirmHandIn(sheet)}
-        className="justify-self-start"
-      >
-        {stage === "submitting" ? t("submitting") : t("submit")}
-      </Button>
+      {sheet && !sheet.fullPaper && submitButton}
     </div>
   );
 }
