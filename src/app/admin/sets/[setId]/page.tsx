@@ -64,6 +64,7 @@ export default async function ReviewPage({
               setId={view.set.setId}
               questionCount={view.set.questionCount}
               reviewedAt={view.review?.reviewedAt ?? null}
+              fullExam={view.fullPaper !== null}
             />
           </>
         }

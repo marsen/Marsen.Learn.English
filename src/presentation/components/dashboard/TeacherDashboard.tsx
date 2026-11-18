@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import type { TeacherDashboardView } from "@/application/dashboard/teacherDashboard";
 import { StatusTags } from "@/presentation/components/admin/StatusTags";
+import { FullExamBadge } from "@/presentation/components/admin/FullExamBadge";
 import { ButtonLink } from "@/presentation/components/ui/Button";
 import { EmptyState } from "@/presentation/components/ui/EmptyState";
 import { Table, Td, Th, Tr } from "@/presentation/components/ui/Table";
@@ -74,7 +75,10 @@ export function TeacherDashboard({
         >
           {view.pending.map((s) => (
             <Tr key={s.setId}>
-              <Td className="font-mono whitespace-nowrap text-primary">{s.setId}</Td>
+              <Td className="font-mono whitespace-nowrap text-primary">
+                {s.setId}
+                {s.fullExam && <FullExamBadge />}
+              </Td>
               <Td>{s.title}</Td>
               <Td className="whitespace-nowrap">
                 <StatusTags tags={[s.aiVerdict === "pass" ? "AIP" : "AI_WARN"]} />

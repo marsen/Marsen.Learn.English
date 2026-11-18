@@ -2,12 +2,15 @@ import type { Account } from "@/domain/account/account";
 import { can } from "@/domain/account/permission";
 import type { AiVerdict } from "@/domain/examSet/examSet";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
+import { isFullExamPaper } from "@/domain/examSet/fullExam";
 import { countAiFindings } from "@/application/examSet/reviewView";
 import { startOfMonthInTaipei } from "@/application/shared/taipeiMonth";
 
 export type PendingSetView = {
   setId: string;
   title: string;
+  /** 完整考卷（代號仍是 s1- 開頭，畫面要另外標出來） */
+  fullExam: boolean;
   aiVerdict: AiVerdict;
   /** AI 提出的疑點數 */
   findingCount: number;
@@ -41,6 +44,7 @@ export class GetTeacherDashboard {
         return {
           setId: s.setId,
           title: s.title,
+          fullExam: isFullExamPaper(s.paper),
           aiVerdict: s.aiVerdict,
           findingCount: secret ? countAiFindings(secret.provenance) : 0,
           uploadedAt: s.uploadedAt,

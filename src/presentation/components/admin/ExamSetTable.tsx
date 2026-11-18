@@ -8,6 +8,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/presentation/components/ui/Button";
 import { ACCESS_ORDER } from "@/presentation/lib/examSetLabels";
 import { StatusTags, TakeableHint } from "./StatusTags";
+import { FullExamBadge } from "./FullExamBadge";
 import { EmptyState } from "@/presentation/components/ui/EmptyState";
 import { Table, Td, Th, Tr } from "@/presentation/components/ui/Table";
 import { formatDateTime } from "@/presentation/lib/format";
@@ -132,6 +133,7 @@ export function ExamSetTable({
               <a href={`/admin/sets/${s.setId}`} className="text-primary underline">
                 {s.setId}
               </a>
+              {s.schemaVersion === 3 && <FullExamBadge />}
             </Td>
             <Td>{s.title}</Td>
             <Td className="whitespace-nowrap">{s.questionCount}</Td>
