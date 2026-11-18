@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { useTranslations } from "next-intl";
+import { unstable_rethrow } from "next/navigation";
 import type { ReviewView } from "@/application/examSet/reviewView";
 import type { ReviewFormState } from "@/presentation/components/formStates";
 import { Alert } from "@/presentation/components/ui/Alert";
@@ -28,7 +29,10 @@ import {
   contentKey,
   isoOf,
   loadReviewDraft,
+  draftStep,
+  releaseGuardAfter,
   saveReviewDraft,
+  withSubmitFallback,
   type ReviewContent,
 } from "@/presentation/lib/reviewDraft";
 import { installLeaveGuard } from "@/presentation/lib/leaveGuard";
@@ -138,7 +142,17 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
   const t = useTranslations();
   const r = (key: string, values?: Record<string, string | number>) =>
     t(`review.${key}`, values);
-  const [state, formAction, isPending] = useActionState(action, {});
+  // 連不到網站時 action 會丟例外，不接住的話整頁換成錯誤頁；改成一般的送出失敗，暫存和畫面都留著（AC-3）
+  const submit = useMemo(
+    () =>
+      withSubmitFallback(
+        action,
+        { problems: [{ code: "submitFailed" as const }] },
+        unstable_rethrow,
+      ),
+    [action],
+  );
+  const [state, formAction, isPending] = useActionState(submit, {});
   const prev = view.review;
 
   // ---------- 草稿 ----------
@@ -247,8 +261,14 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
   const [draftStale, setDraftStale] = useState(false);
   // 送出時的內容：送出成功後，網站存的寫法可能和畫面略有不同（例如去掉前後空白），和這個一樣也算沒改
   const [submittedKey, setSubmittedKey] = useState<string | null>(null);
-  const dirty =
-    loaded && key !== contentKey(base) && !(state.saved && key === submittedKey);
+  const step = draftStep({
+    loaded,
+    key,
+    baseKey: contentKey(base),
+    result: state,
+    submittedKey,
+  });
+  const dirty = step === "save";
 
   // 讀瀏覽器暫存只能在掛載後做（伺服器沒有 localStorage），所以在 effect 裡 setState
   /* eslint-disable react-hooks/set-state-in-effect */
@@ -283,9 +303,9 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
 
   // 內容一改就存；和網站上的一樣就刪
   useEffect(() => {
-    if (!loaded) return;
+    if (step === "wait") return;
     const storage = browserStorage();
-    if (!dirty) clearReviewDraft(storage, accountId, setId);
+    if (step === "clear") clearReviewDraft(storage, accountId, setId);
     else
       saveReviewDraft(storage, {
         setId,
@@ -296,7 +316,7 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
       });
     // key 代表 content 的內容
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loaded, dirty, key, accountId, setId, baseReviewedAt, uploadedAt]);
+  }, [step, key, accountId, setId, baseReviewedAt, uploadedAt]);
 
   // 第一次有暫存才裝離開提醒，裝了就不拆（到送出成功或離開這頁）；只在有暫存時才問
   const dirtyRef = useRef(false);
@@ -314,7 +334,7 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
   }, [dirty, leaveConfirm]);
   // 送出成功：拆掉提醒（之後若要換頁，也要先拆，不然會再問一次）
   useEffect(() => {
-    if (!state.saved) return;
+    if (!releaseGuardAfter(state)) return;
     guardRef.current?.();
     guardRef.current = null;
   }, [state]);

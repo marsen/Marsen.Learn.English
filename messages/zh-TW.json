@@ -80,7 +80,8 @@
       "unknownAiNote": "找不到其中一條 AI 意見，請重新整理頁面再試",
       "editedAiNoteEmpty": "改寫的 AI 意見不能是空白，不需要的話請標為已處理",
       "badPayload": "審稿沒送出去，請重新整理頁面再試",
-      "verdictMissing": "還有 {count} 項沒判"
+      "verdictMissing": "還有 {count} 項沒判",
+      "submitFailed": "送不出去（網路或網站有問題）。判定和總評還暫存在這台瀏覽器，請稍後再按一次送出。"
     },
     "manage": {
       "notLoggedIn": "請先登入",

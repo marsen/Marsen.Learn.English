@@ -2,11 +2,14 @@ import { describe, it, expect } from "vitest";
 import {
   checkReviewDraft,
   clearReviewDraft,
+  draftStep,
   isoOf,
   loadReviewDraft,
+  releaseGuardAfter,
   reviewDraftKey,
   sameContent,
   saveReviewDraft,
+  withSubmitFallback,
   type ReviewContent,
 } from "./reviewDraft";
 
@@ -133,5 +136,60 @@ describe("reviewDraft", () => {
     expect(isoOf(new Date("2026-11-18T00:00:00Z"))).toBe("2026-11-18T00:00:00.000Z");
     expect(isoOf("2026-11-18T00:00:00Z")).toBe("2026-11-18T00:00:00.000Z");
     expect(isoOf(null)).toBeNull();
+  });
+});
+
+describe("送出結果和暫存（AC-3）", () => {
+  const base = { loaded: true, key: "改過", baseKey: "網站上", submittedKey: "改過" };
+
+  it("送出成功：暫存刪掉、離開提醒拆掉", () => {
+    const result = { saved: true };
+    expect(draftStep({ ...base, result })).toBe("clear");
+    expect(releaseGuardAfter(result)).toBe(true);
+  });
+
+  it("送出失敗（problems）：暫存保留（內容含總評照樣存）、離開提醒留著", () => {
+    const result = { problems: [{ code: "submitFailed" }] };
+    expect(draftStep({ ...base, result })).toBe("save");
+    expect(releaseGuardAfter(result)).toBe(false);
+    const s = memoryStorage();
+    saveReviewDraft(s, { ...draft, comment: "總評還在" });
+    expect(loadReviewDraft(s, "a1", "s1")?.comment).toBe("總評還在");
+  });
+
+  it("送出成功後又改了：照樣存", () => {
+    expect(draftStep({ ...base, key: "又改", result: { saved: true } })).toBe("save");
+  });
+
+  it("還沒讀完暫存不動；內容和網站上一樣就刪", () => {
+    expect(draftStep({ ...base, loaded: false, result: {} })).toBe("wait");
+    expect(draftStep({ ...base, key: "網站上", result: {} })).toBe("clear");
+  });
+
+  it("連不到網站（action 丟例外）：改成送出失敗，不丟到錯誤頁", async () => {
+    const failed = { problems: [{ code: "submitFailed" as const }] };
+    const offline = withSubmitFallback(async () => {
+      throw new TypeError("Failed to fetch");
+    }, failed);
+    await expect(offline()).resolves.toBe(failed);
+    const ok = withSubmitFallback(
+      async (): Promise<{ saved?: boolean }> => ({ saved: true }),
+      {},
+    );
+    await expect(ok()).resolves.toEqual({ saved: true });
+  });
+
+  it("框架自己的例外（redirect）照樣丟出去", async () => {
+    const redirect = new Error("NEXT_REDIRECT");
+    const run = withSubmitFallback(
+      async () => {
+        throw redirect;
+      },
+      {},
+      (e) => {
+        if (e === redirect) throw e;
+      },
+    );
+    await expect(run()).rejects.toBe(redirect);
   });
 });

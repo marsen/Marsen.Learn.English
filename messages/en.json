@@ -80,7 +80,8 @@
       "unknownAiNote": "One of the AI comments couldn't be found. Please reload the page and try again",
       "editedAiNoteEmpty": "An edited AI comment can't be empty. Mark it as handled instead",
       "badPayload": "Your review couldn't be sent. Please reload the page and try again",
-      "verdictMissing": "{count, plural, one {# item hasn't} other {# items haven't}} been checked yet"
+      "verdictMissing": "{count, plural, one {# item hasn't} other {# items haven't}} been checked yet",
+      "submitFailed": "Couldn't submit (network or site problem). Your verdicts and comment are still kept in this browser; please try submitting again later."
     },
     "manage": {
       "notLoggedIn": "Please log in first",

@@ -202,3 +202,48 @@ export function isoOf(d: Date | string | null | undefined): string | null {
   const t = new Date(d);
   return Number.isNaN(t.getTime()) ? null : t.toISOString();
 }
+
+/** 這次 render 之後暫存要怎麼處理：還沒讀完不動；內容等於網站上的（或剛送出成功的）就刪；否則存 */
+export function draftStep(s: {
+  loaded: boolean;
+  key: string;
+  baseKey: string;
+  /** 上一次送出的結果：成功（saved）或失敗（problems） */
+  result: { saved?: boolean; problems?: unknown[] };
+  /** 送出時的內容（contentKey）；還沒送出過是 null */
+  submittedKey: string | null;
+}): "wait" | "clear" | "save" {
+  if (!s.loaded) return "wait";
+  if (s.key === s.baseKey) return "clear";
+  // 送出成功：網站存的寫法可能略有不同（例如去掉前後空白），和送出的內容一樣也算沒改
+  if (s.result.saved && s.key === s.submittedKey) return "clear";
+  return "save";
+}
+
+/** 送出成功才拆離開提醒；失敗、還沒送出都留著 */
+export function releaseGuardAfter(result: {
+  saved?: boolean;
+  problems?: unknown[];
+}): boolean {
+  return result.saved === true;
+}
+
+/**
+ * 送出審稿：連不到網站（斷網、伺服器沒回應）時 action 會丟例外，React 會換成錯誤頁、畫面上的判定都不見。
+ * 這裡接住，改回一般的送出失敗（submitFailed），暫存和畫面都留著。
+ * rethrow：框架自己的例外（例如 redirect）要照樣丟出去，由呼叫端給 next 的 unstable_rethrow。
+ */
+export function withSubmitFallback<S, P extends unknown[]>(
+  action: (...args: P) => Promise<S>,
+  failed: S,
+  rethrow: (e: unknown) => void = () => {},
+): (...args: P) => Promise<S> {
+  return async (...args) => {
+    try {
+      return await action(...args);
+    } catch (e) {
+      rethrow(e);
+      return failed;
+    }
+  };
+}
