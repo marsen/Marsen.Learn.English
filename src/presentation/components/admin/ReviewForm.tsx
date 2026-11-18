@@ -331,30 +331,25 @@ export function ReviewForm({ view, audioUrl, action }: Props) {
       cardEls.forEach((el, i) => {
         el.style.top = `${tops[i]}px`;
         const a = anchors[i];
-        if (!a) return;
+        // 只畫展開中那張卡的線，其他卡不畫，免得線太多干擾閱讀
+        if (!a || active !== el.dataset.card) return;
         // 從空格底線下方出發，走行距的空隙，不壓到字
         const x1 = a.right - B.left + 2;
         const y1 = a.bottom - B.top + 3;
         const xm = paperRight - B.left + 8;
         const x2 = M.left - B.left;
         const y2 = M.top - B.top + tops[i] + Math.min(18, el.offsetHeight / 2);
-        const on = active === el.dataset.card;
         const path = document.createElementNS(ns, "path");
         path.setAttribute(
           "d",
           `M${x1},${y1} H${xm} C${xm + 24},${y1} ${x2 - 24},${y2} ${x2},${y2}`,
         );
-        path.setAttribute(
-          "class",
-          on
-            ? "fill-none stroke-primary stroke-2"
-            : "fill-none stroke-muted-foreground/40",
-        );
+        path.setAttribute("class", "fill-none stroke-primary stroke-2");
         const dot = document.createElementNS(ns, "circle");
         dot.setAttribute("cx", String(x1));
         dot.setAttribute("cy", String(y1));
         dot.setAttribute("r", "3");
-        dot.setAttribute("class", on ? "fill-primary" : "fill-muted-foreground/40");
+        dot.setAttribute("class", "fill-primary");
         shapes.push(path, dot);
       });
       const last = cardEls.at(-1);
