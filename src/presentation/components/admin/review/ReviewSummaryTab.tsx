@@ -26,7 +26,7 @@ type Props = {
 export function ReviewSummaryTab({ progress, openAi, onSection, onNote }: Props) {
   const t = useTranslations("review");
   return (
-    <div className="grid min-w-0 gap-4" data-review-summary>
+    <div className="grid min-w-0 grid-cols-1 gap-4" data-review-summary>
       <h2 data-anchor="set" className="font-semibold">
         {t("flow.summaryHeading")}
       </h2>
@@ -46,7 +46,9 @@ export function ReviewSummaryTab({ progress, openAi, onSection, onNote }: Props)
                   <span className="font-normal text-muted-foreground">
                     {p.status === "notStarted"
                       ? t("flow.notStarted")
-                      : t("flow.left", { count: p.pending })}
+                      : p.pending === 0
+                        ? t("flow.awaitingDone")
+                        : t("flow.left", { count: p.pending })}
                   </span>
                 )}
               </b>
@@ -61,18 +63,18 @@ export function ReviewSummaryTab({ progress, openAi, onSection, onNote }: Props)
         ))}
       </ol>
       {openAi.length > 0 ? (
-        <section className="grid gap-1 rounded-xl border border-border bg-surface px-4 py-3 text-sm">
+        <section className="grid min-w-0 grid-cols-1 gap-1 rounded-xl border border-border bg-surface px-4 py-3 text-sm">
           <h3 className="font-semibold">
             {t("flow.openAiTitle", { count: openAi.length })}
           </h3>
           <p className="text-xs text-muted-foreground">{t("flow.openAiNote")}</p>
-          <ul className="grid gap-1">
+          <ul className="grid min-w-0 grid-cols-1 gap-1">
             {openAi.map((n) => (
               <li key={n.ref}>
                 <button
                   type="button"
                   onClick={() => onNote(n)}
-                  className="w-full truncate text-left hover:underline"
+                  className="block w-full truncate text-left hover:underline"
                 >
                   <span className="mr-1 text-muted-foreground">
                     {n.section === null

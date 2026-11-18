@@ -357,7 +357,9 @@
       "openAiNote": "保留＝同意 AI 的說法。不擋送出，送出前再看一眼。",
       "noOpenAi": "AI 意見都處理過了。",
       "wholeSection": "Section {n} 整段",
-      "submitNeeds": "四段都完成、整套也判了才能送出。"
+      "submitNeeds": "四段都完成、整套也判了才能送出。",
+      "judgeSet": "還要判整套",
+      "awaitingDone": "待按完成"
     }
   },
   "permissions": {

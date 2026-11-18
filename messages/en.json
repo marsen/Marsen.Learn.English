@@ -357,7 +357,9 @@
       "openAiNote": "Keeping a note means you agree with the AI. This doesn't block submitting — just take a last look.",
       "noOpenAi": "All AI notes have been handled.",
       "wholeSection": "Section {n} (whole)",
-      "submitNeeds": "Submit becomes available when all four sections are done and the whole set is checked."
+      "submitNeeds": "Submit becomes available when all four sections are done and the whole set is checked.",
+      "judgeSet": "Check the whole set",
+      "awaitingDone": "Press done"
     }
   },
   "permissions": {

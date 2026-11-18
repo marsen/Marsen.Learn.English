@@ -11,6 +11,8 @@ type Props = {
   tab: ReviewTab;
   /** 錄音正在播哪一段（只提示，不換分頁） */
   playing: number | null;
+  /** 整套判了沒（總結那一步：四段都完成、整套也判了才寫「可以送出」） */
+  setJudged: boolean;
   onTab: (tab: ReviewTab) => void;
 };
 
@@ -18,14 +20,16 @@ type Props = {
  * 步驟條：S1→S2→S3→S4→總結，每一步標狀態（✓、剩幾項、還沒開始）和正在播哪段。
  * 電腦一排；手機收成一行（例如「② Section 2・剩 3 項 ▾」），點開看全部。
  */
-export function StepBar({ progress, tab, playing, onTab }: Props) {
+export function StepBar({ progress, tab, playing, setJudged, onTab }: Props) {
   const t = useTranslations("review.flow");
   const circled = (i: number) => String.fromCodePoint(0x2460 + i);
   const statusText = (p: SectionProgress) =>
     p.status === "done"
       ? "✓"
       : p.status === "inProgress"
-        ? t("left", { count: p.pending })
+        ? p.pending === 0
+          ? t("awaitingDone")
+          : t("left", { count: p.pending })
         : t("notStarted");
   const steps: { tab: ReviewTab; name: string; status: string; done: boolean }[] = [
     ...progress.map((p) => ({
@@ -37,7 +41,11 @@ export function StepBar({ progress, tab, playing, onTab }: Props) {
     {
       tab: "summary" as const,
       name: t("summary"),
-      status: progress.every((p) => p.status === "done") ? t("readyToSubmit") : "",
+      status: progress.every((p) => p.status === "done")
+        ? setJudged
+          ? t("readyToSubmit")
+          : t("judgeSet")
+        : "",
       done: false,
     },
   ];
@@ -88,7 +96,7 @@ export function StepBar({ progress, tab, playing, onTab }: Props) {
         ))}
       </ol>
       <details className="md:hidden">
-        <summary className="cursor-pointer text-sm font-semibold">
+        <summary className="cursor-pointer list-none text-sm font-semibold [&::-webkit-details-marker]:hidden">
           {circled(current)} {steps[current]?.name}
           {steps[current]?.status &&
             (steps[current].done

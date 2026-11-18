@@ -338,6 +338,8 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
   // ---------- 錄音 ----------
   const audioRef = useRef<HTMLAudioElement>(null);
   const [now, setNow] = useState(0);
+  // 錄音有沒有在播（步驟條只在播的時候標「正在播」）
+  const [audioOn, setAudioOn] = useState(false);
   const seek = (seconds: number, play = false) => {
     const el = audioRef.current;
     if (!el) return;
@@ -511,7 +513,7 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
   );
   const allSectionsDone = progress.every((p) => p.status === "done");
   const events = view.set.timing.events;
-  const playing = paged ? sectionAt(events, sections, now) : null;
+  const playing = paged && audioOn ? sectionAt(events, sections, now) : null;
   const goTab = (next: ReviewTab) => {
     if (editing !== null && hasUnsaved()) {
       showUnsaved();
@@ -698,13 +700,21 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
           src={audioUrl}
           onTimeUpdate={(e) => setNow(e.currentTarget.currentTime)}
           onSeeked={(e) => setNow(e.currentTarget.currentTime)}
+          onPlay={() => setAudioOn(true)}
+          onPause={() => setAudioOn(false)}
           className="w-full"
         />
         {!view.turns && (
           <p className="mt-1 text-xs text-muted-foreground">{r("noTranscript")}</p>
         )}
         {paged && (
-          <StepBar progress={progress} tab={tab} playing={playing} onTab={goTab} />
+          <StepBar
+            progress={progress}
+            tab={tab}
+            playing={playing}
+            setJudged={verdicts.has(SET)}
+            onTab={goTab}
+          />
         )}
         {/* 進度、下一個待處理、送出：捲到哪都看得到 */}
         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
@@ -768,6 +778,7 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
           <div className="grid min-w-0 gap-4">
             {sectionTab !== null && (
               <SectionSummary
+                key={sectionTab}
                 progress={progress.find((p) => p.section === sectionTab)!}
                 aiNotes={view.aiNotes.filter(
                   (n) => n.questionId === null && n.ieltsSection === sectionTab,
@@ -873,6 +884,7 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
           const check = canComplete(view.questions, view.aiNotes, sState, sectionTab);
           return (
             <SectionFooter
+              key={sectionTab}
               progress={progress.find((p) => p.section === sectionTab)!}
               missing={questionsIn(view.questions, sectionTab).flatMap((id) => {
                 const m = missingOf(view.aiNotes, sState, id);
