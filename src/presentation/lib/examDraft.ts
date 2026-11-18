@@ -102,27 +102,48 @@ export function clearOtherDrafts(
   }
 }
 
+/** 完整考卷每一段（段號 ielts）的作答格題目代號，照畫面順序 */
+export function sectionQuestionIds(
+  fullPaper: FullPaperView,
+): { section: number; questionIds: string[] }[] {
+  return fullPaper.sections.map((s) => ({
+    section: s.ielts,
+    questionIds: s.blocks.flatMap((b) =>
+      b.kind === "form"
+        ? formQuestionIds(b.paper)
+        : b.kind === "choice"
+          ? b.questions.map((q) => q.questionId)
+          : b.items.map((it) => it.questionId),
+    ),
+  }));
+}
+
+function formQuestionIds(p: PaperView): string[] {
+  return p.sections.flatMap((s) =>
+    s.rows.flatMap((r) =>
+      r.parts.flatMap((x) => (x.kind === "blank" ? [x.questionId] : [])),
+    ),
+  );
+}
+
 /** 題目卷上所有空格（作答格）的題目代號，照畫面順序 */
 export function questionIdsOf(
   paper: PaperView,
   fullPaper: FullPaperView | null,
 ): string[] {
-  const fromForm = (p: PaperView) =>
-    p.sections.flatMap((s) =>
-      s.rows.flatMap((r) =>
-        r.parts.flatMap((x) => (x.kind === "blank" ? [x.questionId] : [])),
-      ),
-    );
-  if (!fullPaper) return fromForm(paper);
-  return fullPaper.sections.flatMap((s) =>
-    s.blocks.flatMap((b) =>
-      b.kind === "form"
-        ? fromForm(b.paper)
-        : b.kind === "choice"
-          ? b.questions.map((q) => q.questionId)
-          : b.items.map((it) => it.questionId),
-    ),
-  );
+  if (!fullPaper) return formQuestionIds(paper);
+  return sectionQuestionIds(fullPaper).flatMap((s) => s.questionIds);
+}
+
+/** 完整考卷每一段還有幾題沒填（步驟條、交卷頁、交卷確認都用這個，題數才會一致） */
+export function unansweredBySection(
+  fullPaper: FullPaperView,
+  answers: Readonly<Record<string, string>>,
+): { section: number; left: number }[] {
+  return sectionQuestionIds(fullPaper).map((s) => ({
+    section: s.section,
+    left: unansweredCount(s.questionIds, answers),
+  }));
 }
 
 /** 還有幾題沒填：只有空白也算沒填（畫面上看起來就是空的） */

@@ -7,6 +7,8 @@ import {
   loadDraft,
   questionIdsOf,
   saveDraft,
+  sectionQuestionIds,
+  unansweredBySection,
   unansweredCount,
   type DraftStorage,
 } from "./examDraft";
@@ -170,5 +172,63 @@ describe("examDraft", () => {
     const ids = questionIdsOf(form([]), full);
     expect(ids).toEqual(["f1", "f2", "c1", "m1"]);
     expect(unansweredCount(ids, { f1: "x", c1: "A" })).toBe(2);
+  });
+
+  it("完整考卷：每一段分開列出題目代號，各段還有幾題沒填分開算，加起來等於整份沒填的題數", () => {
+    const full: FullPaperView = {
+      sections: [
+        {
+          ielts: 1,
+          title: "",
+          first: 1,
+          last: 3,
+          blocks: [
+            { kind: "form", paper: form(["f1", "f2"]) },
+            {
+              kind: "choice",
+              instruction: null,
+              questions: [{ questionId: "c1", number: 3, stem: "", options: [] }],
+            },
+          ],
+        },
+        {
+          ielts: 2,
+          title: "",
+          first: 4,
+          last: 5,
+          blocks: [
+            {
+              kind: "matching",
+              instruction: null,
+              options: [],
+              items: [
+                { questionId: "m1", number: 4, text: "" },
+                { questionId: "m2", number: 5, text: "" },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    expect(sectionQuestionIds(full)).toEqual([
+      { section: 1, questionIds: ["f1", "f2", "c1"] },
+      { section: 2, questionIds: ["m1", "m2"] },
+    ]);
+    const answers = { f1: "x", f2: "  ", m2: "B" };
+    const by = unansweredBySection(full, answers);
+    // 只有空白也算沒填
+    expect(by).toEqual([
+      { section: 1, left: 2 },
+      { section: 2, left: 1 },
+    ]);
+    expect(by.reduce((n, s) => n + s.left, 0)).toBe(
+      unansweredCount(questionIdsOf(form([]), full), answers),
+    );
+    expect(
+      unansweredBySection(full, { f1: "a", f2: "b", c1: "A", m1: "C", m2: "D" }),
+    ).toEqual([
+      { section: 1, left: 0 },
+      { section: 2, left: 0 },
+    ]);
   });
 });
