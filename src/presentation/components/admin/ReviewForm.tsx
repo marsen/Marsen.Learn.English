@@ -32,7 +32,26 @@ import {
   type ReviewContent,
 } from "@/presentation/lib/reviewDraft";
 import { installLeaveGuard } from "@/presentation/lib/leaveGuard";
+import {
+  canComplete,
+  isJudged,
+  missingOf,
+  nextPending as nextPendingOf,
+  openAiCount,
+  questionsIn,
+  sectionAt,
+  sectionOfQuestion,
+  sectionProgress,
+  sectionStart,
+  sectionsOf,
+  signature,
+  type SectionState,
+} from "@/presentation/lib/reviewSections";
 import { ReviewPaper } from "./review/ReviewPaper";
+import { StepBar, type ReviewTab } from "./review/StepBar";
+import { SectionSummary } from "./review/SectionSummary";
+import { SectionFooter } from "./review/SectionFooter";
+import { ReviewSummaryTab, type OpenAiNote } from "./review/ReviewSummaryTab";
 import { FullReviewPaper } from "./review/FullReviewPaper";
 import { Transcript, type TranscriptFocus } from "./review/Transcript";
 
@@ -48,6 +67,12 @@ type Props = {
 const SET = "set";
 /** 寬螢幕才把批註排在考卷旁邊、拉線；窄的排在考卷下面 */
 const SIDE_BY_SIDE = "(min-width: 1280px)";
+
+/**
+ * 完整考卷一段一段審（#288）。分頁版全部寫好、驗過才打開；
+ * 打開時錄音列的送出一起換成總結頁的送出（同一個開關）。
+ */
+const PAGED_REVIEW = false;
 
 let nextKey = 0;
 const newKey = () => `n${(nextKey += 1)}`;
@@ -70,7 +95,7 @@ function baseContentOf(view: ReviewView): ReviewContent {
               .filter((q) => !view.aiNotes.some((n) => n.questionId === q.questionId))
               .map((q) => [q.questionId, true]),
           );
-  return {
+  const content: ReviewContent = {
     verdicts,
     aiActions: Object.fromEntries(
       (prev?.aiActions ?? []).map((a) => [
@@ -83,6 +108,24 @@ function baseContentOf(view: ReviewView): ReviewContent {
     confirmed: {},
     seen: [],
   };
+  // 完整考卷：上次送出的審稿已判完（又沒暫存）時，全部當看過，判過的段落當已完成
+  const judgedAll = prev !== null && all.every((k) => k in verdicts);
+  if (!view.fullPaper || !judgedAll) return content;
+  const seen = view.questions.map((q) => q.questionId);
+  const st: SectionState = {
+    verdicts: new Map(Object.entries(verdicts)),
+    aiActions: new Map(Object.entries(content.aiActions)),
+    seen: new Set(seen),
+    confirmed: {},
+  };
+  const confirmed = Object.fromEntries(
+    sectionsOf(view.questions)
+      .filter((n) =>
+        questionsIn(view.questions, n).every((id) => isJudged(view.aiNotes, st, id)),
+      )
+      .map((n) => [String(n), signature(view.questions, view.aiNotes, st, n)]),
+  );
+  return { ...content, seen, confirmed };
 }
 
 /**
@@ -115,10 +158,47 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
   const [comment, setComment] = useState(base.comment);
   const [confirmed, setConfirmed] = useState<Record<string, string>>(base.confirmed);
   const [seen, setSeen] = useState<ReadonlySet<string>>(() => new Set(base.seen));
-  const judge = (target: string, ok: boolean) =>
-    setVerdicts((m) => new Map(m).set(target, ok));
   const [editing, setEditing] = useState<Editing | null>(null);
   const [active, setActive] = useState<string | null>(null);
+
+  // ---------- 一段一段審（完整考卷） ----------
+  const paged = PAGED_REVIEW && view.fullPaper !== null;
+  const sections = paged ? sectionsOf(view.questions) : [];
+  const [tab, setTab] = useState<ReviewTab>(
+    () => sectionsOf(view.questions)[0] ?? "summary",
+  );
+  const sState: SectionState = { verdicts, aiActions, seen, confirmed };
+
+  /** 判一題（或整套）。一段一段審時記下看過；判過了就收起、展開這段下一題（AC-9） */
+  const judge = (target: string, ok: boolean) => {
+    const nextVerdicts = new Map(verdicts).set(target, ok);
+    setVerdicts(nextVerdicts);
+    if (!paged || target === SET) return;
+    const nextSeen = new Set(seen).add(target);
+    setSeen(nextSeen);
+    const st = { ...sState, verdicts: nextVerdicts, seen: nextSeen };
+    // 判 OK 但還有 AI 意見沒處理：不收起，卡上會寫還要處理幾則
+    if (!isJudged(view.aiNotes, st, target)) return;
+    if (editing !== null && hasUnsaved()) return;
+    const sec = sectionOfQuestion(view.questions, target);
+    const ids = sec === null ? [] : questionsIn(view.questions, sec);
+    const i = ids.indexOf(target);
+    const next = [...ids.slice(i + 1), ...ids.slice(0, i)].find(
+      (id) => !isJudged(view.aiNotes, st, id),
+    );
+    if (next === undefined) {
+      setActive(null);
+      setEditing(null);
+      return;
+    }
+    setActive(next);
+    setEditing(
+      notesOf(next).length === 0 && aiOf(next).length === 0
+        ? { kind: "new", target: next }
+        : null,
+    );
+    scrollTo.current = next;
+  };
 
   const targetOf = (key: string) => (key === SET ? null : key);
   const saveNote = (key: string | null, target: string, text: string) => {
@@ -293,8 +373,13 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
   const currentTurn = view.turns ? turnAt(view.turns, now) : null;
 
   // ---------- 批註卡 ----------
+  // 一段一段審：整段的 AI 意見放在那段的小結，整套卡只放不屬於任何一段的
   const aiOf = (target: string) =>
-    view.aiNotes.filter((n) => n.questionId === targetOf(target));
+    view.aiNotes.filter(
+      (n) =>
+        n.questionId === targetOf(target) &&
+        !(paged && target === SET && n.ieltsSection !== null),
+    );
   const notesOf = (target: string) => notes.filter((n) => n.target === targetOf(target));
   const counts = new Map(
     view.questions.map((q) => [
@@ -305,18 +390,22 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
     ]),
   );
   // 整套一定有卡；題目有意見、正在看、正在新增意見的才出卡
+  // 一段一段審：段落分頁只出這段的題目卡，整套卡在總結分頁
   const cards = [
-    SET,
-    ...view.questions
-      .map((q) => q.questionId)
-      .filter(
-        (id) =>
-          (counts.get(id) ?? 0) > 0 ||
-          aiOf(id).length > 0 ||
-          verdicts.get(id) !== true ||
-          active === id ||
-          (editing?.kind === "new" && editing.target === id),
-      ),
+    ...(!paged || tab === "summary" ? [SET] : []),
+    ...(paged
+      ? tab === "summary"
+        ? []
+        : questionsIn(view.questions, tab)
+      : view.questions.map((q) => q.questionId)
+    ).filter(
+      (id) =>
+        (counts.get(id) ?? 0) > 0 ||
+        aiOf(id).length > 0 ||
+        verdicts.get(id) !== true ||
+        active === id ||
+        (editing?.kind === "new" && editing.target === id),
+    ),
   ];
 
   // ---------- 還沒按「好」的意見 ----------
@@ -375,14 +464,18 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
 
   // ---------- 判定的摘要、待處理 ----------
   const allTargets = [SET, ...view.questions.map((q) => q.questionId)];
-  const pending = allTargets.filter((k) => !verdicts.has(k));
+  // 一段一段審：題目要「判過」（AI 意見處理、預設 OK 確認）才不算待處理
+  const pending = allTargets.filter((k) =>
+    paged && k !== SET ? !isJudged(view.aiNotes, sState, k) : !verdicts.has(k),
+  );
   const okCount = allTargets.filter((k) => verdicts.get(k) === true).length;
   const badCount = allTargets.filter((k) => verdicts.get(k) === false).length;
   // 下一個還沒判的項目（從目前展開的那題往後找，繞回開頭）；按鈕上寫明是哪一項
   const from = active ? allTargets.indexOf(active) : -1;
   const order = [...allTargets.slice(from + 1), ...allTargets.slice(0, from + 1)];
-  const nextTarget: string | null =
-    order.find((x) => !verdicts.has(x) && x !== active) ?? pending[0] ?? null;
+  const nextTarget: string | null = paged
+    ? nextPendingOf(view.questions, view.aiNotes, sState, active, SET)
+    : (order.find((x) => !verdicts.has(x) && x !== active) ?? pending[0] ?? null);
   const targetName = (k: string) =>
     k === SET ? r("wholeSet") : r("questionN", { n: questions.get(k)?.number ?? k });
   // 跳過去的那張卡框起來一下，看得出到了哪裡
@@ -392,15 +485,64 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
     const id = window.setTimeout(() => setFlash(null), 1600);
     return () => window.clearTimeout(id);
   }, [flash]);
-  /** 跳到下一個還沒判的項目：展開、捲過去、框起來 */
-  const nextPending = () => {
-    const k = nextTarget;
-    if (k === null) return;
+  /** 跳到一項：展開、捲過去、框起來。一段一段審時，在別的分頁就先切過去（AC-14） */
+  const goTo = (k: string) => {
+    if (editing !== null && hasUnsaved()) {
+      showUnsaved();
+      return;
+    }
+    if (paged) {
+      const sec = k === SET ? "summary" : sectionOfQuestion(view.questions, k);
+      if (sec !== null && sec !== tab) setTab(sec);
+    }
     if (active !== k) select(k);
     // 寬螢幕捲到考卷上的空格（卡就在旁邊），窄的捲到卡
     scrollTo.current = k;
     setFlash(k);
   };
+  /** 跳到下一個還沒判的項目 */
+  const nextPending = () => {
+    if (nextTarget !== null) goTo(nextTarget);
+  };
+
+  // ---------- 分頁（一段一段審） ----------
+  const progress = sections.map((n) =>
+    sectionProgress(view.questions, view.aiNotes, sState, n),
+  );
+  const allSectionsDone = progress.every((p) => p.status === "done");
+  const events = view.set.timing.events;
+  const playing = paged ? sectionAt(events, sections, now) : null;
+  const goTab = (next: ReviewTab) => {
+    if (editing !== null && hasUnsaved()) {
+      showUnsaved();
+      return;
+    }
+    setTab(next);
+    setActive(null);
+    setEditing(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const sectionTab = paged && tab !== "summary" ? tab : null;
+  const nextSection = (n: number) => sections[sections.indexOf(n) + 1] ?? null;
+  const completeSection = (n: number) => {
+    setConfirmed((c) => ({
+      ...c,
+      [String(n)]: signature(view.questions, view.aiNotes, sState, n),
+    }));
+    goTab(nextSection(n) ?? "summary");
+  };
+  const openAi: OpenAiNote[] = paged
+    ? view.aiNotes
+        .filter((n) => !aiActions.has(n.ref))
+        .map((n) => ({
+          ref: n.ref,
+          section: n.ieltsSection,
+          questionId: n.questionId,
+          number: n.questionId ? (questions.get(n.questionId)?.number ?? null) : null,
+          message: n.message,
+        }))
+    : [];
+  const canSubmit = paged ? allSectionsDone && verdicts.has(SET) : pending.length === 0;
 
   // Esc 收起
   const collapseRef = useRef(collapse);
@@ -513,6 +655,22 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
     };
   });
 
+  // 送出的結果：一般在錄音列，一段一段審時在總結分頁的送出旁邊
+  const submitAlerts = (
+    <>
+      {state.problems && state.problems.length > 0 && (
+        <div className="mt-2 max-h-40 overflow-auto">
+          <Alert tone="error" items={state.problems.map((p) => reviewErrorText(t, p))} />
+        </div>
+      )}
+      {state.saved && (
+        <div className="mt-2">
+          <Alert>{r("saved")}</Alert>
+        </div>
+      )}
+    </>
+  );
+
   return (
     <form
       data-review-form
@@ -545,6 +703,9 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
         {!view.turns && (
           <p className="mt-1 text-xs text-muted-foreground">{r("noTranscript")}</p>
         )}
+        {paged && (
+          <StepBar progress={progress} tab={tab} playing={playing} onTab={goTab} />
+        )}
         {/* 進度、下一個待處理、送出：捲到哪都看得到 */}
         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
           <span data-review-progress>
@@ -570,52 +731,74 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
               </b>
             </span>
           )}
-          <Button
-            type="submit"
-            size="sm"
-            className="ml-auto"
-            disabled={isPending || pending.length > 0}
-          >
-            {isPending ? t("common.saving") : prev ? r("update") : r("submit")}
-          </Button>
+          {!paged && (
+            <Button
+              type="submit"
+              size="sm"
+              className="ml-auto"
+              disabled={isPending || !canSubmit}
+            >
+              {isPending ? t("common.saving") : prev ? r("update") : r("submit")}
+            </Button>
+          )}
         </div>
         <p className="mt-1 text-xs text-muted-foreground" data-review-draft-hint>
           {r("draftHint")}
           {draftStale && <b className="ml-2 text-destructive">{r("draftStale")}</b>}
         </p>
-        {state.problems && state.problems.length > 0 && (
-          <div className="mt-2 max-h-40 overflow-auto">
-            <Alert
-              tone="error"
-              items={state.problems.map((p) => reviewErrorText(t, p))}
-            />
-          </div>
-        )}
-        {state.saved && (
-          <div className="mt-2">
-            <Alert>{r("saved")}</Alert>
-          </div>
-        )}
+        {!paged && submitAlerts}
       </div>
 
       <div
         ref={boardRef}
         className="relative grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start xl:gap-12"
       >
-        {view.fullPaper ? (
-          <FullReviewPaper
-            paper={view.fullPaper}
-            questions={questions}
-            active={active}
-            verdicts={verdicts}
-            listening={listening}
-            counts={counts}
-            onSelect={selectFromPaper}
-            onPlay={(id) => {
-              const start = questions.get(id)?.evidence?.start;
-              if (start != null) seek(start, true);
+        {paged && tab === "summary" ? (
+          <ReviewSummaryTab
+            progress={progress}
+            openAi={openAi}
+            onSection={goTab}
+            onNote={(n) => {
+              if (n.questionId) goTo(n.questionId);
+              else if (n.section === null) goTo(SET);
+              else goTab(n.section);
             }}
           />
+        ) : view.fullPaper ? (
+          <div className="grid min-w-0 gap-4">
+            {sectionTab !== null && (
+              <SectionSummary
+                progress={progress.find((p) => p.section === sectionTab)!}
+                aiNotes={view.aiNotes.filter(
+                  (n) => n.questionId === null && n.ieltsSection === sectionTab,
+                )}
+                aiActions={aiActions}
+                onHandle={(ref) => setAi(ref, { action: "deleted", text: "" })}
+                onRestore={(ref) => setAi(ref, null)}
+                start={sectionStart(events, sectionTab)}
+                onPlayStart={() => {
+                  const start = sectionStart(events, sectionTab);
+                  if (start !== null) seek(start, true);
+                }}
+                turnStarts={turnStarts}
+                onSeek={seekFromNote}
+              />
+            )}
+            <FullReviewPaper
+              section={sectionTab ?? undefined}
+              paper={view.fullPaper}
+              questions={questions}
+              active={active}
+              verdicts={verdicts}
+              listening={listening}
+              counts={counts}
+              onSelect={selectFromPaper}
+              onPlay={(id) => {
+                const start = questions.get(id)?.evidence?.start;
+                if (start != null) seek(start, true);
+              }}
+            />
+          </div>
         ) : (
           <ReviewPaper
             paper={view.paper}
@@ -666,6 +849,14 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
                 currentTime={currentTime}
                 turnStarts={turnStarts}
                 onSeek={seekFromNote}
+                flow={
+                  paged && target !== SET
+                    ? {
+                        openAi: openAiCount(view.aiNotes, sState, target),
+                        needsConfirm: verdicts.get(target) === true && !seen.has(target),
+                      }
+                    : undefined
+                }
               />
             </div>
           ))}
@@ -677,29 +868,80 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
         />
       </div>
 
-      {view.turns && (
+      {sectionTab !== null &&
+        (() => {
+          const check = canComplete(view.questions, view.aiNotes, sState, sectionTab);
+          return (
+            <SectionFooter
+              progress={progress.find((p) => p.section === sectionTab)!}
+              missing={questionsIn(view.questions, sectionTab).flatMap((id) => {
+                const m = missingOf(view.aiNotes, sState, id);
+                return m.length === 0
+                  ? []
+                  : [
+                      {
+                        questionId: id,
+                        number: questions.get(id)?.number ?? 0,
+                        missing: m,
+                      },
+                    ];
+              })}
+              waitFor={check.ok ? null : check.waitFor}
+              next={nextSection(sectionTab)}
+              onComplete={() => completeSection(sectionTab)}
+              onJump={goTo}
+            />
+          );
+        })()}
+
+      {view.turns && !(paged && tab === "summary") && (
         <Transcript
-          turns={view.turns}
+          turns={
+            sectionTab === null
+              ? view.turns
+              : view.turns.filter((x) => x.id.startsWith(`s${sectionTab}-`))
+          }
           current={currentTurn}
           focus={focusTurn}
           onSeek={(s) => seek(s)}
         />
       )}
 
-      <section className="grid gap-3 rounded-xl border border-border bg-surface p-4">
-        <h2 className="text-lg font-semibold">{r("decision")}</h2>
-        <label className="text-sm">
-          <span className="mb-1 block font-medium">{r("comment")}</span>
-          <textarea
-            name="comment"
-            rows={3}
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
-          />
-        </label>
-        <p className="text-sm text-muted-foreground">{r("submitAtTop")}</p>
-      </section>
+      {(!paged || tab === "summary") && (
+        <section className="grid gap-3 rounded-xl border border-border bg-surface p-4">
+          <h2 className="text-lg font-semibold">{r("decision")}</h2>
+          <label className="text-sm">
+            <span className="mb-1 block font-medium">{r("comment")}</span>
+            <textarea
+              name="comment"
+              rows={3}
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm"
+            />
+          </label>
+          {paged ? (
+            <div data-summary-submit>
+              <div className="flex flex-wrap items-center gap-3">
+                <b className={badCount > 0 ? "text-destructive" : "text-accent"}>
+                  {badCount > 0 ? r("resultFail") : r("resultPass")}
+                </b>
+                <Button type="submit" size="sm" disabled={isPending || !canSubmit}>
+                  {isPending ? t("common.saving") : prev ? r("update") : r("submit")}
+                </Button>
+                {!canSubmit && (
+                  <span className="text-sm text-muted-foreground">
+                    {r("flow.submitNeeds")}
+                  </span>
+                )}
+              </div>
+              {submitAlerts}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">{r("submitAtTop")}</p>
+          )}
+        </section>
+      )}
     </form>
   );
 }

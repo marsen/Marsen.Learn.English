@@ -52,6 +52,8 @@ type Props = {
   currentTime: () => number;
   turnStarts: ReadonlyMap<string, number>;
   onSeek: Seek;
+  /** 一段一段審（完整考卷）：判 OK 時，沒處理的 AI 意見要標「還沒處理」並提醒；預設 OK 要再按一次確認 */
+  flow?: { openAi: number; needsConfirm: boolean };
 };
 
 /** 嚴重程度的顏色：提醒灰、注意橘、嚴重紅（小標籤的圓點、意見左邊的色條） */
@@ -186,6 +188,16 @@ export function NoteCard(p: Props) {
         {p.verdict === undefined && (
           <span className="text-xs text-muted-foreground">{r("notChecked")}</span>
         )}
+        {p.flow?.needsConfirm && p.verdict === true && (
+          <span className="text-xs font-semibold text-primary-hover" data-needs-confirm>
+            {r("flow.confirmDefault")}
+          </span>
+        )}
+        {p.flow && p.verdict === true && p.flow.openAi > 0 && (
+          <span className="text-xs font-semibold text-destructive" data-open-ai>
+            {r("flow.openAiHint", { count: p.flow.openAi })}
+          </span>
+        )}
       </div>
       {q && (
         <>
@@ -291,6 +303,11 @@ export function NoteCard(p: Props) {
               )}
               {deleted && (
                 <span className="rounded bg-surface px-1.5">{r("handledTag")}</span>
+              )}
+              {p.flow && p.verdict === true && !a && (
+                <span className="rounded bg-surface px-1.5 font-semibold text-destructive">
+                  {r("flow.notHandledTag")}
+                </span>
               )}
             </div>
             <p>{time(edited ? a.text : n.message)}</p>
