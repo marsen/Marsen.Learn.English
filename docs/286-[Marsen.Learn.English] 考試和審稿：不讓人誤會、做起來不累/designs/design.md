@@ -75,6 +75,18 @@
 - 390px 不能整頁橫捲；#285 的離開提醒、交卷確認、草稿、標為已處理不能壞。實機用 3101 檢查。
 - 新文字兩種語言 key 一致（`messages.test.ts` 會擋）。
 
+## 實作時補的細節
+
+- 考試頁開始後，說明和作答區用不同的 `key`：瀏覽器翻譯外掛改過 DOM 時，說明文字會被沿用成狀態列（實機看到），換 key 讓整塊重畫。
+- 碰到的檔案寫死的顏色改 token：`StatusTags` 的老師通過（sky → accent）、`FullExamPaper` 的看題標黃（yellow → primary-soft）。`ExamPaper` 沒碰，不改。
+- 老師總覽（`GetTeacherDashboard`）的待審清單多帶 `fullExam`，代號旁才能標「完整考卷」。
+
+## 已知限制
+
+- 整套的 AI 意見（不屬於某一題）在完整考卷裡寫 `t3`、`t19-20` 時，不知道是哪一段，維持一般文字不連結。產生端改成直接寫 `s3-t3` 才能根治（另開 Question.Generator 工作項）。
+- `t19-20` 這種範圍寫法只認得前半（`t19`），沿用原本的規則。
+
 ## 不做
 
-（實作後依實際進度補上）
+- 第 4 順位、#285 留下的事（見 issue）。
+- 不改 setId、不改資料庫、不改 Question.Generator、不改 `canTake`／`permission.ts`。

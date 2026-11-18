@@ -208,7 +208,7 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
 
   if (stage === "intro") {
     return (
-      <div className="grid gap-4">
+      <div key="intro" className="grid gap-4">
         <p>{t.rich("intro", { title, b: (chunks) => <b>{chunks}</b> })}</p>
         <p className="font-medium">{t("overview", overview)}</p>
         <section className="grid gap-2 rounded-xl border border-border bg-surface p-4">
@@ -256,8 +256,9 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
               })
             : t("statusRead", { clock: formatClock(phase.remaining) });
 
+  // key 不同：開始後整塊換掉，說明文字不會被當成狀態列沿用（瀏覽器翻譯外掛改過 DOM 時會殘留）
   return (
-    <div className="grid gap-4">
+    <div key="running" className="grid gap-4">
       <p
         className="sticky top-0 z-10 rounded-lg bg-background/95 py-2 font-medium"
         aria-live="polite"
