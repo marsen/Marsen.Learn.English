@@ -29,7 +29,7 @@ const TAGS: Record<StatusTag, { who: string; mark: string; className: string }> 
   TP: {
     who: "🍵",
     mark: CHECK,
-    className: "bg-sky-50 text-sky-700 ring-sky-200",
+    className: "bg-accent-soft/60 text-accent-hover ring-accent-soft",
   },
   TR: {
     who: "🍵",

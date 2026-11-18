@@ -24,7 +24,8 @@ function Num({ n }: { n: number }) {
 
 /**
  * 完整考卷（四個 section）：每段一個標題，段內依區塊畫——
- * 填空沿用 2.x 的答題卷、單選用 A/B/C 單選鈕、配對用選項字母的下拉選單。
+ * 填空沿用 2.x 的答題卷、單選用 A/B/C 單選鈕、配對用下拉選單（放在題號後面，選項寫「A — 內容」，
+ * 值仍是字母，草稿、批改不受影響）。
  */
 export function FullExamPaper({ paper, answers, onChange, disabled, highlight }: Props) {
   const t = useTranslations("exam.full");
@@ -65,7 +66,7 @@ export function FullExamPaper({ paper, answers, onChange, disabled, highlight }:
                   {block.questions.map((q) => (
                     <fieldset
                       key={q.questionId}
-                      className={`my-3 rounded-lg px-2 ${lit(q.number) ? "bg-yellow-100" : ""}`}
+                      className={`my-3 rounded-lg px-2 ${lit(q.number) ? "bg-primary-soft" : ""}`}
                     >
                       <legend className="flex items-center">
                         <Num n={q.number} />
@@ -104,24 +105,28 @@ export function FullExamPaper({ paper, answers, onChange, disabled, highlight }:
                 {block.items.map((it) => (
                   <label
                     key={it.questionId}
-                    className={`my-2 flex items-center gap-2 rounded-lg px-2 ${lit(it.number) ? "bg-yellow-100" : ""}`}
+                    className={`my-2 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-lg px-2 py-1 sm:flex-nowrap ${lit(it.number) ? "bg-primary-soft" : ""}`}
                   >
-                    <Num n={it.number} />
-                    <span className="flex-1">{it.text}</span>
-                    <select
-                      aria-label={t("matchingLabel", { n: it.number })}
-                      disabled={disabled}
-                      value={answers[it.questionId] ?? ""}
-                      onChange={(e) => onChange(it.questionId, e.target.value)}
-                      className="rounded border border-border bg-background px-2 py-1"
-                    >
-                      <option value="">{t("choose")}</option>
-                      {block.options.map((o) => (
-                        <option key={o.key} value={o.key}>
-                          {o.key}
-                        </option>
-                      ))}
-                    </select>
+                    <span className="flex w-full min-w-0 items-center sm:w-auto sm:shrink-0">
+                      <Num n={it.number} />
+                      <select
+                        aria-label={t("matchingLabel", { n: it.number })}
+                        disabled={disabled}
+                        value={answers[it.questionId] ?? ""}
+                        onChange={(e) => onChange(it.questionId, e.target.value)}
+                        className="w-full min-w-0 rounded border border-border bg-background px-2 py-1 sm:w-64"
+                      >
+                        <option value="">{t("choose")}</option>
+                        {block.options.map((o) => (
+                          <option key={o.key} value={o.key}>
+                            {t("matchingOption", { key: o.key, text: o.text })}
+                          </option>
+                        ))}
+                      </select>
+                    </span>
+                    <span className="min-w-0 basis-full pl-8 sm:basis-auto sm:pl-0">
+                      {it.text}
+                    </span>
                   </label>
                 ))}
               </div>

@@ -500,6 +500,7 @@
     "full": {
       "sectionHeading": "Section {n}（第 {a}–{b} 題）",
       "matchingLabel": "第 {n} 題",
+      "matchingOption": "{key} — {text}",
       "choose": "選擇"
     }
   },

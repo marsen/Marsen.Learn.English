@@ -500,6 +500,7 @@
     "full": {
       "sectionHeading": "Section {n} (Questions {a}–{b})",
       "matchingLabel": "Question {n}",
+      "matchingOption": "{key} — {text}",
       "choose": "Choose"
     }
   },
