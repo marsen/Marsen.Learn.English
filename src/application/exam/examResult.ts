@@ -1,6 +1,7 @@
 import type { ExamAccess, PublicTiming } from "@/domain/examSet/examSet";
 import type { GradeResult } from "@/domain/exam/grading";
-import type { PaperView } from "./paperView";
+import type { SectionScore, SectionTitle } from "@/domain/examSet/fullExam";
+import type { FullPaperView, PaperView } from "./paperView";
 
 /** 考卷清單上的一張 */
 export type AvailableExam = {
@@ -8,6 +9,10 @@ export type AvailableExam = {
   title: string;
   questionCount: number;
   access: ExamAccess;
+  /** 錄音長度（秒），開始前告訴考生大約要考多久 */
+  totalSeconds: number;
+  /** 完整考卷各段的標題（分辨不同套用）；單段考卷是空陣列 */
+  sections: SectionTitle[];
 };
 
 /** 開始考試後給考生的內容：題目卷、時間軸。不含答案、不含逐字稿 */
@@ -16,6 +21,8 @@ export type ExamSheet = {
   setId: string;
   title: string;
   paper: PaperView;
+  /** 完整考卷（四個 section）才有；有的話畫面照這個畫，paper 是空的 */
+  fullPaper: FullPaperView | null;
   timing: PublicTiming;
 };
 
@@ -41,6 +48,10 @@ export type AttemptResultView = {
   total: number;
   answerKeyVisible: boolean;
   results: QuestionResultView[];
+  /** 完整考卷才有：每個 section 對幾題；2.x 是空陣列 */
+  sections: SectionScore[];
+  /** 滿分 40 題的完整考卷才有：換算的雅思級分（估算）；其他是 null */
+  band: number | null;
 };
 
 /** 考試紀錄的一筆 */

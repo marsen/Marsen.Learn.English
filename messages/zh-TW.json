@@ -78,9 +78,10 @@
       "unknownQuestion": "沒有這一題：{questionId}",
       "noteTooLong": "每則意見最多 {max} 字",
       "unknownAiNote": "找不到其中一條 AI 意見，請重新整理頁面再試",
-      "editedAiNoteEmpty": "改寫的 AI 意見不能是空白，不需要的話請刪除",
+      "editedAiNoteEmpty": "改寫的 AI 意見不能是空白，不需要的話請標為已處理",
       "badPayload": "審稿沒送出去，請重新整理頁面再試",
-      "verdictMissing": "還有 {count} 項沒判"
+      "verdictMissing": "還有 {count} 項沒判",
+      "submitFailed": "送不出去（網路或網站有問題）。判定和總評還暫存在這台瀏覽器，請稍後再按一次送出。"
     },
     "manage": {
       "notLoggedIn": "請先登入",
@@ -147,16 +148,21 @@
     },
     "accessHint": {
       "unlisted": "下架：誰都不能考",
-      "members": "上架：登入的學生、老師能考",
+      "members": "上架：審稿通過後，登入的學生、老師能考",
       "public": "公開：免費試卷用，全站只有一張；誰都能寫，不用等審稿"
+    },
+    "fullExamBadge": "完整考卷",
+    "takeable": {
+      "yes": "學生考得到",
+      "no": "學生考不到"
     },
     "statusTag": {
       "FULL_PASS": "全 PASS：AI 與老師都通過",
       "AIP": "AI 審稿通過",
       "AI_WARN": "AI 有疑慮，請老師留意",
-      "TP": "老師審稿通過（考得到）",
-      "TR": "老師退回（考不到）",
-      "WAIT": "待審：還沒有老師審過（考不到）"
+      "TP": "老師審稿通過",
+      "TR": "老師退回",
+      "WAIT": "待審：還沒有老師審過"
     },
     "trap": {
       "none": "無",
@@ -170,14 +176,17 @@
       "exact_word": "照錄音裡的字",
       "digits_only": "只寫數字",
       "number_word": "數字或英文數字都算對",
-      "date_equivalence": "日期寫法不拘"
+      "date_equivalence": "日期寫法不拘",
+      "letter": "只比字母（大小寫不拘）"
     },
     "answerType": {
       "word": "單字",
       "name_spelled": "拼出的名字",
       "phone": "電話號碼",
       "number": "數字",
-      "place": "地點"
+      "place": "地點",
+      "choice": "單選",
+      "matching": "配對"
     },
     "aiRuling": {
       "problem": "AI 判定：有問題",
@@ -231,7 +240,8 @@
     "colVersion": "版本",
     "versionHint": {
       "transcript": "2.1：有逐字稿",
-      "noTranscript": "2.0：沒有逐字稿。重新打包成 2.1 後到上傳頁覆蓋，就能補上"
+      "noTranscript": "2.0：沒有逐字稿。重新打包成 2.1 後到上傳頁覆蓋，就能補上",
+      "fullExam": "3.0：完整考卷（四個 section），有逐字稿"
     },
     "trialLabel": "免費試卷：",
     "noTrialWarning": "還沒有公開題組：首頁的免費試卷會導到考卷清單。在下面挑一張按「公開」。",
@@ -275,22 +285,24 @@
     "edit": "修改",
     "delete": "刪除",
     "restore": "復原",
+    "markHandled": "標為已處理",
     "revertToAi": "改回 AI 原文",
     "deleteReasonPlaceholder": "為什麼不用改？（選填，會一起給 AI）",
     "byTeacher": "老師",
     "editedTag": "老師改過",
-    "deletedTag": "老師刪除",
-    "deleteReason": "刪除原因：{text}",
+    "handledTag": "已處理",
+    "handledReason": "處理說明：{text}",
     "commentCount": "{count} 則意見",
     "transcript": "逐字稿",
-    "transcriptHint": "點時間跳過去聽，正在播的那句會亮起來。",
+    "transcriptHint": "點時間跳過去聽，正在播的那句會亮起來。從意見點句子編號，會捲到那一句並框起來。",
+    "transcriptSection": "Section {n}",
     "noTranscript": "這套題打包時還沒有逐字稿，所以沒有 ▶ 和逐字稿。",
     "unsavedComment": "有一則意見還沒存，請先按「好」（或「取消」）。",
     "close": "收起（Esc）",
     "showAiOriginal": "看 AI 原文",
     "chipAi": "AI {count}",
     "chipTeacher": "老師 {count}",
-    "chipDeleted": "已刪除 {count}",
+    "chipHandled": "已處理 {count}",
     "aiSeverity": "AI · {severity}",
     "needsFixing": "有問題",
     "notChecked": "還沒判",
@@ -299,8 +311,56 @@
     "summaryBad": "{count} 項有問題",
     "summaryJoin": "、",
     "pending": "{count} 項待處理",
+    "nextPending": "下一個待處理：{target}",
+    "noPending": "沒有待處理了",
+    "submitAtTop": "寫完總評，按上方錄音列的「送出」。",
     "resultPass": "→ 合格",
-    "resultFail": "→ 不合格"
+    "resultFail": "→ 不合格",
+    "full": {
+      "answer": "答案：{answer}",
+      "section": "段落",
+      "options": "選項",
+      "sectionN": "Section {n}"
+    },
+    "draftHint": "判定暫存在這台瀏覽器，送出後才算正式。",
+    "draftStale": "暫存已過期（這份審稿在別處送出過或題組重新上傳），已清除。",
+    "leaveConfirm": "審到一半的判定還沒送出（已暫存在這台瀏覽器）。確定要離開嗎？",
+    "flow": {
+      "sectionN": "Section {n}",
+      "summary": "總結",
+      "left": "剩 {count} 項",
+      "notStarted": "還沒開始",
+      "readyToSubmit": "可以送出",
+      "playing": "正在播",
+      "playingHere": "錄音正在播這段",
+      "steps": "審稿步驟",
+      "summaryTitle": "Section {n} 小結",
+      "sectionAiCount": "AI 對整段 {count} 則",
+      "playSection": "從 Section {n} 開頭播",
+      "sectionAiHint": "AI 對整段的意見可以標為已處理；不影響這段能不能完成。",
+      "missingUnjudged": "還沒判",
+      "missingAi": "AI 意見 {count} 則未處理",
+      "missingConfirm": "預設 OK，請確認",
+      "missingLine": "第 {n} 題：{what}",
+      "missingJoin": "、",
+      "complete": "Section {n} 完成，前往 Section {next}",
+      "completeToSummary": "Section {n} 完成，前往總結",
+      "goNext": "前往 Section {n}",
+      "goSummary": "前往總結",
+      "sectionDone": "Section {n} 已完成",
+      "waitFor": "Section {n} 完成後才能按",
+      "confirmDefault": "預設 OK，請確認（再按一次 OK）",
+      "openAiHint": "還有 {count} 則 AI 意見要標為已處理",
+      "notHandledTag": "還沒處理",
+      "summaryHeading": "總結：四段進度",
+      "openAiTitle": "還沒處理的 AI 意見 {count} 則",
+      "openAiNote": "保留＝同意 AI 的說法。不擋送出，送出前再看一眼。",
+      "noOpenAi": "AI 意見都處理過了。",
+      "wholeSection": "Section {n} 整段",
+      "submitNeeds": "四段都完成、整套也判了才能送出。",
+      "judgeSet": "還要判整套",
+      "awaitingDone": "待按完成"
+    }
   },
   "permissions": {
     "uploadSets": "上傳題目",
@@ -439,18 +499,24 @@
   },
   "examList": {
     "metaTitle": "考卷",
-    "title": "雅思聽力 Section 1",
+    "title": "雅思聽力考卷",
     "guestHint": "你現在看到的是公開考卷。<login>登入</login>後可以寫更多。",
     "empty": "目前沒有可以寫的考卷。",
-    "questionCount": "{count} 題"
+    "fullExam": "完整考卷（{sections} 段・{count} 題）",
+    "singleSection": "Section 1・{count} 題",
+    "sectionTitle": "S{n} {title}"
   },
   "exam": {
     "metaTitle": "考試",
     "unavailableGuest": "這張考卷現在不能考。<login>登入</login>後可能可以寫。",
     "intro": "《{title}》。按下開始後錄音會直接播放，<b>只播一次，不能暫停或倒轉</b>，跟正式考試一樣。錄音裡有看題時間和最後檢查時間，錄音結束會自動交卷。",
+    "overview": "約 {minutes} 分鐘・{questions} 題・{sections} 段",
+    "volumeTest": "先試音量",
+    "volumeTestHint": "這是一段範例錄音，不是考試：可以隨意播放、暫停，不會開始計時。調好音量再按「開始考試」。",
     "start": "開始考試",
     "submitted": "已交卷，正在打開批改結果…",
     "statusStart": "錄音開始。",
+    "statusSection": "Section {n}・",
     "statusListen": "錄音播放中，邊聽邊填。",
     "statusCheck": "檢查你的答案。{clock}",
     "statusRead": "看題時間　{clock}",
@@ -462,6 +528,9 @@
     },
     "submit": "交卷",
     "submitting": "交卷中…",
+    "confirmSubmit": "確定要交卷嗎？",
+    "confirmSubmitUnanswered": "還有 {count} 題沒填，確定要交卷嗎？",
+    "leaveConfirm": "考試還沒交卷，離開這頁就不能繼續作答。確定要離開嗎？",
     "errors": {
       "unavailable": "這張考卷現在不能考。",
       "submitFailed": "交卷失敗：{message}。答案還在，請再按一次「交卷」。",
@@ -469,6 +538,33 @@
       "audioFailed": "錄音播放失敗，你可以繼續作答，再自己按交卷。",
       "audioInterrupted": "錄音中斷了，請重新整理後再試一次。",
       "autoplayBlocked": "錄音沒辦法自動播放，請重新整理後再試一次。"
+    },
+    "full": {
+      "sectionHeading": "Section {n}（第 {a}–{b} 題）",
+      "matchingLabel": "第 {n} 題",
+      "matchingOption": "{key} — {text}",
+      "choose": "選擇"
+    },
+    "paging": {
+      "nav": "翻頁",
+      "prev": "← 上一段：Section {n}",
+      "next": "下一段：Section {n} →",
+      "toSubmit": "下一頁：交卷 →",
+      "submitTitle": "交卷",
+      "sectionLeft": "Section {n}・剩 {count} 題沒填",
+      "sectionDone": "Section {n} ✓ 都填了",
+      "backTo": "回到 Section {n}",
+      "confirmHint": "交了就不能再改。錄音播完會自動交卷。",
+      "recheck": "再檢查",
+      "confirmSubmit": "確定交卷",
+      "steps": "考卷分段",
+      "sectionN": "Section {n}",
+      "left": "剩 {count} 題沒填",
+      "viewing": "正在看 Section {n}",
+      "viewingSubmit": "正在看 交卷頁",
+      "audioAt": "♪ 錄音在 Section {n}",
+      "audioHere": "錄音在這段",
+      "onlyForward": "錄音開始後只往前播，不能倒退或跳段；題目可以自己前後翻頁，最後一頁交卷。"
     }
   },
   "history": {
@@ -489,7 +585,9 @@
     "colGiven": "你寫的",
     "colExpected": "正解",
     "blank": "（空白）",
-    "accepted": "（也算對：{list}）"
+    "accepted": "（也算對：{list}）",
+    "band": "雅思聽力級分（估算）：{band}",
+    "sectionScore": "Section {n}：答對 {correct} / {total} 題"
   },
   "landing": {
     "metaTitle": "無限雅思聽力模擬測試",

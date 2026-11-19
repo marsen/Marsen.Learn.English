@@ -24,7 +24,9 @@ describe("bundleProblems", () => {
 
   it("應該擋下不支援的版本", () => {
     expect(bundleProblems({ ...ok, schemaVersion: 1 })).toHaveLength(1);
-    expect(bundleProblems({ ...ok, schemaVersion: 3 })).toHaveLength(1);
+    expect(bundleProblems({ ...ok, schemaVersion: 4 })).toHaveLength(1);
+    // 3＝完整考卷（四個 section），收
+    expect(bundleProblems({ ...ok, schemaVersion: 3 })).toHaveLength(0);
   });
 
   it("應該擋下和 set.json 不一致的錄音", () => {

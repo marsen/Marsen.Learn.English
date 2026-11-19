@@ -3,7 +3,7 @@ import { canTake } from "@/domain/examSet/access";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import { ownerOf, rolesOf, type ExamTaker } from "@/application/shared/actor";
 import type { StartExamResult } from "./examResult";
-import { toPaperView } from "./paperView";
+import { toSheetPapers } from "./paperView";
 
 /**
  * 開始考一張考卷：建立一次作答，回傳題目卷與時間軸（不含答案）。
@@ -35,7 +35,7 @@ export class StartExam {
         attemptId: attempt.id,
         setId: set.setId,
         title: set.title,
-        paper: toPaperView(set.paper),
+        ...toSheetPapers(set.paper),
         timing: set.timing,
       },
     };

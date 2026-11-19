@@ -2,16 +2,17 @@
 
 import type { ExamSet } from "@/domain/examSet/examSet";
 import type { ExamSetSummary } from "@/domain/examSet/examSetFilter";
-import { statusTagsOf } from "@/domain/examSet/statusTags";
-import { SUPPORTED_SCHEMA_VERSION } from "@/domain/examSet/bundle";
+import { statusTagsOf, studentsCanTake } from "@/domain/examSet/statusTags";
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/presentation/components/ui/Button";
 import { ACCESS_ORDER } from "@/presentation/lib/examSetLabels";
-import { StatusTags } from "./StatusTags";
+import { StatusTags, TakeableHint } from "./StatusTags";
+import { FullExamBadge } from "./FullExamBadge";
 import { EmptyState } from "@/presentation/components/ui/EmptyState";
 import { Table, Td, Th, Tr } from "@/presentation/components/ui/Table";
 import { formatDateTime } from "@/presentation/lib/format";
+import { versionHintOf, versionLabel } from "@/presentation/lib/examSetVersion";
 
 type Props = {
   sets: ExamSetSummary[];
@@ -132,23 +133,20 @@ export function ExamSetTable({
               <a href={`/admin/sets/${s.setId}`} className="text-primary underline">
                 {s.setId}
               </a>
+              {s.schemaVersion === 3 && <FullExamBadge />}
             </Td>
             <Td>{s.title}</Td>
             <Td className="whitespace-nowrap">{s.questionCount}</Td>
             <Td className="whitespace-nowrap">
               <span
-                title={t(
-                  s.schemaMinor > 0
-                    ? "sets.versionHint.transcript"
-                    : "sets.versionHint.noTranscript",
-                )}
+                title={t(`sets.versionHint.${versionHintOf(s)}`)}
                 className={`rounded-full px-2 py-0.5 font-mono text-xs ${
-                  s.schemaMinor > 0
+                  versionHintOf(s) !== "noTranscript"
                     ? "bg-accent-soft text-accent-hover"
                     : "bg-muted text-muted-foreground"
                 }`}
               >
-                {SUPPORTED_SCHEMA_VERSION}.{s.schemaMinor}
+                {versionLabel(s)}
               </span>
             </Td>
             <Td>
@@ -202,6 +200,9 @@ export function ExamSetTable({
                   {t(`examSet.access.${s.access}`)}
                 </span>
               )}
+              <div className="mt-1">
+                <TakeableHint takeable={studentsCanTake(s)} />
+              </div>
             </Td>
             <Td className="whitespace-nowrap text-muted-foreground">
               {formatDateTime(s.uploadedAt, locale)}

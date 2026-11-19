@@ -1,0 +1,3215 @@
+{
+  "schema_version": 3,
+  "schema_minor": 0,
+  "set_id": "s1-tour-0002",
+  "title": "IELTS Listening Test (Sections 1, 2, 3, 4)",
+  "question_count": 40,
+  "sections": [
+    {
+      "ielts_section": 1,
+      "source_set_id": "s1-tour-0002",
+      "topic": "tour-booking",
+      "title": "Tour Booking Form",
+      "first_question": 1,
+      "last_question": 10,
+      "paper": {
+        "blocks": [
+          {
+            "type": "form",
+            "form": {
+              "set_id": "s1-tour-0002",
+              "type": "form_table",
+              "title": "Tour Booking Form",
+              "instruction": "Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
+              "rows": [
+                {
+                  "label": "Tour type",
+                  "parts": [
+                    {
+                      "text": "Coach tour"
+                    }
+                  ]
+                },
+                {
+                  "label": "Home town",
+                  "field_id": "home_town",
+                  "parts": [
+                    {
+                      "blank": "q01",
+                      "field_id": "home_town"
+                    }
+                  ],
+                  "section": "Customer details"
+                },
+                {
+                  "label": "Departure date",
+                  "field_id": "departure_date",
+                  "parts": [
+                    {
+                      "text": "Leaves on"
+                    },
+                    {
+                      "blank": "q02",
+                      "field_id": "departure_date"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Tour details"
+                },
+                {
+                  "label": "Length of tour",
+                  "field_id": "days",
+                  "parts": [
+                    {
+                      "text": "The tour lasts"
+                    },
+                    {
+                      "blank": "q03",
+                      "field_id": "days"
+                    },
+                    {
+                      "text": "days."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Tour details"
+                },
+                {
+                  "label": "Number of people",
+                  "field_id": "people",
+                  "parts": [
+                    {
+                      "text": "Booking for"
+                    },
+                    {
+                      "blank": "q04",
+                      "field_id": "people"
+                    },
+                    {
+                      "text": "people."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Tour details"
+                },
+                {
+                  "label": "Occasion",
+                  "field_id": "occasion",
+                  "parts": [
+                    {
+                      "text": "The trip is for their"
+                    },
+                    {
+                      "blank": "q05",
+                      "field_id": "occasion"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Tour details"
+                },
+                {
+                  "label": "Room request",
+                  "field_id": "room_request",
+                  "parts": [
+                    {
+                      "text": "Would like a room with a"
+                    },
+                    {
+                      "blank": "q06",
+                      "field_id": "room_request"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Tour details"
+                },
+                {
+                  "label": "Dietary need",
+                  "field_id": "meal_need",
+                  "parts": [
+                    {
+                      "text": "Dietary need:"
+                    },
+                    {
+                      "blank": "q07",
+                      "field_id": "meal_need"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Extras"
+                },
+                {
+                  "label": "Seat",
+                  "field_id": "seat",
+                  "parts": [
+                    {
+                      "text": "Would like a seat near the"
+                    },
+                    {
+                      "blank": "q08",
+                      "field_id": "seat"
+                    },
+                    {
+                      "text": "of the coach."
+                    }
+                  ],
+                  "inline": true,
+                  "says": [
+                    "coach"
+                  ],
+                  "section": "Extras"
+                },
+                {
+                  "label": "Travel insurance",
+                  "field_id": "insurance",
+                  "parts": [
+                    {
+                      "text": "Travel insurance:"
+                    },
+                    {
+                      "blank": "q09",
+                      "field_id": "insurance"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Payment"
+                },
+                {
+                  "label": "Heard about us from",
+                  "field_id": "heard_from",
+                  "parts": [
+                    {
+                      "text": "Heard about the tour through"
+                    },
+                    {
+                      "blank": "q10",
+                      "field_id": "heard_from"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Payment"
+                }
+              ],
+              "section_styles": {
+                "Customer details": "list",
+                "Tour details": "paragraph",
+                "Extras": "paragraph",
+                "Payment": "paragraph"
+              }
+            }
+          }
+        ]
+      },
+      "answers": {
+        "set_id": "s1-tour-0002",
+        "topic": "tour-booking",
+        "variant": "couple",
+        "recipe": "T5",
+        "seed": 4028,
+        "scenario": {
+          "setting": "At a travel agency office on a weekday morning, an American customer books a coach tour to celebrate his wedding anniversary with his wife.",
+          "accent": "en-GB"
+        },
+        "answers": [
+          {
+            "question_id": "q01",
+            "field_id": "home_town",
+            "answer": "Harlan",
+            "accepted": [],
+            "type": "place",
+            "trap": "none",
+            "answer_policy": "exact_word"
+          },
+          {
+            "question_id": "q02",
+            "field_id": "departure_date",
+            "answer": "22 September",
+            "accepted": [
+              "September 22",
+              "22nd September",
+              "September 22nd"
+            ],
+            "type": "date",
+            "trap": "self_correction",
+            "answer_policy": "date_equivalence",
+            "wrong_value": "24 September",
+            "note": "t8: the customer first reads out 24 September, then says that is the Wales trip and corrects it to 22 September."
+          },
+          {
+            "question_id": "q03",
+            "field_id": "days",
+            "answer": "16",
+            "accepted": [
+              "sixteen"
+            ],
+            "type": "number",
+            "trap": "similar_numbers",
+            "answer_policy": "number_word",
+            "note": "t10: the customer chooses 16 days and in the same turn rejects the 60-day grand tour."
+          },
+          {
+            "question_id": "q04",
+            "field_id": "people",
+            "answer": "18",
+            "accepted": [
+              "eighteen"
+            ],
+            "type": "number",
+            "trap": "similar_numbers",
+            "answer_policy": "number_word",
+            "note": "t12: the customer says 18; t13: the clerk mishears it as 80; t14: the customer corrects it to 18."
+          },
+          {
+            "question_id": "q05",
+            "field_id": "occasion",
+            "answer": "anniversary",
+            "accepted": [
+              "the anniversary",
+              "an anniversary"
+            ],
+            "type": "word",
+            "trap": "none",
+            "answer_policy": "exact_word"
+          },
+          {
+            "question_id": "q06",
+            "field_id": "room_request",
+            "answer": "balcony",
+            "accepted": [
+              "the balcony",
+              "a balcony"
+            ],
+            "type": "word",
+            "trap": "paraphrase",
+            "answer_policy": "exact_word",
+            "note": "t18: the customer asks for a balcony by talking about coffee outdoors and hoping for one at each hotel, without using the form's wording."
+          },
+          {
+            "question_id": "q07",
+            "field_id": "meal_need",
+            "answer": "vegetarian",
+            "accepted": [
+              "the vegetarian",
+              "a vegetarian"
+            ],
+            "type": "word",
+            "trap": "none",
+            "answer_policy": "exact_word"
+          },
+          {
+            "question_id": "q08",
+            "field_id": "seat",
+            "answer": "front",
+            "accepted": [
+              "the front",
+              "a front"
+            ],
+            "type": "word",
+            "trap": "none",
+            "answer_policy": "exact_word"
+          },
+          {
+            "question_id": "q09",
+            "field_id": "insurance",
+            "answer": "required",
+            "accepted": [
+              "the required",
+              "a required"
+            ],
+            "type": "word",
+            "trap": "none",
+            "answer_policy": "exact_word"
+          },
+          {
+            "question_id": "q10",
+            "field_id": "heard_from",
+            "answer": "neighbours",
+            "accepted": [
+              "neighbors",
+              "the neighbours",
+              "the neighbors"
+            ],
+            "type": "word",
+            "trap": "none",
+            "answer_policy": "exact_word"
+          }
+        ],
+        "cast": {
+          "A": {
+            "id": "bm_daniel",
+            "accent": "en-GB",
+            "gender": "m",
+            "age": "middle",
+            "can_spell": false
+          },
+          "B": {
+            "id": "am_michael",
+            "accent": "en-US",
+            "gender": "m",
+            "age": "old",
+            "can_spell": true
+          },
+          "speller": "B"
+        }
+      },
+      "transcript": {
+        "turns": [
+          {
+            "id": "s1-t1",
+            "speaker": "A",
+            "text": "Good morning, sir. Welcome to Wayfarer Travel. Do have a seat. It's lovely and quiet here on a Tuesday, so there's no rush at all."
+          },
+          {
+            "id": "s1-t2",
+            "speaker": "B",
+            "text": "Well, thank you. Good morning. Boy, it sure is raining out there, and I left my umbrella at my son's apartment, of course."
+          },
+          {
+            "id": "s1-t3",
+            "speaker": "A",
+            "text": "Oh dear, typical English weather, I'm afraid. I can hear you're not from round here. Are you on holiday?"
+          },
+          {
+            "id": "s1-t4",
+            "speaker": "B",
+            "text": "Sort of. My wife and I are staying with our son for a few months. Anyway, she sent me down here to book one of your coach tours, so here I am."
+          },
+          {
+            "id": "s1-t5",
+            "speaker": "A",
+            "text": "Splendid, you've come to the right place. Let me open a new booking on the computer. First of all, where are you from, back in the States?"
+          },
+          {
+            "id": "s1-t6",
+            "speaker": "B",
+            "text": "We're from a little town called Harlan. That's H-A-R-L-A-N. You won't have heard of it, believe me. It's got a diner, a gas station and not much else."
+          },
+          {
+            "id": "s1-t7",
+            "speaker": "A",
+            "text": "No, I can't say I have, but it sounds peaceful. Now then, which tour were you thinking of, and when would you want to set off?"
+          },
+          {
+            "id": "s1-t8",
+            "speaker": "B",
+            "text": "It's the Scotland one. Let me see, I've got your brochure right here. Um, it says 24 September. No, wait, sorry, that's the line for the Wales trip. We want 22 September, as you folks write it."
+          },
+          {
+            "id": "s1-t9",
+            "speaker": "A",
+            "text": "Not to worry, the print's tiny in that thing. There are plenty of seats left on that departure. And how long would you want to be away? We run that route in a few different lengths."
+          },
+          {
+            "id": "s1-t10",
+            "speaker": "B",
+            "text": "Well, we've talked it over, and we'd like the one that takes 16 days. Not the 60-day grand tour on your back page, though! I could never sit that long."
+          },
+          {
+            "id": "s1-t11",
+            "speaker": "A",
+            "text": "Ha, very few people can, to be honest. Sensible choice, sir. Right, is it just you and your wife travelling, or will anyone be joining you?"
+          },
+          {
+            "id": "s1-t12",
+            "speaker": "B",
+            "text": "Oh no, it's the whole family. Our other kids and all the grandkids are flying over, and my brother too. So that's 18 of us altogether."
+          },
+          {
+            "id": "s1-t13",
+            "speaker": "A",
+            "text": "Sorry, did you say 80? We'd need two coaches for that!"
+          },
+          {
+            "id": "s1-t14",
+            "speaker": "B",
+            "text": "No, no, 18. We're a big family, but we're not that big!"
+          },
+          {
+            "id": "s1-t15",
+            "speaker": "A",
+            "text": "Thank goodness for that! One coach will do nicely, then, and there's a small group discount as well. That's quite a party you've got. Is it a special occasion?"
+          },
+          {
+            "id": "s1-t16",
+            "speaker": "B",
+            "text": "It sure is. It's our anniversary. A whole lot of years together now, if you can believe it. She still says she only agreed to marry me because I won her a stuffed bear at the county fair."
+          },
+          {
+            "id": "s1-t17",
+            "speaker": "A",
+            "text": "Many congratulations to you both! We'd better make sure it's a comfortable trip, then. The hotels are all very pleasant, but is there anything in particular you'd want for the two of you when you're staying there?"
+          },
+          {
+            "id": "s1-t18",
+            "speaker": "B",
+            "text": "Well, my wife loves her coffee outdoors first thing in the morning, so we're hoping for a balcony at each hotel. It doesn't need to be anything fancy."
+          },
+          {
+            "id": "s1-t19",
+            "speaker": "A",
+            "text": "I'll make a note of that, and the hotels are usually very obliging. Moving on to meals, breakfast and dinner are included. Is there anything the kitchen ought to know about?"
+          },
+          {
+            "id": "s1-t20",
+            "speaker": "B",
+            "text": "Yes, there is. I'm vegetarian, and have been ever since my doctor had a word with me some years back. Everybody else in the family eats just about anything."
+          },
+          {
+            "id": "s1-t21",
+            "speaker": "A",
+            "text": "That's no problem at all, the chefs are used to that. And what about your places on the coach? We can reserve seats in advance, if you've got a preference."
+          },
+          {
+            "id": "s1-t22",
+            "speaker": "B",
+            "text": "Uh, yes. I get kind of queasy on long rides, so I'd want to sit at the front, where I can see the road. My wife says it's that or she's not sitting next to me."
+          },
+          {
+            "id": "s1-t23",
+            "speaker": "A",
+            "text": "Very wise. I'll put that down now. Next, the payment side of things. What about insurance? Some customers sort out their own, but we can arrange it here for you."
+          },
+          {
+            "id": "s1-t24",
+            "speaker": "B",
+            "text": "We don't have any of our own, so put it down as required, please. I wouldn't go without it at my age."
+          },
+          {
+            "id": "s1-t25",
+            "speaker": "A",
+            "text": "Certainly, I'll add that to the total. Just one last thing for our records, if you don't mind. How did you find out about this tour?"
+          },
+          {
+            "id": "s1-t26",
+            "speaker": "B",
+            "text": "Oh, that's easy. Our neighbors told us about it. They took the same trip last year, and they haven't stopped talking about it since."
+          },
+          {
+            "id": "s1-t27",
+            "speaker": "A",
+            "text": "Word of mouth is still the best advertising, I always say. Well, that's everything I need. I'll print the details for you to take back to your wife."
+          },
+          {
+            "id": "s1-t28",
+            "speaker": "B",
+            "text": "That'd be great. Thanks so much for your help. She'll be thrilled, and maybe by then this rain will have quit."
+          }
+        ],
+        "evidence": [
+          {
+            "question_id": "q01",
+            "turn": "s1-t6",
+            "quote": "We're from a little town called Harlan. That's H-A-R-L-A-N."
+          },
+          {
+            "question_id": "q02",
+            "turn": "s1-t8",
+            "quote": "We want 22 September, as you folks write it."
+          },
+          {
+            "question_id": "q03",
+            "turn": "s1-t10",
+            "quote": "Well, we've talked it over, and we'd like the one that takes 16 days."
+          },
+          {
+            "question_id": "q04",
+            "turn": "s1-t14",
+            "quote": "No, no, 18."
+          },
+          {
+            "question_id": "q05",
+            "turn": "s1-t16",
+            "quote": "It's our anniversary."
+          },
+          {
+            "question_id": "q06",
+            "turn": "s1-t18",
+            "quote": "Well, my wife loves her coffee outdoors first thing in the morning, so we're hoping for a balcony at each hotel."
+          },
+          {
+            "question_id": "q07",
+            "turn": "s1-t20",
+            "quote": "I'm vegetarian, and have been ever since my doctor had a word with me some years back."
+          },
+          {
+            "question_id": "q08",
+            "turn": "s1-t22",
+            "quote": "I get kind of queasy on long rides, so I'd want to sit at the front, where I can see the road."
+          },
+          {
+            "question_id": "q09",
+            "turn": "s1-t24",
+            "quote": "We don't have any of our own, so put it down as required, please."
+          },
+          {
+            "question_id": "q10",
+            "turn": "s1-t26",
+            "quote": "Our neighbors told us about it."
+          }
+        ]
+      },
+      "provenance": {
+        "generator_version": "0.1.0",
+        "plan": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "at": "2026-11-05T17:44:44.696Z"
+        },
+        "script": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "at": "2026-11-05T17:49:17.265Z"
+        },
+        "blind": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "warnings": 0,
+          "at": "2026-11-05T17:49:23.581Z"
+        },
+        "validate": {
+          "ok": true,
+          "block": 0,
+          "warn": 0,
+          "at": "2026-11-05T17:49:17.285Z"
+        },
+        "ai_review": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "at": "2026-11-05T17:51:10.038Z",
+          "verdict": "pass",
+          "findings": [
+            {
+              "question_id": "q10",
+              "category": "ambiguity",
+              "severity": "info",
+              "message": "After the answer, the clerk says in t27: \"Word of mouth is still the best advertising, I always say.\" \"Word of mouth\" fits \"Heard about the tour through ___\" very naturally, arguably better than \"neighbours\". Only the two-word limit rules it out, because it is three words, so the key stays unique and marking it wrong is correct. It is still an unplanned distractor in an item labelled trap=none. \"our neighbors\" is also within the limit and will be marked wrong. That is acceptable because the form is written in the third person (\"their\" in q05).",
+              "suggestion": "Either reword t27 (for example \"Personal recommendations are still the best advertising, I always say.\") or keep the line and record it in the key as a deliberate distractor."
+            },
+            {
+              "question_id": "q02",
+              "category": "naturalness",
+              "severity": "info",
+              "message": "In t8, \"We want 22 September, as you folks write it.\" comments on written date format inside a spoken recording. The clause adds nothing for a listener and exists only to justify an American using British date order. The self-correction itself works well: \"24 September\" is clearly withdrawn with \"No, wait, sorry, that's the line for the Wales trip.\"",
+              "suggestion": "Cut the clause, for example \"We want the one below it, 22 September.\" This also sounds like someone reading from a brochure."
+            },
+            {
+              "question_id": "q09",
+              "category": "naturalness",
+              "severity": "info",
+              "message": "In t24, \"put it down as required, please\" has the customer dictating form language. A customer would more likely say \"Yes, we'll need that.\" The line is the stiffest in an otherwise natural dialogue, and it signals the answer. The key is still sound: \"required\" is the only spoken word that fits the gap.",
+              "suggestion": "Make the wording less form-like while keeping the keyword, for example \"We don't have any of our own, so that's required, I guess. I wouldn't go without it at my age.\""
+            },
+            {
+              "question_id": "q03",
+              "category": "consistency",
+              "severity": "info",
+              "message": "In t9 the clerk says \"We run that route in a few different lengths\", which refers to the Scotland tour. In t10 the customer then mentions \"the 60-day grand tour on your back page\". A 60-day coach tour of Scotland is implausible, and the line is not clearly a different product. The 16/60 contrast works as a trap, but the distractor is a little contrived.",
+              "suggestion": "Make the distractor clearly a separate product, for example \"Not the 60-day European grand tour on your back page, though!\""
+            },
+            {
+              "question_id": "q06",
+              "category": "trap",
+              "severity": "info",
+              "message": "The key labels this item trap=paraphrase, but t18 says \"we're hoping for a balcony at each hotel\" directly, with no competing room feature. The only paraphrase is in the lead-in (\"coffee outdoors\", and \"room\" not being spoken). The item is fair and answerable, but it is effectively untrapped and the label overstates it.",
+              "suggestion": "Relabel it trap=none, or add a rejected option (for example the customer does not mind about a sea view but wants a balcony)."
+            },
+            {
+              "question_id": null,
+              "category": "difficulty",
+              "severity": "info",
+              "message": "The traps are front-loaded. q02, q03 and q04 are consecutive number items, and q03 and q04 use the same -teen/-ty contrast (16/60, then 18/80). q05 to q10 are almost all answered directly after a clear signpost. This suits Section 1 but makes the second half very easy. The blind candidate's high confidence on all ten items does not settle this, because that candidate appears to have worked from text, so the 16/60 and 18/80 sound confusions were not tested.",
+              "suggestion": "Consider replacing one -teen/-ty item with a different trap, or adding a rejected option to one of q07 to q10. Check q03 and q04 on the final audio, making sure \"16\" and \"60\" are clearly stressed and distinct."
+            },
+            {
+              "question_id": null,
+              "category": "naturalness",
+              "severity": "info",
+              "message": "The clerk opens \"a new booking\" in t5 and says \"that's everything I need\" in t27, but never takes the customer's name or any contact details. t23 also announces \"the payment side of things\", yet no payment is discussed beyond insurance. For a booking of 18 people this is slightly unrealistic, though it does not affect any answer.",
+              "suggestion": "Optionally add a brief line in t27 saying the clerk will take names and a deposit when the customer returns with his wife."
+            }
+          ]
+        },
+        "warnings": []
+      }
+    },
+    {
+      "ielts_section": 2,
+      "source_set_id": "s2-volunteer-0001",
+      "topic": "volunteer-programme",
+      "title": "Community Centre Volunteer Programme",
+      "first_question": 11,
+      "last_question": 20,
+      "paper": {
+        "blocks": [
+          {
+            "type": "choice",
+            "instruction": "Choose the correct letter, A, B or C.",
+            "questions": [
+              {
+                "question_id": "q11",
+                "stem": "Before their first shift, all new volunteers must",
+                "options": [
+                  {
+                    "key": "A",
+                    "text": "complete an online safety course."
+                  },
+                  {
+                    "key": "B",
+                    "text": "have a short meeting with the coordinator."
+                  },
+                  {
+                    "key": "C",
+                    "text": "provide a medical certificate."
+                  }
+                ]
+              },
+              {
+                "question_id": "q12",
+                "stem": "Why does the centre need more volunteers this year?",
+                "options": [
+                  {
+                    "key": "A",
+                    "text": "The building has been made larger."
+                  },
+                  {
+                    "key": "B",
+                    "text": "Several regular volunteers have moved away."
+                  },
+                  {
+                    "key": "C",
+                    "text": "More children are using the after-school club."
+                  }
+                ]
+              },
+              {
+                "question_id": "q13",
+                "stem": "On the days they work, volunteers get free",
+                "options": [
+                  {
+                    "key": "A",
+                    "text": "parking."
+                  },
+                  {
+                    "key": "B",
+                    "text": "use of the gym."
+                  },
+                  {
+                    "key": "C",
+                    "text": "lunch."
+                  }
+                ]
+              },
+              {
+                "question_id": "q14",
+                "stem": "If volunteers cannot come to a shift, they should",
+                "options": [
+                  {
+                    "key": "A",
+                    "text": "send a message to the person in charge that day."
+                  },
+                  {
+                    "key": "B",
+                    "text": "find another volunteer to replace them."
+                  },
+                  {
+                    "key": "C",
+                    "text": "cancel the shift on the centre's website."
+                  }
+                ]
+              },
+              {
+                "question_id": "q15",
+                "stem": "Today, volunteers should collect their ID badges from",
+                "options": [
+                  {
+                    "key": "A",
+                    "text": "the reception desk."
+                  },
+                  {
+                    "key": "B",
+                    "text": "the coordinator's office."
+                  },
+                  {
+                    "key": "C",
+                    "text": "the main hall."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "matching",
+            "instruction": "What does the speaker say about each of the following volunteer jobs? Choose FIVE answers from the box and write the correct letter, A-G, next to each question.",
+            "options": [
+              {
+                "key": "A",
+                "text": "needs a particular qualification"
+              },
+              {
+                "key": "B",
+                "text": "is new this year"
+              },
+              {
+                "key": "C",
+                "text": "has a waiting list"
+              },
+              {
+                "key": "D",
+                "text": "can be done from home"
+              },
+              {
+                "key": "E",
+                "text": "involves early starts"
+              },
+              {
+                "key": "F",
+                "text": "is being reduced"
+              },
+              {
+                "key": "G",
+                "text": "requires physical strength"
+              }
+            ],
+            "items": [
+              {
+                "question_id": "q16",
+                "text": "Garden team"
+              },
+              {
+                "question_id": "q17",
+                "text": "Café assistant"
+              },
+              {
+                "question_id": "q18",
+                "text": "Homework club"
+              },
+              {
+                "question_id": "q19",
+                "text": "Driving elderly residents"
+              },
+              {
+                "question_id": "q20",
+                "text": "Editing the newsletter"
+              }
+            ]
+          }
+        ]
+      },
+      "answers": {
+        "set_id": "s2-volunteer-0001",
+        "topic": "volunteer-programme",
+        "variant": "open-day",
+        "recipe": "C3",
+        "seed": 1748203929,
+        "scenario": {
+          "setting": "At a community center open day, the volunteer coordinator gives a talk to local residents who are interested in becoming volunteers.",
+          "accent": "en-US"
+        },
+        "answers": [
+          {
+            "question_id": "q11",
+            "field_id": "choice_1",
+            "answer": "B",
+            "accepted": [],
+            "type": "choice",
+            "trap": "distractor",
+            "answer_policy": "letter",
+            "note": "t2: a required 15-minute chat with the coordinator (introduced in t1) matches B; t2 also says the online safety module (A) was dropped last year and no doctor's note or health paperwork (C) is needed."
+          },
+          {
+            "question_id": "q12",
+            "field_id": "choice_2",
+            "answer": "A",
+            "accepted": [],
+            "type": "choice",
+            "trap": "paraphrase",
+            "answer_policy": "letter",
+            "note": "t3: the new wing doubling the floor space paraphrases A; t3 also says nobody has moved on (B) and after-school club numbers have stayed steady (C)."
+          },
+          {
+            "question_id": "q13",
+            "field_id": "choice_3",
+            "answer": "C",
+            "accepted": [],
+            "type": "choice",
+            "trap": "distractor",
+            "answer_policy": "letter",
+            "note": "t4: a free midday meal matches C; parking (A) is no longer free since the town took over the lot, and the gym (B) is for paying members only."
+          },
+          {
+            "question_id": "q14",
+            "field_id": "choice_4",
+            "answer": "A",
+            "accepted": [],
+            "type": "choice",
+            "trap": "paraphrase",
+            "answer_policy": "letter",
+            "note": "t5: texting whoever runs the building that day paraphrases A; t5 says finding a replacement (B) is the staff's job and the online system cannot process changes (C)."
+          },
+          {
+            "question_id": "q15",
+            "field_id": "choice_5",
+            "answer": "C",
+            "accepted": [],
+            "type": "choice",
+            "trap": "distractor",
+            "answer_policy": "letter",
+            "note": "t6: badges are at the back of this hall, which t1 calls the big hall on the ground floor, matching C; reception (A) is not giving them out today and the coordinator's office (B) will be empty this afternoon."
+          },
+          {
+            "question_id": "q16",
+            "field_id": "matching_1",
+            "answer": "E",
+            "accepted": [],
+            "type": "matching",
+            "trap": "paraphrase",
+            "answer_policy": "letter",
+            "note": "t8: meeting at 6:30 in the morning paraphrases E; heavy digging suggests G, but t8 says a contractor does all the heavy work."
+          },
+          {
+            "question_id": "q17",
+            "field_id": "matching_2",
+            "answer": "C",
+            "accepted": [],
+            "type": "matching",
+            "trap": "paraphrase",
+            "answer_policy": "letter",
+            "note": "t9: taking names and calling people when a spot opens paraphrases C; the rumor that the café is cutting its hours (F) is denied in t9."
+          },
+          {
+            "question_id": "q18",
+            "field_id": "matching_3",
+            "answer": "F",
+            "accepted": [],
+            "type": "matching",
+            "trap": "distractor",
+            "answer_policy": "letter",
+            "note": "t10: the cut from 4 afternoons to 2 matches F; t10 says the waiting list (C) existed only last year and no longer does."
+          },
+          {
+            "question_id": "q19",
+            "field_id": "matching_4",
+            "answer": "A",
+            "accepted": [],
+            "type": "matching",
+            "trap": "paraphrase",
+            "answer_policy": "letter",
+            "note": "t11: a compulsory first-aid certificate paraphrases A; t11 mentions wheelchair users but says drivers never have to lift anyone, which rules out G."
+          },
+          {
+            "question_id": "q20",
+            "field_id": "matching_5",
+            "answer": "D",
+            "accepted": [],
+            "type": "matching",
+            "trap": "paraphrase",
+            "answer_policy": "letter",
+            "note": "t12: working on a laptop at the kitchen table without coming in paraphrases D; t12 raises the idea of a new role (B) and rejects it outright, saying there has been a volunteer editor for 20 years and the post is simply vacant again."
+          }
+        ],
+        "cast": {
+          "A": {
+            "id": "am_puck",
+            "engine": "kokoro",
+            "accent": "en-US",
+            "gender": "m",
+            "age": "middle",
+            "can_spell": false,
+            "spell_checked": false
+          },
+          "speller": null
+        }
+      },
+      "transcript": {
+        "turns": [
+          {
+            "id": "s2-t1",
+            "speaker": "A",
+            "text": "Good afternoon, everybody, and thanks for joining us in the big hall here on the ground floor. I'm Greg Turner, the volunteer coordinator at the community center, and I'm going to walk you through how things work and the different jobs we need help with."
+          },
+          {
+            "id": "s2-t2",
+            "speaker": "A",
+            "text": "OK, first things first. Before your first shift, every one of you will need to sit down with me for a quick 15-minute chat, just so I can get to know you. Now, new volunteers used to have to do an online safety module, but we dropped that last year. And you don't need to bring any kind of doctor's note or health paperwork, either."
+          },
+          {
+            "id": "s2-t3",
+            "speaker": "A",
+            "text": "You might be wondering why we're recruiting so hard this year. Well, since the new wing opened in the summer, we've got roughly twice as much floor space to staff. It's not that people are leaving, by the way. Our existing team is as loyal as ever, and nobody's moved on. And numbers at the after-school club have stayed pretty steady."
+          },
+          {
+            "id": "s2-t4",
+            "speaker": "A",
+            "text": "Now, a quick word about perks. Parking in the lot out front used to be free for volunteers, but the town has taken it over, so I'm afraid you'll pay like everyone else. The gym is for paying members only, and that's not something I can change. But on any day you're working, your midday meal in the café is on the house. It's a nice little bonus."
+          },
+          {
+            "id": "s2-t5",
+            "speaker": "A",
+            "text": "OK, moving on to something important: what should you do if you find you can't make it in for a shift you've signed up for? Just text the duty manager's cell phone. That's whoever is running the building on that particular day, and their number is on the schedule. You don't need to arrange your own replacement, because finding cover is our job. And the online system only handles sign-ups, so it can't process changes."
+          },
+          {
+            "id": "s2-t6",
+            "speaker": "A",
+            "text": "Last thing before we move on: ID badges. Normally we hand those out at reception, but the front desk is swamped with the open day, so they aren't giving them out today. My own office is upstairs, but I won't be there this afternoon. So please pick up your badge from the table at the back of this hall, on your way out."
+          },
+          {
+            "id": "s2-t7",
+            "speaker": "A",
+            "text": "Right, that's the practical side covered. Now let's turn to the volunteer jobs themselves, so you can start thinking about which one might suit you best."
+          },
+          {
+            "id": "s2-t8",
+            "speaker": "A",
+            "text": "First up, the garden team. The beds have to be watered before the day heats up, so the team meets at 6:30 in the morning. You might assume there's lots of heavy digging involved, but in fact all the heavy work is done by a landscaping contractor we hire."
+          },
+          {
+            "id": "s2-t9",
+            "speaker": "A",
+            "text": "Next up, the café assistant role. So many people have signed up for this one that I'm taking names, and I'll call you when a spot opens up. You may have heard a rumor that the café is cutting its hours. That's not true; the opening times are staying exactly the same."
+          },
+          {
+            "id": "s2-t10",
+            "speaker": "A",
+            "text": "Then there's the homework club. Since the local school now runs its own study program, the club is going from 4 afternoons a week down to 2. There was actually a waiting list to help out with it last year, but that definitely isn't the case anymore."
+          },
+          {
+            "id": "s2-t11",
+            "speaker": "A",
+            "text": "Now, let's talk about driving elderly residents. Drivers must hold a current first-aid certificate before they can take anyone out, and we can't make exceptions. Some passengers use wheelchairs, but staff at the other end help them in and out, so you'll never have to do any lifting."
+          },
+          {
+            "id": "s2-t12",
+            "speaker": "A",
+            "text": "And finally, editing the newsletter. Some of you may think this is a new role, but it isn't; we've had a volunteer editor for 20 years, and the post has just become vacant again. The editor never needs to come into the building to do the work. You can do everything on your own laptop at the kitchen table."
+          },
+          {
+            "id": "s2-t13",
+            "speaker": "A",
+            "text": "So, that's everything from me. Thanks for listening, and do come and find me if you have any questions."
+          }
+        ],
+        "evidence": [
+          {
+            "question_id": "q11",
+            "turn": "s2-t2",
+            "quote": "Before your first shift, every one of you will need to sit down with me for a quick 15-minute chat, just so I can get to know you."
+          },
+          {
+            "question_id": "q12",
+            "turn": "s2-t3",
+            "quote": "Well, since the new wing opened in the summer, we've got roughly twice as much floor space to staff."
+          },
+          {
+            "question_id": "q13",
+            "turn": "s2-t4",
+            "quote": "But on any day you're working, your midday meal in the café is on the house."
+          },
+          {
+            "question_id": "q14",
+            "turn": "s2-t5",
+            "quote": "Just text the duty manager's cell phone. That's whoever is running the building on that particular day, and their number is on the schedule."
+          },
+          {
+            "question_id": "q15",
+            "turn": "s2-t6",
+            "quote": "So please pick up your badge from the table at the back of this hall, on your way out."
+          },
+          {
+            "question_id": "q16",
+            "turn": "s2-t8",
+            "quote": "The beds have to be watered before the day heats up, so the team meets at 6:30 in the morning."
+          },
+          {
+            "question_id": "q17",
+            "turn": "s2-t9",
+            "quote": "So many people have signed up for this one that I'm taking names, and I'll call you when a spot opens up."
+          },
+          {
+            "question_id": "q18",
+            "turn": "s2-t10",
+            "quote": "Since the local school now runs its own study program, the club is going from 4 afternoons a week down to 2."
+          },
+          {
+            "question_id": "q19",
+            "turn": "s2-t11",
+            "quote": "Drivers must hold a current first-aid certificate before they can take anyone out, and we can't make exceptions."
+          },
+          {
+            "question_id": "q20",
+            "turn": "s2-t12",
+            "quote": "The editor never needs to come into the building to do the work. You can do everything on your own laptop at the kitchen table."
+          }
+        ]
+      },
+      "provenance": {
+        "generator_version": "0.1.0",
+        "plan": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "at": "2026-11-17T06:31:38.706Z"
+        },
+        "script": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "at": "2026-11-17T06:36:13.045Z"
+        },
+        "blind": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "warnings": 0,
+          "at": "2026-11-17T06:36:18.856Z"
+        },
+        "validate": {
+          "ok": true,
+          "block": 0,
+          "warn": 0,
+          "at": "2026-11-17T06:36:13.052Z"
+        },
+        "ai_review": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "at": "2026-11-17T06:36:46.612Z",
+          "verdict": "needs_human",
+          "findings": [
+            {
+              "question_id": null,
+              "category": "naturalness",
+              "severity": "warn",
+              "message": "Every multiple-choice turn and most matching turns follow the same template: the key is stated, then each distractor is named and explicitly denied, usually straight after. Examples are t2 \"Now, new volunteers used to have to do an online safety module, but we dropped that last year. And you don't need to bring any kind of doctor's note or health paperwork, either.\", t3 \"It's not that people are leaving, by the way... And numbers at the after-school club have stayed pretty steady.\" and t6 \"Normally we hand those out at reception... My own office is upstairs, but I won't be there this afternoon.\" Because of this, the talk can sound like someone going through the options, and a test-wise candidate can find the answer by noticing which option is not denied. Real Section 2 talks usually let some distractors fall away implicitly, mention them earlier or later than the key, or leave them only loosely related.",
+              "suggestion": "Vary the structure in at least two or three questions. Let one distractor be mentioned without an explicit 'no'; for example, in t4 say the gym is 'available to members on the first floor' without mentioning volunteers. Sometimes put the distractor after the key, or put the key last after a correction (for example, reception -> 'actually, not today' -> hall), so the order of key and distractors is less predictable."
+            },
+            {
+              "question_id": null,
+              "category": "difficulty",
+              "severity": "info",
+              "message": "The blind candidate answered all 10 items correctly, every one with high confidence and no alternatives. Each distractor is ruled out with a direct negation (\"we dropped that last year\", \"nobody's moved on\", \"that's not true\", \"that definitely isn't the case anymore\", \"you'll never have to do any lifting\", \"it isn't\"), so the paper may be easier than a typical Section 2.",
+              "suggestion": "Make one or two items harder: either rule distractors out by implication instead of with a flat 'no', or make the key paraphrase less direct."
+            },
+            {
+              "question_id": "q15",
+              "category": "other",
+              "severity": "info",
+              "message": "The key 'the main hall' is supported only by linking \"this hall\" in t6 back to \"the big hall here on the ground floor\" in t1. That link is legitimate and fair, and the blind candidate made it. However, the option wording 'main hall' matches neither 'big hall' nor anything said in t6, so the item depends on the candidate remembering t1.",
+              "suggestion": "Acceptable as it stands. To tighten it, refer back once in t6, for example 'the table at the back of this hall, the main one we're sitting in'. Alternatively, keep it as an intended test of reference tracking."
+            },
+            {
+              "question_id": "q17",
+              "category": "other",
+              "severity": "info",
+              "message": "Box option F ('is being reduced') is offered as a trap for the café through the rumor about cutting hours, and t9 denies it. F is also the key for q18, so a candidate who wrongly puts F for q17 loses q18 as well. The test is still fair, and the denial \"That's not true; the opening times are staying exactly the same\" is unambiguous.",
+              "suggestion": ""
+            },
+            {
+              "question_id": null,
+              "category": "consistency",
+              "severity": "info",
+              "message": "The question paper title uses British spelling, 'Community Centre Volunteer Programme', while the transcript uses American spelling and vocabulary: \"community center\", \"cell phone\", \"rumor\", \"program\". Candidates only hear the transcript, so this does not affect answering, but it is inconsistent for anyone reading the script.",
+              "suggestion": "Choose one variety for the script, for example 'centre', 'mobile', 'rumour' and 'programme', or adjust the title."
+            }
+          ]
+        },
+        "warnings": []
+      }
+    },
+    {
+      "ielts_section": 3,
+      "source_set_id": "s3-study-0001",
+      "topic": "study-spaces-project",
+      "title": "Research Project: Study Spaces on Campus",
+      "first_question": 21,
+      "last_question": 30,
+      "paper": {
+        "blocks": [
+          {
+            "type": "choice",
+            "instruction": "Choose the correct letter, A, B or C.",
+            "questions": [
+              {
+                "question_id": "q21",
+                "stem": "What surprised the students most about the survey results?",
+                "options": [
+                  {
+                    "key": "A",
+                    "text": "Few students used the library at weekends."
+                  },
+                  {
+                    "key": "B",
+                    "text": "Students preferred busy areas to completely silent ones."
+                  },
+                  {
+                    "key": "C",
+                    "text": "Most students studied alone rather than in groups."
+                  }
+                ]
+              },
+              {
+                "question_id": "q22",
+                "stem": "Why did they decide not to use the café observation data?",
+                "options": [
+                  {
+                    "key": "A",
+                    "text": "The number of observations was too small."
+                  },
+                  {
+                    "key": "B",
+                    "text": "Café staff asked them to stop observing."
+                  },
+                  {
+                    "key": "C",
+                    "text": "The two observers recorded things differently."
+                  }
+                ]
+              },
+              {
+                "question_id": "q23",
+                "stem": "What does Linda think explains the low use of the group study rooms?",
+                "options": [
+                  {
+                    "key": "A",
+                    "text": "The booking system is too complicated."
+                  },
+                  {
+                    "key": "B",
+                    "text": "The rooms are too far from the entrance."
+                  },
+                  {
+                    "key": "C",
+                    "text": "The rooms lack enough power sockets."
+                  }
+                ]
+              },
+              {
+                "question_id": "q24",
+                "stem": "How will they deal with the low response rate from postgraduates?",
+                "options": [
+                  {
+                    "key": "A",
+                    "text": "Send another reminder email."
+                  },
+                  {
+                    "key": "B",
+                    "text": "Interview a small number in person."
+                  },
+                  {
+                    "key": "C",
+                    "text": "Leave postgraduates out of the analysis."
+                  }
+                ]
+              },
+              {
+                "question_id": "q25",
+                "stem": "What does Owen say about the survey question on weekly study hours?",
+                "options": [
+                  {
+                    "key": "A",
+                    "text": "It could be understood in different ways."
+                  },
+                  {
+                    "key": "B",
+                    "text": "It should have come earlier in the survey."
+                  },
+                  {
+                    "key": "C",
+                    "text": "It gave them the most useful data."
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "matching",
+            "instruction": "What do the students decide to do with each of the following sections of their report? Choose FIVE answers from the box and write the correct letter, A-G, next to each question.",
+            "options": [
+              {
+                "key": "A",
+                "text": "shorten it considerably"
+              },
+              {
+                "key": "B",
+                "text": "add a diagram or chart"
+              },
+              {
+                "key": "C",
+                "text": "ask the tutor for advice"
+              },
+              {
+                "key": "D",
+                "text": "include more recent sources"
+              },
+              {
+                "key": "E",
+                "text": "explain the limitations more clearly"
+              },
+              {
+                "key": "F",
+                "text": "use a more formal tone"
+              },
+              {
+                "key": "G",
+                "text": "leave it as it is"
+              }
+            ],
+            "items": [
+              {
+                "question_id": "q26",
+                "text": "Introduction"
+              },
+              {
+                "question_id": "q27",
+                "text": "Literature review"
+              },
+              {
+                "question_id": "q28",
+                "text": "Methodology"
+              },
+              {
+                "question_id": "q29",
+                "text": "Results"
+              },
+              {
+                "question_id": "q30",
+                "text": "Conclusion"
+              }
+            ]
+          }
+        ]
+      },
+      "answers": {
+        "set_id": "s3-study-0001",
+        "topic": "study-spaces-project",
+        "variant": "feedback",
+        "recipe": "C2",
+        "seed": 1748487995,
+        "scenario": {
+          "setting": "In a university seminar room, a young male classmate (Owen) and a mature female student (Linda) review their study-spaces project data and plan revisions to their report.",
+          "accent": "en-GB"
+        },
+        "answers": [
+          {
+            "question_id": "q21",
+            "field_id": "choice_1",
+            "answer": "B",
+            "accepted": [],
+            "type": "choice",
+            "trap": "paraphrase",
+            "answer_policy": "letter",
+            "note": "t4: people chose spots with chatter over hushed floors, which matches B; t3 says low weekend library use was expected (A), and t4 says the solo/group split was about fifty-fifty (C)."
+          },
+          {
+            "question_id": "q22",
+            "field_id": "choice_2",
+            "answer": "C",
+            "accepted": [],
+            "type": "choice",
+            "trap": "distractor",
+            "answer_policy": "letter",
+            "note": "t6: the two observers counted 'studying' differently, which matches C; t6 says nearly 40 hours was plenty (rules out A), and t8 says the café manager was happy to have them (rules out B)."
+          },
+          {
+            "question_id": "q23",
+            "field_id": "choice_3",
+            "answer": "A",
+            "accepted": [],
+            "type": "choice",
+            "trap": "distractor",
+            "answer_policy": "letter",
+            "note": "t10: reserving takes 3 online screens plus approval, which matches A; Owen's location idea in t9 (B) is rejected in t10 because the rooms by the main doors are just as empty, and t12 says the sockets were upgraded (C)."
+          },
+          {
+            "question_id": "q24",
+            "field_id": "choice_4",
+            "answer": "B",
+            "accepted": [],
+            "type": "choice",
+            "trap": "distractor",
+            "answer_policy": "letter",
+            "note": "t15-t16: both agree to talk to 4 or 5 postgraduates face to face, which matches B; t13 says the earlier reminder brought only 2 replies (A), and t14 rejects leaving the group out (C)."
+          },
+          {
+            "question_id": "q25",
+            "field_id": "choice_5",
+            "answer": "A",
+            "accepted": [],
+            "type": "choice",
+            "trap": "paraphrase",
+            "answer_policy": "letter",
+            "note": "t17: respondents read the hours question in different ways, which matches A; t18 says its place in the questionnaire was fine (B) and that the noise question gave the most valuable data (C)."
+          },
+          {
+            "question_id": "q26",
+            "field_id": "matching_1",
+            "answer": "G",
+            "accepted": [],
+            "type": "matching",
+            "trap": "distractor",
+            "answer_policy": "letter",
+            "note": "t20-t21: the introduction stays unchanged, which matches G; Owen's suggestion in t19 to cut it down (A) is rejected in t20 because it is well within the word guide."
+          },
+          {
+            "question_id": "q27",
+            "field_id": "matching_2",
+            "answer": "D",
+            "accepted": [],
+            "type": "matching",
+            "trap": "paraphrase",
+            "answer_policy": "letter",
+            "note": "t22: the studies from the 1990s must be supplemented with recent work, which matches D; t21-t22 say the length is fine, which rules out A."
+          },
+          {
+            "question_id": "q28",
+            "field_id": "matching_3",
+            "answer": "E",
+            "accepted": [],
+            "type": "matching",
+            "trap": "distractor",
+            "answer_policy": "letter",
+            "note": "t24: they will set out the study's weak points properly, which matches E; Owen's flowchart idea in t23 (B) is rejected in t24 because the steps are already easy to follow."
+          },
+          {
+            "question_id": "q29",
+            "field_id": "matching_4",
+            "answer": "B",
+            "accepted": [],
+            "type": "matching",
+            "trap": "paraphrase",
+            "answer_policy": "letter",
+            "note": "t26-t27: the percentages will be shown as a bar graph, which matches B; t27 says nothing else in the section needs changing."
+          },
+          {
+            "question_id": "q30",
+            "field_id": "matching_5",
+            "answer": "C",
+            "accepted": [],
+            "type": "matching",
+            "trap": "distractor",
+            "answer_policy": "letter",
+            "note": "t29-t30: they will ask Dr Hallam where the recommendations belong, which matches C; Owen's idea in t27 to cut the conclusion (A) is rejected in t28."
+          }
+        ],
+        "cast": {
+          "A": {
+            "id": "bm_fable",
+            "engine": "kokoro",
+            "accent": "en-GB",
+            "gender": "m",
+            "age": "young",
+            "can_spell": false,
+            "spell_checked": false
+          },
+          "B": {
+            "id": "breeze-us-f-middle-1",
+            "engine": "breeze",
+            "ref": "us-f-middle-1",
+            "accent": "en-US",
+            "gender": "f",
+            "age": "middle",
+            "can_spell": true,
+            "spell_checked": false
+          },
+          "speller": null
+        }
+      },
+      "transcript": {
+        "turns": [
+          {
+            "id": "s3-t1",
+            "speaker": "A",
+            "text": "Right, Linda, now that all the data's in, shall we go through what we've found before we start revising the report?"
+          },
+          {
+            "id": "s3-t2",
+            "speaker": "B",
+            "text": "Sure, Owen. I was looking at it over the weekend, and I have to say some of it wasn't what I expected."
+          },
+          {
+            "id": "s3-t3",
+            "speaker": "A",
+            "text": "Same here. I mean, hardly anyone uses the library on Saturdays and Sundays, but we'd predicted that from the start, hadn't we?"
+          },
+          {
+            "id": "s3-t4",
+            "speaker": "B",
+            "text": "Exactly, that was no surprise. And the split between working solo and working in groups came out roughly fifty-fifty, so nothing striking there either. What really shocked me was that people picked spots with a bit of chatter and movement around them over the totally hushed floors."
+          },
+          {
+            "id": "s3-t5",
+            "speaker": "A",
+            "text": "Yeah, that was the big one. Now, the café observations. I know we've dropped them, but was the problem that we didn't watch for enough hours?"
+          },
+          {
+            "id": "s3-t6",
+            "speaker": "B",
+            "text": "No, we had nearly 40 hours, which was plenty. The trouble was that you counted anyone with a laptop as studying, and I only counted people with notes or books open, so our two sets of records just can't be compared."
+          },
+          {
+            "id": "s3-t7",
+            "speaker": "A",
+            "text": "Fair enough. It's a pity, really, after all that effort."
+          },
+          {
+            "id": "s3-t8",
+            "speaker": "B",
+            "text": "It is, especially since the café manager was perfectly happy to have us sitting there. Anyway, what about the group study rooms?"
+          },
+          {
+            "id": "s3-t9",
+            "speaker": "A",
+            "text": "Well, I reckon they're hardly used because they're tucked away at the back of the building."
+          },
+          {
+            "id": "s3-t10",
+            "speaker": "B",
+            "text": "I'm not so sure. The two rooms right next to the main doors are just as empty. I think it's because to reserve one you have to go through 3 separate online screens and then wait for approval. People just give up."
+          },
+          {
+            "id": "s3-t11",
+            "speaker": "A",
+            "text": "Hmm. Could it be the power sockets, then? Everyone wants to charge their laptop."
+          },
+          {
+            "id": "s3-t12",
+            "speaker": "B",
+            "text": "No, the sockets were all upgraded last term, so that's not the issue. OK, next thing: the postgraduates. Hardly any of them responded. Maybe we should email them again?"
+          },
+          {
+            "id": "s3-t13",
+            "speaker": "A",
+            "text": "We've already sent a reminder, though, and it only brought in 2 more replies. I can't see another one making much difference. Could we just drop them from the analysis?"
+          },
+          {
+            "id": "s3-t14",
+            "speaker": "B",
+            "text": "I'd rather not. Leaving that group out entirely would weaken the whole study."
+          },
+          {
+            "id": "s3-t15",
+            "speaker": "A",
+            "text": "So how about this: we find 4 or 5 postgraduates and sit down with them face to face for a proper chat?"
+          },
+          {
+            "id": "s3-t16",
+            "speaker": "B",
+            "text": "Yes, let's do that. Even a handful of real conversations would tell us a lot."
+          },
+          {
+            "id": "s3-t17",
+            "speaker": "A",
+            "text": "Brilliant. One more thing about the survey itself. The question on weekly study hours didn't really work. Some people clearly included lectures and seminars in their total, while others only counted the work they did on their own, so the figures don't mean the same thing."
+          },
+          {
+            "id": "s3-t18",
+            "speaker": "B",
+            "text": "True. Where it came in the questionnaire was fine, though; that wasn't the problem. And it was the question about noise levels that gave us the most valuable information, not that one."
+          },
+          {
+            "id": "s3-t19",
+            "speaker": "A",
+            "text": "Agreed. Right, let's move on to the report itself and go through it section by section. Starting with the introduction, do you think we should cut it down a bit?"
+          },
+          {
+            "id": "s3-t20",
+            "speaker": "B",
+            "text": "Let me check. No, it's well within the word guide, and it sets up our research question neatly. I really don't think we need to touch it."
+          },
+          {
+            "id": "s3-t21",
+            "speaker": "A",
+            "text": "Fine, we won't change a word of it, then. What about the literature review? I think the length is about right."
+          },
+          {
+            "id": "s3-t22",
+            "speaker": "B",
+            "text": "I agree, the length's fine. The problem is that several of the studies we rely on are from the 1990s, before laptops and Wi-Fi changed how people study. We need to track down work that's been published in the last few years."
+          },
+          {
+            "id": "s3-t23",
+            "speaker": "A",
+            "text": "I'll search the databases this week. Now, the methodology. I was thinking we could add a flowchart showing each step of the data collection."
+          },
+          {
+            "id": "s3-t24",
+            "speaker": "B",
+            "text": "I'm not sure that would help. The steps are already easy to follow in the text. What's missing is honesty about the weak points, like why we dropped the café observations and how few postgraduates replied. We should set those out properly."
+          },
+          {
+            "id": "s3-t25",
+            "speaker": "A",
+            "text": "Fair point. I'll draft a paragraph on that, and we can go through it together. Then there's the results section."
+          },
+          {
+            "id": "s3-t26",
+            "speaker": "B",
+            "text": "At the moment it's just paragraphs full of percentages. Readers would take in the comparison between the different spaces far more easily if we showed it as a bar graph."
+          },
+          {
+            "id": "s3-t27",
+            "speaker": "A",
+            "text": "Good idea, I'll make it. Everything else in that section seems fine to me. Finally, the conclusion. It's a bit long, isn't it? Maybe we should cut it."
+          },
+          {
+            "id": "s3-t28",
+            "speaker": "B",
+            "text": "Honestly, I don't think length is the real problem. What I can't decide is whether our recommendations to the university belong in the conclusion or in a separate section."
+          },
+          {
+            "id": "s3-t29",
+            "speaker": "A",
+            "text": "Neither can I. So rather than changing anything yet, shall we email Dr Hallam, our course tutor, and check where they ought to go?"
+          },
+          {
+            "id": "s3-t30",
+            "speaker": "B",
+            "text": "Yes, let's write to Dr Hallam before we touch it."
+          }
+        ],
+        "evidence": [
+          {
+            "question_id": "q21",
+            "turn": "s3-t4",
+            "quote": "What really shocked me was that people picked spots with a bit of chatter and movement around them over the totally hushed floors."
+          },
+          {
+            "question_id": "q22",
+            "turn": "s3-t6",
+            "quote": "The trouble was that you counted anyone with a laptop as studying, and I only counted people with notes or books open, so our two sets of records just can't be compared."
+          },
+          {
+            "question_id": "q23",
+            "turn": "s3-t10",
+            "quote": "I think it's because to reserve one you have to go through 3 separate online screens and then wait for approval."
+          },
+          {
+            "question_id": "q24",
+            "turn": "s3-t15",
+            "quote": "So how about this: we find 4 or 5 postgraduates and sit down with them face to face for a proper chat?"
+          },
+          {
+            "question_id": "q25",
+            "turn": "s3-t17",
+            "quote": "Some people clearly included lectures and seminars in their total, while others only counted the work they did on their own, so the figures don't mean the same thing."
+          },
+          {
+            "question_id": "q26",
+            "turn": "s3-t20",
+            "quote": "I really don't think we need to touch it."
+          },
+          {
+            "question_id": "q27",
+            "turn": "s3-t22",
+            "quote": "We need to track down work that's been published in the last few years."
+          },
+          {
+            "question_id": "q28",
+            "turn": "s3-t24",
+            "quote": "What's missing is honesty about the weak points, like why we dropped the café observations and how few postgraduates replied."
+          },
+          {
+            "question_id": "q29",
+            "turn": "s3-t26",
+            "quote": "Readers would take in the comparison between the different spaces far more easily if we showed it as a bar graph."
+          },
+          {
+            "question_id": "q30",
+            "turn": "s3-t29",
+            "quote": "So rather than changing anything yet, shall we email Dr Hallam, our course tutor, and check where they ought to go?"
+          }
+        ]
+      },
+      "provenance": {
+        "generator_version": "0.1.0",
+        "plan": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "at": "2026-11-17T06:36:13.546Z"
+        },
+        "script": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "at": "2026-11-17T06:37:39.036Z"
+        },
+        "blind": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "warnings": 0,
+          "at": "2026-11-17T06:37:44.926Z"
+        },
+        "validate": {
+          "ok": true,
+          "block": 0,
+          "warn": 0,
+          "at": "2026-11-17T06:37:39.043Z"
+        },
+        "ai_review": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "at": "2026-11-17T06:38:15.823Z",
+          "verdict": "pass",
+          "findings": [
+            {
+              "question_id": "q30",
+              "category": "ambiguity",
+              "severity": "info",
+              "message": "Owen's phrase \"So rather than changing anything yet\" in t29 and Linda's \"before we touch it\" in t30 sound a little like G ('leave it as it is'). A weaker candidate could write G. The key is still safe: the speakers are only putting the change off until Dr Hallam replies, and t28 shows they expect to move the recommendations. Because each option is used at most once, G also belongs to q26 (\"I really don't think we need to touch it\" / \"we won't change a word of it\").",
+              "suggestion": "This is acceptable as a fair distractor. To make it firmer, Linda could add in t30: \"...and then we'll move the recommendations wherever she suggests.\""
+            },
+            {
+              "question_id": "q28",
+              "category": "other",
+              "severity": "info",
+              "message": "E says 'explain the limitations more clearly', but t24 says the limitations are missing, not unclear: \"What's missing is honesty about the weak points... We should set those out properly.\" A careful candidate will still match E, because no other option fits and B is rejected outright (\"I'm not sure that would help\").",
+              "suggestion": "Change option E to 'discuss the limitations more fully', or have Linda say the weak points are \"only mentioned in passing\" so that 'more clearly' fits exactly."
+            },
+            {
+              "question_id": "q22",
+              "category": "naturalness",
+              "severity": "info",
+              "message": "In t5 Owen asks why the café data was dropped (\"was the problem that we didn't watch for enough hours?\"), and Linda then explains that the problem came from Owen's own way of counting (\"you counted anyone with a laptop as studying\"). The two made the decision together, so it is a little odd that Owen does not seem to know the reason. It reads as a set-up line for distractor A.",
+              "suggestion": "Phrase Owen's line as a check rather than a question: \"I suppose the hours weren't really the issue, were they? We had loads.\" Linda can then confirm and give the real reason."
+            },
+            {
+              "question_id": null,
+              "category": "other",
+              "severity": "info",
+              "message": "I checked every item against every option. Each MC question has one supported key, and the other two options are clearly ruled out: q21 A by t3 \"we'd predicted that\" and C by t4 \"roughly fifty-fifty\"; q22 A by t6 \"nearly 40 hours, which was plenty\" and B by t8 \"perfectly happy to have us\"; q23 B by t10 \"just as empty\" and C by t12 \"sockets were all upgraded\"; q24 A by t13 and C by t14; q25 B and C both by t18. In the matching task, A is offered as a distractor three times and rejected each time (t20, t22, t28). B is rejected for the methodology (t24) and then used for the results (t26). F never comes up, which is fine for an unused option. Answers come in question order, all the MC answers come before the matching section begins, the keys are paraphrased rather than read out, and the evidence quotes sit at the stated turns.",
+              "suggestion": ""
+            }
+          ]
+        },
+        "warnings": []
+      }
+    },
+    {
+      "ielts_section": 4,
+      "source_set_id": "s4-roman-0002",
+      "topic": "roman-concrete",
+      "title": "Roman Concrete",
+      "first_question": 31,
+      "last_question": 40,
+      "paper": {
+        "blocks": [
+          {
+            "type": "form",
+            "form": {
+              "set_id": "s4-roman-0002",
+              "type": "form_table",
+              "title": "Roman Concrete",
+              "instruction": "Write ONE WORD ONLY for each answer.",
+              "rows": [
+                {
+                  "label": "Modern concrete",
+                  "field_id": "modern_lifetime",
+                  "parts": [
+                    {
+                      "text": "Modern concrete often starts to crack within a few"
+                    },
+                    {
+                      "blank": "q31",
+                      "field_id": "modern_lifetime"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Background"
+                },
+                {
+                  "label": "Key ingredient",
+                  "field_id": "volcanic_ingredient",
+                  "parts": [
+                    {
+                      "text": "The key ingredient was volcanic"
+                    },
+                    {
+                      "blank": "q32",
+                      "field_id": "volcanic_ingredient"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Ingredients"
+                },
+                {
+                  "label": "Liquid",
+                  "field_id": "mixing_liquid",
+                  "parts": [
+                    {
+                      "text": "For harbor structures, this was mixed with lime and"
+                    },
+                    {
+                      "blank": "q33",
+                      "field_id": "mixing_liquid"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Ingredients"
+                },
+                {
+                  "label": "White lumps",
+                  "field_id": "lump_belief",
+                  "parts": [
+                    {
+                      "text": "White lumps in the material were once thought to be a sign of poor"
+                    },
+                    {
+                      "blank": "q34",
+                      "field_id": "lump_belief"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Why it lasts"
+                },
+                {
+                  "label": "Self-repair",
+                  "field_id": "repair_product",
+                  "parts": [
+                    {
+                      "text": "When water gets into a crack, the lumps dissolve and form new"
+                    },
+                    {
+                      "blank": "q35",
+                      "field_id": "repair_product"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Why it lasts"
+                },
+                {
+                  "label": "In the sea",
+                  "field_id": "sea_strength",
+                  "parts": [
+                    {
+                      "text": "Structures standing in the sea actually grew stronger with"
+                    },
+                    {
+                      "blank": "q36",
+                      "field_id": "sea_strength"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Why it lasts"
+                },
+                {
+                  "label": "Examining samples",
+                  "field_id": "sample_tool",
+                  "parts": [
+                    {
+                      "text": "Scientists examined ancient samples using a powerful"
+                    },
+                    {
+                      "blank": "q37",
+                      "field_id": "sample_tool"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Modern research and uses"
+                },
+                {
+                  "label": "Test wall",
+                  "field_id": "repair_time",
+                  "parts": [
+                    {
+                      "text": "A test wall made with the ancient recipe repaired itself within two"
+                    },
+                    {
+                      "blank": "q38",
+                      "field_id": "repair_time"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Modern research and uses"
+                },
+                {
+                  "label": "Modern cement",
+                  "field_id": "cement_need",
+                  "parts": [
+                    {
+                      "text": "Producing modern cement requires a great deal of"
+                    },
+                    {
+                      "blank": "q39",
+                      "field_id": "cement_need"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Modern research and uses"
+                },
+                {
+                  "label": "Disadvantage",
+                  "field_id": "disadvantage",
+                  "parts": [
+                    {
+                      "text": "The main disadvantage of the Roman method is its slow"
+                    },
+                    {
+                      "blank": "q40",
+                      "field_id": "disadvantage"
+                    },
+                    {
+                      "text": "."
+                    }
+                  ],
+                  "inline": true,
+                  "section": "Modern research and uses"
+                }
+              ],
+              "section_styles": {
+                "Background": "list",
+                "Ingredients": "list",
+                "Why it lasts": "list",
+                "Modern research and uses": "list"
+              }
+            }
+          }
+        ]
+      },
+      "answers": {
+        "set_id": "s4-roman-0002",
+        "topic": "roman-concrete",
+        "variant": "public",
+        "recipe": "L4",
+        "seed": 1692477833,
+        "scenario": {
+          "setting": "A public lecture at a university, open to members of the local community.",
+          "accent": "en-US"
+        },
+        "answers": [
+          {
+            "question_id": "q31",
+            "field_id": "modern_lifetime",
+            "answer": "decades",
+            "accepted": [],
+            "type": "word",
+            "trap": "paraphrase",
+            "answer_policy": "exact_word",
+            "note": "t2: the note's 'starts to crack within a few' is paraphrased as 'begins to fracture and crumble after only a couple of decades'."
+          },
+          {
+            "question_id": "q32",
+            "field_id": "volcanic_ingredient",
+            "answer": "ash",
+            "accepted": [],
+            "type": "word",
+            "trap": "none",
+            "answer_policy": "exact_word"
+          },
+          {
+            "question_id": "q33",
+            "field_id": "mixing_liquid",
+            "answer": "seawater",
+            "accepted": [
+              "sea-water"
+            ],
+            "type": "word",
+            "trap": "distractor",
+            "answer_policy": "exact_word",
+            "wrong_value": "sand",
+            "note": "t4: the lecturer says builders on land added sand, then gives seawater as what the lime and ash were mixed with for harbor walls and piers."
+          },
+          {
+            "question_id": "q34",
+            "field_id": "lump_belief",
+            "answer": "mixing",
+            "accepted": [],
+            "type": "word",
+            "trap": "paraphrase",
+            "answer_policy": "exact_word",
+            "note": "t5: 'once thought to be a sign of poor' is paraphrased as 'usually dismissed as evidence that Roman workers had been careless with their mixing'."
+          },
+          {
+            "question_id": "q35",
+            "field_id": "repair_product",
+            "answer": "crystals",
+            "accepted": [],
+            "type": "word",
+            "trap": "paraphrase",
+            "answer_policy": "exact_word",
+            "note": "t6: 'water gets into a crack, the lumps dissolve and form new' is paraphrased as rain seeping into a fracture and the chunks breaking down to build fresh crystals."
+          },
+          {
+            "question_id": "q36",
+            "field_id": "sea_strength",
+            "answer": "age",
+            "accepted": [],
+            "type": "word",
+            "trap": "none",
+            "answer_policy": "exact_word"
+          },
+          {
+            "question_id": "q37",
+            "field_id": "sample_tool",
+            "answer": "microscope",
+            "accepted": [],
+            "type": "word",
+            "trap": "none",
+            "answer_policy": "exact_word"
+          },
+          {
+            "question_id": "q38",
+            "field_id": "repair_time",
+            "answer": "weeks",
+            "accepted": [],
+            "type": "word",
+            "trap": "distractor",
+            "answer_policy": "exact_word",
+            "wrong_value": "months",
+            "note": "t9: the researchers expected healing to take several months, but the wall actually sealed itself in 2 weeks."
+          },
+          {
+            "question_id": "q39",
+            "field_id": "cement_need",
+            "answer": "fuel",
+            "accepted": [],
+            "type": "word",
+            "trap": "none",
+            "answer_policy": "exact_word"
+          },
+          {
+            "question_id": "q40",
+            "field_id": "disadvantage",
+            "answer": "hardening",
+            "accepted": [],
+            "type": "word",
+            "trap": "none",
+            "answer_policy": "exact_word"
+          }
+        ],
+        "cast": {
+          "A": {
+            "id": "breeze-us-f-old-1",
+            "engine": "breeze",
+            "ref": "us-f-old-1",
+            "accent": "en-US",
+            "gender": "f",
+            "age": "old",
+            "can_spell": true,
+            "spell_checked": false
+          },
+          "speller": null
+        }
+      },
+      "transcript": {
+        "turns": [
+          {
+            "id": "s4-t1",
+            "speaker": "A",
+            "text": "Good evening, everyone, and thank you for coming out on such a chilly night. I'm delighted to see so many familiar faces from the neighborhood. Tonight I want to talk about something that's quite literally under our feet, and that's concrete. Specifically, I'll explain why structures built by the Romans are still standing after 2 millennia, and what modern engineers are hoping to learn from them."
+          },
+          {
+            "id": "s4-t2",
+            "speaker": "A",
+            "text": "Let me start with a bit of background. The concrete poured into our highways and parking structures today is usually engineered to last about a century. Yet much of it begins to fracture and crumble after only a couple of decades. Meanwhile, the unreinforced dome of the Pantheon in Rome has survived since the 2nd century. So what did the Romans know that we don't?"
+          },
+          {
+            "id": "s4-t3",
+            "speaker": "A",
+            "text": "Let's turn to the ingredients. The star of the recipe was volcanic ash, which builders dug out of the hillsides around the Bay of Naples. It's chemically very reactive, and as we'll see, that turns out to be crucial."
+          },
+          {
+            "id": "s4-t4",
+            "speaker": "A",
+            "text": "The Romans combined this with lime. Now, on land, builders added sand to the mix, just as you'd expect in a modern sidewalk. But for the harbor walls and piers we're most interested in, the lime and ash were mixed with seawater. That choice triggered reactions I'll come back to in a moment."
+          },
+          {
+            "id": "s4-t5",
+            "speaker": "A",
+            "text": "So why does it last? For a long time, specialists were puzzled by small, chalky white chunks scattered all through the material. These were usually dismissed as evidence that Roman workers had been careless with their mixing. People saw them as a kind of ancient sloppiness, and nobody gave them a second thought."
+          },
+          {
+            "id": "s4-t6",
+            "speaker": "A",
+            "text": "It turns out those chunks are doing a very important job, and this is where the story gets exciting. When rain seeps into a hairline fracture, the chunks partly break down, and what's released reacts to build fresh crystals that knit the gap closed. In other words, the structure heals itself. Nobody has to come out and patch anything."
+          },
+          {
+            "id": "s4-t7",
+            "speaker": "A",
+            "text": "What's interesting is that this effect is even more striking in the sea. Piers and breakwaters built in the shallows of the Mediterranean haven't weakened over the centuries; they've actually become tougher with age. The surrounding sea keeps feeding the chemical reactions, so the structure keeps reinforcing itself from the inside."
+          },
+          {
+            "id": "s4-t8",
+            "speaker": "A",
+            "text": "So what have modern researchers done with all this? One team took fragments from ancient sites back to the lab. They studied them under an extremely high-powered microscope. That let them see exactly how those white chunks came about: the lime had been added while still hot, which left reactive pockets behind."
+          },
+          {
+            "id": "s4-t9",
+            "speaker": "A",
+            "text": "Then came the real test. The same group built a small wall using the ancient recipe, deliberately broke it, and ran water through the gaps. Frankly, they'd assumed any healing would take several months, if it happened at all. Instead, the gaps had sealed completely in just 2 weeks. An identical wall made with modern cement stayed broken."
+          },
+          {
+            "id": "s4-t10",
+            "speaker": "A",
+            "text": "Now, why does any of this matter beyond the history books? It comes down to the environment. Manufacturing modern cement means running huge kilns at around 1,450 degrees Celsius, and keeping them that hot involves burning vast quantities of fuel. As a result, the cement industry produces roughly 8 percent of global carbon emissions."
+          },
+          {
+            "id": "s4-t11",
+            "speaker": "A",
+            "text": "Of course, I don't want to give you the impression that the Roman approach is perfect, because it isn't. Its biggest drawback is that the hardening is painfully slow. A builder today expects to pour a floor on Monday and walk on it by Friday, and Roman concrete simply won't cooperate."
+          },
+          {
+            "id": "s4-t12",
+            "speaker": "A",
+            "text": "Still, researchers are now experimenting with blends that borrow the Roman tricks while speeding things up. So the next time you drive past a crumbling overpass, remember that part of the answer may have been sitting in the Bay of Naples all along. Thank you, and I'm happy to take your questions."
+          }
+        ],
+        "evidence": [
+          {
+            "question_id": "q31",
+            "turn": "s4-t2",
+            "quote": "Yet much of it begins to fracture and crumble after only a couple of decades."
+          },
+          {
+            "question_id": "q32",
+            "turn": "s4-t3",
+            "quote": "The star of the recipe was volcanic ash, which builders dug out of the hillsides around the Bay of Naples."
+          },
+          {
+            "question_id": "q33",
+            "turn": "s4-t4",
+            "quote": "But for the harbor walls and piers we're most interested in, the lime and ash were mixed with seawater."
+          },
+          {
+            "question_id": "q34",
+            "turn": "s4-t5",
+            "quote": "These were usually dismissed as evidence that Roman workers had been careless with their mixing."
+          },
+          {
+            "question_id": "q35",
+            "turn": "s4-t6",
+            "quote": "When rain seeps into a hairline fracture, the chunks partly break down, and what's released reacts to build fresh crystals that knit the gap closed."
+          },
+          {
+            "question_id": "q36",
+            "turn": "s4-t7",
+            "quote": "Piers and breakwaters built in the shallows of the Mediterranean haven't weakened over the centuries; they've actually become tougher with age."
+          },
+          {
+            "question_id": "q37",
+            "turn": "s4-t8",
+            "quote": "They studied them under an extremely high-powered microscope."
+          },
+          {
+            "question_id": "q38",
+            "turn": "s4-t9",
+            "quote": "Instead, the gaps had sealed completely in just 2 weeks."
+          },
+          {
+            "question_id": "q39",
+            "turn": "s4-t10",
+            "quote": "Manufacturing modern cement means running huge kilns at around 1,450 degrees Celsius, and keeping them that hot involves burning vast quantities of fuel."
+          },
+          {
+            "question_id": "q40",
+            "turn": "s4-t11",
+            "quote": "Its biggest drawback is that the hardening is painfully slow."
+          }
+        ]
+      },
+      "provenance": {
+        "generator_version": "0.1.0",
+        "plan": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "at": "2026-11-16T15:02:13.304Z"
+        },
+        "script": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "at": "2026-11-16T20:13:53.399Z"
+        },
+        "blind": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "warnings": 1,
+          "at": "2026-11-16T20:14:12.729Z"
+        },
+        "validate": {
+          "ok": true,
+          "block": 0,
+          "warn": 0,
+          "at": "2026-11-16T20:14:04.511Z"
+        },
+        "ai_review": {
+          "model": "claude-cli（預設模型）",
+          "mode": "claude",
+          "at": "2026-11-16T20:14:43.411Z",
+          "verdict": "needs_human",
+          "findings": [
+            {
+              "question_id": null,
+              "category": "naturalness",
+              "severity": "warn",
+              "message": "The talk is framed as a neighborhood public talk, not an academic lecture. Examples are 'thank you for coming out on such a chilly night', 'I'm delighted to see so many familiar faces from the neighborhood', 'So the next time you drive past a crumbling overpass' and 'I'm happy to take your questions'. This framing is closer to a Section 2 community talk than to the academic register expected in Section 4. The body of the talk (t3-t11) is academic enough.",
+              "suggestion": "Change t1 to a lecture setting, for example: 'Good morning. In today's lecture on construction materials, I want to look at Roman concrete...'. Remove the neighborhood and drive-past references, and end t12 with a link to further reading or the next lecture."
+            },
+            {
+              "question_id": null,
+              "category": "difficulty",
+              "severity": "info",
+              "message": "Several items are close to word-for-word matches with little or no paraphrase. These include q32 ('volcanic ash' is said exactly as in the note), q37 ('high-powered microscope' for 'powerful microscope'), q36 ('tougher with age' for 'stronger with age') and q40 ('the hardening is painfully slow' for 'slow hardening'). Five of the ten items have trap 'none'. The set will probably be easier than a typical Section 4.",
+              "suggestion": "Paraphrase one or two more of the cue phrases. For q32, the note could say 'material from volcanoes' while the speaker says 'volcanic ash'. For q36, the speaker could say 'as the years went by' and then 'with age' later, or a further distractor could be added near the answer."
+            },
+            {
+              "question_id": "q33",
+              "category": "trap",
+              "severity": "info",
+              "message": "The 'sand' distractor works well: t4 clearly marks 'on land' as different from 'harbor walls and piers', and the note says 'For harbor structures'. The key accepts 'seawater' and 'sea-water'. Because the rule treats a hyphen and a space as the same, 'sea water' is also accepted. No problem was found.",
+              "suggestion": ""
+            },
+            {
+              "question_id": "q38",
+              "category": "trap",
+              "severity": "info",
+              "message": "The 'months' and 'weeks' distractor in t9 is fair. The speaker clearly signals the contrast with 'Frankly, they'd assumed... several months' followed by 'Instead... in just 2 weeks'. The number 'two' given in the note matches '2 weeks'. No problem was found.",
+              "suggestion": ""
+            }
+          ]
+        },
+        "warnings": [
+          {
+            "id": "w01",
+            "source": "blind",
+            "rule": "B2",
+            "question_id": "q39",
+            "message": "The blind answerer thinks another answer is possible: heat.",
+            "ai_ruling": "ok"
+          }
+        ]
+      }
+    }
+  ],
+  "timing": {
+    "set_id": "s1-tour-0002",
+    "total_seconds": 1599.5,
+    "events": [
+      {
+        "type": "announce",
+        "id": "s1-intro",
+        "section": 1,
+        "start": 0,
+        "end": 5.82
+      },
+      {
+        "type": "announce",
+        "id": "s1-look1",
+        "section": 1,
+        "start": 5.82,
+        "end": 9.66
+      },
+      {
+        "type": "pause",
+        "id": "s1-pause1",
+        "section": 1,
+        "start": 9.66,
+        "end": 29.66,
+        "questions": [
+          1,
+          6
+        ],
+        "seconds": 20
+      },
+      {
+        "type": "announce",
+        "id": "s1-now1",
+        "section": 1,
+        "start": 29.66,
+        "end": 33.12
+      },
+      {
+        "type": "turn",
+        "id": "s1-t1",
+        "section": 1,
+        "start": 33.12,
+        "end": 46.51,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t2",
+        "section": 1,
+        "start": 47.01,
+        "end": 54.47,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t3",
+        "section": 1,
+        "start": 55.17,
+        "end": 62.21,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t4",
+        "section": 1,
+        "start": 62.71,
+        "end": 71.84,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t5",
+        "section": 1,
+        "start": 72.54,
+        "end": 85.96,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t6",
+        "section": 1,
+        "start": 86.46,
+        "end": 98.87,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t7",
+        "section": 1,
+        "start": 99.57,
+        "end": 110.93,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t8",
+        "section": 1,
+        "start": 111.43,
+        "end": 124.51,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t9",
+        "section": 1,
+        "start": 125.21,
+        "end": 140.85,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t10",
+        "section": 1,
+        "start": 141.35,
+        "end": 150.48,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t11",
+        "section": 1,
+        "start": 151.18,
+        "end": 163.4,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t12",
+        "section": 1,
+        "start": 163.9,
+        "end": 172.56,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t13",
+        "section": 1,
+        "start": 173.26,
+        "end": 176.94,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t14",
+        "section": 1,
+        "start": 177.44,
+        "end": 181.32,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t15",
+        "section": 1,
+        "start": 182.02,
+        "end": 197.94,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t16",
+        "section": 1,
+        "start": 198.44,
+        "end": 210.23,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t17",
+        "section": 1,
+        "start": 210.93,
+        "end": 228.61,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s1-t18",
+        "section": 1,
+        "start": 229.11,
+        "end": 238.89,
+        "group": 1
+      },
+      {
+        "type": "announce",
+        "id": "s1-look2",
+        "section": 1,
+        "start": 239.59,
+        "end": 245.88
+      },
+      {
+        "type": "pause",
+        "id": "s1-pause2",
+        "section": 1,
+        "start": 245.88,
+        "end": 265.88,
+        "questions": [
+          7,
+          8
+        ],
+        "seconds": 20
+      },
+      {
+        "type": "announce",
+        "id": "s1-now2",
+        "section": 1,
+        "start": 265.88,
+        "end": 271.47
+      },
+      {
+        "type": "turn",
+        "id": "s1-t19",
+        "section": 1,
+        "start": 271.47,
+        "end": 285.87,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s1-t20",
+        "section": 1,
+        "start": 286.37,
+        "end": 295.85,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s1-t21",
+        "section": 1,
+        "start": 296.55,
+        "end": 308.46,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s1-t22",
+        "section": 1,
+        "start": 308.96,
+        "end": 320.67,
+        "group": 2
+      },
+      {
+        "type": "announce",
+        "id": "s1-look3",
+        "section": 1,
+        "start": 321.37,
+        "end": 327.58
+      },
+      {
+        "type": "pause",
+        "id": "s1-pause3",
+        "section": 1,
+        "start": 327.58,
+        "end": 347.58,
+        "questions": [
+          9,
+          10
+        ],
+        "seconds": 20
+      },
+      {
+        "type": "announce",
+        "id": "s1-now3",
+        "section": 1,
+        "start": 347.58,
+        "end": 353.23
+      },
+      {
+        "type": "turn",
+        "id": "s1-t23",
+        "section": 1,
+        "start": 353.23,
+        "end": 369.25,
+        "group": 3
+      },
+      {
+        "type": "turn",
+        "id": "s1-t24",
+        "section": 1,
+        "start": 369.75,
+        "end": 376.09,
+        "group": 3
+      },
+      {
+        "type": "turn",
+        "id": "s1-t25",
+        "section": 1,
+        "start": 376.79,
+        "end": 385.83,
+        "group": 3
+      },
+      {
+        "type": "turn",
+        "id": "s1-t26",
+        "section": 1,
+        "start": 386.33,
+        "end": 395.77,
+        "group": 3
+      },
+      {
+        "type": "turn",
+        "id": "s1-t27",
+        "section": 1,
+        "start": 396.47,
+        "end": 411.24,
+        "group": 3
+      },
+      {
+        "type": "turn",
+        "id": "s1-t28",
+        "section": 1,
+        "start": 411.74,
+        "end": 418.63,
+        "group": 3
+      },
+      {
+        "type": "announce",
+        "id": "s1-end",
+        "section": 1,
+        "start": 419.33,
+        "end": 424.57
+      },
+      {
+        "type": "pause",
+        "id": "s1-check",
+        "section": 1,
+        "start": 424.57,
+        "end": 454.57,
+        "questions": [
+          1,
+          10
+        ],
+        "seconds": 30
+      },
+      {
+        "type": "announce",
+        "id": "s2-intro",
+        "section": 2,
+        "start": 456.57,
+        "end": 465.91
+      },
+      {
+        "type": "announce",
+        "id": "s2-look1",
+        "section": 2,
+        "start": 465.91,
+        "end": 470.29
+      },
+      {
+        "type": "pause",
+        "id": "s2-pause1",
+        "section": 2,
+        "start": 470.29,
+        "end": 500.29,
+        "questions": [
+          11,
+          15
+        ],
+        "seconds": 30
+      },
+      {
+        "type": "announce",
+        "id": "s2-now1",
+        "section": 2,
+        "start": 500.29,
+        "end": 504.75
+      },
+      {
+        "type": "turn",
+        "id": "s2-t1",
+        "section": 2,
+        "start": 504.75,
+        "end": 518.95,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s2-t2",
+        "section": 2,
+        "start": 519.55,
+        "end": 538.45,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s2-t3",
+        "section": 2,
+        "start": 539.05,
+        "end": 558.14,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s2-t4",
+        "section": 2,
+        "start": 558.74,
+        "end": 579.74,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s2-t5",
+        "section": 2,
+        "start": 580.34,
+        "end": 603.45,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s2-t6",
+        "section": 2,
+        "start": 604.05,
+        "end": 622.22,
+        "group": 1
+      },
+      {
+        "type": "announce",
+        "id": "s2-look2",
+        "section": 2,
+        "start": 622.82,
+        "end": 628.81
+      },
+      {
+        "type": "pause",
+        "id": "s2-pause2",
+        "section": 2,
+        "start": 628.81,
+        "end": 658.81,
+        "questions": [
+          16,
+          20
+        ],
+        "seconds": 30
+      },
+      {
+        "type": "announce",
+        "id": "s2-now2",
+        "section": 2,
+        "start": 658.81,
+        "end": 664.21
+      },
+      {
+        "type": "turn",
+        "id": "s2-t7",
+        "section": 2,
+        "start": 664.21,
+        "end": 672.95,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s2-t8",
+        "section": 2,
+        "start": 673.55,
+        "end": 688.03,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s2-t9",
+        "section": 2,
+        "start": 688.63,
+        "end": 704.36,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s2-t10",
+        "section": 2,
+        "start": 704.96,
+        "end": 719.42,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s2-t11",
+        "section": 2,
+        "start": 720.02,
+        "end": 735.99,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s2-t12",
+        "section": 2,
+        "start": 736.59,
+        "end": 754.01,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s2-t13",
+        "section": 2,
+        "start": 754.61,
+        "end": 760.12,
+        "group": 2
+      },
+      {
+        "type": "announce",
+        "id": "s2-end",
+        "section": 2,
+        "start": 760.72,
+        "end": 765.76
+      },
+      {
+        "type": "pause",
+        "id": "s2-check",
+        "section": 2,
+        "start": 765.76,
+        "end": 795.76,
+        "questions": [
+          11,
+          20
+        ],
+        "seconds": 30
+      },
+      {
+        "type": "announce",
+        "id": "s3-intro",
+        "section": 3,
+        "start": 797.76,
+        "end": 805.67
+      },
+      {
+        "type": "announce",
+        "id": "s3-look1",
+        "section": 3,
+        "start": 805.67,
+        "end": 810.6
+      },
+      {
+        "type": "pause",
+        "id": "s3-pause1",
+        "section": 3,
+        "start": 810.6,
+        "end": 840.6,
+        "questions": [
+          21,
+          25
+        ],
+        "seconds": 30
+      },
+      {
+        "type": "announce",
+        "id": "s3-now1",
+        "section": 3,
+        "start": 840.6,
+        "end": 845.53
+      },
+      {
+        "type": "turn",
+        "id": "s3-t1",
+        "section": 3,
+        "start": 845.53,
+        "end": 851.35,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t2",
+        "section": 3,
+        "start": 851.95,
+        "end": 859.63,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t3",
+        "section": 3,
+        "start": 860.23,
+        "end": 867.6,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t4",
+        "section": 3,
+        "start": 868.2,
+        "end": 887.58,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t5",
+        "section": 3,
+        "start": 888.18,
+        "end": 895.43,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t6",
+        "section": 3,
+        "start": 896.03,
+        "end": 909.87,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t7",
+        "section": 3,
+        "start": 910.47,
+        "end": 913.77,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t8",
+        "section": 3,
+        "start": 914.37,
+        "end": 922.94,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t9",
+        "section": 3,
+        "start": 923.54,
+        "end": 927.9,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t10",
+        "section": 3,
+        "start": 928.5,
+        "end": 942.5,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t11",
+        "section": 3,
+        "start": 943.1,
+        "end": 947.41,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t12",
+        "section": 3,
+        "start": 948.01,
+        "end": 963.13,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t13",
+        "section": 3,
+        "start": 963.73,
+        "end": 972.33,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t14",
+        "section": 3,
+        "start": 972.93,
+        "end": 977.57,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t15",
+        "section": 3,
+        "start": 978.17,
+        "end": 984.21,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t16",
+        "section": 3,
+        "start": 984.81,
+        "end": 990.57,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s3-t17",
+        "section": 3,
+        "start": 991.17,
+        "end": 1005.55,
+        "group": 1
+      },
+      {
+        "type": "announce",
+        "id": "s3-look2",
+        "section": 3,
+        "start": 1006.15,
+        "end": 1012.74
+      },
+      {
+        "type": "pause",
+        "id": "s3-pause2",
+        "section": 3,
+        "start": 1012.74,
+        "end": 1042.74,
+        "questions": [
+          26,
+          30
+        ],
+        "seconds": 30
+      },
+      {
+        "type": "announce",
+        "id": "s3-now2",
+        "section": 3,
+        "start": 1042.74,
+        "end": 1048.45
+      },
+      {
+        "type": "turn",
+        "id": "s3-t18",
+        "section": 3,
+        "start": 1048.45,
+        "end": 1059.89,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s3-t19",
+        "section": 3,
+        "start": 1060.49,
+        "end": 1069.01,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s3-t20",
+        "section": 3,
+        "start": 1069.61,
+        "end": 1078.37,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s3-t21",
+        "section": 3,
+        "start": 1078.97,
+        "end": 1084.63,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s3-t22",
+        "section": 3,
+        "start": 1085.23,
+        "end": 1100.19,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s3-t23",
+        "section": 3,
+        "start": 1100.79,
+        "end": 1108.57,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s3-t24",
+        "section": 3,
+        "start": 1109.17,
+        "end": 1123.91,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s3-t25",
+        "section": 3,
+        "start": 1124.51,
+        "end": 1130.45,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s3-t26",
+        "section": 3,
+        "start": 1131.05,
+        "end": 1141.69,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s3-t27",
+        "section": 3,
+        "start": 1142.29,
+        "end": 1150.7,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s3-t28",
+        "section": 3,
+        "start": 1151.3,
+        "end": 1163.3,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s3-t29",
+        "section": 3,
+        "start": 1163.9,
+        "end": 1170.89,
+        "group": 2
+      },
+      {
+        "type": "turn",
+        "id": "s3-t30",
+        "section": 3,
+        "start": 1171.49,
+        "end": 1174.32,
+        "group": 2
+      },
+      {
+        "type": "announce",
+        "id": "s3-end",
+        "section": 3,
+        "start": 1174.92,
+        "end": 1180.06
+      },
+      {
+        "type": "pause",
+        "id": "s3-check",
+        "section": 3,
+        "start": 1180.06,
+        "end": 1210.06,
+        "questions": [
+          21,
+          30
+        ],
+        "seconds": 30
+      },
+      {
+        "type": "announce",
+        "id": "s4-intro",
+        "section": 4,
+        "start": 1212.06,
+        "end": 1218.35
+      },
+      {
+        "type": "announce",
+        "id": "s4-look1",
+        "section": 4,
+        "start": 1218.35,
+        "end": 1222.94
+      },
+      {
+        "type": "pause",
+        "id": "s4-pause1",
+        "section": 4,
+        "start": 1222.94,
+        "end": 1252.94,
+        "questions": [
+          31,
+          40
+        ],
+        "seconds": 30
+      },
+      {
+        "type": "announce",
+        "id": "s4-now1",
+        "section": 4,
+        "start": 1252.94,
+        "end": 1257.5
+      },
+      {
+        "type": "turn",
+        "id": "s4-t1",
+        "section": 4,
+        "start": 1257.5,
+        "end": 1286.98,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s4-t2",
+        "section": 4,
+        "start": 1287.58,
+        "end": 1315.36,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s4-t3",
+        "section": 4,
+        "start": 1315.96,
+        "end": 1335.96,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s4-t4",
+        "section": 4,
+        "start": 1336.56,
+        "end": 1357.78,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s4-t5",
+        "section": 4,
+        "start": 1358.38,
+        "end": 1383.92,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s4-t6",
+        "section": 4,
+        "start": 1384.52,
+        "end": 1413.14,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s4-t7",
+        "section": 4,
+        "start": 1413.74,
+        "end": 1438.57,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s4-t8",
+        "section": 4,
+        "start": 1439.17,
+        "end": 1462.95,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s4-t9",
+        "section": 4,
+        "start": 1463.55,
+        "end": 1488.53,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s4-t10",
+        "section": 4,
+        "start": 1489.13,
+        "end": 1517.89,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s4-t11",
+        "section": 4,
+        "start": 1518.49,
+        "end": 1538.43,
+        "group": 1
+      },
+      {
+        "type": "turn",
+        "id": "s4-t12",
+        "section": 4,
+        "start": 1539.03,
+        "end": 1560.88,
+        "group": 1
+      },
+      {
+        "type": "announce",
+        "id": "s4-end",
+        "section": 4,
+        "start": 1561.48,
+        "end": 1566.58
+      },
+      {
+        "type": "pause",
+        "id": "s4-check",
+        "section": 4,
+        "start": 1566.58,
+        "end": 1596.58,
+        "questions": [
+          31,
+          40
+        ],
+        "seconds": 30
+      },
+      {
+        "type": "announce",
+        "id": "exam-end",
+        "start": 1596.58,
+        "end": 1599.54
+      }
+    ]
+  },
+  "audio": {
+    "file": "audio.mp3",
+    "bytes": 12797036,
+    "sha256": "317b71433cf7d0c55e88fb2cefb1d786e430e787353ccfe807fa5eab82f3ff30",
+    "seconds": 1599.5
+  },
+  "ai_review_verdict": "needs_human"
+}

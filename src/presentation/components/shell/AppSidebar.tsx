@@ -55,7 +55,8 @@ export function AppSidebar({ items, email, roles, logout }: Props) {
   });
 
   const logoutButton = (
-    <form action={logout}>
+    // data-logout：考試中登出時，離開提醒認得出來，順便清掉這次的暫存答案
+    <form action={logout} data-logout>
       <button
         type="submit"
         className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm text-muted-foreground hover:bg-muted"

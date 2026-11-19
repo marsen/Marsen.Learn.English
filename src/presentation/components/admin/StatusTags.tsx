@@ -29,7 +29,7 @@ const TAGS: Record<StatusTag, { who: string; mark: string; className: string }> 
   TP: {
     who: "🍵",
     mark: CHECK,
-    className: "bg-sky-50 text-sky-700 ring-sky-200",
+    className: "bg-accent-soft/60 text-accent-hover ring-accent-soft",
   },
   TR: {
     who: "🍵",
@@ -88,6 +88,18 @@ function Tag({ tag }: { tag: StatusTag }) {
           {title}
         </span>
       )}
+    </span>
+  );
+}
+
+/** 學生考不考得到（由 canTake 推出來，和審稿狀態分開講；公開的不看審稿） */
+export function TakeableHint({ takeable }: { takeable: boolean }) {
+  const t = useTranslations("examSet.takeable");
+  return (
+    <span
+      className={`text-xs whitespace-nowrap ${takeable ? "text-accent-hover" : "text-muted-foreground"}`}
+    >
+      {takeable ? t("yes") : t("no")}
     </span>
   );
 }

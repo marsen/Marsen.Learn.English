@@ -6,8 +6,8 @@ import { Msg } from "@/presentation/components/Msg";
 import { DocumentTitle } from "@/presentation/components/DocumentTitle";
 import { ReviewMeta } from "@/presentation/components/admin/ReviewMeta";
 import { ReviewForm } from "@/presentation/components/admin/ReviewForm";
-import { StatusTags } from "@/presentation/components/admin/StatusTags";
-import { statusTagsOf } from "@/domain/examSet/statusTags";
+import { StatusTags, TakeableHint } from "@/presentation/components/admin/StatusTags";
+import { statusTagsOf, studentsCanTake } from "@/domain/examSet/statusTags";
 import { DeleteSetButton } from "@/presentation/components/dashboard/DeleteSetButton";
 import { requireAccount } from "@/infrastructure/auth/currentAccount";
 import {
@@ -56,13 +56,15 @@ export default async function ReviewPage({
         }
         description={
           <>
-            <div className="mb-2">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
               <StatusTags tags={statusTagsOf(view.set)} />
+              <TakeableHint takeable={studentsCanTake(view.set)} />
             </div>
             <ReviewMeta
               setId={view.set.setId}
               questionCount={view.set.questionCount}
               reviewedAt={view.review?.reviewedAt ?? null}
+              fullExam={view.fullPaper !== null}
             />
           </>
         }
@@ -70,6 +72,7 @@ export default async function ReviewPage({
       <ReviewForm
         view={view}
         audioUrl={`/admin/sets/${setId}/audio`}
+        accountId={account.id}
         action={reviewExamSetAction.bind(null, setId)}
       />
     </Page>

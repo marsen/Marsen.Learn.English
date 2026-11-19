@@ -67,6 +67,8 @@ describe("ListExamSets 過濾", () => {
       "s1-library-0001",
     ]);
     expect(r?.filter).toEqual({});
+    // 單一 section 的題組是 2.x
+    expect(r?.sets.every((s) => s.schemaVersion === 2)).toBe(true);
   });
 
   it("應該能找出老師通過但還沒上架的題組", async () => {

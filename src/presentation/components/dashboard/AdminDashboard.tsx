@@ -9,6 +9,8 @@ import type {
 } from "@/application/dashboard/adminDashboard";
 import { statusTagsOf } from "@/domain/examSet/statusTags";
 import { StatusTags } from "@/presentation/components/admin/StatusTags";
+import { FullExamBadge } from "@/presentation/components/admin/FullExamBadge";
+import { isFullExamPaper } from "@/domain/examSet/fullExam";
 import { CopyButton } from "./CopyButton";
 import { DeleteSetButton } from "./DeleteSetButton";
 import { TopicChart } from "./TopicChart";
@@ -93,6 +95,7 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
                 >
                   {r.set.setId}
                 </Link>
+                {isFullExamPaper(r.set.paper) && <FullExamBadge />}
               </Td>
               <Td>{r.set.title}</Td>
               <Td className="whitespace-nowrap">
@@ -144,6 +147,7 @@ export function AdminDashboard({ view, setAccessAction, deleteAction }: Props) {
                 >
                   {r.set.setId}
                 </Link>
+                {isFullExamPaper(r.set.paper) && <FullExamBadge />}
                 <span>{r.set.title}</span>
                 <StatusTags tags={statusTagsOf(r.set)} />
                 <span className="ml-auto text-xs text-muted-foreground">

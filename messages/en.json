@@ -78,9 +78,10 @@
       "unknownQuestion": "No such question: {questionId}",
       "noteTooLong": "Each comment can be at most {max} characters",
       "unknownAiNote": "One of the AI comments couldn't be found. Please reload the page and try again",
-      "editedAiNoteEmpty": "An edited AI comment can't be empty. Delete it instead",
+      "editedAiNoteEmpty": "An edited AI comment can't be empty. Mark it as handled instead",
       "badPayload": "Your review couldn't be sent. Please reload the page and try again",
-      "verdictMissing": "{count, plural, one {# item hasn't} other {# items haven't}} been checked yet"
+      "verdictMissing": "{count, plural, one {# item hasn't} other {# items haven't}} been checked yet",
+      "submitFailed": "Couldn't submit (network or site problem). Your verdicts and comment are still kept in this browser; please try submitting again later."
     },
     "manage": {
       "notLoggedIn": "Please log in first",
@@ -147,16 +148,21 @@
     },
     "accessHint": {
       "unlisted": "Unlisted: nobody can take it",
-      "members": "Listed: logged-in students and teachers can take it",
+      "members": "Listed: logged-in students and teachers can take it once a teacher approves it",
       "public": "Public: the free test, only one site-wide; anyone can take it, no review needed"
+    },
+    "fullExamBadge": "Full test",
+    "takeable": {
+      "yes": "Students can take it",
+      "no": "Students can't take it"
     },
     "statusTag": {
       "FULL_PASS": "All passed: AI and teacher both approved",
       "AIP": "Passed AI review",
       "AI_WARN": "AI has concerns, please take a closer look",
-      "TP": "Approved by a teacher (can be taken)",
-      "TR": "Rejected by a teacher (can't be taken)",
-      "WAIT": "Waiting: no teacher has reviewed it yet (can't be taken)"
+      "TP": "Approved by a teacher",
+      "TR": "Rejected by a teacher",
+      "WAIT": "Waiting: no teacher has reviewed it yet"
     },
     "trap": {
       "none": "None",
@@ -170,14 +176,17 @@
       "exact_word": "Same word as the recording",
       "digits_only": "Digits only",
       "number_word": "Digits or number words both accepted",
-      "date_equivalence": "Any date format accepted"
+      "date_equivalence": "Any date format accepted",
+      "letter": "Letter only (any case)"
     },
     "answerType": {
       "word": "Word",
       "name_spelled": "Spelled name",
       "phone": "Phone number",
       "number": "Number",
-      "place": "Place"
+      "place": "Place",
+      "choice": "Multiple choice",
+      "matching": "Matching"
     },
     "aiRuling": {
       "problem": "AI verdict: problem",
@@ -231,7 +240,8 @@
     "colVersion": "Version",
     "versionHint": {
       "transcript": "2.1: has a transcript",
-      "noTranscript": "2.0: no transcript. Re-bundle it as 2.1 and overwrite it on the upload page to add one"
+      "noTranscript": "2.0: no transcript. Re-bundle it as 2.1 and overwrite it on the upload page to add one",
+      "fullExam": "3.0: full test (four sections) with a transcript"
     },
     "trialLabel": "Free test:",
     "noTrialWarning": "No public set yet: the homepage free test links to the exam list. Pick one below and click “Public”.",
@@ -274,23 +284,25 @@
     "cancel": "Cancel",
     "edit": "Edit",
     "delete": "Delete",
-    "restore": "Undo delete",
+    "restore": "Undo",
+    "markHandled": "Mark as handled",
     "revertToAi": "Back to the AI's wording",
     "deleteReasonPlaceholder": "Why doesn't this need fixing? (optional, the AI will see it)",
     "byTeacher": "Teacher",
     "editedTag": "Edited by teacher",
-    "deletedTag": "Deleted by teacher",
-    "deleteReason": "Reason: {text}",
+    "handledTag": "Handled",
+    "handledReason": "Note: {text}",
     "commentCount": "{count, plural, one {# comment} other {# comments}}",
     "transcript": "Transcript",
-    "transcriptHint": "Click a time to jump there. The line being played is highlighted.",
+    "transcriptHint": "Click a time to jump there. The line being played is highlighted. Clicking a line number in a note scrolls to that line and outlines it.",
+    "transcriptSection": "Section {n}",
     "noTranscript": "This set was packed before transcripts were included, so the ▶ buttons and the transcript aren't available.",
     "unsavedComment": "You have a comment you haven't saved. Press OK (or Cancel) on it first.",
     "close": "Close (Esc)",
     "showAiOriginal": "Show the AI's original",
     "chipAi": "{count} AI",
     "chipTeacher": "{count} teacher",
-    "chipDeleted": "{count} deleted",
+    "chipHandled": "{count} handled",
     "aiSeverity": "AI · {severity}",
     "needsFixing": "Needs fixing",
     "notChecked": "Not checked yet",
@@ -299,8 +311,56 @@
     "summaryBad": "{count, plural, one {# problem} other {# problems}}",
     "summaryJoin": " · ",
     "pending": "{count} left to check",
+    "nextPending": "Next to check: {target}",
+    "noPending": "Nothing left to check",
+    "submitAtTop": "When the comment is done, submit with the button in the audio bar at the top.",
     "resultPass": "→ Pass",
-    "resultFail": "→ Fail"
+    "resultFail": "→ Fail",
+    "full": {
+      "answer": "Answer: {answer}",
+      "section": "Section",
+      "options": "Options",
+      "sectionN": "Section {n}"
+    },
+    "draftHint": "Your verdicts are kept in this browser; they count only after you submit.",
+    "draftStale": "Your saved draft was out of date (the review was submitted elsewhere or the set was re-uploaded), so it was cleared.",
+    "leaveConfirm": "Your review isn't submitted yet (a draft is kept in this browser). Leave this page?",
+    "flow": {
+      "sectionN": "Section {n}",
+      "summary": "Summary",
+      "left": "{count} left",
+      "notStarted": "Not started",
+      "readyToSubmit": "Ready to submit",
+      "playing": "Playing",
+      "playingHere": "The recording is playing this section",
+      "steps": "Review steps",
+      "summaryTitle": "Section {n} summary",
+      "sectionAiCount": "{count} AI notes on the whole section",
+      "playSection": "Play from the start of Section {n}",
+      "sectionAiHint": "AI notes on the whole section can be marked as handled; they don't block finishing the section.",
+      "missingUnjudged": "not checked",
+      "missingAi": "{count} AI notes not handled",
+      "missingConfirm": "OK by default — please confirm",
+      "missingLine": "Question {n}: {what}",
+      "missingJoin": ", ",
+      "complete": "Section {n} done — go to Section {next}",
+      "completeToSummary": "Section {n} done — go to summary",
+      "goNext": "Go to Section {n}",
+      "goSummary": "Go to summary",
+      "sectionDone": "Section {n} done",
+      "waitFor": "Available after Section {n} is done",
+      "confirmDefault": "OK by default — click OK again to confirm",
+      "openAiHint": "{count} AI notes still need to be marked as handled",
+      "notHandledTag": "Not handled",
+      "summaryHeading": "Summary: progress of the four sections",
+      "openAiTitle": "{count} AI notes not handled",
+      "openAiNote": "Keeping a note means you agree with the AI. This doesn't block submitting — just take a last look.",
+      "noOpenAi": "All AI notes have been handled.",
+      "wholeSection": "Section {n} (whole)",
+      "submitNeeds": "Submit becomes available when all four sections are done and the whole set is checked.",
+      "judgeSet": "Check the whole set",
+      "awaitingDone": "Press done"
+    }
   },
   "permissions": {
     "uploadSets": "Upload sets",
@@ -439,18 +499,24 @@
   },
   "examList": {
     "metaTitle": "Tests",
-    "title": "IELTS Listening Section 1",
+    "title": "IELTS Listening tests",
     "guestHint": "You're seeing the public tests. <login>Log in</login> to take more.",
     "empty": "There are no tests to take right now.",
-    "questionCount": "{count, plural, one {# question} other {# questions}}"
+    "fullExam": "Full test ({sections} sections · {count} questions)",
+    "singleSection": "Section 1 · {count, plural, one {# question} other {# questions}}",
+    "sectionTitle": "S{n} {title}"
   },
   "exam": {
     "metaTitle": "Test",
     "unavailableGuest": "This test can't be taken right now. <login>Log in</login> and you may be able to take it.",
     "intro": "\"{title}\". When you press start, the recording plays right away. <b>It plays only once and can't be paused or rewound</b>, just like the real exam. The recording includes time to read the questions and time to check at the end. Your answers are submitted automatically when it ends.",
+    "overview": "About {minutes} min · {questions, plural, one {# question} other {# questions}} · {sections, plural, one {# section} other {# sections}}",
+    "volumeTest": "Check your volume first",
+    "volumeTestHint": "This is a sample recording, not the test. Play or pause it as much as you like; no timer starts. Set your volume, then press \"Start the test\".",
     "start": "Start the test",
     "submitted": "Submitted. Opening your results…",
     "statusStart": "The recording is starting.",
+    "statusSection": "Section {n} · ",
     "statusListen": "Recording playing. Fill in the answers as you listen.",
     "statusCheck": "Check your answers. {clock}",
     "statusRead": "Reading time  {clock}",
@@ -462,6 +528,9 @@
     },
     "submit": "Submit",
     "submitting": "Submitting…",
+    "confirmSubmit": "Are you sure you want to submit?",
+    "confirmSubmitUnanswered": "{count, plural, one {# question is} other {# questions are}} still blank. Are you sure you want to submit?",
+    "leaveConfirm": "Your exam hasn't been submitted. If you leave this page you can't continue answering. Leave anyway?",
     "errors": {
       "unavailable": "This test can't be taken right now.",
       "submitFailed": "Couldn't submit: {message}. Your answers are still here. Please press \"Submit\" again.",
@@ -469,6 +538,33 @@
       "audioFailed": "The recording failed to play. You can keep answering and submit yourself.",
       "audioInterrupted": "The recording was interrupted. Please refresh the page and try again.",
       "autoplayBlocked": "The recording couldn't start automatically. Please refresh the page and try again."
+    },
+    "full": {
+      "sectionHeading": "Section {n} (Questions {a}–{b})",
+      "matchingLabel": "Question {n}",
+      "matchingOption": "{key} — {text}",
+      "choose": "Choose"
+    },
+    "paging": {
+      "nav": "Pages",
+      "prev": "← Previous: Section {n}",
+      "next": "Next: Section {n} →",
+      "toSubmit": "Next: Submit →",
+      "submitTitle": "Submit",
+      "sectionLeft": "Section {n} · {count, plural, one {# question} other {# questions}} left blank",
+      "sectionDone": "Section {n} ✓ all answered",
+      "backTo": "Back to Section {n}",
+      "confirmHint": "You can't change your answers after submitting. Your answers are submitted automatically when the recording ends.",
+      "recheck": "Keep checking",
+      "confirmSubmit": "Yes, submit",
+      "steps": "Test sections",
+      "sectionN": "Section {n}",
+      "left": "{count} left blank",
+      "viewing": "Viewing Section {n}",
+      "viewingSubmit": "Viewing the submit page",
+      "audioAt": "♪ Recording in Section {n}",
+      "audioHere": "The recording is in this section",
+      "onlyForward": "Once the recording starts it only moves forward; you can't rewind or skip. You can page back and forth through the questions yourself and submit on the last page."
     }
   },
   "history": {
@@ -489,7 +585,9 @@
     "colGiven": "Your answer",
     "colExpected": "Answer",
     "blank": "(blank)",
-    "accepted": "(also accepted: {list})"
+    "accepted": "(also accepted: {list})",
+    "band": "IELTS Listening band (estimate): {band}",
+    "sectionScore": "Section {n}: {correct} / {total} correct"
   },
   "landing": {
     "metaTitle": "Practicing More: IELTS Listening practice tests",
