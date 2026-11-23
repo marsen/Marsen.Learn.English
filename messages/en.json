@@ -509,7 +509,11 @@
   "exam": {
     "metaTitle": "Test",
     "unavailableGuest": "This test can't be taken right now. <login>Log in</login> and you may be able to take it.",
-    "intro": "The recording starts as soon as you press start. <b>It plays only once and can't be paused or rewound.</b> Your answers are submitted automatically when it ends.",
+    "rules": {
+      "start": "The recording starts as soon as you press start",
+      "once": "<b>It plays only once and can't be paused or rewound</b>",
+      "autoSubmit": "Your answers are submitted automatically when it ends"
+    },
     "overview": "About {minutes} min · {questions, plural, one {# question} other {# questions}} · {sections, plural, one {# section} other {# sections}}",
     "volumeTest": "Check your volume first",
     "volumeTestHint": "This is a sample recording, not the test. Play or pause it as much as you like; no timer starts. Set your volume, then press \"Start the test\".",

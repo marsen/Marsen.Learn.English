@@ -224,11 +224,13 @@ export function ExamRunner({ overview, audioUrl, start, submit }: Props) {
   if (stage === "intro") {
     return (
       <div key="intro" className="grid gap-4">
-        <p className="font-medium">{t("overview", overview)}</p>
-        <p>
-          {t.rich("intro", { b: (chunks) => <b>{chunks}</b> })}
-          {overview.sections > 1 && <> {t("paging.onlyForward")}</>}
-        </p>
+        <ul className="grid list-disc gap-1 pl-5">
+          <li className="font-medium">{t("overview", overview)}</li>
+          <li>{t("rules.start")}</li>
+          <li>{t.rich("rules.once", { b: (chunks) => <b>{chunks}</b> })}</li>
+          <li>{t("rules.autoSubmit")}</li>
+          {overview.sections > 1 && <li>{t("paging.onlyForward")}</li>}
+        </ul>
         <section className="grid gap-2 rounded-xl border border-border bg-surface p-4">
           <h2 className="font-semibold">{t("volumeTest")}</h2>
           <p className="text-sm text-muted-foreground">{t("volumeTestHint")}</p>
