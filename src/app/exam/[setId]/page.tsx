@@ -30,7 +30,6 @@ export default async function ExamPage({
       <DocumentTitle id="exam.metaTitle" />
       {exam ? (
         <ExamRunner
-          title={exam.title}
           overview={{
             minutes: Math.max(1, Math.round(exam.totalSeconds / 60)),
             questions: exam.questionCount,

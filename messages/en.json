@@ -509,7 +509,7 @@
   "exam": {
     "metaTitle": "Test",
     "unavailableGuest": "This test can't be taken right now. <login>Log in</login> and you may be able to take it.",
-    "intro": "\"{title}\". When you press start, the recording plays right away. <b>It plays only once and can't be paused or rewound</b>, just like the real exam. The recording includes time to read the questions and time to check at the end. Your answers are submitted automatically when it ends.",
+    "intro": "The recording starts as soon as you press start. <b>It plays only once and can't be paused or rewound.</b> Your answers are submitted automatically when it ends.",
     "overview": "About {minutes} min · {questions, plural, one {# question} other {# questions}} · {sections, plural, one {# section} other {# sections}}",
     "volumeTest": "Check your volume first",
     "volumeTestHint": "This is a sample recording, not the test. Play or pause it as much as you like; no timer starts. Set your volume, then press \"Start the test\".",
@@ -564,7 +564,7 @@
       "viewingSubmit": "Viewing the submit page",
       "audioAt": "♪ Recording in Section {n}",
       "audioHere": "The recording is in this section",
-      "onlyForward": "Once the recording starts it only moves forward; you can't rewind or skip. You can page back and forth through the questions yourself and submit on the last page."
+      "onlyForward": "You can page back and forth through the questions and submit on the last page."
     }
   },
   "history": {

@@ -33,7 +33,6 @@ import {
 import { installLeaveGuard } from "@/presentation/lib/leaveGuard";
 
 type Props = {
-  title: string;
   /** 開始前給考生看的：大約幾分鐘、幾題、幾段 */
   overview: { minutes: number; questions: number; sections: number };
   audioUrl: string;
@@ -61,7 +60,7 @@ const MAX_AUDIO_RETRIES = 3;
 /** 試音量用的範例錄音（首頁試題的錄音）：不用考卷錄音，不吃取音檔的次數上限 */
 const VOLUME_TEST_AUDIO = "/landing-demo/audio.mp3";
 
-export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) {
+export function ExamRunner({ overview, audioUrl, start, submit }: Props) {
   const volumeTestRef = useRef<HTMLAudioElement | null>(null);
   const [stage, setStage] = useState<Stage>("intro");
   const [sheet, setSheet] = useState<ExamSheet | null>(null);
@@ -225,9 +224,11 @@ export function ExamRunner({ title, overview, audioUrl, start, submit }: Props) 
   if (stage === "intro") {
     return (
       <div key="intro" className="grid gap-4">
-        <p>{t.rich("intro", { title, b: (chunks) => <b>{chunks}</b> })}</p>
         <p className="font-medium">{t("overview", overview)}</p>
-        {overview.sections > 1 && <p>{t("paging.onlyForward")}</p>}
+        <p>
+          {t.rich("intro", { b: (chunks) => <b>{chunks}</b> })}
+          {overview.sections > 1 && <> {t("paging.onlyForward")}</>}
+        </p>
         <section className="grid gap-2 rounded-xl border border-border bg-surface p-4">
           <h2 className="font-semibold">{t("volumeTest")}</h2>
           <p className="text-sm text-muted-foreground">{t("volumeTestHint")}</p>

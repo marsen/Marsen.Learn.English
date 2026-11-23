@@ -509,7 +509,7 @@
   "exam": {
     "metaTitle": "考試",
     "unavailableGuest": "這張考卷現在不能考。<login>登入</login>後可能可以寫。",
-    "intro": "《{title}》。按下開始後錄音會直接播放，<b>只播一次，不能暫停或倒轉</b>，跟正式考試一樣。錄音裡有看題時間和最後檢查時間，錄音結束會自動交卷。",
+    "intro": "按下開始後錄音直接播放，<b>只播一次、不能暫停或倒轉</b>。錄音結束會自動交卷。",
     "overview": "約 {minutes} 分鐘・{questions} 題・{sections} 段",
     "volumeTest": "先試音量",
     "volumeTestHint": "這是一段範例錄音，不是考試：可以隨意播放、暫停，不會開始計時。調好音量再按「開始考試」。",
@@ -564,7 +564,7 @@
       "viewingSubmit": "正在看 交卷頁",
       "audioAt": "♪ 錄音在 Section {n}",
       "audioHere": "錄音在這段",
-      "onlyForward": "錄音開始後只往前播，不能倒退或跳段；題目可以自己前後翻頁，最後一頁交卷。"
+      "onlyForward": "題目可以前後翻頁，最後一頁交卷。"
     }
   },
   "history": {
