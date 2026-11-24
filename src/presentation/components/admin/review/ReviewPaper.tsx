@@ -4,7 +4,7 @@ import { Fragment } from "react";
 import { useTranslations } from "next-intl";
 import type { PaperView } from "@/application/exam/paperView";
 import type { ReviewQuestion } from "@/application/examSet/reviewView";
-import { VerdictMark } from "./NoteCard";
+import { VerdictMark, type Unfinished } from "./NoteCard";
 
 type Props = {
   paper: PaperView;
@@ -16,7 +16,7 @@ type Props = {
   /** 錄音正在講答案的題目 */
   listening: string | null;
   /** 判 OK 但還沒判完的題（一段一段審才有） */
-  unfinished?: ReadonlySet<string>;
+  unfinished?: ReadonlyMap<string, Unfinished>;
   onSelect: (questionId: string) => void;
   onPlay: (questionId: string) => void;
   /** 標題當作「整套」的批註錨點；完整考卷裡的填空區塊不用（錨點在整份考卷的標題） */
@@ -129,7 +129,7 @@ export function ReviewPaper({
                               <span className="ml-0.5">
                                 <VerdictMark
                                   verdict={verdict}
-                                  unfinished={unfinished?.has(part.questionId)}
+                                  unfinished={unfinished?.get(part.questionId)}
                                 />
                               </span>
                             </button>

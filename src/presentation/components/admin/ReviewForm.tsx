@@ -21,6 +21,7 @@ import {
   type DraftAiAction,
   type DraftNote,
   type Editing,
+  type Unfinished,
 } from "./review/NoteCard";
 import { browserStorage } from "@/presentation/lib/examDraft";
 import {
@@ -491,9 +492,16 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
     (k) => verdicts.get(k) === true && !pending.includes(k),
   ).length;
   const badCount = allTargets.filter((k) => verdicts.get(k) === false).length;
-  // 考卷上標「⚠」：判 OK 但還沒判完（預設 OK 沒確認、AI 意見沒處理）
-  const unfinished = new Set(
-    pending.filter((k) => k !== SET && verdicts.get(k) === true),
+  // 判 OK 但還沒判完：AI 意見沒處理（⚠）優先，其次預設 OK 沒確認（灰 ✓）
+  const unfinished = new Map<string, Unfinished>(
+    pending
+      .filter((k) => k !== SET && verdicts.get(k) === true)
+      .map((k) => [
+        k,
+        missingOf(view.aiNotes, sState, k).some((m) => m.kind === "aiOpen")
+          ? "ai"
+          : "confirm",
+      ]),
   );
   // 下一個還沒判的項目（從目前展開的那題往後找，繞回開頭）；按鈕上寫明是哪一項
   const from = active ? allTargets.indexOf(active) : -1;
@@ -860,7 +868,7 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
                 notes={notesOf(target)}
                 active={active === target}
                 verdict={verdicts.get(target)}
-                unfinished={unfinished.has(target)}
+                unfinished={unfinished.get(target)}
                 onVerdict={(ok) => judge(target, ok)}
                 editing={editing}
                 warnUnsaved={hintFor !== null && hintFor === editing}

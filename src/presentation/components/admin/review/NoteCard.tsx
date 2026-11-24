@@ -33,8 +33,8 @@ type Props = {
   active: boolean;
   /** 判定：true＝OK，false＝有問題，undefined＝還沒判 */
   verdict: boolean | undefined;
-  /** 判 OK 但還沒判完（預設 OK 沒確認、AI 意見沒處理） */
-  unfinished?: boolean;
+  /** 判 OK 但還沒判完的原因 */
+  unfinished?: Unfinished;
   onVerdict: (ok: boolean) => void;
   editing: Editing | null;
   /** 打開的意見框有沒存的字，老師又想做別的事：在框下面提醒 */
@@ -64,24 +64,31 @@ const DOT: Record<Severity, string> = {
   warn: "bg-primary",
   block: "bg-destructive",
 };
-/** 判定的記號：✓ OK、✗ 有問題、○ 還沒判 */
-/** unfinished：判 OK 但還沒判完（預設 OK 沒確認、AI 意見沒處理），標「⚠」 */
+/** 判 OK 但還沒判完的原因：AI 意見沒處理、預設 OK 沒確認 */
+export type Unfinished = "ai" | "confirm";
+
+/**
+ * 判定的記號：灰 ● 還沒判、綠 ✓ OK、紅 ✗ 有問題；
+ * 判 OK 但還沒判完：AI 意見沒處理標橘 ⚠、預設 OK 沒確認標灰 ✓（確認後變綠）
+ */
 export function VerdictMark({
   verdict,
-  unfinished = false,
+  unfinished,
 }: {
   verdict: boolean | undefined;
-  unfinished?: boolean;
+  unfinished?: Unfinished;
 }) {
   const t = useTranslations("review");
   const [mark, cls, label] =
-    verdict === true && unfinished
+    verdict === true && unfinished === "ai"
       ? ["⚠\uFE0E", "text-primary-hover", t("okUnfinished")]
-      : verdict === true
-        ? ["✓", "text-accent", t("ok")]
-        : verdict === false
-          ? ["✗", "text-destructive", t("needsFixing")]
-          : ["●", "text-muted-foreground", t("notChecked")];
+      : verdict === true && unfinished === "confirm"
+        ? ["✓", "text-muted-foreground", t("flow.missingConfirm")]
+        : verdict === true
+          ? ["✓", "text-accent", t("ok")]
+          : verdict === false
+            ? ["✗", "text-destructive", t("needsFixing")]
+            : ["●", "text-muted-foreground", t("notChecked")];
   return (
     <span
       role="img"

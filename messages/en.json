@@ -302,7 +302,7 @@
     "aiSeverity": "AI · {severity}",
     "needsFixing": "Needs fixing",
     "notChecked": "Not checked yet",
-    "okUnfinished": "OK, but not finished — open it to see what's left",
+    "okUnfinished": "OK, but the AI notes aren't handled yet",
     "verdictGroup": "Is this OK?",
     "summaryOk": "{count} OK",
     "summaryBad": "{count, plural, one {# problem} other {# problems}}",

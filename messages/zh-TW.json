@@ -302,7 +302,7 @@
     "aiSeverity": "AI · {severity}",
     "needsFixing": "有問題",
     "notChecked": "還沒判",
-    "okUnfinished": "判 OK，但還沒判完，打開看還缺什麼",
+    "okUnfinished": "判 OK，但 AI 意見還沒處理",
     "verdictGroup": "判定",
     "summaryOk": "{count} 項 OK",
     "summaryBad": "{count} 項有問題",

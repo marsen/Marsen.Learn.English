@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import type { ChoiceOption, FullPaperView } from "@/application/exam/paperView";
 import type { ReviewQuestion } from "@/application/examSet/reviewView";
-import { VerdictMark } from "./NoteCard";
+import { VerdictMark, type Unfinished } from "./NoteCard";
 import { ReviewPaper } from "./ReviewPaper";
 
 type Props = {
@@ -13,7 +13,7 @@ type Props = {
   verdicts: ReadonlyMap<string, boolean>;
   listening: string | null;
   /** 判 OK 但還沒判完的題 */
-  unfinished?: ReadonlySet<string>;
+  unfinished?: ReadonlyMap<string, Unfinished>;
   onSelect: (questionId: string) => void;
   onPlay: (questionId: string) => void;
   /** 一段一段審：只畫這一段 */
@@ -74,7 +74,7 @@ export function FullReviewPaper(props: Props) {
             <span className="font-semibold">
               {t("review.full.answer", { answer: q?.answer ?? "?" })}
             </span>
-            <VerdictMark verdict={verdict} unfinished={unfinished?.has(questionId)} />
+            <VerdictMark verdict={verdict} unfinished={unfinished?.get(questionId)} />
           </button>
         </div>
         {options && (
