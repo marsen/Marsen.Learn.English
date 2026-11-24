@@ -485,7 +485,10 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
   const pending = allTargets.filter((k) =>
     paged && k !== SET ? !isJudged(view.aiNotes, sState, k) : !verdicts.has(k),
   );
-  const okCount = allTargets.filter((k) => verdicts.get(k) === true).length;
+  // OK 只算不在待處理的（預設 OK 沒確認的不重複算），OK＋有問題＋待處理＝總數
+  const okCount = allTargets.filter(
+    (k) => verdicts.get(k) === true && !pending.includes(k),
+  ).length;
   const badCount = allTargets.filter((k) => verdicts.get(k) === false).length;
   // 下一個還沒判的項目（從目前展開的那題往後找，繞回開頭）；按鈕上寫明是哪一項
   const from = active ? allTargets.indexOf(active) : -1;

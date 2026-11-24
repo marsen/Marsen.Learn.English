@@ -90,6 +90,20 @@ describe("reviewSections", () => {
     expect(sectionProgress(questions, aiNotes, sectionNote, 1).status).toBe("done");
   });
 
+  it("OK 只算判過的：預設 OK 沒確認、AI 意見沒處理的算待處理，不重複算", () => {
+    const s = state({
+      verdicts: new Map([
+        ["q01", true],
+        ["q02", true],
+      ]),
+      seen: new Set(["q02"]),
+    });
+    // q01 預設 OK 沒確認、q02 有 AI 意見沒處理：兩題都還沒判過
+    const p = sectionProgress(questions, aiNotes, s, 1);
+    expect(p).toMatchObject({ ok: 0, bad: 0, pending: 2 });
+    expect(p.ok + p.bad + p.pending).toBe(2);
+  });
+
   it("沒看過任何一題的段是還沒開始", () => {
     expect(sectionProgress(questions, aiNotes, state(), 2).status).toBe("notStarted");
   });

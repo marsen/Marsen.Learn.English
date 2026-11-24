@@ -127,7 +127,10 @@ export function sectionProgress(
     state.confirmed[String(section)] === signature(questions, aiNotes, state, section);
   return {
     section,
-    ok: ids.filter((id) => state.verdicts.get(id) === true).length,
+    // OK 只算判過的（預設 OK 沒確認、AI 意見沒處理的算在 pending），三個數加起來＝題數
+    ok: ids.filter(
+      (id) => state.verdicts.get(id) === true && isJudged(aiNotes, state, id),
+    ).length,
     bad: ids.filter((id) => state.verdicts.get(id) === false).length,
     pending,
     status: done
