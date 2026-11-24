@@ -490,6 +490,10 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
     (k) => verdicts.get(k) === true && !pending.includes(k),
   ).length;
   const badCount = allTargets.filter((k) => verdicts.get(k) === false).length;
+  // 考卷上標「◐」：判 OK 但還沒判完（預設 OK 沒確認、AI 意見沒處理）
+  const unfinished = new Set(
+    pending.filter((k) => k !== SET && verdicts.get(k) === true),
+  );
   // 下一個還沒判的項目（從目前展開的那題往後找，繞回開頭）；按鈕上寫明是哪一項
   const from = active ? allTargets.indexOf(active) : -1;
   const order = [...allTargets.slice(from + 1), ...allTargets.slice(0, from + 1)];
@@ -818,7 +822,7 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
               active={active}
               verdicts={verdicts}
               listening={listening}
-              counts={counts}
+              unfinished={unfinished}
               onSelect={selectFromPaper}
               onPlay={(id) => {
                 const start = questions.get(id)?.evidence?.start;
@@ -833,7 +837,6 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
             active={active}
             verdicts={verdicts}
             listening={listening}
-            counts={counts}
             onSelect={selectFromPaper}
             onPlay={(id) => {
               const start = questions.get(id)?.evidence?.start;

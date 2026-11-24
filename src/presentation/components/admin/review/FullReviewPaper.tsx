@@ -12,7 +12,8 @@ type Props = {
   active: string | null;
   verdicts: ReadonlyMap<string, boolean>;
   listening: string | null;
-  counts: ReadonlyMap<string, number>;
+  /** 判 OK 但還沒判完的題 */
+  unfinished?: ReadonlySet<string>;
   onSelect: (questionId: string) => void;
   onPlay: (questionId: string) => void;
   /** 一段一段審：只畫這一段 */
@@ -24,12 +25,12 @@ type Props = {
  * 單選、配對列出題目、選項，正確答案標出來。點題目＝看這一題的意見；▶＝從答案那句開始聽。
  */
 export function FullReviewPaper(props: Props) {
-  const { paper, questions, active, verdicts, listening, counts, onSelect, onPlay } =
+  const { paper, questions, active, verdicts, listening, unfinished, onSelect, onPlay } =
     props;
   const sections = paper.sections.filter((s) => s.ielts === props.section);
   const t = useTranslations();
 
-  /** 單選、配對的一題：題號、題目、答案字母、判定、意見數；data-anchor 給批註欄拉線用 */
+  /** 單選、配對的一題：題號、題目、答案字母、判定；data-anchor 給批註欄拉線用 */
   const Question = ({
     questionId,
     number,
@@ -42,7 +43,6 @@ export function FullReviewPaper(props: Props) {
     options: ChoiceOption[] | null;
   }) => {
     const q = questions.get(questionId);
-    const n = counts.get(questionId) ?? 0;
     const on = active === questionId;
     const hearing = listening === questionId;
     const verdict = verdicts.get(questionId);
@@ -74,15 +74,7 @@ export function FullReviewPaper(props: Props) {
             <span className="font-semibold">
               {t("review.full.answer", { answer: q?.answer ?? "?" })}
             </span>
-            <VerdictMark verdict={verdict} />
-            {n > 0 && (
-              <sup
-                className="text-[0.7rem] font-bold text-primary-hover"
-                aria-label={t("review.commentCount", { count: n })}
-              >
-                {n}
-              </sup>
-            )}
+            <VerdictMark verdict={verdict} unfinished={unfinished?.has(questionId)} />
           </button>
         </div>
         {options && (

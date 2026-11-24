@@ -15,8 +15,8 @@ type Props = {
   verdicts: ReadonlyMap<string, boolean>;
   /** 錄音正在講答案的題目 */
   listening: string | null;
-  /** 每題有幾則意見（刪掉的不算） */
-  counts: ReadonlyMap<string, number>;
+  /** 判 OK 但還沒判完的題（一段一段審才有） */
+  unfinished?: ReadonlySet<string>;
   onSelect: (questionId: string) => void;
   onPlay: (questionId: string) => void;
   /** 標題當作「整套」的批註錨點；完整考卷裡的填空區塊不用（錨點在整份考卷的標題） */
@@ -53,7 +53,7 @@ export function ReviewPaper({
   active,
   verdicts,
   listening,
-  counts,
+  unfinished,
   onSelect,
   onPlay,
   withSetAnchor = true,
@@ -85,7 +85,6 @@ export function ReviewPaper({
                     {row.parts.map((part, pi) => {
                       if (part.kind === "text") return <span key={pi}>{part.text} </span>;
                       const q = questions.get(part.questionId);
-                      const n = counts.get(part.questionId) ?? 0;
                       const on = active === part.questionId;
                       const hearing = listening === part.questionId;
                       const verdict = verdicts.get(part.questionId);
@@ -128,16 +127,11 @@ export function ReviewPaper({
                                 {q?.answer ?? "?"}
                               </span>
                               <span className="ml-0.5">
-                                <VerdictMark verdict={verdict} />
+                                <VerdictMark
+                                  verdict={verdict}
+                                  unfinished={unfinished?.has(part.questionId)}
+                                />
                               </span>
-                              {n > 0 && (
-                                <sup
-                                  className="ml-0.5 text-[0.7rem] font-bold text-primary-hover"
-                                  aria-label={t("commentCount", { count: n })}
-                                >
-                                  {n}
-                                </sup>
-                              )}
                             </button>
                           </span>
                           {/* 空格放在不換行的範圍外面，太窄時才能換行；下一段是標點就不空 */}

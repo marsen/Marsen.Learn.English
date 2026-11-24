@@ -63,20 +63,29 @@ const DOT: Record<Severity, string> = {
   block: "bg-destructive",
 };
 /** 判定的記號：✓ OK、✗ 有問題、○ 還沒判 */
-export function VerdictMark({ verdict }: { verdict: boolean | undefined }) {
+/** unfinished：判 OK 但還沒判完（預設 OK 沒確認、AI 意見沒處理），標「◐」 */
+export function VerdictMark({
+  verdict,
+  unfinished = false,
+}: {
+  verdict: boolean | undefined;
+  unfinished?: boolean;
+}) {
   const t = useTranslations("review");
   const [mark, cls, label] =
-    verdict === true
-      ? ["✓", "text-accent", t("ok")]
-      : verdict === false
-        ? ["✗", "text-destructive", t("needsFixing")]
-        : ["○", "text-muted-foreground", t("notChecked")];
+    verdict === true && unfinished
+      ? ["◐", "text-accent", t("okUnfinished")]
+      : verdict === true
+        ? ["●", "text-accent", t("ok")]
+        : verdict === false
+          ? ["●", "text-destructive", t("needsFixing")]
+          : ["○", "text-muted-foreground", t("notChecked")];
   return (
     <span
       role="img"
       aria-label={label}
       title={label}
-      className={`text-xs font-bold ${cls}`}
+      className={`text-sm font-bold ${cls}`}
     >
       {mark}
     </span>
