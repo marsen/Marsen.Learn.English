@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import type { ChoiceOption, FullPaperView } from "@/application/exam/paperView";
 import type { ReviewQuestion } from "@/application/examSet/reviewView";
-import { VerdictMark, type Unfinished } from "./NoteCard";
+import { PaperMark, type Unfinished } from "./NoteCard";
 import { ReviewPaper } from "./ReviewPaper";
 
 type Props = {
@@ -14,6 +14,8 @@ type Props = {
   listening: string | null;
   /** 判 OK 但還沒判完的題 */
   unfinished?: ReadonlyMap<string, Unfinished>;
+  /** 點灰 ✓ 確認預設 OK */
+  onConfirm?: (questionId: string) => void;
   onSelect: (questionId: string) => void;
   onPlay: (questionId: string) => void;
   /** 一段一段審：只畫這一段 */
@@ -25,8 +27,17 @@ type Props = {
  * 單選、配對列出題目、選項，正確答案標出來。點題目＝看這一題的意見；▶＝從答案那句開始聽。
  */
 export function FullReviewPaper(props: Props) {
-  const { paper, questions, active, verdicts, listening, unfinished, onSelect, onPlay } =
-    props;
+  const {
+    paper,
+    questions,
+    active,
+    verdicts,
+    listening,
+    unfinished,
+    onConfirm,
+    onSelect,
+    onPlay,
+  } = props;
   const sections = paper.sections.filter((s) => s.ielts === props.section);
   const t = useTranslations();
 
@@ -74,8 +85,12 @@ export function FullReviewPaper(props: Props) {
             <span className="font-semibold">
               {t("review.full.answer", { answer: q?.answer ?? "?" })}
             </span>
-            <VerdictMark verdict={verdict} unfinished={unfinished?.get(questionId)} />
           </button>
+          <PaperMark
+            verdict={verdict}
+            unfinished={unfinished?.get(questionId)}
+            onConfirm={onConfirm && (() => onConfirm(questionId))}
+          />
         </div>
         {options && (
           <ul className="ml-14">

@@ -303,6 +303,7 @@
     "needsFixing": "Needs fixing",
     "notChecked": "Not checked yet",
     "okUnfinished": "OK, but the AI notes aren't handled yet",
+    "confirmOk": "OK by default — click to confirm",
     "verdictGroup": "Is this OK?",
     "summaryOk": "{count} OK",
     "summaryBad": "{count, plural, one {# problem} other {# problems}}",

@@ -101,6 +101,35 @@ export function VerdictMark({
   );
 }
 
+/**
+ * 考卷上的判定記號。預設 OK 沒確認（灰 ✓）時是按鈕：老師看著答案點一下就確認，變綠 ✓。
+ * 放在選題按鈕外面（按鈕不能包按鈕）。
+ */
+export function PaperMark({
+  verdict,
+  unfinished,
+  onConfirm,
+}: {
+  verdict: boolean | undefined;
+  unfinished?: Unfinished;
+  onConfirm?: () => void;
+}) {
+  const t = useTranslations("review");
+  if (verdict === true && unfinished === "confirm" && onConfirm)
+    return (
+      <button
+        type="button"
+        onClick={onConfirm}
+        title={t("confirmOk")}
+        aria-label={t("confirmOk")}
+        className="rounded px-0.5 hover:bg-accent-soft"
+      >
+        <VerdictMark verdict={verdict} unfinished={unfinished} />
+      </button>
+    );
+  return <VerdictMark verdict={verdict} unfinished={unfinished} />;
+}
+
 const BAR: Record<Severity, string> = {
   info: "border-muted-foreground/40",
   warn: "border-primary",

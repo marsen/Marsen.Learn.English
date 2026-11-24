@@ -832,6 +832,7 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
               verdicts={verdicts}
               listening={listening}
               unfinished={unfinished}
+              onConfirm={(id) => judge(id, true)}
               onSelect={selectFromPaper}
               onPlay={(id) => {
                 const start = questions.get(id)?.evidence?.start;
