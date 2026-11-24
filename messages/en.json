@@ -255,6 +255,7 @@
     "audio": "Recording",
     "insertTime": "Insert current time",
     "questionN": "Question {n}",
+    "questionShort": "Q{n}",
     "wholeSet": "Whole set",
     "suggestion": "Suggestion: {text}",
     "answer": "Answer",

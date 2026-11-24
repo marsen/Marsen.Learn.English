@@ -406,7 +406,7 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
           .length,
     ]),
   );
-  // 整套一定有卡；題目有意見、正在看、正在新增意見的才出卡
+  // 整套一定有卡；題目有意見、還沒判完、正在看、正在新增意見的才出卡
   // 一段一段審：段落分頁只出這段的題目卡，整套卡在總結分頁
   const cards = [
     ...(!paged || tab === "summary" ? [SET] : []),
@@ -420,6 +420,7 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
         (counts.get(id) ?? 0) > 0 ||
         aiOf(id).length > 0 ||
         verdicts.get(id) !== true ||
+        (paged && !isJudged(view.aiNotes, sState, id)) ||
         active === id ||
         (editing?.kind === "new" && editing.target === id),
     ),
@@ -490,7 +491,7 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
     (k) => verdicts.get(k) === true && !pending.includes(k),
   ).length;
   const badCount = allTargets.filter((k) => verdicts.get(k) === false).length;
-  // 考卷上標「◐」：判 OK 但還沒判完（預設 OK 沒確認、AI 意見沒處理）
+  // 考卷上標「⚠」：判 OK 但還沒判完（預設 OK 沒確認、AI 意見沒處理）
   const unfinished = new Set(
     pending.filter((k) => k !== SET && verdicts.get(k) === true),
   );
@@ -859,6 +860,7 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
                 notes={notesOf(target)}
                 active={active === target}
                 verdict={verdicts.get(target)}
+                unfinished={unfinished.has(target)}
                 onVerdict={(ok) => judge(target, ok)}
                 editing={editing}
                 warnUnsaved={hintFor !== null && hintFor === editing}

@@ -33,6 +33,8 @@ type Props = {
   active: boolean;
   /** 判定：true＝OK，false＝有問題，undefined＝還沒判 */
   verdict: boolean | undefined;
+  /** 判 OK 但還沒判完（預設 OK 沒確認、AI 意見沒處理） */
+  unfinished?: boolean;
   onVerdict: (ok: boolean) => void;
   editing: Editing | null;
   /** 打開的意見框有沒存的字，老師又想做別的事：在框下面提醒 */
@@ -63,7 +65,7 @@ const DOT: Record<Severity, string> = {
   block: "bg-destructive",
 };
 /** 判定的記號：✓ OK、✗ 有問題、○ 還沒判 */
-/** unfinished：判 OK 但還沒判完（預設 OK 沒確認、AI 意見沒處理），標「◐」 */
+/** unfinished：判 OK 但還沒判完（預設 OK 沒確認、AI 意見沒處理），標「⚠」 */
 export function VerdictMark({
   verdict,
   unfinished = false,
@@ -74,12 +76,12 @@ export function VerdictMark({
   const t = useTranslations("review");
   const [mark, cls, label] =
     verdict === true && unfinished
-      ? ["◐", "text-accent", t("okUnfinished")]
+      ? ["⚠\uFE0E", "text-primary-hover", t("okUnfinished")]
       : verdict === true
-        ? ["●", "text-accent", t("ok")]
+        ? ["✓", "text-accent", t("ok")]
         : verdict === false
-          ? ["●", "text-destructive", t("needsFixing")]
-          : ["○", "text-muted-foreground", t("notChecked")];
+          ? ["✗", "text-destructive", t("needsFixing")]
+          : ["●", "text-muted-foreground", t("notChecked")];
   return (
     <span
       role="img"
@@ -137,6 +139,19 @@ export function NoteCard(p: Props) {
     const firstText = firstAi
       ? (p.aiActions.get(firstAi.ref)?.text ?? firstAi.message)
       : p.notes[0]?.text;
+    // 題目卡縮成「判定符號 Q3」；滑鼠移上去看第一則意見
+    if (q)
+      return (
+        <button
+          type="button"
+          onClick={p.onSelect}
+          title={firstText ? firstText.slice(0, 80) : name}
+          className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-2 py-0.5 text-xs whitespace-nowrap text-muted-foreground hover:border-primary"
+        >
+          <VerdictMark verdict={p.verdict} unfinished={p.unfinished} />
+          {r("questionShort", { n: q.number })}
+        </button>
+      );
     return (
       <button
         type="button"
@@ -144,7 +159,7 @@ export function NoteCard(p: Props) {
         title={firstText ? firstText.slice(0, 80) : undefined}
         className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-0.5 text-[0.8125rem] whitespace-nowrap text-muted-foreground hover:border-primary"
       >
-        <VerdictMark verdict={p.verdict} />
+        <VerdictMark verdict={p.verdict} unfinished={p.unfinished} />
         <b className="text-heading">{name}</b>
         {sum.worst && (
           <span className={`h-2 w-2 shrink-0 rounded-full ${DOT[sum.worst]}`} />

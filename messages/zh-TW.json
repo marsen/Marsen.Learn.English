@@ -255,6 +255,7 @@
     "audio": "錄音",
     "insertTime": "插入目前時間",
     "questionN": "第 {n} 題",
+    "questionShort": "Q{n}",
     "wholeSet": "整套",
     "suggestion": "建議：{text}",
     "answer": "標準答案",
