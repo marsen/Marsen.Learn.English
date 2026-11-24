@@ -6,8 +6,8 @@ import { Msg } from "@/presentation/components/Msg";
 import { DocumentTitle } from "@/presentation/components/DocumentTitle";
 import { ReviewMeta } from "@/presentation/components/admin/ReviewMeta";
 import { ReviewForm } from "@/presentation/components/admin/ReviewForm";
-import { StatusTags, TakeableHint } from "@/presentation/components/admin/StatusTags";
-import { statusTagsOf, studentsCanTake } from "@/domain/examSet/statusTags";
+import { StatusTags } from "@/presentation/components/admin/StatusTags";
+import { statusTagsOf } from "@/domain/examSet/statusTags";
 import { DeleteSetButton } from "@/presentation/components/dashboard/DeleteSetButton";
 import { requireAccount } from "@/infrastructure/auth/currentAccount";
 import {
@@ -58,7 +58,6 @@ export default async function ReviewPage({
           <>
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <StatusTags tags={statusTagsOf(view.set)} />
-              <TakeableHint takeable={studentsCanTake(view.set)} />
             </div>
             <ReviewMeta
               setId={view.set.setId}

@@ -152,10 +152,6 @@
       "public": "Public: the free test, only one site-wide; anyone can take it, no review needed"
     },
     "fullExamBadge": "Full test",
-    "takeable": {
-      "yes": "Students can take it",
-      "no": "Students can't take it"
-    },
     "statusTag": {
       "FULL_PASS": "All passed: AI and teacher both approved",
       "AIP": "Passed AI review",

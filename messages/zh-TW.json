@@ -152,10 +152,6 @@
       "public": "公開：免費試卷用，全站只有一張；誰都能寫，不用等審稿"
     },
     "fullExamBadge": "完整考卷",
-    "takeable": {
-      "yes": "學生考得到",
-      "no": "學生考不到"
-    },
     "statusTag": {
       "FULL_PASS": "全 PASS：AI 與老師都通過",
       "AIP": "AI 審稿通過",

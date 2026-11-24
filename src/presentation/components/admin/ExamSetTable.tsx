@@ -2,12 +2,12 @@
 
 import type { ExamSet } from "@/domain/examSet/examSet";
 import type { ExamSetSummary } from "@/domain/examSet/examSetFilter";
-import { statusTagsOf, studentsCanTake } from "@/domain/examSet/statusTags";
+import { statusTagsOf } from "@/domain/examSet/statusTags";
 import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/presentation/components/ui/Button";
 import { ACCESS_ORDER } from "@/presentation/lib/examSetLabels";
-import { StatusTags, TakeableHint } from "./StatusTags";
+import { StatusTags } from "./StatusTags";
 import { FullExamBadge } from "./FullExamBadge";
 import { EmptyState } from "@/presentation/components/ui/EmptyState";
 import { Table, Td, Th, Tr } from "@/presentation/components/ui/Table";
@@ -200,9 +200,6 @@ export function ExamSetTable({
                   {t(`examSet.access.${s.access}`)}
                 </span>
               )}
-              <div className="mt-1">
-                <TakeableHint takeable={studentsCanTake(s)} />
-              </div>
             </Td>
             <Td className="whitespace-nowrap text-muted-foreground">
               {formatDateTime(s.uploadedAt, locale)}
