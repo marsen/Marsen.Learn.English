@@ -128,7 +128,9 @@ export function DemoQuestion({
               key={r.questionId}
               className={`text-lg font-semibold ${r.ok ? "text-accent" : "text-primary-hover"}`}
             >
-              {r.ok ? td("correct") : td("wrong", { answer: r.answer })}
+              {r.ok
+                ? td("correct", { number: r.number })
+                : td("wrong", { number: r.number, answer: r.answer })}
             </p>
           ))}
           <details className="rounded-2xl bg-surface px-5 py-4" open>

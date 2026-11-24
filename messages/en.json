@@ -1,6 +1,6 @@
 {
   "common": {
-    "brand": "Practicing More",
+    "brand": "ListenMore",
     "language": "Language",
     "languageNames": {
       "zh-TW": "中文",
@@ -517,7 +517,7 @@
     "overview": "About {minutes} min · {questions, plural, one {# question} other {# questions}} · {sections, plural, one {# section} other {# sections}}",
     "volumeTest": "Check your volume first",
     "volumeTestHint": "This is a sample recording, not the test. Play or pause it as much as you like; no timer starts. Set your volume, then press \"Start the test\".",
-    "start": "Start the test",
+    "start": "START",
     "submitted": "Submitted. Opening your results…",
     "statusStart": "The recording is starting.",
     "statusSection": "Section {n} · ",
@@ -569,7 +569,8 @@
       "audioAt": "♪ Recording in Section {n}",
       "audioHere": "The recording is in this section",
       "onlyForward": "You can page back and forth through the questions and submit on the last page"
-    }
+    },
+    "progressAria": "Recording progress"
   },
   "history": {
     "title": "My test history",
@@ -580,119 +581,119 @@
     "view": "See results"
   },
   "result": {
-    "title": "Results",
+    "title": "Your results",
     "notFound": "We couldn't find the results for this attempt.",
-    "signupTitle": "Want to see the answers? Sign up for free",
-    "signupBody": "Enter your email, then the login code we send you, and you're signed up. This attempt is saved to your account and you'll see the answer to every question.",
-    "sendSignupCode": "Send me a sign-up code",
+    "signupTitle": "See the correct answers — free",
+    "signupBody": "Just enter your email. We'll send you a 6-digit code — no password needed. This test will be saved to your account, with the correct answer to every question.",
+    "sendSignupCode": "Email me a code",
     "colNumber": "No.",
     "colGiven": "Your answer",
-    "colExpected": "Answer",
+    "colExpected": "Correct answer",
     "blank": "(blank)",
     "accepted": "(also accepted: {list})",
     "band": "IELTS Listening band (estimate): {band}",
     "sectionScore": "Section {n}: {correct} / {total} correct"
   },
   "landing": {
-    "metaTitle": "Practicing More: IELTS Listening practice tests",
+    "metaTitle": "ListenMore — Free Listening Mock Tests for IELTS Practice",
     "nav": {
       "features": "Features",
       "how": "How it works",
-      "demo": "Try a test",
+      "demo": "Try it",
       "faq": "FAQ"
     },
-    "navCta": "Try for free",
+    "navCta": "Take a free test",
     "login": "Log in",
     "dashboard": "My dashboard",
     "navCtaMember": "Start practicing",
     "hero": {
-      "badge": "Section 1 · Form completion",
-      "titleLine1": "IELTS Listening practice tests",
-      "titleLine2": "Lots of sets. Keep practicing.",
-      "lead": "Modeled on the real exam: reading time and the same pacing. Instant feedback shows you the mistakes you make most.",
-      "cta": "Try a full test for free",
-      "secondary": "Try one question first →",
+      "badge": "Free · Start now",
+      "titleLine1": "Listening takes practice.",
+      "titleLine2": "Here's plenty.",
+      "lead": "Every IELTS Listening mock test shows you what you missed. Luckily, there's always another one.",
+      "cta": "Start test",
+      "secondary": "Or try 2 questions first →",
       "note": "",
       "illustration": "[Illustration placeholder: cute headphones]",
-      "playingTag": "Recording playing"
+      "playingTag": "Now playing"
     },
     "features": {
-      "title": "Why practice here",
-      "lead": "There's no shortcut to listening. Listen more, write more, make more mistakes.",
+      "title": "Train smarter. Score higher.",
+      "lead": "Unlimited mock tests, exam-real timing, instant marking and AI-powered insights, all in one place.",
       "items": {
         "unlimited": {
-          "title": "Always new questions",
-          "body": "New questions every day, new sets every week."
+          "title": "Unlimited practice",
+          "body": "Fresh IELTS Listening mock tests, added all the time. Practice as much as you want."
         },
         "realPace": {
-          "title": "Real exam pacing",
-          "body": "Reading pauses, recording pace and a final check, all following the exam timeline."
+          "title": "Exam-real simulation",
+          "body": "Real timing, audio played once, real test pressure. Walk into test day like you've done it a hundred times."
         },
         "instantGrading": {
-          "title": "Marked as soon as you submit",
-          "body": "Capital letters and date formats are checked by the rules. See right away which answers were right or wrong."
+          "title": "Your score in seconds",
+          "body": "Hit submit, get your score. No waiting, no answer key, no guesswork."
         },
         "weakTraps": {
-          "title": "See your common mistakes",
-          "body": "Self-corrections, similar numbers, spelling… see where you're weakest."
+          "title": "AI weak-spot analysis",
+          "body": "Our AI pinpoints the traps that cost you marks, so you know exactly what to fix next."
         }
       }
     },
     "steps": {
-      "title": "Try it now",
+      "title": "Three steps. Zero hassle.",
       "items": {
         "open": {
-          "title": "Open a test",
-          "body": "No sign-up. Press start and the test begins."
+          "title": "Hit start",
+          "body": "No sign-up, no setup. Your mock test starts in one click."
         },
         "listen": {
-          "title": "Fill in the answer sheet as you listen",
-          "body": "The page tells you when it's reading time and highlights the blanks to look at."
+          "title": "Listen like it's test day",
+          "body": "We guide you through reading time, so you always know where to look."
         },
         "review": {
-          "title": "See your score and the answers",
-          "body": "Log in with your email to see every answer and keep your practice history."
+          "title": "Unlock the answers",
+          "body": "Get your score instantly. Sign in free with just your email to see every correct answer and track your progress."
         }
       }
     },
     "demo": {
-      "title": "TRY A QUESTIONS FIRST",
-      "lead": "Two questions cut from a real test set. The recording plays only once. Fill in the answers as you listen.",
-      "idle": "Press play to start (plays only once)",
-      "playing": "Playing. Fill in the answers as you listen.",
-      "ended": "The recording has ended. Check your answers.",
+      "title": "Try 2 questions. Right now.",
+      "lead": "A quick taste of a real mock test. The audio plays once, just like the exam, so listen closely.",
+      "idle": "Press play to start. The audio plays only once.",
+      "playing": "Playing now. Answer as you listen.",
+      "ended": "That's the end of the audio. Check your answers.",
       "submit": "Submit",
-      "playAria": "Play the sample recording",
-      "playFailed": "The recording couldn't play. Please refresh the page and try again.",
+      "playAria": "Play the sample audio",
+      "playFailed": "The audio didn't play. Refresh the page and try again.",
       "transcript": "Transcript",
-      "fullTest": "Take a full test (10 questions) →",
-      "correct": "Correct!",
-      "wrong": "The answer is {answer}"
+      "fullTest": "Ready for more? Take the full test (10 questions) →",
+      "correct": "Question {number}: Correct!",
+      "wrong": "Question {number}: The answer is {answer}"
     },
     "faq": {
-      "title": "FAQ",
+      "title": "Got questions?",
       "items": {
         "price": {
-          "q": "Does it cost anything?",
-          "a": "Trying a test is free and needs no sign-up. Sign up to take more tests and see the answers."
+          "q": "Is it really free?",
+          "a": "Yes. Jump into a full mock test right now, no sign-up needed. Create a free account to unlock more tests, see every correct answer and track your progress."
         },
         "author": {
-          "q": "Who writes the questions?",
-          "a": "They're generated in the IELTS Section 1 format, and a teacher reviews each set before it's opened for practice."
+          "q": "Who creates the tests?",
+          "a": "Every test is AI-generated in the official IELTS Listening format and reviewed by a teacher before it goes live. Real exam style, fresh content, every time."
         },
         "score": {
-          "q": "Does my score here reflect my IELTS score?",
-          "a": "No. This is practice, and it has nothing to do with how the real exam is scored."
+          "q": "Will this boost my IELTS band score?",
+          "a": "Practice is what moves your score. Each mock test here trains you on one part of the IELTS Listening test, so the more you take, the more ready you'll be for all 40 questions on test day."
         }
       }
     },
     "finalCta": {
-      "title": "Try a test now",
-      "lead": "6 minutes, 10 questions, results right away.",
-      "cta": "Start a free test"
+      "title": "Ready to try one?",
+      "lead": "10 questions. About 6 minutes. Your score at the end.",
+      "cta": "Start test"
     },
     "footer": {
-      "disclaimer": "This site isn't affiliated with IELTS. Practice scores don't represent official scores."
+      "disclaimer": "ListenMore is not affiliated with IELTS. Scores here are for practice only."
     }
   }
 }

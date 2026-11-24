@@ -569,7 +569,8 @@
       "audioAt": "♪ 錄音在 Section {n}",
       "audioHere": "錄音在這段",
       "onlyForward": "題目可以前後翻頁，最後一頁交卷"
-    }
+    },
+    "progressAria": "錄音進度"
   },
   "history": {
     "title": "我的考試紀錄",
@@ -583,8 +584,8 @@
     "title": "批改結果",
     "notFound": "找不到這次作答的結果。",
     "signupTitle": "想看正解？免費註冊就能看",
-    "signupBody": "輸入 email，再輸入信裡的登入碼就完成註冊，這次的作答會保留在你的帳號裡，並看到每題正解。",
-    "sendSignupCode": "寄註冊碼給我",
+    "signupBody": "只要 email，我們寄 6 位數登入碼給你，不用密碼。這次的成績會存進帳號，每題正解都看得到。",
+    "sendSignupCode": "寄登入碼給我",
     "colNumber": "題號",
     "colGiven": "你寫的",
     "colExpected": "正解",
@@ -613,7 +614,7 @@
       "cta": "免費試寫一回",
       "secondary": "先試做一題 →",
       "note": "",
-      "illustration": "[在此處放入微日系Q 版耳機插圖]",
+      "illustration": "[ TBD:在此處放入微日系Q 版耳機插圖]",
       "playingTag": "錄音播放中"
     },
     "features": {
@@ -622,7 +623,7 @@
       "items": {
         "unlimited": {
           "title": "題庫持續翻新",
-          "body": "天天有題寫，周周有題練"
+          "body": "題庫持續增加，練習不中斷。"
         },
         "realPace": {
           "title": "擬真考試節奏",
@@ -630,7 +631,7 @@
         },
         "instantGrading": {
           "title": "交卷立刻批改",
-          "body": "大小寫、日期寫法都照規則比對，每題對錯一目了然。"
+          "body": "交卷立刻知道分數，每題對錯一目了然。"
         },
         "weakTraps": {
           "title": "數據分析常犯錯誤",
@@ -666,8 +667,8 @@
       "playFailed": "錄音沒辦法播放，請重新整理後再試一次。",
       "transcript": "逐字稿",
       "fullTest": "寫完整一回（10 題）→",
-      "correct": "答對了！",
-      "wrong": "正解是 {answer}"
+      "correct": "第 {number} 題：答對了！",
+      "wrong": "第 {number} 題：正解是 {answer}"
     },
     "faq": {
       "title": "常見問題",

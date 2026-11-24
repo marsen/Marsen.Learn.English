@@ -71,6 +71,8 @@ export function ExamRunner({ overview, audioUrl, start, submit }: Props) {
   // 完整考卷：學生正在看哪一頁（自己翻，錄音換段時不跟著換）
   const [page, setPage] = useState<ExamPage | null>(null);
   const [error, setError] = useState<RunnerError | null>(null);
+  // 錄音進度（只顯示，不能拖：錄音在背景播，畫面上沒有播放器）
+  const [played, setPlayed] = useState<{ at: number; total: number } | null>(null);
   const t = useTranslations("exam");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   // 給錄音事件（不在 React 流程內）讀最新的答案與是否已在交卷
@@ -178,6 +180,8 @@ export function ExamRunner({ overview, audioUrl, start, submit }: Props) {
     const audio = new Audio(audioUrl);
     audioRef.current = audio;
     audio.addEventListener("timeupdate", () => {
+      const total = r.sheet.timing.totalSeconds || audio.duration;
+      if (total > 0) setPlayed({ at: Math.min(audio.currentTime, total), total });
       const event = eventAt(r.sheet.timing.events, audio.currentTime);
       const v = viewOf(event, audio.currentTime);
       if (v) setPhase(v);
@@ -299,6 +303,28 @@ export function ExamRunner({ overview, audioUrl, start, submit }: Props) {
     </Button>
   );
 
+  // 錄音進度（只顯示，不能拖）
+  const progressBar = played && (
+    <div className="flex items-center gap-3">
+      <div
+        role="progressbar"
+        aria-label={t("progressAria")}
+        aria-valuemin={0}
+        aria-valuemax={Math.round(played.total)}
+        aria-valuenow={Math.round(played.at)}
+        className="h-2 flex-1 overflow-hidden rounded-full bg-border"
+      >
+        <div
+          className="h-full rounded-full bg-accent transition-[width] duration-200"
+          style={{ width: `${(played.at / played.total) * 100}%` }}
+        />
+      </div>
+      <span className="text-sm text-muted-foreground tabular-nums">
+        {formatClock(played.at)} / {formatClock(played.total)}
+      </span>
+    </div>
+  );
+
   // key 不同：開始後整塊換掉，說明文字不會被當成狀態列沿用（瀏覽器翻譯外掛改過 DOM 時會殘留）
   return (
     <div key="running" className="grid gap-4">
@@ -310,6 +336,7 @@ export function ExamRunner({ overview, audioUrl, start, submit }: Props) {
             {section !== null && t("statusSection", { n: section })}
             {status}
           </p>
+          {progressBar}
           {errorText && <Alert tone="error">{errorText}</Alert>}
           <ExamSteps
             left={unansweredBySection(sheet.fullPaper, answers)}
@@ -320,13 +347,13 @@ export function ExamRunner({ overview, audioUrl, start, submit }: Props) {
         </div>
       ) : (
         <>
-          <p
-            className="sticky top-0 z-10 rounded-lg bg-background/95 py-2 font-medium"
-            aria-live="polite"
-          >
-            {section !== null && t("statusSection", { n: section })}
-            {status}
-          </p>
+          <div className="sticky top-0 z-10 grid gap-2 rounded-lg bg-background/95 py-2">
+            <p className="font-medium" aria-live="polite">
+              {section !== null && t("statusSection", { n: section })}
+              {status}
+            </p>
+            {progressBar}
+          </div>
           {errorText && <Alert tone="error">{errorText}</Alert>}
         </>
       )}
