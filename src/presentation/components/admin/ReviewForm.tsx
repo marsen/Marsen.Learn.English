@@ -928,7 +928,7 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
           }
           current={currentTurn}
           focus={focusTurn}
-          onSeek={(s) => seek(s)}
+          onSeek={(s) => seek(s, true)}
         />
       )}
 
