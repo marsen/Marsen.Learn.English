@@ -165,9 +165,7 @@
                     }
                   ],
                   "inline": true,
-                  "says": [
-                    "coach"
-                  ],
+                  "says": ["coach"],
                   "section": "Extras"
                 },
                 {
@@ -241,11 +239,7 @@
             "question_id": "q02",
             "field_id": "departure_date",
             "answer": "22 September",
-            "accepted": [
-              "September 22",
-              "22nd September",
-              "September 22nd"
-            ],
+            "accepted": ["September 22", "22nd September", "September 22nd"],
             "type": "date",
             "trap": "self_correction",
             "answer_policy": "date_equivalence",
@@ -256,9 +250,7 @@
             "question_id": "q03",
             "field_id": "days",
             "answer": "16",
-            "accepted": [
-              "sixteen"
-            ],
+            "accepted": ["sixteen"],
             "type": "number",
             "trap": "similar_numbers",
             "answer_policy": "number_word",
@@ -268,9 +260,7 @@
             "question_id": "q04",
             "field_id": "people",
             "answer": "18",
-            "accepted": [
-              "eighteen"
-            ],
+            "accepted": ["eighteen"],
             "type": "number",
             "trap": "similar_numbers",
             "answer_policy": "number_word",
@@ -280,10 +270,7 @@
             "question_id": "q05",
             "field_id": "occasion",
             "answer": "anniversary",
-            "accepted": [
-              "the anniversary",
-              "an anniversary"
-            ],
+            "accepted": ["the anniversary", "an anniversary"],
             "type": "word",
             "trap": "none",
             "answer_policy": "exact_word"
@@ -292,10 +279,7 @@
             "question_id": "q06",
             "field_id": "room_request",
             "answer": "balcony",
-            "accepted": [
-              "the balcony",
-              "a balcony"
-            ],
+            "accepted": ["the balcony", "a balcony"],
             "type": "word",
             "trap": "paraphrase",
             "answer_policy": "exact_word",
@@ -305,10 +289,7 @@
             "question_id": "q07",
             "field_id": "meal_need",
             "answer": "vegetarian",
-            "accepted": [
-              "the vegetarian",
-              "a vegetarian"
-            ],
+            "accepted": ["the vegetarian", "a vegetarian"],
             "type": "word",
             "trap": "none",
             "answer_policy": "exact_word"
@@ -317,10 +298,7 @@
             "question_id": "q08",
             "field_id": "seat",
             "answer": "front",
-            "accepted": [
-              "the front",
-              "a front"
-            ],
+            "accepted": ["the front", "a front"],
             "type": "word",
             "trap": "none",
             "answer_policy": "exact_word"
@@ -329,10 +307,7 @@
             "question_id": "q09",
             "field_id": "insurance",
             "answer": "required",
-            "accepted": [
-              "the required",
-              "a required"
-            ],
+            "accepted": ["the required", "a required"],
             "type": "word",
             "trap": "none",
             "answer_policy": "exact_word"
@@ -341,11 +316,7 @@
             "question_id": "q10",
             "field_id": "heard_from",
             "answer": "neighbours",
-            "accepted": [
-              "neighbors",
-              "the neighbours",
-              "the neighbors"
-            ],
+            "accepted": ["neighbors", "the neighbours", "the neighbors"],
             "type": "word",
             "trap": "none",
             "answer_policy": "exact_word"
@@ -1937,9 +1908,7 @@
             "question_id": "q33",
             "field_id": "mixing_liquid",
             "answer": "seawater",
-            "accepted": [
-              "sea-water"
-            ],
+            "accepted": ["sea-water"],
             "type": "word",
             "trap": "distractor",
             "answer_policy": "exact_word",
@@ -2241,10 +2210,7 @@
         "section": 1,
         "start": 9.66,
         "end": 29.66,
-        "questions": [
-          1,
-          6
-        ],
+        "questions": [1, 6],
         "seconds": 20
       },
       {
@@ -2411,10 +2377,7 @@
         "section": 1,
         "start": 245.88,
         "end": 265.88,
-        "questions": [
-          7,
-          8
-        ],
+        "questions": [7, 8],
         "seconds": 20
       },
       {
@@ -2469,10 +2432,7 @@
         "section": 1,
         "start": 327.58,
         "end": 347.58,
-        "questions": [
-          9,
-          10
-        ],
+        "questions": [9, 10],
         "seconds": 20
       },
       {
@@ -2543,10 +2503,7 @@
         "section": 1,
         "start": 424.57,
         "end": 454.57,
-        "questions": [
-          1,
-          10
-        ],
+        "questions": [1, 10],
         "seconds": 30
       },
       {
@@ -2569,10 +2526,7 @@
         "section": 2,
         "start": 470.29,
         "end": 500.29,
-        "questions": [
-          11,
-          15
-        ],
+        "questions": [11, 15],
         "seconds": 30
       },
       {
@@ -2643,10 +2597,7 @@
         "section": 2,
         "start": 628.81,
         "end": 658.81,
-        "questions": [
-          16,
-          20
-        ],
+        "questions": [16, 20],
         "seconds": 30
       },
       {
@@ -2725,10 +2676,7 @@
         "section": 2,
         "start": 765.76,
         "end": 795.76,
-        "questions": [
-          11,
-          20
-        ],
+        "questions": [11, 20],
         "seconds": 30
       },
       {
@@ -2751,10 +2699,7 @@
         "section": 3,
         "start": 810.6,
         "end": 840.6,
-        "questions": [
-          21,
-          25
-        ],
+        "questions": [21, 25],
         "seconds": 30
       },
       {
@@ -2913,10 +2858,7 @@
         "section": 3,
         "start": 1012.74,
         "end": 1042.74,
-        "questions": [
-          26,
-          30
-        ],
+        "questions": [26, 30],
         "seconds": 30
       },
       {
@@ -3043,10 +2985,7 @@
         "section": 3,
         "start": 1180.06,
         "end": 1210.06,
-        "questions": [
-          21,
-          30
-        ],
+        "questions": [21, 30],
         "seconds": 30
       },
       {
@@ -3069,10 +3008,7 @@
         "section": 4,
         "start": 1222.94,
         "end": 1252.94,
-        "questions": [
-          31,
-          40
-        ],
+        "questions": [31, 40],
         "seconds": 30
       },
       {
@@ -3191,10 +3127,7 @@
         "section": 4,
         "start": 1566.58,
         "end": 1596.58,
-        "questions": [
-          31,
-          40
-        ],
+        "questions": [31, 40],
         "seconds": 30
       },
       {
