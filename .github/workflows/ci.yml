@@ -8,6 +8,10 @@ on:
       - "fix/**"
       - "chore/**"
       - "refactor/**"
+    # 只改文件（docs/、Markdown）不跑 CI；main 上 CI 沒跑，Deploy 也不會觸發
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
   workflow_dispatch:
 
 jobs:
