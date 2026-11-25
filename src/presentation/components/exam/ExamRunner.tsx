@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useTranslations } from "next-intl";
 import type {
   ExamSheet,
@@ -25,6 +25,7 @@ import {
   browserStorage,
   clearDraft,
   clearOtherDrafts,
+  findDraftForSet,
   questionIdsOf,
   saveDraft,
   unansweredBySection,
@@ -33,6 +34,7 @@ import {
 import { installLeaveGuard } from "@/presentation/lib/leaveGuard";
 
 type Props = {
+  setId: string;
   /** 開始前給考生看的：大約幾分鐘、幾題、幾段 */
   overview: { minutes: number; questions: number; sections: number };
   audioUrl: string;
@@ -60,7 +62,10 @@ const MAX_AUDIO_RETRIES = 3;
 /** 試音量用的範例錄音（首頁試題的錄音）：不用考卷錄音，不吃取音檔的次數上限 */
 const VOLUME_TEST_AUDIO = "/landing-demo/audio.mp3";
 
-export function ExamRunner({ overview, audioUrl, start, submit }: Props) {
+/** 暫存不會在這頁以外被改，不用訂閱變化 */
+const noSubscribe = () => () => {};
+
+export function ExamRunner({ setId, overview, audioUrl, start, submit }: Props) {
   const volumeTestRef = useRef<HTMLAudioElement | null>(null);
   const [stage, setStage] = useState<Stage>("intro");
   const [sheet, setSheet] = useState<ExamSheet | null>(null);
@@ -95,15 +100,58 @@ export function ExamRunner({ overview, audioUrl, start, submit }: Props) {
     [],
   );
 
+  // 上次考試中重新整理、離開（沒交卷）：回到考試頁就用暫存的答案交卷，進成績頁（#285 AC-3）。
+  // 暫存只在瀏覽器：伺服器端當作沒有，所以用 useSyncExternalStore 讀
+  const leftAttempt = useSyncExternalStore(
+    noSubscribe,
+    () => findDraftForSet(browserStorage(), setId)?.attemptId ?? null,
+    () => null,
+  );
+  // 交不出去（網站找不到那次作答，例如換了帳號；或網路斷掉）：照常顯示考試說明
+  const [resumeFailed, setResumeFailed] = useState(false);
+  const resuming = leftAttempt !== null && !resumeFailed && stage === "intro";
+  useEffect(() => {
+    // 只在考試說明頁：開始考試後這次的暫存也會被找到，不能拿去交
+    if (!leftAttempt || resumeFailed || stage !== "intro") return;
+    const draft = findDraftForSet(browserStorage(), setId);
+    if (!draft) return;
+    let cancelled = false;
+    submit(draft.attemptId, draft.answers)
+      .then((r) => {
+        if (cancelled) return;
+        clearDraft(browserStorage(), draft.attemptId);
+        if (r.ok || r.reason === "already_submitted")
+          window.location.assign(
+            `/exam/result/${r.ok ? r.attemptId : draft.attemptId}?left=1`,
+          );
+        else setResumeFailed(true);
+      })
+      .catch(() => {
+        // 網路斷掉之類：暫存留著，下次回來再交
+        if (!cancelled) setResumeFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [leftAttempt, resumeFailed, stage, setId, submit]);
+
   useEffect(() => {
     if (stage !== "running" || releaseGuardRef.current) return;
     const attemptId = sheet?.attemptId;
-    releaseGuardRef.current = installLeaveGuard(
+    const release = installLeaveGuard(
       () => leaveConfirmRef.current,
       () => {
         if (attemptId) clearDraft(browserStorage(), attemptId);
       },
     );
+    // iPhone Safari 沒有離開提醒：至少擋掉往下拉就重新整理的手勢
+    const root = document.documentElement;
+    const overscroll = root.style.overscrollBehavior;
+    root.style.overscrollBehavior = "none";
+    releaseGuardRef.current = () => {
+      release();
+      root.style.overscrollBehavior = overscroll;
+    };
   }, [stage, sheet]);
 
   /** 交卷完成要跳成績頁：先拿掉離開提醒、刪掉瀏覽器裡的暫存答案 */
@@ -174,6 +222,12 @@ export function ExamRunner({ overview, audioUrl, start, submit }: Props) {
     }
     // 開始新考試：之前沒交卷留下的暫存清掉，只留這次的
     clearOtherDrafts(browserStorage(), r.sheet.attemptId);
+    // 一開始就存一份（還沒填也存）：一題都沒填就重新整理，回來也能交卷
+    saveDraft(browserStorage(), {
+      attemptId: r.sheet.attemptId,
+      setId: r.sheet.setId,
+      answers: {},
+    });
     setSheet(r.sheet);
     if (r.sheet.fullPaper) setPage(r.sheet.fullPaper.sections[0]?.ielts ?? "submit");
     setStage("running");
@@ -250,6 +304,14 @@ export function ExamRunner({ overview, audioUrl, start, submit }: Props) {
         <Button onClick={begin} className="justify-self-start">
           {t("start")}
         </Button>
+      </div>
+    );
+  }
+
+  if (resuming) {
+    return (
+      <div className="grid gap-2">
+        <Alert>{t("resuming")}</Alert>
       </div>
     );
   }

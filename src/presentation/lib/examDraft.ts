@@ -84,6 +84,29 @@ export function clearDraft(storage: DraftStorage | null, attemptId: string): voi
   }
 }
 
+/**
+ * 找這份考卷（setId）沒交卷留下的暫存：考試中重新整理、離開後回到考試頁時，用它交卷（#285 AC-3）。
+ * 有好幾份時取最新存的
+ */
+export function findDraftForSet(
+  storage: (DraftStorage & Pick<Storage, "length" | "key">) | null,
+  setId: string,
+): ExamDraft | null {
+  if (!storage) return null;
+  try {
+    let found: ExamDraft | null = null;
+    for (let i = 0; i < storage.length; i++) {
+      const k = storage.key(i);
+      if (!k || !k.startsWith(PREFIX)) continue;
+      const d = loadDraft(storage, k.slice(PREFIX.length));
+      if (d && d.setId === setId && (!found || d.savedAt > found.savedAt)) found = d;
+    }
+    return found;
+  } catch {
+    return null;
+  }
+}
+
 /** 開始新考試時用：清掉其他次作答留下的暫存，只留 keepAttemptId 這一次 */
 export function clearOtherDrafts(
   storage: (DraftStorage & Pick<Storage, "length" | "key">) | null,
