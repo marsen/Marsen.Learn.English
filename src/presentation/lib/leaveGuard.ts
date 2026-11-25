@@ -10,6 +10,8 @@ export type LeaveGuardOptions = {
  * ① beforeunload：重新整理、關分頁、整頁跳轉（瀏覽器自己的提示，文字不能改；iPhone Safari 不支援）
  * ② 在 document 用 capture 攔連結的 click 和表單 submit（左側選單、登出）
  * ③ 進來時多推一筆歷史紀錄，按上一頁先回到這筆，問過再真的離開
+ * ④ 攔重新整理的快捷鍵（F5、Ctrl+R、⌘R）：先用 message 問，確定才重新整理；
+ *    瀏覽器的重新整理按鈕攔不到，只剩 ① 瀏覽器自己的提示
  * message 每次問的時候才讀（考試中切換介面語言也跟著換）。
  * 回傳 release()：交卷前一定要先呼叫，不然交卷後跳成績頁會又跳出提醒。
  */
@@ -41,6 +43,14 @@ export function installLeaveGuard(
     e.preventDefault();
     e.stopPropagation();
     return false;
+  };
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (!isReloadKey(e)) return;
+    if (ask(e)) {
+      e.preventDefault();
+      window.location.reload();
+    }
   };
 
   const onClick = (e: MouseEvent) => {
@@ -76,6 +86,7 @@ export function installLeaveGuard(
 
   window.history.pushState(window.history.state, "", window.location.href);
   window.addEventListener("beforeunload", onBeforeUnload);
+  document.addEventListener("keydown", onKeyDown, true);
   document.addEventListener("click", onClick, true);
   document.addEventListener("submit", onSubmit, true);
   window.addEventListener("popstate", onPopState);
@@ -84,6 +95,7 @@ export function installLeaveGuard(
     if (released) return;
     released = true;
     window.removeEventListener("beforeunload", onBeforeUnload);
+    document.removeEventListener("keydown", onKeyDown, true);
     document.removeEventListener("click", onClick, true);
     document.removeEventListener("submit", onSubmit, true);
     window.removeEventListener("popstate", onPopState);
@@ -109,4 +121,13 @@ export function isLogoutForm(target: EventTarget | null): boolean {
     target instanceof HTMLFormElement &&
     target.hasAttribute("data-logout")
   );
+}
+
+/** 重新整理的快捷鍵：F5、Ctrl+R（Windows、Linux）、⌘R（Mac），加 Shift 的強制重新整理也算 */
+export function isReloadKey(
+  e: Pick<KeyboardEvent, "key" | "ctrlKey" | "metaKey" | "altKey">,
+): boolean {
+  if (e.altKey) return false;
+  if (e.key === "F5") return true;
+  return (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "r";
 }

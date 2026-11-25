@@ -533,7 +533,7 @@
     "submitting": "交卷中…",
     "confirmSubmit": "確定要交卷嗎？",
     "confirmSubmitUnanswered": "還有 {count} 題沒填，確定要交卷嗎？",
-    "leaveConfirm": "考試還沒交卷，離開這頁就不能繼續作答。確定要離開嗎？",
+    "leaveConfirm": "離開就會交卷",
     "errors": {
       "unavailable": "這張考卷現在不能考。",
       "submitFailed": "交卷失敗：{message}。答案還在，請再按一次「交卷」。",

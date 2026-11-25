@@ -533,7 +533,7 @@
     "submitting": "Submitting…",
     "confirmSubmit": "Are you sure you want to submit?",
     "confirmSubmitUnanswered": "{count, plural, one {# question is} other {# questions are}} still blank. Are you sure you want to submit?",
-    "leaveConfirm": "Your exam hasn't been submitted. If you leave this page you can't continue answering. Leave anyway?",
+    "leaveConfirm": "Leaving will submit your test.",
     "errors": {
       "unavailable": "This test can't be taken right now.",
       "submitFailed": "Couldn't submit: {message}. Your answers are still here. Please press \"Submit\" again.",

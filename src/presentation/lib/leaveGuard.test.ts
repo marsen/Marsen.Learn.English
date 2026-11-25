@@ -1,5 +1,5 @@
 import { afterEach, describe, it, expect, vi } from "vitest";
-import { installLeaveGuard, leavesPage } from "./leaveGuard";
+import { installLeaveGuard, isReloadKey, leavesPage } from "./leaveGuard";
 
 const link = (href: string, attrs: { target?: string; download?: boolean } = {}) => ({
   target: attrs.target ?? "",
@@ -88,5 +88,60 @@ describe("installLeaveGuard", () => {
     expect(confirm).not.toHaveBeenCalled();
     expect(submit({}).defaultPrevented).toBe(true);
     expect(unload()).toBe(true);
+  });
+});
+
+describe("isReloadKey", () => {
+  const key = (
+    k: string,
+    mods: Partial<Record<"ctrlKey" | "metaKey" | "altKey", boolean>> = {},
+  ) => ({
+    key: k,
+    ctrlKey: false,
+    metaKey: false,
+    altKey: false,
+    ...mods,
+  });
+
+  it("F5、Ctrl+R、⌘R、加 Shift 的 R 都算重新整理", () => {
+    expect(isReloadKey(key("F5"))).toBe(true);
+    expect(isReloadKey(key("r", { ctrlKey: true }))).toBe(true);
+    expect(isReloadKey(key("r", { metaKey: true }))).toBe(true);
+    expect(isReloadKey(key("R", { metaKey: true }))).toBe(true);
+  });
+
+  it("單按 r（作答打字）、Alt 組合鍵不算", () => {
+    expect(isReloadKey(key("r"))).toBe(false);
+    expect(isReloadKey(key("R"))).toBe(false);
+    expect(isReloadKey(key("r", { ctrlKey: true, altKey: true }))).toBe(false);
+  });
+});
+
+describe("重新整理快捷鍵", () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  function press(confirmAnswer: boolean) {
+    const { confirm } = fakeBrowser(confirmAnswer);
+    const reload = vi.fn();
+    (window as unknown as { location: unknown }).location = { href: "/x", reload };
+    const release = installLeaveGuard(() => "離開就會交卷");
+    const e = new Event("keydown", { cancelable: true });
+    Object.assign(e, { key: "F5", ctrlKey: false, metaKey: false, altKey: false });
+    document.dispatchEvent(e);
+    release();
+    return { confirm, reload, e };
+  }
+
+  it("按 F5 先問；確定才重新整理", () => {
+    const { confirm, reload, e } = press(true);
+    expect(confirm).toHaveBeenCalledWith("離開就會交卷");
+    expect(e.defaultPrevented).toBe(true);
+    expect(reload).toHaveBeenCalled();
+  });
+
+  it("取消就不重新整理", () => {
+    const { reload, e } = press(false);
+    expect(e.defaultPrevented).toBe(true);
+    expect(reload).not.toHaveBeenCalled();
   });
 });
