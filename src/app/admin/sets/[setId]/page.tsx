@@ -56,13 +56,14 @@ export default async function ReviewPage({
         }
         description={
           <>
-            <div className="mb-2">
+            <div className="mb-2 flex flex-wrap items-center gap-2">
               <StatusTags tags={statusTagsOf(view.set)} />
             </div>
             <ReviewMeta
               setId={view.set.setId}
               questionCount={view.set.questionCount}
               reviewedAt={view.review?.reviewedAt ?? null}
+              fullExam={view.fullPaper !== null}
             />
           </>
         }
@@ -70,6 +71,7 @@ export default async function ReviewPage({
       <ReviewForm
         view={view}
         audioUrl={`/admin/sets/${setId}/audio`}
+        accountId={account.id}
         action={reviewExamSetAction.bind(null, setId)}
       />
     </Page>

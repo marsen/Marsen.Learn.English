@@ -64,8 +64,11 @@ export function reviewFeedback(view: ReviewView, reviewerEmail: string | null): 
   lines.push("", "## Questions");
   for (const q of view.questions) {
     lines.push(
-      `### ${q.questionId} · Q${q.number}${q.label ? ` · ${q.label}` : ""} · teacher: ${verdictOf(q.questionId)}`,
+      `### ${q.questionId} · Q${q.number}${q.ieltsSection !== null ? ` · Section ${q.ieltsSection}` : ""}${q.label ? ` · ${q.label}` : ""} · teacher: ${verdictOf(q.questionId)}`,
     );
+    // 單選、配對：附上選項，AI 才知道答案字母指的是什麼
+    if (q.options)
+      lines.push(`Options: ${q.options.map((o) => `${o.key}. ${o.text}`).join(" | ")}`);
     const facts = [
       `Answer: ${q.answer}${q.accepted.length > 0 ? ` (also accepted: ${q.accepted.join(", ")})` : ""}`,
       q.answerType && `type ${q.answerType}`,
@@ -74,6 +77,7 @@ export function reviewFeedback(view: ReviewView, reviewerEmail: string | null): 
       q.evidence &&
         `evidence ${q.evidence.turn}${q.evidence.start !== null ? ` ${clock(q.evidence.start)}` : ""}`,
     ];
+    if (q.note) facts.push(`note: ${q.note}`);
     lines.push(facts.filter(Boolean).join(" · "));
     lines.push(...orNone(commentsFor(q.questionId), "- no comments"));
   }

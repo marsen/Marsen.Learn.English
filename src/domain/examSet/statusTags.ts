@@ -5,7 +5,7 @@ import type { AiVerdict, ExamSetStatus } from "./examSet";
  * - AI：AIP（通過）／AI_WARN（有疑慮）
  * - 老師：TP（通過）／TR（退回）／WAIT（待審）
  * - FULL_PASS：AIP ＋ TP
- * 考不考得到只看老師（TP），AI 有疑慮但老師通過照樣能考，只是不會有 FULL_PASS。
+ * 籤只講審稿狀態；考不考得到還要看開放對象（規則在 access.ts 的 canTake）。
  */
 export type StatusTag = "FULL_PASS" | "AIP" | "AI_WARN" | "TP" | "TR" | "WAIT";
 

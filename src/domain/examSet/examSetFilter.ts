@@ -12,7 +12,10 @@ export type ExamSetSummary = Pick<
   | "status"
   | "access"
   | "uploadedAt"
->;
+> & {
+  /** 大版號（2＝單一 section、3＝完整考卷）；由內容判斷，見 schemaVersionOf */
+  schemaVersion: number;
+};
 
 /** 題組清單的過濾條件；沒給的條件就不過濾 */
 export type ExamSetFilter = {
@@ -28,7 +31,10 @@ export function isFilterEmpty(f: ExamSetFilter): boolean {
 }
 
 /** 一套題符不符合條件（記憶體版 repository 與測試用；資料庫版在 SQL 裡做同樣的事） */
-export function matchesFilter(s: ExamSetSummary, f: ExamSetFilter): boolean {
+export function matchesFilter(
+  s: Omit<ExamSetSummary, "schemaVersion">,
+  f: ExamSetFilter,
+): boolean {
   if (f.status && s.status !== f.status) return false;
   if (f.aiVerdict && s.aiVerdict !== f.aiVerdict) return false;
   if (f.access && s.access !== f.access) return false;

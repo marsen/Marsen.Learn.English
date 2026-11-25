@@ -35,7 +35,8 @@ export type UploadSetFormState = {
 };
 
 export type ReviewFormState = {
-  problems?: (ReviewError | { code: "notLoggedIn" })[];
+  /** submitFailed：連不到網站（斷網等），由審稿頁自己接住 action 的例外 */
+  problems?: (ReviewError | { code: "notLoggedIn" } | { code: "submitFailed" })[];
   saved?: boolean;
 };
 

@@ -4,7 +4,7 @@ import { Fragment } from "react";
 import { useTranslations } from "next-intl";
 import type { PaperView } from "@/application/exam/paperView";
 import type { ReviewQuestion } from "@/application/examSet/reviewView";
-import { VerdictMark } from "./NoteCard";
+import { PaperMark, type Unfinished } from "./NoteCard";
 
 type Props = {
   paper: PaperView;
@@ -15,10 +15,14 @@ type Props = {
   verdicts: ReadonlyMap<string, boolean>;
   /** 錄音正在講答案的題目 */
   listening: string | null;
-  /** 每題有幾則意見（刪掉的不算） */
-  counts: ReadonlyMap<string, number>;
+  /** 判 OK 但還沒判完的題（一段一段審才有） */
+  unfinished?: ReadonlyMap<string, Unfinished>;
+  /** 點灰 ✓ 確認預設 OK */
+  onConfirm?: (questionId: string) => void;
   onSelect: (questionId: string) => void;
   onPlay: (questionId: string) => void;
+  /** 標題當作「整套」的批註錨點；完整考卷裡的填空區塊不用（錨點在整份考卷的標題） */
+  withSetAnchor?: boolean;
 };
 
 function nextIsPunctuation(
@@ -51,14 +55,19 @@ export function ReviewPaper({
   active,
   verdicts,
   listening,
-  counts,
+  unfinished,
+  onConfirm,
   onSelect,
   onPlay,
+  withSetAnchor = true,
 }: Props) {
   const t = useTranslations("review");
   return (
     <div className="min-w-0 rounded-xl border border-border bg-surface px-5 py-4 leading-loose">
-      <h2 data-anchor="set" className="my-3 text-center font-semibold">
+      <h2
+        data-anchor={withSetAnchor ? "set" : undefined}
+        className="my-3 text-center font-semibold"
+      >
         {paper.title}
       </h2>
       {paper.instruction && <Instruction text={paper.instruction} />}
@@ -79,7 +88,6 @@ export function ReviewPaper({
                     {row.parts.map((part, pi) => {
                       if (part.kind === "text") return <span key={pi}>{part.text} </span>;
                       const q = questions.get(part.questionId);
-                      const n = counts.get(part.questionId) ?? 0;
                       const on = active === part.questionId;
                       const hearing = listening === part.questionId;
                       const verdict = verdicts.get(part.questionId);
@@ -121,18 +129,16 @@ export function ReviewPaper({
                               >
                                 {q?.answer ?? "?"}
                               </span>
-                              <span className="ml-0.5">
-                                <VerdictMark verdict={verdict} />
-                              </span>
-                              {n > 0 && (
-                                <sup
-                                  className="ml-0.5 text-[0.7rem] font-bold text-primary-hover"
-                                  aria-label={t("commentCount", { count: n })}
-                                >
-                                  {n}
-                                </sup>
-                              )}
                             </button>
+                            <span className="ml-0.5">
+                              <PaperMark
+                                verdict={verdict}
+                                unfinished={unfinished?.get(part.questionId)}
+                                onConfirm={
+                                  onConfirm && (() => onConfirm(part.questionId))
+                                }
+                              />
+                            </span>
                           </span>
                           {/* 空格放在不換行的範圍外面，太窄時才能換行；下一段是標點就不空 */}
                           {nextIsPunctuation(row.parts[pi + 1]) ? "" : " "}

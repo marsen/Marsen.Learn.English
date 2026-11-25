@@ -3,18 +3,26 @@
  */
 
 export type TimeSegment =
-  { kind: "text"; text: string } | { kind: "time"; text: string; seconds: number };
+  | { kind: "text"; text: string }
+  | { kind: "time"; text: string; seconds: number; turn?: string };
 
-/** [mm:ss] 或 t12 這種句子編號（前後不能黏著英數字） */
-const PATTERN = /\[(\d{1,2}):(\d{2})\]|(?<![A-Za-z0-9])(t\d{1,3})(?![A-Za-z0-9])/g;
+/**
+ * [mm:ss]、t12 這種句子編號、完整考卷的 s1-t12（前後不能黏著英數字）。
+ * s1-t12 要整個認，不然會被切成「s1-」和「t12」。
+ */
+const PATTERN =
+  /\[(\d{1,2}):(\d{2})\]|(?<![A-Za-z0-9])((?:s\d{1,2}-)?t\d{1,3})(?![A-Za-z0-9])/g;
 
 /**
  * 把一段文字拆成「一般文字」和「可以點的時間」。
  * 句子編號要在 turnStarts 裡找得到才算時間（顯示成 t12 [01:35]），找不到就當一般文字。
+ * 完整考卷的逐字稿編號是 s1-t12，AI 意見常只寫 t12：給了 section 就先查 s{section}-t12，
+ * 顯示成和逐字稿一樣的 s1-t12。沒有 section（整套的意見）查不到就不猜。
  */
 export function splitTimeRefs(
   text: string,
   turnStarts: ReadonlyMap<string, number>,
+  section: number | null = null,
 ): TimeSegment[] {
   const out: TimeSegment[] = [];
   let last = 0;
@@ -29,17 +37,31 @@ export function splitTimeRefs(
     if (m[1] !== undefined) {
       push({ kind: "time", text: m[0], seconds: Number(m[1]) * 60 + Number(m[2]) });
     } else {
-      const start = turnStarts.get(m[3]);
+      const turn = resolveTurn(m[3], turnStarts, section);
+      const start = turn === null ? undefined : turnStarts.get(turn);
       push(
-        start === undefined
+        turn === null || start === undefined
           ? { kind: "text", text: m[0] }
-          : { kind: "time", text: `${m[3]} ${clock(start)}`, seconds: start },
+          : { kind: "time", text: `${turn} ${clock(start)}`, seconds: start, turn },
       );
     }
     last = at + m[0].length;
   }
   if (last < text.length) push({ kind: "text", text: text.slice(last) });
   return out;
+}
+
+/** 句子編號 → 逐字稿裡真正的編號；找不到是 null */
+function resolveTurn(
+  id: string,
+  turnStarts: ReadonlyMap<string, number>,
+  section: number | null,
+): string | null {
+  if (section !== null && /^t\d+$/.test(id)) {
+    const full = `s${section}-${id}`;
+    if (turnStarts.has(full)) return full;
+  }
+  return turnStarts.has(id) ? id : null;
 }
 
 /** 秒數 → [mm:ss] */

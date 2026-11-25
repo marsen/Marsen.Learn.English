@@ -19,6 +19,7 @@ import { clientIpHash } from "@/infrastructure/auth/clientIp";
 import { claimGuestAttempts } from "@/infrastructure/di/examSetContainer";
 import { getAccountRepository } from "@/infrastructure/di/authContainer";
 import { can } from "@/domain/account/permission";
+import { loginRequestState } from "@/app/lib/loginRequestState";
 
 const SEVEN_DAYS = 60 * 60 * 24 * 7;
 
@@ -33,14 +34,13 @@ export async function requestLoginCodeAction(
     guestId: await readGuestId(),
     ipHash: await clientIpHash(),
   });
-  // 重寄失敗時留在輸入登入碼的步驟（上一組碼可能還能用）
-  if (!result.ok)
-    return { error: result.error, email, sentTo: prev.sentTo, sentAt: prev.sentAt };
-  return {
-    sentTo: email,
-    sentAt: Date.now(),
-    devCode: devLoginCodeFor(email) ?? undefined,
-  };
+  return loginRequestState({
+    prev,
+    email,
+    result,
+    devCode: devLoginCodeFor(email),
+    now: Date.now(),
+  });
 }
 
 export async function verifyLoginCodeAction(

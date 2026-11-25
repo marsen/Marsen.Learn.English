@@ -14,6 +14,24 @@ export function ExamResult({ result }: { result: AttemptResultView }) {
         <p className="mt-1 text-3xl font-semibold">
           {result.score} / {result.total}
         </p>
+        {result.band !== null && (
+          <p className="mt-1 text-lg font-semibold">
+            {t("result.band", { band: result.band.toFixed(1) })}
+          </p>
+        )}
+        {result.sections.length > 0 && (
+          <ul className="mt-3 grid gap-1 text-sm">
+            {result.sections.map((s) => (
+              <li key={s.section}>
+                {t("result.sectionScore", {
+                  n: s.section,
+                  correct: s.correct,
+                  total: s.total,
+                })}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       <Table
         head={

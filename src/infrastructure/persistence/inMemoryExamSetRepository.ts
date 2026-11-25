@@ -1,3 +1,5 @@
+import { schemaVersionOf } from "@/domain/examSet/bundle";
+import { isFullExamPaper } from "@/domain/examSet/fullExam";
 import type { ExamAccess, ExamSet, ExamSetPrivate } from "@/domain/examSet/examSet";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import {
@@ -54,7 +56,9 @@ export class InMemoryExamSetRepository implements ExamSetRepository {
           status,
           access,
           uploadedAt,
+          paper,
         }) => ({
+          schemaVersion: schemaVersionOf(isFullExamPaper(paper)),
           setId,
           title,
           topic,

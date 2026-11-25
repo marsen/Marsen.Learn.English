@@ -96,3 +96,45 @@ describe("reviewFeedback", () => {
     expect(text).toContain("- no comments");
   });
 });
+
+describe("reviewFeedback：完整考卷", () => {
+  it("單選、配對附上 Section、選項與依據", async () => {
+    const { parseFullExam } = await import("@/application/examSet/fullExamJson");
+    const raw = JSON.parse(
+      readFileSync(
+        new URL("../../../tests/fixtures/exam.sample.json", import.meta.url),
+        "utf8",
+      ),
+    );
+    const r = parseFullExam(raw);
+    if (!r.ok) throw new Error("fixture 不合格");
+    const x = r.bundle;
+    const full: ExamSet = {
+      ...set,
+      setId: x.set_id,
+      paper: x.paper,
+      timing: toPublicTiming(x.timing),
+      questionCount: 40,
+    };
+    const text = reviewFeedback(
+      buildReviewView(
+        full,
+        {
+          setId: x.set_id,
+          answers: x.answers,
+          provenance: x.provenance,
+          transcript: null,
+        },
+        null,
+      ),
+      null,
+    );
+    expect(text).toContain("### q11 · Q11 · Section 2 · Before their first shift");
+    expect(text).toContain("Options: A. complete an online safety course. | B. ");
+    expect(text).toContain("policy letter");
+    expect(text).toMatch(
+      /### q16 · Q16 · Section 2 · Garden team[^\n]*\nOptions: A\. needs a particular qualification/,
+    );
+    expect(text).toContain("### q31 · Q31 · Section 4");
+  });
+});

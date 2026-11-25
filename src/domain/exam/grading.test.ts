@@ -29,6 +29,15 @@ const e = (
 });
 
 describe("matchesAnswer", () => {
+  it("letter：只比字母，大小寫和前後空白不算", () => {
+    const k = e("letter", "B");
+    expect(matchesAnswer(k, "B")).toBe(true);
+    expect(matchesAnswer(k, " b ")).toBe(true);
+    expect(matchesAnswer(k, "A")).toBe(false);
+    expect(matchesAnswer(k, "")).toBe(false);
+    expect(matchesAnswer(k, "B C")).toBe(false);
+  });
+
   it("exact_word：拼錯就是錯；連字號等同空白", () => {
     const k = e("exact_word", "Harlow Road");
     expect(matchesAnswer(k, "harlow road.")).toBe(true);

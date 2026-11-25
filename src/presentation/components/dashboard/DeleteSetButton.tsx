@@ -24,7 +24,7 @@ export function DeleteSetButton({ setId, action, attemptCount }: Props) {
     );
 
   return (
-    <form action={action} className="inline-flex items-center gap-2">
+    <form data-delete-set action={action} className="inline-flex items-center gap-2">
       <input type="hidden" name="setId" value={setId} />
       <span className="text-sm text-destructive">
         {attemptCount

@@ -1,4 +1,5 @@
 import { canTake } from "@/domain/examSet/access";
+import { sectionTitlesOf } from "@/domain/examSet/fullExam";
 import type { ExamSetRepository } from "@/domain/examSet/examSetRepository";
 import { rolesOf, type Actor } from "@/application/shared/actor";
 import type { AvailableExam } from "./examResult";
@@ -16,6 +17,8 @@ export class ListAvailableExams {
         title: s.title,
         questionCount: s.questionCount,
         access: s.access,
+        totalSeconds: s.timing.totalSeconds,
+        sections: sectionTitlesOf(s.paper),
       }));
   }
 }

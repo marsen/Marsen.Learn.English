@@ -7,7 +7,7 @@ import { Button } from "@/presentation/components/ui/Button";
 import { examSetLabel } from "@/presentation/lib/examSetLabels";
 import { clock } from "@/presentation/lib/reviewTime";
 import { aiSeverity, chipSummary, type Severity } from "@/presentation/lib/reviewNotes";
-import { TimeButton, TimeText } from "./TimeText";
+import { TimeButton, TimeText, type Seek } from "./TimeText";
 
 /** 老師的意見（畫面上的草稿；key 只給 React 用） */
 export type DraftNote = { key: string; target: string | null; text: string };
@@ -15,7 +15,8 @@ export type DraftNote = { key: string; target: string | null; text: string };
 /** 老師對 AI 意見的處理；沒有就是保留 */
 export type DraftAiAction = { action: "edited" | "deleted"; text: string };
 
-/** 正在編輯什麼：老師的意見、新增意見、改寫 AI 意見、刪除 AI 意見（填原因） */
+/** 正在編輯什麼：老師的意見、新增意見、改寫 AI 意見、把 AI 意見標為已處理（填說明）。
+ * 「已處理」存的值沿用 "deleted"（不搬資料），畫面上不叫刪除，AI 原文照樣顯示。 */
 export type Editing =
   | { kind: "note"; key: string }
   | { kind: "new"; target: string }
@@ -32,6 +33,8 @@ type Props = {
   active: boolean;
   /** 判定：true＝OK，false＝有問題，undefined＝還沒判 */
   verdict: boolean | undefined;
+  /** 判 OK 但還沒判完的原因 */
+  unfinished?: Unfinished;
   onVerdict: (ok: boolean) => void;
   editing: Editing | null;
   /** 打開的意見框有沒存的字，老師又想做別的事：在框下面提醒 */
@@ -50,7 +53,9 @@ type Props = {
   onCollapse: () => void;
   currentTime: () => number;
   turnStarts: ReadonlyMap<string, number>;
-  onSeek: (seconds: number) => void;
+  onSeek: Seek;
+  /** 一段一段審（完整考卷）：判 OK 時，沒處理的 AI 意見要標「還沒處理」並提醒；預設 OK 要再按一次確認 */
+  flow?: { openAi: number; needsConfirm: boolean };
 };
 
 /** 嚴重程度的顏色：提醒灰、注意橘、嚴重紅（小標籤的圓點、意見左邊的色條） */
@@ -59,25 +64,70 @@ const DOT: Record<Severity, string> = {
   warn: "bg-primary",
   block: "bg-destructive",
 };
-/** 判定的記號：✓ OK、✗ 有問題、○ 還沒判 */
-export function VerdictMark({ verdict }: { verdict: boolean | undefined }) {
+/** 判 OK 但還沒判完的原因：AI 意見沒處理、預設 OK 沒確認 */
+export type Unfinished = "ai" | "confirm";
+
+/**
+ * 判定的記號：灰 ● 還沒判、綠 ✓ OK、紅 ✗ 有問題；
+ * 判 OK 但還沒判完：AI 意見沒處理標橘 ⚠、預設 OK 沒確認標灰 ✓（確認後變綠）
+ */
+export function VerdictMark({
+  verdict,
+  unfinished,
+}: {
+  verdict: boolean | undefined;
+  unfinished?: Unfinished;
+}) {
   const t = useTranslations("review");
   const [mark, cls, label] =
-    verdict === true
-      ? ["✓", "text-accent", t("ok")]
-      : verdict === false
-        ? ["✗", "text-destructive", t("needsFixing")]
-        : ["○", "text-muted-foreground", t("notChecked")];
+    verdict === true && unfinished === "ai"
+      ? ["⚠\uFE0E", "text-primary-hover", t("okUnfinished")]
+      : verdict === true && unfinished === "confirm"
+        ? ["✓", "text-muted-foreground", t("flow.missingConfirm")]
+        : verdict === true
+          ? ["✓", "text-accent", t("ok")]
+          : verdict === false
+            ? ["✗", "text-destructive", t("needsFixing")]
+            : ["●", "text-muted-foreground", t("notChecked")];
   return (
     <span
       role="img"
       aria-label={label}
       title={label}
-      className={`text-xs font-bold ${cls}`}
+      className={`text-sm font-bold ${cls}`}
     >
       {mark}
     </span>
   );
+}
+
+/**
+ * 考卷上的判定記號。預設 OK 沒確認（灰 ✓）時是按鈕：老師看著答案點一下就確認，變綠 ✓。
+ * 放在選題按鈕外面（按鈕不能包按鈕）。
+ */
+export function PaperMark({
+  verdict,
+  unfinished,
+  onConfirm,
+}: {
+  verdict: boolean | undefined;
+  unfinished?: Unfinished;
+  onConfirm?: () => void;
+}) {
+  const t = useTranslations("review");
+  if (verdict === true && unfinished === "confirm" && onConfirm)
+    return (
+      <button
+        type="button"
+        onClick={onConfirm}
+        title={t("confirmOk")}
+        aria-label={t("confirmOk")}
+        className="rounded px-0.5 hover:bg-accent-soft"
+      >
+        <VerdictMark verdict={verdict} unfinished={unfinished} />
+      </button>
+    );
+  return <VerdictMark verdict={verdict} unfinished={unfinished} />;
 }
 
 const BAR: Record<Severity, string> = {
@@ -99,7 +149,12 @@ export function NoteCard(p: Props) {
   const q = p.question;
   const isNew = p.editing?.kind === "new" && p.editing.target === p.target;
   const time = (text: string) => (
-    <TimeText text={text} turnStarts={p.turnStarts} onSeek={p.onSeek} />
+    <TimeText
+      text={text}
+      turnStarts={p.turnStarts}
+      section={p.question?.ieltsSection ?? null}
+      onSeek={p.onSeek}
+    />
   );
   const name = q ? r("questionN", { n: q.number }) : r("wholeSet");
   const severityOf = (n: AiNote) => aiSeverity(n);
@@ -113,13 +168,26 @@ export function NoteCard(p: Props) {
     const parts = [
       sum.ai > 0 && r("chipAi", { count: sum.ai }),
       sum.teacher > 0 && r("chipTeacher", { count: sum.teacher }),
-      sum.deleted > 0 && r("chipDeleted", { count: sum.deleted }),
+      sum.deleted > 0 && r("chipHandled", { count: sum.deleted }),
     ].filter(Boolean);
     // 滑鼠移上去先瞄第一則
     const firstAi = p.aiNotes.find((n) => !isDeleted(n));
     const firstText = firstAi
       ? (p.aiActions.get(firstAi.ref)?.text ?? firstAi.message)
       : p.notes[0]?.text;
+    // 題目卡縮成「判定符號 Q3」；滑鼠移上去看第一則意見
+    if (q)
+      return (
+        <button
+          type="button"
+          onClick={p.onSelect}
+          title={firstText ? firstText.slice(0, 80) : name}
+          className="inline-flex items-center gap-1 rounded-full border border-border bg-surface px-2 py-0.5 text-xs whitespace-nowrap text-muted-foreground hover:border-primary"
+        >
+          <VerdictMark verdict={p.verdict} unfinished={p.unfinished} />
+          {r("questionShort", { n: q.number })}
+        </button>
+      );
     return (
       <button
         type="button"
@@ -127,7 +195,7 @@ export function NoteCard(p: Props) {
         title={firstText ? firstText.slice(0, 80) : undefined}
         className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-0.5 text-[0.8125rem] whitespace-nowrap text-muted-foreground hover:border-primary"
       >
-        <VerdictMark verdict={p.verdict} />
+        <VerdictMark verdict={p.verdict} unfinished={p.unfinished} />
         <b className="text-heading">{name}</b>
         {sum.worst && (
           <span className={`h-2 w-2 shrink-0 rounded-full ${DOT[sum.worst]}`} />
@@ -180,6 +248,16 @@ export function NoteCard(p: Props) {
         {p.verdict === undefined && (
           <span className="text-xs text-muted-foreground">{r("notChecked")}</span>
         )}
+        {p.flow?.needsConfirm && p.verdict === true && (
+          <span className="text-xs font-semibold text-primary-hover" data-needs-confirm>
+            {r("flow.confirmDefault")}
+          </span>
+        )}
+        {p.flow && p.verdict === true && p.flow.openAi > 0 && (
+          <span className="text-xs font-semibold text-destructive" data-open-ai>
+            {r("flow.openAiHint", { count: p.flow.openAi })}
+          </span>
+        )}
       </div>
       {q && (
         <>
@@ -188,6 +266,28 @@ export function NoteCard(p: Props) {
               {r("answerDetails")}
             </summary>
             <dl className="mt-1 grid grid-cols-[6.5rem_1fr] gap-x-2 gap-y-0.5">
+              {q.ieltsSection !== null && (
+                <>
+                  <dt className="text-muted-foreground">{r("full.section")}</dt>
+                  <dd>{r("full.sectionN", { n: q.ieltsSection })}</dd>
+                </>
+              )}
+              {q.options && (
+                <>
+                  <dt className="text-muted-foreground">{r("full.options")}</dt>
+                  <dd>
+                    {q.options.map((o) => (
+                      <div
+                        key={o.key}
+                        className={o.key === q.answer ? "font-semibold" : undefined}
+                      >
+                        {o.key}. {o.text}
+                        {o.key === q.answer && " ✓"}
+                      </div>
+                    ))}
+                  </dd>
+                </>
+              )}
               <dt className="text-muted-foreground">{r("accepted")}</dt>
               <dd>
                 {q.accepted.length > 0
@@ -214,7 +314,11 @@ export function NoteCard(p: Props) {
                   <dt className="text-muted-foreground">{r("evidence")}</dt>
                   <dd>
                     {q.evidence.start !== null && (
-                      <TimeButton seconds={q.evidence.start} onSeek={p.onSeek}>
+                      <TimeButton
+                        seconds={q.evidence.start}
+                        turn={q.evidence.turn}
+                        onSeek={p.onSeek}
+                      >
                         {q.evidence.turn} {clock(q.evidence.start)}
                       </TimeButton>
                     )}{" "}
@@ -248,7 +352,7 @@ export function NoteCard(p: Props) {
         return (
           <div
             key={n.ref}
-            className={`grid gap-1 rounded-lg border-l-3 px-3 py-2 ${BAR[severity]} ${deleted ? "bg-muted text-muted-foreground" : "bg-card"}`}
+            className={`grid gap-1 rounded-lg border-l-3 px-3 py-2 ${BAR[severity]} ${deleted ? "bg-muted" : "bg-card"}`}
           >
             <div className="flex flex-wrap items-center gap-x-2 text-xs text-muted-foreground">
               <span className="font-bold text-primary-hover">
@@ -258,12 +362,15 @@ export function NoteCard(p: Props) {
                 <span className="rounded bg-muted px-1.5">{r("editedTag")}</span>
               )}
               {deleted && (
-                <span className="rounded bg-surface px-1.5">{r("deletedTag")}</span>
+                <span className="rounded bg-surface px-1.5">{r("handledTag")}</span>
+              )}
+              {p.flow && p.verdict === true && !a && (
+                <span className="rounded bg-surface px-1.5 font-semibold text-destructive">
+                  {r("flow.notHandledTag")}
+                </span>
               )}
             </div>
-            <p className={deleted ? "line-through" : ""}>
-              {time(edited ? a.text : n.message)}
-            </p>
+            <p>{time(edited ? a.text : n.message)}</p>
             {n.suggestion && !edited && (
               <p className="text-xs text-muted-foreground">
                 {r("suggestion", { text: "" })}
@@ -287,7 +394,7 @@ export function NoteCard(p: Props) {
             )}
             {deleted && a.text && (
               <p className="border-t border-dashed border-border pt-1 text-xs">
-                {r("deleteReason", { text: a.text })}
+                {r("handledReason", { text: a.text })}
               </p>
             )}
             {p.editing?.kind === "aiDelete" && p.editing.ref === n.ref ? (
@@ -295,8 +402,7 @@ export function NoteCard(p: Props) {
                 warn={p.warnUnsaved}
                 initial=""
                 placeholder={r("deleteReasonPlaceholder")}
-                saveLabel={r("delete")}
-                danger
+                saveLabel={r("markHandled")}
                 allowEmpty
                 currentTime={p.currentTime}
                 onCancel={() => p.setEditing(null)}
@@ -331,11 +437,11 @@ export function NoteCard(p: Props) {
                       </Button>
                     )}
                     <Button
-                      variant="dangerSecondary"
+                      variant="secondary"
                       size="xs"
                       onClick={() => p.setEditing({ kind: "aiDelete", ref: n.ref })}
                     >
-                      {r("delete")}
+                      {r("markHandled")}
                     </Button>
                   </>
                 )}
@@ -422,7 +528,6 @@ function Editor({
   currentTime,
   withTime = false,
   saveLabel,
-  danger = false,
   allowEmpty = false,
   warn = false,
 }: {
@@ -433,7 +538,6 @@ function Editor({
   currentTime: () => number;
   withTime?: boolean;
   saveLabel?: string;
-  danger?: boolean;
   allowEmpty?: boolean;
   warn?: boolean;
 }) {
@@ -474,7 +578,7 @@ function Editor({
             {t("insertTime")}
           </Button>
         )}
-        <Button variant={danger ? "danger" : "primary"} size="xs" onClick={save}>
+        <Button variant="primary" size="xs" onClick={save}>
           {saveLabel ?? t("ok")}
         </Button>
         <Button variant="secondary" size="xs" onClick={onCancel}>
