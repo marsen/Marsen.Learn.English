@@ -4,6 +4,7 @@ import {
   clearDraft,
   clearOtherDrafts,
   draftKey,
+  findDraftForSet,
   loadDraft,
   questionIdsOf,
   saveDraft,
@@ -230,5 +231,29 @@ describe("examDraft", () => {
       { section: 1, left: 0 },
       { section: 2, left: 0 },
     ]);
+  });
+});
+
+describe("findDraftForSet", () => {
+  it("找到這份考卷沒交卷的暫存", () => {
+    const s = memory();
+    saveDraft(s, { attemptId: "a1", setId: "s1", answers: { q1: "x" } });
+    saveDraft(s, { attemptId: "a2", setId: "s2", answers: {} });
+    expect(findDraftForSet(s, "s1")?.attemptId).toBe("a1");
+  });
+
+  it("同一份考卷有好幾份時取最新的", () => {
+    const s = memory();
+    saveDraft(s, { attemptId: "old", setId: "s1", answers: {} }, new Date("2026-01-01"));
+    saveDraft(s, { attemptId: "new", setId: "s1", answers: {} }, new Date("2026-01-02"));
+    expect(findDraftForSet(s, "s1")?.attemptId).toBe("new");
+  });
+
+  it("沒有、壞掉、別的鍵都回 null", () => {
+    const s = memory();
+    s.setItem(draftKey("bad"), "{");
+    s.setItem("other", JSON.stringify({ setId: "s1" }));
+    expect(findDraftForSet(s, "s1")).toBeNull();
+    expect(findDraftForSet(null, "s1")).toBeNull();
   });
 });

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Page, PageHeader } from "@/presentation/components/ui/Page";
+import { Alert } from "@/presentation/components/ui/Alert";
 import { Msg } from "@/presentation/components/Msg";
 import { DocumentTitle } from "@/presentation/components/DocumentTitle";
 import { ExamResult } from "@/presentation/components/exam/ExamResult";
@@ -17,10 +18,14 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function ResultPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ attemptId: string }>;
+  searchParams: Promise<{ left?: string }>;
 }) {
   const { attemptId } = await params;
+  // 考試中離開、回來時用暫存答案交的卷（#285 AC-3）
+  const leftExam = (await searchParams).left === "1";
   const actor = await getCurrentAccount();
   const guestId = actor ? null : await readGuestId();
   const result = await getAttemptResult().execute({ actor, guestId, attemptId });
@@ -29,6 +34,11 @@ export default async function ResultPage({
     <Page>
       <DocumentTitle id="result.title" />
       <PageHeader title={<Msg id="result.title" />} />
+      {result && leftExam && (
+        <Alert className="mb-6">
+          <Msg id="result.leftExam" />
+        </Alert>
+      )}
       {!result && (
         <p>
           <Msg id="result.notFound" />

@@ -516,6 +516,7 @@
     "volumeTest": "先試音量",
     "volumeTestHint": "這是一段範例錄音，不是考試：可以隨意播放、暫停，不會開始計時。調好音量再按「開始考試」。",
     "start": "開始考試",
+    "resuming": "上次考試沒交卷，正在用存下的答案交卷…",
     "submitted": "已交卷，正在打開批改結果…",
     "statusStart": "錄音開始。",
     "statusSection": "Section {n}・",
@@ -579,6 +580,7 @@
     "view": "看結果"
   },
   "result": {
+    "leftExam": "你在考試中離開了頁面，已用離開前的答案交卷。",
     "title": "批改結果",
     "notFound": "找不到這次作答的結果。",
     "signupTitle": "想看正解？免費註冊就能看",

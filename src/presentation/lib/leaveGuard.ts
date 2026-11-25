@@ -15,7 +15,7 @@ export type LeaveGuardOptions = {
  */
 export function installLeaveGuard(
   message: () => string,
-  /** 考試中按登出、又按「確定離開」時呼叫（清掉這次的暫存答案；其他離開方式不清，留給之後的 AC-3） */
+  /** 考試中按登出、又按「確定離開」時呼叫（清掉這次的暫存答案；其他離開方式不清，回到考試頁時拿去交卷（AC-3）） */
   onLogoutConfirmed?: () => void,
   options: LeaveGuardOptions = {},
 ): () => void {

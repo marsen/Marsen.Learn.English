@@ -516,6 +516,7 @@
     "volumeTest": "Check your volume first",
     "volumeTestHint": "This is a sample recording, not the test. Play or pause it as much as you like; no timer starts. Set your volume, then press \"Start the test\".",
     "start": "START",
+    "resuming": "Your last test wasn't submitted. Submitting it with your saved answers…",
     "submitted": "Submitted. Opening your results…",
     "statusStart": "The recording is starting.",
     "statusSection": "Section {n} · ",
@@ -579,6 +580,7 @@
     "view": "See results"
   },
   "result": {
+    "leftExam": "You left the page during the test, so it was submitted with the answers you had saved.",
     "title": "Your results",
     "notFound": "We couldn't find the results for this attempt.",
     "signupTitle": "See the correct answers — free",
