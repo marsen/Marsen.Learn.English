@@ -37,6 +37,7 @@ import {
   type ReviewContent,
 } from "@/presentation/lib/reviewDraft";
 import { installLeaveGuard } from "@/presentation/lib/leaveGuard";
+import { isAudioUnreadable } from "@/presentation/lib/audioStatus";
 import {
   canComplete,
   isJudged,
@@ -356,6 +357,13 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
   const [now, setNow] = useState(0);
   // 錄音有沒有在播（步驟條只在播的時候標「正在播」）
   const [audioOn, setAudioOn] = useState(false);
+  // 錄音讀不到：明講，不讓播放器停在 0:00 沒有說明
+  const [audioMissing, setAudioMissing] = useState(false);
+  // 錄音回得快的話，頁面接手前就已經出錯，onError 收不到，所以接手後再看一次
+  useEffect(() => {
+    const el = audioRef.current;
+    if (el && isAudioUnreadable(el)) setAudioMissing(true);
+  }, []);
   const seek = (seconds: number, play = false) => {
     const el = audioRef.current;
     if (!el) return;
@@ -733,8 +741,15 @@ export function ReviewForm({ view, audioUrl, accountId, action }: Props) {
           onSeeked={(e) => setNow(e.currentTarget.currentTime)}
           onPlay={() => setAudioOn(true)}
           onPause={() => setAudioOn(false)}
+          onError={() => setAudioMissing(true)}
+          onLoadedMetadata={() => setAudioMissing(false)}
           className="w-full"
         />
+        {audioMissing && (
+          <Alert tone="error" className="mt-2">
+            {r("audioMissing")}
+          </Alert>
+        )}
         {!view.turns && (
           <p className="mt-1 text-xs text-muted-foreground">{r("noTranscript")}</p>
         )}

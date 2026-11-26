@@ -293,6 +293,7 @@
     "transcriptHint": "Click a time to jump there. The line being played is highlighted. Clicking a line number in a note scrolls to that line and outlines it.",
     "transcriptSection": "Section {n}",
     "noTranscript": "This set was packed before transcripts were included, so the ▶ buttons and the transcript aren't available.",
+    "audioMissing": "This set's recording can't be loaded. Ask an admin to upload it again.",
     "unsavedComment": "You have a comment you haven't saved. Press OK (or Cancel) on it first.",
     "close": "Close (Esc)",
     "showAiOriginal": "Show the AI's original",
