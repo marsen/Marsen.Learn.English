@@ -200,7 +200,12 @@ export function parseFullExam(raw: unknown): ParseFullExamResult {
         findings: sections.flatMap((s) => tag(aiOf(s).findings, s.ielts_section, false)),
       },
       warnings: sections.flatMap((s) => tag(provOf(s).warnings, s.ielts_section, true)),
-      sections: sections.map((s) => ({ ielts_section: s.ielts_section, ...provOf(s) })),
+      // 每段的製作紀錄原樣留著；旁白（answers.cast）也放這裡，審稿頁給管理員看用
+      sections: sections.map((s) => ({
+        ielts_section: s.ielts_section,
+        ...provOf(s),
+        ...(s.answers.cast !== undefined ? { cast: s.answers.cast } : {}),
+      })),
     },
   };
   // 轉好的內容再用 2.x 的外型檢查一次（逐字稿每句的欄位等）

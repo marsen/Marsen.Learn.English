@@ -358,6 +358,28 @@
       "submitNeeds": "Submit becomes available when all four sections are done and the whole set is checked.",
       "judgeSet": "Check the whole set",
       "awaitingDone": "Press done"
+    },
+    "voices": {
+      "title": "Narrator voices (admins only)",
+      "section": "Section {n}",
+      "narrator": "Speaker {role}",
+      "engine": "Engine",
+      "voice": "Voice",
+      "accent": "Accent",
+      "genderLabel": "Gender",
+      "ageLabel": "Age",
+      "colon": ": ",
+      "notRecorded": "Not recorded",
+      "gender": {
+        "m": "Male",
+        "f": "Female"
+      },
+      "age": {
+        "young": "Young",
+        "middle": "Middle-aged",
+        "old": "Older"
+      },
+      "reuploadHint": "Full tests uploaded before the site started keeping narrator data don't have it. Upload the test again (overwrite) to see it."
     }
   },
   "permissions": {
