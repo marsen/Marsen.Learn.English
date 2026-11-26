@@ -293,6 +293,7 @@
     "transcriptHint": "點時間跳過去聽，正在播的那句會亮起來。從意見點句子編號，會捲到那一句並框起來。",
     "transcriptSection": "Section {n}",
     "noTranscript": "這套題打包時還沒有逐字稿，所以沒有 ▶ 和逐字稿。",
+    "audioMissing": "這份的錄音讀不到，請聯絡管理員重新上傳。",
     "unsavedComment": "有一則意見還沒存，請先按「好」（或「取消」）。",
     "close": "收起（Esc）",
     "showAiOriginal": "看 AI 原文",
