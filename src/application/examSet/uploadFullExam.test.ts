@@ -6,6 +6,7 @@ import { blanksOf } from "@/domain/exam/paper";
 import { sectionRangesOf } from "@/domain/examSet/fullExam";
 import { parseAnswerKey } from "./answerKey";
 import { buildReviewView } from "./reviewView";
+import { narratorVoicesOf } from "./narratorVoices";
 import { InMemoryExamSetRepository } from "@/infrastructure/persistence/inMemoryExamSetRepository";
 import { InMemoryAudioStorage } from "@/infrastructure/storage/inMemoryAudioStorage";
 import { NodeSha256 } from "@/infrastructure/crypto/nodeSha256";
@@ -93,6 +94,27 @@ describe("上傳完整考卷（set.json 3.0）", () => {
       expect(n.ieltsSection).toBe(
         view.questions.find((q) => q.questionId === n.questionId)?.ieltsSection,
       );
+  });
+
+  it("審稿頁：每段的旁白（answers.cast）存進製作紀錄，四段照順序讀得到", async () => {
+    await upload(exam());
+    const voices = narratorVoicesOf(sets.privateOf("s1-tour-0002")!, true);
+    expect(voices.map((s) => s.ieltsSection)).toEqual([1, 2, 3, 4]);
+    expect(voices.map((s) => s.narrators.map((n) => n.role))).toEqual([
+      ["A", "B"],
+      ["A"],
+      ["A", "B"],
+      ["A"],
+    ]);
+    // Section 1 是舊資料，沒有 engine
+    expect(voices[0].narrators[0]).toMatchObject({ voice: "bm_daniel", engine: null });
+    expect(voices[2].narrators[1]).toMatchObject({
+      voice: "breeze-us-f-middle-1",
+      engine: "breeze",
+      accent: "en-US",
+      gender: "f",
+      age: "middle",
+    });
   });
 
   it("題組列表的摘要：完整考卷是 3.0（大版號由內容判斷）", async () => {

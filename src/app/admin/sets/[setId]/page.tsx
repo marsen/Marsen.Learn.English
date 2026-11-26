@@ -7,6 +7,7 @@ import { DocumentTitle } from "@/presentation/components/DocumentTitle";
 import { ReviewMeta } from "@/presentation/components/admin/ReviewMeta";
 import { ReviewForm } from "@/presentation/components/admin/ReviewForm";
 import { StatusTags } from "@/presentation/components/admin/StatusTags";
+import { NarratorVoices } from "@/presentation/components/admin/review/NarratorVoices";
 import { statusTagsOf } from "@/domain/examSet/statusTags";
 import { DeleteSetButton } from "@/presentation/components/dashboard/DeleteSetButton";
 import { requireAccount } from "@/infrastructure/auth/currentAccount";
@@ -33,7 +34,7 @@ export default async function ReviewPage({
     if (result.reason === "forbidden") redirect("/admin?denied=1");
     notFound();
   }
-  const { view } = result;
+  const { view, voices } = result;
   // 只有管理員拿得到（老師是 null），拿得到才顯示刪除
   const attemptCounts = await countSetAttempts().execute({
     actor: account,
@@ -65,6 +66,10 @@ export default async function ReviewPage({
               reviewedAt={view.review?.reviewedAt ?? null}
               fullExam={view.fullPaper !== null}
             />
+            {/* 錄音旁白：只有管理員拿得到（老師是 null） */}
+            {voices && (
+              <NarratorVoices voices={voices} fullExam={view.fullPaper !== null} />
+            )}
           </>
         }
       />

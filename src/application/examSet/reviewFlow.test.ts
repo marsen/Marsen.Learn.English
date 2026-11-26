@@ -98,6 +98,23 @@ describe("GetExamSetForReview", () => {
     }
   });
 
+  it("錄音旁白只給管理員（兼老師）看，只有老師身分的拿到 null", async () => {
+    const adminTeacher = account("admin-teacher", ["admin", "teacher"]);
+    const asAdmin = await new GetExamSetForReview(sets).execute({
+      actor: adminTeacher,
+      setId: SET,
+    });
+    if (!asAdmin.ok) throw new Error(asAdmin.reason);
+    // 範例題組沒有 cast：一段、沒有旁白
+    expect(asAdmin.voices).toEqual([{ ieltsSection: null, narrators: [] }]);
+    const asTeacher = await new GetExamSetForReview(sets).execute({
+      actor: teacher,
+      setId: SET,
+    });
+    if (!asTeacher.ok) throw new Error(asTeacher.reason);
+    expect(asTeacher.voices).toBeNull();
+  });
+
   it("應該對不存在的題組回 not_found", async () => {
     const r = await new GetExamSetForReview(sets).execute({
       actor: teacher,

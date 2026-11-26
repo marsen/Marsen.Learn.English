@@ -358,6 +358,28 @@
       "submitNeeds": "四段都完成、整套也判了才能送出。",
       "judgeSet": "還要判整套",
       "awaitingDone": "待按完成"
+    },
+    "voices": {
+      "title": "錄音旁白（只有管理員看得到）",
+      "section": "Section {n}",
+      "narrator": "旁白 {role}",
+      "engine": "引擎",
+      "voice": "聲音",
+      "accent": "口音",
+      "genderLabel": "性別",
+      "ageLabel": "年齡",
+      "colon": "：",
+      "notRecorded": "未記錄",
+      "gender": {
+        "m": "男",
+        "f": "女"
+      },
+      "age": {
+        "young": "年輕",
+        "middle": "中年",
+        "old": "年長"
+      },
+      "reuploadHint": "完整考卷在網站開始記錄旁白之前上傳的，沒有這份資料；重新上傳（覆蓋）後才看得到。"
     }
   },
   "permissions": {
